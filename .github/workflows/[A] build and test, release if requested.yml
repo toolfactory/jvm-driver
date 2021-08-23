@@ -30,9 +30,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
-      - if: startsWith(matrix.os, 'ubuntu') == true
-        name: chmod compileExternalClasses.sh
-        run: chmod +x ./src/main/resources/compileExternalClasses.sh
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
         run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file pom.xml
