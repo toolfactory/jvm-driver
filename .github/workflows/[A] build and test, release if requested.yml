@@ -31,7 +31,7 @@ jobs:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
       - if: startsWith(matrix.os, 'ubuntu') == true || startsWith(matrix.os, 'macOS') == true
-        name: chmod compileExternalClasses.sh
+        name: Change the permissions of the build script of external classes
         run: chmod +x ./src/main/resources/compileExternalClasses.sh
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
