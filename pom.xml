@@ -474,7 +474,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>chmod +x ${project.basedir}/src/main/resources/compileExternalClasses.sh</executable>
+									<executable>ls -l +x ${project.basedir}/src/main/resources</executable>
 								</configuration>
 							</execution>
 						</executions>
