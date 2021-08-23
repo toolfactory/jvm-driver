@@ -477,20 +477,6 @@
 									<executable>chmod +x ${project.basedir}/src/main/resources/compileExternalClasses.sh</executable>
 								</configuration>
 							</execution>
-							<execution>
-								<phase>compile</phase>
-								<id>compile external classes</id>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>${project.basedir}/src/main/resources/compileExternalClasses.${org.codehaus.mojo.exec-maven-plugin.exec-extension}</executable>
-									<arguments>
-										<argument>${java.home}</argument>
-										<argument>${project.basedir}/src/main/resources</argument>
-									</arguments>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 				</plugins>
