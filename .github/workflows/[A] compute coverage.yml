@@ -3,11 +3,11 @@ name: Compute coverage
 on:
   push:
     branches:
-      - experimental
+      - main
     paths: 
-      - "src/main/**.java"
-      - "src/test/**.java"
-#      - ".github/workflows/**"
+      - "src/main/**"
+      - "src/test/**"
+      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
