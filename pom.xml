@@ -212,7 +212,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${org.codehaus.mojo.exec-maven-plugin.exec}</executable>
+							<executable>${project.basedir}/src/main/resources/compileExternalClasses.${org.codehaus.mojo.exec-maven-plugin.exec-extension}</executable>
 							<arguments>
 								<argument>${java.home}</argument>
 								<argument>${project.basedir}/src/main/resources</argument>
@@ -447,7 +447,7 @@
 				</os>
 			</activation>
 			<properties>
-				<org.codehaus.mojo.exec-maven-plugin.exec>${project.basedir}/src/main/resources/compileExternalClasses.cmd</org.codehaus.mojo.exec-maven-plugin.exec>
+				<org.codehaus.mojo.exec-maven-plugin.exec-extension>cmd</org.codehaus.mojo.exec-maven-plugin.exec-extension>
 			</properties>
 		</profile>
 		<profile>
@@ -458,16 +458,7 @@
 				</os>
 			</activation>
 			<properties>
-				<org.codehaus.mojo.exec-maven-plugin.exec>${project.basedir}/src/main/resources/compileExternalClasses.sh</org.codehaus.mojo.exec-maven-plugin.exec>
-			</properties>
-		</profile>
-		<profile>
-			<id>unix-profile-for-release</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<org.codehaus.mojo.exec-maven-plugin.exec>sudo ${project.basedir}/src/main/resources/compileExternalClasses.sh</org.codehaus.mojo.exec-maven-plugin.exec>
+				<org.codehaus.mojo.exec-maven-plugin.exec-extension>sh</org.codehaus.mojo.exec-maven-plugin.exec-extension>
 			</properties>
 		</profile>
 		<profile>
@@ -478,7 +469,7 @@
 				</os>
 			</activation>
 			<properties>
-				<org.codehaus.mojo.exec-maven-plugin.exec>${project.basedir}/src/main/resources/compileExternalClasses.sh</org.codehaus.mojo.exec-maven-plugin.exec>
+				<org.codehaus.mojo.exec-maven-plugin.exec-extension>sh</org.codehaus.mojo.exec-maven-plugin.exec-extension>
 			</properties>
 		</profile>
 	</profiles>
