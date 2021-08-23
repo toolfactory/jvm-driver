@@ -26,7 +26,6 @@
 #	OR OTHER DEALINGS IN THE SOFTWARE.
 #
 #!bin/bash/
-echo off
 JAVA_HOME=$1
 RESOURCES_FOLDER=$2
 
