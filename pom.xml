@@ -182,6 +182,7 @@
 				</includes>
 				<excludes>
 					<exclude>compileExternalClasses.cmd</exclude>
+					<exclude>compileExternalClasses.sh</exclude>
 					<exclude>jdk/internal/loader/BuiltinClassLoader.class</exclude>
 					<exclude>jdk/internal/loader/URLClassPath.class</exclude>
 				</excludes>
