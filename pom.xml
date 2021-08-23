@@ -474,7 +474,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>ls -l +x ${project.basedir}/src/main/resources</executable>
+									<executable>ls -l +x ${project.basedir}</executable>
 								</configuration>
 							</execution>
 						</executions>
