@@ -206,8 +206,8 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<id>compile external classes</id>
 						<phase>compile</phase>
+						<id>compile external classes</id>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -215,6 +215,7 @@
 							<executable>${project.basedir}/src/main/resources/compileExternalClasses.${org.codehaus.mojo.exec-maven-plugin.exec-extension}</executable>
 							<arguments>
 								<argument>${java.home}</argument>
+								<argument>${project.basedir}/src/main/resources</argument>
 							</arguments>
 						</configuration>
 					</execution>

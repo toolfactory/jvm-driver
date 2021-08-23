@@ -31,6 +31,7 @@ package org.burningwave.jvm.driver.java;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+@SuppressWarnings("unchecked")
 class BufferHandler {
 	
 	public static ByteBuffer shareContent(ByteBuffer byteBuffer) {
