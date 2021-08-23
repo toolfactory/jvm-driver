@@ -33,7 +33,7 @@
 
 	<groupId>org.burningwave</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>0.9.1-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Burningwave JVM driver</name>
