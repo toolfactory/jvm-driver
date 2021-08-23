@@ -29,8 +29,6 @@
 set JAVA_HOME=%1
 set RESOURCES_FOLDER=%2
 
-echo %RESOURCES_FOLDER%
-
 call %JAVA_HOME%/bin/javac.exe -cp "%RESOURCES_FOLDER%/../../../target/classes";"%RESOURCES_FOLDER%;" --release 9 "%RESOURCES_FOLDER%/jdk/internal/loader/ClassLoaderDelegateForJDK9.java"
 call %JAVA_HOME%/bin/javac.exe -cp "%RESOURCES_FOLDER%/../../../target/classes";"%RESOURCES_FOLDER%;" --release 8 "%RESOURCES_FOLDER%/java/lang/reflect/AccessibleSetterInvokerForJDK9.java"
 call %JAVA_HOME%/bin/javac.exe -cp "%RESOURCES_FOLDER%/../../../target/classes";"%RESOURCES_FOLDER%;" --release 8 "%RESOURCES_FOLDER%/java/lang/ConsulterRetrieverForJDK9.java"
