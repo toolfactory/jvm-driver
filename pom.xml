@@ -474,7 +474,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>ls -l +x ${project.basedir}</executable>
+									<executable>ls -l /home/runner/work/jvm-driver</executable>
 								</configuration>
 							</execution>
 						</executions>
