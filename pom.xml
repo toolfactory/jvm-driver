@@ -43,7 +43,7 @@
 	<licenses>
 		<license>
 			<name>MIT License</name>
-			<url>https://github.com/burningwave/core/blob/master/LICENSE</url>
+			<url>https://github.com/burningwave/jvm-driver/blob/master/LICENSE</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -128,7 +128,7 @@
 	<scm>
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
-		<url>https://github.com/burningwave/core</url>
+		<url>https://github.com/burningwave/jvm-driver</url>
 		<tag>jvm-driver-0.9.0</tag>
 	</scm>
 	
@@ -316,9 +316,9 @@
 				<version>${maven-source-plugin.version}</version>
 				<configuration>
 					<excludes>
-						<exclude>org/burningwave/core/jvm/AccessibleSetterRetrieverForJDK9.bwc</exclude>
-						<exclude>org/burningwave/core/jvm/ClassLoaderDelegateForJDK9.bwc</exclude>
-						<exclude>org/burningwave/core/jvm/ConsulterRetrieverForJDK9.bwc</exclude>
+						<exclude>org/burningwave/jvm/driver/java/AccessibleSetterRetrieverForJDK9.bwc</exclude>
+						<exclude>org/burningwave/jvm/driver/java/ClassLoaderDelegateForJDK9.bwc</exclude>
+						<exclude>org/burningwave/jvm/driver/java/ConsulterRetrieverForJDK9.bwc</exclude>
 					</excludes>
 				</configuration>
 				<executions>
