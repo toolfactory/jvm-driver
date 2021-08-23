@@ -3,7 +3,7 @@
  *
  * Author: Roberto Gentili
  *
- * Hosted at: https://github.com/burningwave/core
+ * Hosted at: https://github.com/burningwave/jvm-driver
  *
  * --
  *
