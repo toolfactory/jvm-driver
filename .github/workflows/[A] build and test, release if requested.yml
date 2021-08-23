@@ -13,13 +13,13 @@ on:
 
 jobs:
     
-  build-and-test-on-windows-with-Java-8-and-later:
+  build-and-test-with-Java-8-and-later:
     name: Build -> Test (JVM ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
       fail-fast: false
       max-parallel: 16
       matrix:
-        os: [windows-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
         architecture: [x64]
     runs-on: ${{ matrix.os }}
@@ -30,6 +30,9 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
+      - if: startsWith(matrix.os, 'ubuntu') == true 
+        name: chmod compileExternalClasses.sh
+        run: chmod +x ./src/main/resources/compileExternalClasses.sh
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
         run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file pom.xml
@@ -39,76 +42,10 @@ jobs:
       - if: endsWith(matrix.java, '18-ea') == true 
         name: Build and test with early access version JDK
         run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file pom.xml
-  
-  build-and-test-on-linux-with-Java-8-and-later:
-    name: Build -> Test (JVM ${{ matrix.java }}, ${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      max-parallel: 16
-      matrix:
-        os: [ubuntu-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
-        architecture: [x64]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-          architecture: ${{ matrix.architecture }}
-      - if: endsWith(matrix.java, '-ea') != true 
-        name: Build and test with final version JDK
-        run: |
-           chmod +x ./src/main/resources/compileExternalClasses.sh
-           mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file pom.xml
-      - if: endsWith(matrix.java, '17-ea') == true 
-        name: Build and test with early access version JDK
-        run: |
-           chmod +x ./src/main/resources/compileExternalClasses.sh
-           mvn -B clean test -Dproject_jdk_version=17 -DskipTests=false --file pom.xml
-      - if: endsWith(matrix.java, '18-ea') == true 
-        name: Build and test with early access version JDK
-        run: |
-           chmod +x ./src/main/resources/compileExternalClasses.sh
-           mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file pom.xml
-  
-  build-and-test-on-mac-os-with-Java-8-and-later:
-    name: Build -> Test (JVM ${{ matrix.java }}, ${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      max-parallel: 16
-      matrix:
-        os: [macOS-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
-        architecture: [x64]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-          architecture: ${{ matrix.architecture }}
-      - if: endsWith(matrix.java, '-ea') != true 
-        name: Build and test with final version JDK
-        run: |
-           chmod +x ./src/main/resources/compileExternalClasses.sh
-           mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file pom.xml
-      - if: endsWith(matrix.java, '17-ea') == true 
-        name: Build and test with early access version JDK
-        run: |
-           chmod +x ./src/main/resources/compileExternalClasses.sh
-           mvn -B clean test -Dproject_jdk_version=17 -DskipTests=false --file pom.xml
-      - if: endsWith(matrix.java, '18-ea') == true 
-        name: Build and test with early access version JDK
-        run: |
-           chmod +x ./src/main/resources/compileExternalClasses.sh
-           mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file pom.xml
        
   release:
     name: Release if requested
-    needs: [build-and-test-on-windows-with-Java-8-and-later, build-and-test-on-linux-with-Java-8-and-later, build-and-test-on-mac-os-with-Java-8-and-later]
+    needs: [build-and-test-with-Java-8-and-later]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
     steps:
