@@ -31,7 +31,7 @@ package org.burningwave.jvm.driver.java;
 import java.util.Objects;
 
 @FunctionalInterface
-public interface ThrowingBiFunction<P0, P1, R, E extends Throwable> {
+interface ThrowingBiFunction<P0, P1, R, E extends Throwable> {
 
     R apply(P0 p0, P1 p1) throws E;
 

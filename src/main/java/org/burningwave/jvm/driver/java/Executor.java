@@ -29,7 +29,7 @@
 package org.burningwave.jvm.driver.java;
 
 
-public interface Executor {
+interface Executor {
 
     
     static <E extends Throwable> void run(ThrowingRunnable<E> runnable) {

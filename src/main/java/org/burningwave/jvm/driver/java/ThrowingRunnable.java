@@ -29,7 +29,7 @@
 package org.burningwave.jvm.driver.java;
 
 @FunctionalInterface
-public interface ThrowingRunnable<E extends Throwable> {
+interface ThrowingRunnable<E extends Throwable> {
 
     public abstract void run() throws E;
     
