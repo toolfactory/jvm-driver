@@ -26,7 +26,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.burningwave.jvm.driver.java;
+package org.burningwave.jvm;
 
 
 import java.io.Closeable;
@@ -46,9 +46,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.burningwave.jvm.Driver;
-import org.burningwave.jvm.JVMInfo;
 
 import sun.misc.Unsafe;
 

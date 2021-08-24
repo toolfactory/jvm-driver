@@ -33,6 +33,6 @@ $JAVA_HOME/bin/javac -cp "$RESOURCES_FOLDER/../../../target/classes":"$RESOURCES
 $JAVA_HOME/bin/javac -cp "$RESOURCES_FOLDER/../../../target/classes":"$RESOURCES_FOLDER:" --release 8 "$RESOURCES_FOLDER/java/lang/reflect/AccessibleSetterInvokerForJDK9.java"
 $JAVA_HOME/bin/javac -cp "$RESOURCES_FOLDER/../../../target/classes":"$RESOURCES_FOLDER:" --release 8 "$RESOURCES_FOLDER/java/lang/ConsulterRetrieverForJDK9.java"
 
-mv "$RESOURCES_FOLDER/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/driver/java/ClassLoaderDelegateForJDK9.bwc"
-mv "$RESOURCES_FOLDER/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/driver/java/AccessibleSetterInvokerForJDK9.bwc"
-mv "$RESOURCES_FOLDER/java/lang/ConsulterRetrieverForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/driver/java/ConsulterRetrieverForJDK9.bwc"
+mv "$RESOURCES_FOLDER/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/ClassLoaderDelegateForJDK9.bwc"
+mv "$RESOURCES_FOLDER/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/AccessibleSetterInvokerForJDK9.bwc"
+mv "$RESOURCES_FOLDER/java/lang/ConsulterRetrieverForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/ConsulterRetrieverForJDK9.bwc"

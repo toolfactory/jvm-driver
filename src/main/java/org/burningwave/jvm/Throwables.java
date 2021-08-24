@@ -26,43 +26,43 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.burningwave.jvm.driver.java;
+package org.burningwave.jvm;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 
 @SuppressWarnings("unchecked")
-class BufferHandler {
+class Throwables {
 	
-	public static ByteBuffer shareContent(ByteBuffer byteBuffer) {
-		ByteBuffer duplicated = duplicate(byteBuffer);
-		if (position(byteBuffer) > 0) {
-			flip(duplicated);
-		}		
-		return duplicated;
+	public static Throwables create() {
+		return new Throwables();
 	}
 	
-	public static <T extends Buffer> T flip(T buffer) {
-		return (T)((Buffer)buffer).flip();
+	public static <T> T throwException(Object obj, Object... arguments) {
+		Throwable exception = null;
+		StackTraceElement[] stackTraceOfException = null;
+		if (obj instanceof String) {
+			if (arguments == null || arguments.length == 0) {
+				exception = new RuntimeException((String)obj);
+			} else {
+				exception = new RuntimeException(Strings.compile((String)obj, arguments));
+			}
+			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
+			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);	
+		} else {
+			exception = (Throwable)obj;
+			StackTraceElement[] stackTrace = exception.getStackTrace();
+			stackTraceOfException = new StackTraceElement[stackTrace.length + 1];
+			stackTraceOfException[0] = Thread.currentThread().getStackTrace()[2];
+			System.arraycopy(stackTrace, 0, stackTraceOfException, 1, stackTrace.length);			
+		}
+		exception.setStackTrace(stackTraceOfException);				
+		throwException(exception);
+		return null;
 	}
 	
-	public static <T extends Buffer> int position(T buffer) {
-		return ((Buffer)buffer).position();
-	}
 	
-	public static ByteBuffer duplicate(ByteBuffer buffer) {
-		return buffer.duplicate();
-	}
-	
-	public static <T extends Buffer> int limit(T buffer) {
-		return ((Buffer)buffer).limit();
-	}
-	
-	public static byte[] toByteArray(ByteBuffer byteBuffer) {
-    	byteBuffer = shareContent(byteBuffer);
-    	byte[] result = new byte[limit(byteBuffer)];
-    	byteBuffer.get(result, 0, result.length);
-        return result;
+	private static <E extends Throwable> void throwException(Throwable exc) throws E {
+		throw (E)exc;
 	}
 	
 }

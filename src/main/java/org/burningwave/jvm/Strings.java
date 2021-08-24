@@ -26,19 +26,28 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.burningwave.jvm.driver.java;
+package org.burningwave.jvm;
 
-import java.io.InputStream;
-import java.util.Optional;
+import java.util.Objects;
 
-class Resources {
-
-	public static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
-		return Optional.ofNullable(
-			resourceClassLoader
-		).orElseGet(() -> ClassLoader.getSystemClassLoader()).getResourceAsStream(
-			resourceRelativePath
-		);
+class Strings {
+	
+	public static String compile(String message, Object... arguments) {
+		for (Object obj : arguments) {
+			message = message.replaceFirst("\\{\\}", Objects.isNull(obj) ? "null" : clear(obj.toString()));
+		}
+		return message;
 	}
+	
+	private static String clear(String text) {
+		return text
+		.replace("\\", "\\\\\\")
+		.replace("{", "\\{")
+		.replace("}", "\\}")
+		.replace("(", "\\(")
+		.replace(")", "\\)")
+		.replace(".", "\\.")
+		.replace("$", "\\$");
+	}	
 	
 }

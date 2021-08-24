@@ -26,30 +26,19 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.burningwave.jvm.driver.java;
+package org.burningwave.jvm;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Optional;
 
-class Streams {
-	
-	public static byte[] toByteArray(InputStream inputStream) {
-		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-			copy(inputStream, outputStream);
-			return outputStream.toByteArray();
-		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
-		}
-	}
-	
-	public static void copy(InputStream input, OutputStream output) throws IOException {
-		byte[] buffer = new byte[1024];
-		int bytesRead = 0;
-		while (-1 != (bytesRead = input.read(buffer))) {
-			output.write(buffer, 0, bytesRead);
-		}
+class Resources {
+
+	public static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
+		return Optional.ofNullable(
+			resourceClassLoader
+		).orElseGet(() -> ClassLoader.getSystemClassLoader()).getResourceAsStream(
+			resourceRelativePath
+		);
 	}
 	
 }
