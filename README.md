@@ -12,4 +12,47 @@
 [![Supported JVM](https://img.shields.io/badge/supported%20JVM-8%2C%209%2C%2010%2C%2011%2C%2012%2C%2013%2C%2014%2C%2015%2C%2016%2C%2017-blueviolet)](https://github.com/burningwave/jvm-driver/actions/runs/1161537104)
 
 
-A driver to allow deep interaction with the JVM
+A driver to allow deep interaction with the JVM. The methods exposed by the driver are the following:
+```java
+	public abstract void setFieldValue(Object target, Field field, Object value);
+
+	public abstract <T> T getFieldValue(Object target, Field field);
+
+	public abstract Method[] getDeclaredMethods(Class<?> cls);
+
+	public abstract <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
+
+	public abstract Field[] getDeclaredFields(Class<?> cls);
+
+	public abstract Field getDeclaredField(Class<?> cls, String name);
+
+	public abstract <T> T newInstance(Constructor<T> ctor, Object[] params);
+
+	public abstract Object invoke(Method method, Object target, Object[] params);
+
+	public abstract Lookup getConsulter(Class<?> cls);
+
+	public abstract Class<?> getClassLoaderDelegateClass();
+
+	public abstract Class<?> getBuiltinClassLoaderClass();
+
+	public abstract boolean isClassLoaderDelegate(ClassLoader classLoader);
+
+	public abstract boolean isBuiltinClassLoader(ClassLoader classLoader);
+
+	public abstract Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
+
+	public abstract Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
+
+	public abstract Package retrieveLoadedPackage(ClassLoader classLoader, Object packageToFind, String packageName);
+
+	public abstract Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
+
+	public abstract void setAccessible(AccessibleObject object, boolean flag);
+```
+
+To create a Driver instance you should use this code
+```java
+Driver driver = new DefaultDriver();
+```
+
