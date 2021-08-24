@@ -64,7 +64,7 @@ public class DefaultDriver implements Driver {
 	MethodHandle constructorInvoker;
 	BiConsumer<AccessibleObject, Boolean> accessibleSetter;
 	Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
-	TriFunction<ClassLoader, Object, String, Package> packageRetriever;
+	BiFunction<ClassLoader, Object, Function<String, Package>> packageRetriever;
 	BiFunction<Class<?>, byte[], Class<?>> defineHookClassFunction;
 	
 	Long loadedPackagesMapMemoryOffset;
@@ -109,7 +109,7 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public Package retrieveLoadedPackage(ClassLoader classLoader, Object packageToFind, String packageName) {
-		return packageRetriever.apply(classLoader, packageToFind, packageName);
+		return packageRetriever.apply(classLoader, packageToFind).apply(packageName);
 	}
 	
 	@Override
@@ -497,7 +497,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			protected void initSpecificElements() {
-				driver.packageRetriever = (classLoader, object, packageName) -> (Package)object;	
+				driver.packageRetriever = (classLoader, object) -> (packageName) -> (Package)object;	
 			}
 			
 		}
@@ -623,7 +623,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup classLoaderConsulter = driver.consulterRetriever.apply(ClassLoader.class);
 					MethodType methodType = MethodType.methodType(Package.class, String.class);
 					MethodHandle methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
-					driver.packageRetriever = (classLoader, object, packageName) -> {
+					driver.packageRetriever = (classLoader, object) -> (packageName) -> {
 						try {
 							return (Package)methodHandle.invokeExact(classLoader, packageName);
 						} catch (Throwable exc) {
