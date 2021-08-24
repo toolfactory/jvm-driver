@@ -32,6 +32,7 @@ import java.io.Closeable;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 class JavaClass implements Closeable {
 	private String classNameSlashed;
@@ -55,7 +56,7 @@ class JavaClass implements Closeable {
 		}
 	}
 	
-	public static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, ThrowingFunction<JavaClass, T, E> javaClassConsumer) throws E {
+	public static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
 		try(JavaClass javaClass = JavaClass.create(byteCode)) {
 			return javaClassConsumer.apply(javaClass);
 		}

@@ -44,6 +44,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.burningwave.jvm.Driver;
@@ -64,7 +65,7 @@ public class DefaultDriver implements Driver {
 	BiConsumer<AccessibleObject, Boolean> accessibleSetter;
 	Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
 	TriFunction<ClassLoader, Object, String, Package> packageRetriever;
-	ThrowingBiFunction<Class<?>, byte[], Class<?>, ? extends Throwable> defineHookClassFunction;
+	BiFunction<Class<?>, byte[], Class<?>> defineHookClassFunction;
 	
 	Long loadedPackagesMapMemoryOffset;
 	Long loadedClassesVectorMemoryOffset;	
@@ -99,7 +100,11 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
-		return Executor.get(() ->defineHookClassFunction.apply(clientClass, byteCode));
+		try {
+			return defineHookClassFunction.apply(clientClass, byteCode);
+		} catch (Throwable exc) {
+			return Throwables.throwException(exc);
+		}
 	}
 	
 	@Override
@@ -506,7 +511,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			protected void initDefineHookClassFunction() {
-				Executor.run(() -> {
+				try {
 					Unsafe unsafe = driver.unsafe;
 					MethodHandle defineHookClassMethodHandle = ((MethodHandles.Lookup)privateLookupInMethodHandle.invoke(unsafe.getClass(), mainConsulter)).findSpecial(
 						unsafe.getClass(),
@@ -514,17 +519,27 @@ public class DefaultDriver implements Driver {
 						MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
 						unsafe.getClass()
 					);
-					driver.defineHookClassFunction = (clientClass, byteCode) -> (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
-				});
+					driver.defineHookClassFunction = (clientClass, byteCode) -> {
+						try {
+							return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
+						} catch (Throwable exc) {
+							return Throwables.throwException(exc);
+						}
+					};
+				} catch (Throwable exc) {
+					Throwables.throwException(exc);
+				}
 			}
 			
 			protected void initPrivateLookupInMethodHandle() {
-				Executor.run(() -> { 
+				try {
 					privateLookupInMethodHandle = mainConsulter.findStatic(
 						MethodHandles.class, "privateLookupIn",
 						MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
 					);
-				});
+				} catch (Throwable exc) {
+					Throwables.throwException(exc);
+				}
 			}
 
 			protected void initMainConsulter() {
@@ -708,7 +723,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			protected void initDefineHookClassFunction() {
-				Executor.run(() -> {
+				try {
 					MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
 					MethodHandles.Lookup mainConsulter = this.mainConsulter;
 					MethodHandle defineClassMethodHandle = mainConsulter.findSpecial(
@@ -718,17 +733,26 @@ public class DefaultDriver implements Driver {
 						MethodHandles.Lookup.class
 					);
 					driver.defineHookClassFunction = (clientClass, byteCode) -> {
-						MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, mainConsulter);
 						try {
-							return (Class<?>) defineClassMethodHandle.invoke(lookup, byteCode);
-						} catch (LinkageError exc) {
-							return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass ->
-								Class.forName(javaClass.getName())
-							);
-						}
-						
+							MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, mainConsulter);
+							try {
+								return (Class<?>) defineClassMethodHandle.invoke(lookup, byteCode);
+							} catch (LinkageError exc) {
+								return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
+									try {
+										return Class.forName(javaClass.getName());
+									} catch (Throwable inExc) {
+										return Throwables.throwException(inExc);
+									}
+								});
+							}
+						} catch (Throwable exc) {
+							return Throwables.throwException(exc);
+						}						
 					};
-				});
+				} catch (Throwable exc) {
+					Throwables.throwException(exc);
+				}
 			}
 		}
 	
