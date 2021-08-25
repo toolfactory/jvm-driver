@@ -62,9 +62,9 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Function<Class<?>, MethodHandles.Lookup>  consulterSupplier) {
 		try {
-			MethodHandle defineHookClassMethodHandle = retrieveConsulter(consulter, privateLookupInMethodHandle).findSpecial(
+			MethodHandle defineHookClassMethodHandle = consulterSupplier.apply(unsafe.getClass()).findSpecial(
 				unsafe.getClass(),
 				"defineAnonymousClass",
 				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
@@ -81,11 +81,6 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			return Throwables.throwException(exc);
 		}
 		
-	}
-
-	Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle)
-			throws Throwable {
-		return (Lookup) privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
 	}
 	
 	@Override
@@ -273,12 +268,6 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		
 		public ForJava9(Driver driver) {
 			super(driver);
-		}
-
-		@Override
-		Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod)
-				throws Throwable {
-			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
 		
 		@Override

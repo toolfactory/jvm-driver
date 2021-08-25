@@ -30,9 +30,7 @@ package org.burningwave.jvm;
 
 
 import java.io.Closeable;
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
@@ -44,7 +42,7 @@ import java.util.function.Supplier;
 
 public interface NativeFunctionSupplier extends Closeable {
 
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Function<Class<?>, MethodHandles.Lookup>  consulterSupplier);
 	
 	public BiFunction<Object, Field, Object> getFieldValueFunction();
 

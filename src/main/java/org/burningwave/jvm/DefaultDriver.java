@@ -246,8 +246,8 @@ public class DefaultDriver implements Driver {
 			driver.allocateInstanceInvoker = nativeFunctionSupplier.getAllocateInstanceFunction();
 			driver.fieldValueRetriever = nativeFunctionSupplier.getFieldValueFunction();
 			driver.fieldValueSetter = nativeFunctionSupplier.getSetFieldValueFunction();
-			initDefineHookClassFunction();
 			initConsulterRetriever();
+			initDefineHookClassFunction();
 			initMembersRetrievers();
 			initAccessibleSetter();
 			initConstructorInvoker();
@@ -307,7 +307,7 @@ public class DefaultDriver implements Driver {
 		
 		protected static class ForJava8 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
-			MethodHandle privateLookupInMethodHandle;
+			MethodHandle consulterClassConstructor;
 			
 			
 			protected ForJava8(DefaultDriver driver) {
@@ -317,10 +317,8 @@ public class DefaultDriver implements Driver {
 					mainConsulter = MethodHandles.lookup();
 					modes.setAccessible(true);
 					modes.setInt(mainConsulter, -1);
-					privateLookupInMethodHandle = mainConsulter.findSpecial(
-						MethodHandles.Lookup.class, "in",
-						MethodType.methodType(MethodHandles.Lookup.class, Class.class),
-						MethodHandles.Lookup.class
+					consulterClassConstructor = mainConsulter.findConstructor(
+						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
@@ -329,9 +327,10 @@ public class DefaultDriver implements Driver {
 
 			protected void initConsulterRetriever() {
 				try {
+					MethodHandle consulterClassConstructor = this.consulterClassConstructor;
 					driver.consulterRetriever = (cls) -> {
 						try {
-							return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
+							return (Lookup) consulterClassConstructor.invoke(cls, -1);
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
 						}
@@ -344,7 +343,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
-					driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
+					driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(driver.consulterRetriever);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
@@ -399,15 +398,14 @@ public class DefaultDriver implements Driver {
 		
 		protected static class ForJava9 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
-			MethodHandle privateLookupInMethodHandle;
+			MethodHandle consulterClassConstructor;
 			
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
-				mainConsulter = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
 				try {
-					privateLookupInMethodHandle = mainConsulter.findStatic(
-						MethodHandles.class, "privateLookupIn",
-						MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
+					mainConsulter = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
+					consulterClassConstructor = mainConsulter.findConstructor(
+						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class)
 					);
 				} catch (Throwable exc) {
 					Throwables.throwException(exc);
@@ -420,19 +418,22 @@ public class DefaultDriver implements Driver {
 			}	
 			
 			protected void initDefineHookClassFunction() {
-				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
+				MethodHandle consulterClassConstructor = this.consulterClassConstructor;
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(cls -> {
+					try {
+						return (MethodHandles.Lookup)consulterClassConstructor.invoke(cls);
+					} catch (Throwable exc) {
+						return Throwables.throwException(exc);
+					}
+				});
 			}
 			
 			protected void initConsulterRetriever() {
 				try {
-					MethodHandles.Lookup mainConsulter = this.mainConsulter;
-					MethodHandle methodHandlesLookupConstructor = mainConsulter.findConstructor(
-						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class)
-					);
+					MethodHandle consulterClassConstructor = this.consulterClassConstructor;
 					driver.consulterRetriever = (cls) -> {
 						try {
-
-							return (MethodHandles.Lookup)methodHandlesLookupConstructor.invoke(cls);
+							return (MethodHandles.Lookup)consulterClassConstructor.invoke(cls);
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
 						}
@@ -525,7 +526,7 @@ public class DefaultDriver implements Driver {
 			public void close() {
 				super.close();
 				this.mainConsulter = null;
-				this.privateLookupInMethodHandle = null;
+				this.consulterClassConstructor = null;
 			}
 
 		}
@@ -539,8 +540,6 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
-					MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
-					MethodHandles.Lookup mainConsulter = this.mainConsulter;
 					MethodHandle defineClassMethodHandle = mainConsulter.findSpecial(
 						MethodHandles.Lookup.class,
 						"defineClass",
@@ -549,9 +548,8 @@ public class DefaultDriver implements Driver {
 					);
 					driver.hookClassDefiner = (clientClass, byteCode) -> {
 						try {
-							MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, mainConsulter);
 							try {
-								return (Class<?>) defineClassMethodHandle.invoke(lookup, byteCode);
+								return (Class<?>) defineClassMethodHandle.invoke(driver.getConsulter(clientClass), byteCode);
 							} catch (LinkageError exc) {
 								return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
 									try {
