@@ -9,7 +9,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2021 Roberto Gentili
+ * Copyright (c) 2019-2021 Roberto Gentili
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without
@@ -30,6 +30,7 @@ package org.burningwave.jvm;
 
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -39,13 +40,13 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import sun.misc.Unsafe;
 
@@ -53,19 +54,21 @@ import sun.misc.Unsafe;
 @SuppressWarnings("all")
 public class DefaultDriver implements Driver {
 	
-	Unsafe unsafe;
 	MethodHandle getDeclaredFieldsRetriever;
 	MethodHandle getDeclaredMethodsRetriever;
 	MethodHandle getDeclaredConstructorsRetriever;
 	MethodHandle methodInvoker;
 	MethodHandle constructorInvoker;
+	
+	Function<ClassLoader, Collection<Class<?>>> retrieveLoadedClassesFunction;
+	Function<ClassLoader, Map<String, ?>> retrieveLoadedPackagesFunction;
+	Function<Class<?>, Object> allocateInstanceFunction;
+	BiFunction<Object, Field, Object> getFieldValueFunction;
+	Function<Object, BiConsumer<Field, Object>> setFieldValueFunction;
 	BiConsumer<AccessibleObject, Boolean> accessibleSetter;
 	Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
 	BiFunction<ClassLoader, Object, Function<String, Package>> packageRetriever;
 	BiFunction<Class<?>, byte[], Class<?>> defineHookClassFunction;
-	
-	Long loadedPackagesMapMemoryOffset;
-	Long loadedClassesVectorMemoryOffset;	
 	
 	Class<?> classLoaderDelegateClass;
 	Class<?> builtinClassLoaderClass;
@@ -111,12 +114,12 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
-		return (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
+		return retrieveLoadedClassesFunction.apply(classLoader);
 	}
 	
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
-		return (Map<String, ?>)unsafe.getObject(classLoader, loadedPackagesMapMemoryOffset);
+		return retrieveLoadedPackagesFunction.apply(classLoader);
 	}
 	
 	@Override
@@ -201,132 +204,20 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
-		target = Modifier.isStatic(field.getModifiers())?
-			field.getDeclaringClass() :
-			target;
-		long fieldOffset = Modifier.isStatic(field.getModifiers())?
-			unsafe.staticFieldOffset(field) :
-			unsafe.objectFieldOffset(field);
-		Class<?> cls = field.getType();
-		if(!cls.isPrimitive()) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)unsafe.getObject(target, fieldOffset);
-			} else {
-				return (T)unsafe.getObjectVolatile(target, fieldOffset);
-			}
-		} else if (cls == int.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Integer.valueOf(unsafe.getInt(target, fieldOffset));
-			} else {
-				return (T)Integer.valueOf(unsafe.getIntVolatile(target, fieldOffset));
-			}
-		} else if (cls == long.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Long.valueOf(unsafe.getLong(target, fieldOffset));
-			} else {
-				return (T)Long.valueOf(unsafe.getLongVolatile(target, fieldOffset));
-			}
-		} else if (cls == float.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Float.valueOf(unsafe.getFloat(target, fieldOffset));
-			} else {
-				return (T)Float.valueOf(unsafe.getFloatVolatile(target, fieldOffset));
-			}
-		} else if (cls == double.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Double.valueOf(unsafe.getDouble(target, fieldOffset));
-			} else {
-				return (T)Double.valueOf(unsafe.getDoubleVolatile(target, fieldOffset));
-			}
-		} else if (cls == boolean.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Boolean.valueOf(unsafe.getBoolean(target, fieldOffset));
-			} else {
-				return (T)Boolean.valueOf(unsafe.getBooleanVolatile(target, fieldOffset));
-			}
-		} else if (cls == byte.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Byte.valueOf(unsafe.getByte(target, fieldOffset));
-			} else {
-				return (T)Byte.valueOf(unsafe.getByteVolatile(target, fieldOffset));
-			}
-		} else {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				return (T)Character.valueOf(unsafe.getChar(target, fieldOffset));
-			} else {
-				return (T)Character.valueOf(unsafe.getCharVolatile(target, fieldOffset));
-			}
-		}
+		return (T)getFieldValueFunction.apply(target, field);
 	}
 	
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
-		if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-			Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
-		}
-		target = Modifier.isStatic(field.getModifiers())?
-			field.getDeclaringClass() :
-			target;
-		long fieldOffset = Modifier.isStatic(field.getModifiers())?
-			unsafe.staticFieldOffset(field) :
-			unsafe.objectFieldOffset(field);
-		Class<?> cls = field.getType();
-		if(!cls.isPrimitive()) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putObject(target, fieldOffset, value);
-			} else {
-				unsafe.putObjectVolatile(target, fieldOffset, value);
-			}			
-		} else if (cls == int.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putInt(target, fieldOffset, ((Integer)value).intValue());
-			} else {
-				unsafe.putIntVolatile(target, fieldOffset, ((Integer)value).intValue());
-			}
-		} else if (cls == long.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putLong(target, fieldOffset, ((Long)value).longValue());
-			} else {
-				unsafe.putLongVolatile(target, fieldOffset, ((Long)value).longValue());
-			}
-		} else if (cls == float.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putFloat(target, fieldOffset, ((Float)value).floatValue());
-			} else {
-				unsafe.putFloatVolatile(target, fieldOffset, ((Float)value).floatValue());
-			}
-		} else if (cls == double.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putDouble(target, fieldOffset, ((Double)value).doubleValue());
-			} else {
-				unsafe.putDoubleVolatile(target, fieldOffset, ((Double)value).doubleValue());
-			}
-		} else if (cls == boolean.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putBoolean(target, fieldOffset, ((Boolean)value).booleanValue());
-			} else {
-				unsafe.putBooleanVolatile(target, fieldOffset, ((Boolean)value).booleanValue());
-			}
-		} else if (cls == byte.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putByte(target, fieldOffset, ((Byte)value).byteValue());
-			} else {
-				unsafe.putByteVolatile(target, fieldOffset, ((Byte)value).byteValue());
-			}
-		} else if (cls == char.class) {
-			if (!Modifier.isVolatile(field.getModifiers())) {
-				unsafe.putChar(target, fieldOffset, ((Character)value).charValue());
-			} else {
-				unsafe.putCharVolatile(target, fieldOffset, ((Character)value).charValue());
-			}
-		}
+		setFieldValueFunction.apply(target).accept(field, value);
+	}
+	
+	public <T> T allocateInstance(Class<?> cls) {
+		return (T)allocateInstanceFunction.apply(cls);
 	}
 	
 	@Override
 	public void close() {
-		loadedPackagesMapMemoryOffset = null;
-		loadedClassesVectorMemoryOffset = null;
-		unsafe = null;
 		getDeclaredFieldsRetriever = null;
 		getDeclaredMethodsRetriever = null;
 		getDeclaredConstructorsRetriever = null;
@@ -342,27 +233,29 @@ public class DefaultDriver implements Driver {
 	
 	protected abstract static class Initializer implements Closeable {
 		DefaultDriver driver;
+		NativeFunctionSupplier nativeFunctionSupplier;
 		
 		protected Initializer(DefaultDriver driver) {
 			this.driver = driver;
-			try {
-				Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-				theUnsafeField.setAccessible(true);
-				this.driver.unsafe = (Unsafe)theUnsafeField.get(null);
-			} catch (Throwable exc) {
-				Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
-			}
+			initNativeFunctionSupplier();
 		}
+		
+		void initNativeFunctionSupplier() {
+			this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
+		}		
 
 		protected Initializer start() {
+			driver.allocateInstanceFunction = nativeFunctionSupplier.getAllocateInstanceFunction();
+			driver.getFieldValueFunction = nativeFunctionSupplier.getFieldValueFunction();
+			driver.setFieldValueFunction = nativeFunctionSupplier.getSetFieldValueFunction();
 			initConsulterRetriever();
 			initMembersRetrievers();
 			initAccessibleSetter();
 			initConstructorInvoker();
 			initMethodInvoker();
 			initSpecificElements();			
-			initClassesVectorField();
-			initPackagesMapField();
+			driver.retrieveLoadedClassesFunction = nativeFunctionSupplier.getRetrieveLoadedClassesFunction();
+			driver.retrieveLoadedPackagesFunction = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
 			return this;
 		}
 
@@ -375,26 +268,6 @@ public class DefaultDriver implements Driver {
 		protected abstract void initConstructorInvoker();	
 		
 		protected abstract void initMethodInvoker();			
-
-		protected void initPackagesMapField() {
-			try {
-				this.driver.loadedPackagesMapMemoryOffset = driver.unsafe.objectFieldOffset(
-					this.driver.getDeclaredField(ClassLoader.class, "packages")
-				);
-			} catch (Throwable exc) {
-				Throwables.throwException(new InitializationException("Could not initialize field memory offset of loaded classes vector", exc));
-			}
-		}
-
-		protected void initClassesVectorField() {
-			try {
-				this.driver.loadedClassesVectorMemoryOffset = driver.unsafe.objectFieldOffset(
-					this.driver.getDeclaredField(ClassLoader.class, "classes")
-				);
-			} catch (Throwable exc) {
-				Throwables.throwException(new InitializationException("Could not initialize field memory offset of packages map", exc));
-			}
-		}
 		
 		protected void initMembersRetrievers() {
 			try {
@@ -426,7 +299,9 @@ public class DefaultDriver implements Driver {
 		
 		@Override
 		public void close() {
-			this.driver = null;
+			nativeFunctionSupplier.close();
+			nativeFunctionSupplier = null;
+			driver = null;
 		}
 		
 		protected static class ForJava8 extends Initializer {
@@ -505,27 +380,19 @@ public class DefaultDriver implements Driver {
 			
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
-			}
-			
-			protected void initDefineHookClassFunction() {
+				mainConsulter = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
 				try {
-					Unsafe unsafe = driver.unsafe;
-					MethodHandle defineHookClassMethodHandle = ((MethodHandles.Lookup)privateLookupInMethodHandle.invoke(unsafe.getClass(), mainConsulter)).findSpecial(
-						unsafe.getClass(),
-						"defineAnonymousClass",
-						MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-						unsafe.getClass()
+					privateLookupInMethodHandle = mainConsulter.findStatic(
+						MethodHandles.class, "privateLookupIn",
+						MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
 					);
-					driver.defineHookClassFunction = (clientClass, byteCode) -> {
-						try {
-							return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
-						} catch (Throwable exc) {
-							return Throwables.throwException(exc);
-						}
-					};
 				} catch (Throwable exc) {
 					Throwables.throwException(exc);
 				}
+			}
+			
+			protected void initDefineHookClassFunction() {
+				driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 			}
 			
 			protected void initPrivateLookupInMethodHandle() {
@@ -538,10 +405,6 @@ public class DefaultDriver implements Driver {
 					Throwables.throwException(exc);
 				}
 			}
-
-			protected void initMainConsulter() {
-				mainConsulter = MethodHandles.lookup();
-			}
 			
 			protected void initConsulterRetriever() {
 				try (
@@ -549,19 +412,12 @@ public class DefaultDriver implements Driver {
 						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
 					);
 				) {
-					Unsafe unsafe = driver.unsafe;
-					initMainConsulter();
-					initPrivateLookupInMethodHandle();
 					initDefineHookClassFunction();
 					Class<?> methodHandleWrapperClass = driver.defineHookClass(
 						Class.class, Streams.toByteArray(inputStream)
 					);
-					unsafe.putObject(methodHandleWrapperClass,
-						unsafe.staticFieldOffset(methodHandleWrapperClass.getDeclaredField("consulterRetriever")),
-						privateLookupInMethodHandle
-					);
-					driver.consulterRetriever =
-						(Function<Class<?>, MethodHandles.Lookup>)unsafe.allocateInstance(methodHandleWrapperClass);
+					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"), privateLookupInMethodHandle);
+					driver.consulterRetriever = driver.allocateInstance(methodHandleWrapperClass);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
@@ -574,16 +430,11 @@ public class DefaultDriver implements Driver {
 						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
 					);
 				) {	
-					Unsafe unsafe = driver.unsafe;
 					Class<?> methodHandleWrapperClass = driver.defineHookClass(
 						AccessibleObject.class, Streams.toByteArray(inputStream)
 					);
-					unsafe.putObject(methodHandleWrapperClass,
-						unsafe.staticFieldOffset(methodHandleWrapperClass.getDeclaredField("methodHandleRetriever")),
-						driver.getConsulter(methodHandleWrapperClass)
-					);					
-					driver.accessibleSetter =
-						(BiConsumer<AccessibleObject, Boolean>)unsafe.allocateInstance(methodHandleWrapperClass);
+					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"), driver.getConsulter(methodHandleWrapperClass));				
+					driver.accessibleSetter = driver.allocateInstance(methodHandleWrapperClass);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
@@ -713,10 +564,9 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initMainConsulter() {
-				super.initMainConsulter();
-				driver.unsafe.putInt(mainConsulter, 12L, -1);
-			}
+			void initNativeFunctionSupplier() {
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava17(this.driver);
+			}	
 			
 			@Override
 			protected void initDefineHookClassFunction() {

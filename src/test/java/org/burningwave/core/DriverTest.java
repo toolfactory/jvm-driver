@@ -3,6 +3,7 @@ package org.burningwave.core;
 import org.burningwave.jvm.DefaultDriver;
 import org.burningwave.jvm.Driver;
 import org.junit.jupiter.api.Test;
+import java.lang.invoke.MethodHandle;
 
 public class DriverTest{
 
@@ -11,8 +12,8 @@ public class DriverTest{
 	public void createAndCloseTest() {
 		try {
 			Driver driver = new DefaultDriver();
-			sun.misc.Unsafe unsafe =
-				driver.getFieldValue(driver, driver.getDeclaredField(driver.getClass(), "unsafe"));
+			MethodHandle methodHandle =
+				driver.getFieldValue(driver, driver.getDeclaredField(driver.getClass(), "constructorInvoker"));
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 		}

@@ -9,7 +9,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2021 Roberto Gentili
+ * Copyright (c) 2019-2021 Roberto Gentili
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without
@@ -37,7 +37,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2021 Roberto Gentili
+ * Copyright (c) 2019-2021 Roberto Gentili
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without
@@ -68,43 +68,45 @@ import java.util.Map;
 
 public interface Driver extends Closeable {
 
-	public abstract void setFieldValue(Object target, Field field, Object value);
+	public void setFieldValue(Object target, Field field, Object value);
 
-	public abstract <T> T getFieldValue(Object target, Field field);
+	public <T> T getFieldValue(Object target, Field field);
 
-	public abstract Method[] getDeclaredMethods(Class<?> cls);
+	public Method[] getDeclaredMethods(Class<?> cls);
 
-	public abstract <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
+	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
 
-	public abstract Field[] getDeclaredFields(Class<?> cls);
+	public Field[] getDeclaredFields(Class<?> cls);
 
-	public abstract Field getDeclaredField(Class<?> cls, String name);
+	public Field getDeclaredField(Class<?> cls, String name);
 
-	public abstract <T> T newInstance(Constructor<T> ctor, Object[] params);
+	public <T> T newInstance(Constructor<T> ctor, Object[] params);
 
-	public abstract Object invoke(Method method, Object target, Object[] params);
+	public Object invoke(Method method, Object target, Object[] params);
 
-	public abstract Lookup getConsulter(Class<?> cls);
+	public Lookup getConsulter(Class<?> cls);
 
-	public abstract Class<?> getClassLoaderDelegateClass();
+	public Class<?> getClassLoaderDelegateClass();
 
-	public abstract Class<?> getBuiltinClassLoaderClass();
+	public Class<?> getBuiltinClassLoaderClass();
 
-	public abstract boolean isClassLoaderDelegate(ClassLoader classLoader);
+	public boolean isClassLoaderDelegate(ClassLoader classLoader);
 
-	public abstract boolean isBuiltinClassLoader(ClassLoader classLoader);
+	public boolean isBuiltinClassLoader(ClassLoader classLoader);
 
-	public abstract Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
+	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
 
-	public abstract Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
+	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
 
-	public abstract Package retrieveLoadedPackage(ClassLoader classLoader, Object packageToFind, String packageName);
+	public Package retrieveLoadedPackage(ClassLoader classLoader, Object packageToFind, String packageName);
 
-	public abstract Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
+	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 
-	public abstract void setAccessible(AccessibleObject object, boolean flag);
+	public void setAccessible(AccessibleObject object, boolean flag);
 	
-	public abstract void close();
+	public <T> T allocateInstance(Class<?> cls);
+	
+	public void close();
 	
 	public static class InitializationException extends Exception {
 

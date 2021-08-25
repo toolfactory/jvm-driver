@@ -28,28 +28,36 @@
  */
 package org.burningwave.jvm;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-class Streams {
+import java.io.Closeable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+
+public interface NativeFunctionSupplier extends Closeable {
+
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle privateLookupInMethodHandle);
 	
-	public static byte[] toByteArray(InputStream inputStream) {
-		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-			copy(inputStream, outputStream);
-			return outputStream.toByteArray();
-		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
-		}
-	}
+	public BiFunction<Object, Field, Object> getFieldValueFunction();
+
+	public Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
+
+	public Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
+
+	public Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
+
+	public <T> T getAllocateInstanceFunction();
 	
-	public static void copy(InputStream input, OutputStream output) throws IOException {
-		byte[] buffer = new byte[1024];
-		int bytesRead = 0;
-		while (-1 != (bytesRead = input.read(buffer))) {
-			output.write(buffer, 0, bytesRead);
-		}
-	}
+	public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
 	
+	public void close();
+
 }
