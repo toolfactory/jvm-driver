@@ -283,7 +283,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		
 	}
 	
-	public static class ForJava17 extends UnsafeNativeFunctionSupplier {
+	public static class ForJava17 extends ForJava9 {
 
 		public ForJava17(Driver driver) {
 			super(driver);
