@@ -455,10 +455,10 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initConstructorInvoker() {
 				try {
-					Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
-					Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-					MethodHandles.Lookup consulter = driver.getConsulter(nativeAccessorImplClass);
-					driver.constructorInvoker = consulter.unreflect(method);
+					driver.constructorInvoker = mainConsulter.findStatic(
+						Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl"), 
+						"newInstance0", MethodType.methodType(Object.class, Constructor.class, Object[].class)						
+					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
 				}	
@@ -466,10 +466,10 @@ public class DefaultDriver implements Driver {
 			
 			protected void initMethodInvoker() {
 				try {
-					Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
-					Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-					MethodHandles.Lookup consulter = driver.getConsulter(nativeMethodAccessorImplClass);
-					driver.methodInvoker = consulter.unreflect(invoker);
+					driver.methodInvoker =  mainConsulter.findStatic(
+						Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl"), 
+						"invoke0", MethodType.methodType(Object.class, Method.class, Object.class, Object[].class)						
+					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize method invoker", exc));
 				}
@@ -480,8 +480,11 @@ public class DefaultDriver implements Driver {
 			protected void initSpecificElements() {
 				try {
 					MethodHandles.Lookup classLoaderConsulter = driver.consulterRetriever.apply(ClassLoader.class);
-					MethodType methodType = MethodType.methodType(Package.class, String.class);
-					MethodHandle methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
+					MethodHandle methodHandle = classLoaderConsulter.findSpecial(
+						ClassLoader.class, "getDefinedPackage",
+						MethodType.methodType(Package.class, String.class),
+						ClassLoader.class
+					);
 					driver.packageRetriever = (classLoader, object) -> (packageName) -> {
 						try {
 							return (Package)methodHandle.invokeExact(classLoader, packageName);
@@ -525,6 +528,11 @@ public class DefaultDriver implements Driver {
 			protected ForJava17(DefaultDriver driver) {
 				super(driver);
 			}
+			
+			@Override
+			void initNativeFunctionSupplier() {
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava17(this.driver);
+			}	
 			
 			@Override
 			protected void initDefineHookClassFunction() {
