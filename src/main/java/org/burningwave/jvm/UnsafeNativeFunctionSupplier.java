@@ -286,13 +286,9 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			sun.misc.Unsafe unsafe = this.unsafe;
 			return () -> {
 				MethodHandles.Lookup consulter = MethodHandles.lookup();
-				unsafe.putInt(consulter, getMethodHandlesLookupAllowModesFieldOffset(), -1);
+				unsafe.putInt(consulter, 12L, -1);
 				return consulter;
 			};
-		}
-
-		long getMethodHandlesLookupAllowModesFieldOffset() {
-			return 12L;
 		}
 		
 	}
