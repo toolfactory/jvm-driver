@@ -338,12 +338,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			protected void initDefineHookClassFunction() {
-				try {
-					driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(driver.consulterRetriever);
-				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
-				}
-								
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(driver.consulterRetriever);								
 			}
 			
 			protected void initAccessibleSetter() {
@@ -418,14 +413,7 @@ public class DefaultDriver implements Driver {
 			}	
 			
 			protected void initDefineHookClassFunction() {
-				MethodHandle consulterClassConstructor = this.consulterClassConstructor;
-				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(cls -> {
-					try {
-						return (MethodHandles.Lookup)consulterClassConstructor.invoke(cls);
-					} catch (Throwable exc) {
-						return Throwables.throwException(exc);
-					}
-				});
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(driver.consulterRetriever);
 			}
 			
 			protected void initConsulterRetriever() {
@@ -492,7 +480,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initSpecificElements() {
 				try {
-					MethodHandles.Lookup classLoaderConsulter = driver.consulterRetriever.apply(ClassLoader.class);
+					MethodHandles.Lookup classLoaderConsulter = driver.getConsulter(ClassLoader.class);
 					MethodHandle methodHandle = classLoaderConsulter.findSpecial(
 						ClassLoader.class, "getDefinedPackage",
 						MethodType.methodType(Package.class, String.class),
