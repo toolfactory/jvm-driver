@@ -46,7 +46,7 @@ import org.burningwave.jvm.Driver.InitializationException;
 import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
-public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
+abstract class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	
@@ -264,7 +264,28 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		this.driver = null;
 	}
 	
-	public static class ForJava9 extends UnsafeNativeFunctionSupplier {
+	static class ForJava8 extends UnsafeNativeFunctionSupplier {
+		
+		public ForJava8(Driver driver) {
+			super(driver);
+		}
+
+		@Override
+		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+			try {
+				Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+				modes.setAccessible(true);
+				MethodHandles.Lookup mainConsulter = MethodHandles.lookup();
+				modes.setInt(mainConsulter, -1);
+				return () -> mainConsulter;
+			} catch (Throwable exc) {
+				return Throwables.throwException(exc);
+			}
+		}
+		
+	}
+	
+	static class ForJava9 extends UnsafeNativeFunctionSupplier {
 		
 		public ForJava9(Driver driver) {
 			super(driver);

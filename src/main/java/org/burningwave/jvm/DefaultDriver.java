@@ -236,11 +236,7 @@ public class DefaultDriver implements Driver {
 		protected Initializer(DefaultDriver driver) {
 			this.driver = driver;
 			initNativeFunctionSupplier();
-		}
-		
-		void initNativeFunctionSupplier() {
-			this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
-		}		
+		}	
 
 		protected Initializer start() {
 			driver.allocateInstanceInvoker = nativeFunctionSupplier.getAllocateInstanceFunction();
@@ -257,7 +253,9 @@ public class DefaultDriver implements Driver {
 			driver.loadedPackagesRetriever = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
 			return this;
 		}
-
+		
+		protected abstract void initNativeFunctionSupplier();
+		
 		protected abstract void initDefineHookClassFunction();
 
 		protected abstract void initConsulterRetriever();
@@ -311,17 +309,17 @@ public class DefaultDriver implements Driver {
 			protected ForJava8(DefaultDriver driver) {
 				super(driver);
 				try {
-					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-					modes.setAccessible(true);
-					MethodHandles.Lookup mainConsulter = MethodHandles.lookup();
-					modes.setInt(mainConsulter, -1);
-					consulterClassConstructor = mainConsulter.findConstructor(
+					consulterClassConstructor = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get().findConstructor(
 						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
 			}
+			
+			protected void initNativeFunctionSupplier() {
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava8(this.driver);
+			}	
 
 			protected void initConsulterRetriever() {
 				try {
@@ -415,7 +413,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			void initNativeFunctionSupplier() {
+			protected void initNativeFunctionSupplier() {
 				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava9(this.driver);
 			}	
 			
