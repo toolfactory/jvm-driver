@@ -60,15 +60,15 @@ public class DefaultDriver implements Driver {
 	MethodHandle methodInvoker;
 	MethodHandle constructorInvoker;
 	
-	Function<ClassLoader, Collection<Class<?>>> retrieveLoadedClassesFunction;
+	Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
 	Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
-	Function<Class<?>, Object> allocateInstanceFunction;
-	BiFunction<Object, Field, Object> getFieldValueFunction;
-	Function<Object, BiConsumer<Field, Object>> setFieldValueFunction;
+	Function<Class<?>, Object> allocateInstanceInvoker;
+	BiFunction<Object, Field, Object> fieldValueRetriever;
+	Function<Object, BiConsumer<Field, Object>> fieldValueSetter;
 	BiConsumer<AccessibleObject, Boolean> accessibleSetter;
 	Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
 	BiFunction<ClassLoader, Object, Function<String, Package>> packageRetriever;
-	BiFunction<Class<?>, byte[], Class<?>> defineHookClassFunction;
+	BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
 	
 	Class<?> classLoaderDelegateClass;
 	Class<?> builtinClassLoaderClass;
@@ -101,7 +101,7 @@ public class DefaultDriver implements Driver {
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
 		try {
-			return defineHookClassFunction.apply(clientClass, byteCode);
+			return hookClassDefiner.apply(clientClass, byteCode);
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
 		}
@@ -114,7 +114,7 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
-		return retrieveLoadedClassesFunction.apply(classLoader);
+		return loadedClassesRetriever.apply(classLoader);
 	}
 	
 	@Override
@@ -204,16 +204,16 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
-		return (T)getFieldValueFunction.apply(target, field);
+		return (T)fieldValueRetriever.apply(target, field);
 	}
 	
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
-		setFieldValueFunction.apply(target).accept(field, value);
+		fieldValueSetter.apply(target).accept(field, value);
 	}
 	
 	public <T> T allocateInstance(Class<?> cls) {
-		return (T)allocateInstanceFunction.apply(cls);
+		return (T)allocateInstanceInvoker.apply(cls);
 	}
 	
 	@Override
@@ -228,7 +228,7 @@ public class DefaultDriver implements Driver {
 		consulterRetriever = null;
 		classLoaderDelegateClass = null;
 		builtinClassLoaderClass = null;
-		defineHookClassFunction = null;
+		hookClassDefiner = null;
 	}
 	
 	protected abstract static class Initializer implements Closeable {
@@ -245,9 +245,9 @@ public class DefaultDriver implements Driver {
 		}		
 
 		protected Initializer start() {
-			driver.allocateInstanceFunction = nativeFunctionSupplier.getAllocateInstanceFunction();
-			driver.getFieldValueFunction = nativeFunctionSupplier.getFieldValueFunction();
-			driver.setFieldValueFunction = nativeFunctionSupplier.getSetFieldValueFunction();
+			driver.allocateInstanceInvoker = nativeFunctionSupplier.getAllocateInstanceFunction();
+			driver.fieldValueRetriever = nativeFunctionSupplier.getFieldValueFunction();
+			driver.fieldValueSetter = nativeFunctionSupplier.getSetFieldValueFunction();
 			initDefineHookClassFunction();
 			initConsulterRetriever();
 			initMembersRetrievers();
@@ -255,7 +255,7 @@ public class DefaultDriver implements Driver {
 			initConstructorInvoker();
 			initMethodInvoker();
 			initSpecificElements();			
-			driver.retrieveLoadedClassesFunction = nativeFunctionSupplier.getRetrieveLoadedClassesFunction();
+			driver.loadedClassesRetriever = nativeFunctionSupplier.getRetrieveLoadedClassesFunction();
 			driver.loadedPackagesRetriever = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
 			return this;
 		}
@@ -346,7 +346,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
-					driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
+					driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
@@ -422,7 +422,7 @@ public class DefaultDriver implements Driver {
 			}	
 			
 			protected void initDefineHookClassFunction() {
-				driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 			}
 			
 			protected void initConsulterRetriever() {
@@ -597,7 +597,7 @@ public class DefaultDriver implements Driver {
 						MethodType.methodType(Class.class, byte[].class),
 						MethodHandles.Lookup.class
 					);
-					driver.defineHookClassFunction = (clientClass, byteCode) -> {
+					driver.hookClassDefiner = (clientClass, byteCode) -> {
 						try {
 							MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, mainConsulter);
 							try {
