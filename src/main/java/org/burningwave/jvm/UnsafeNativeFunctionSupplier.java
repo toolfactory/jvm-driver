@@ -281,14 +281,6 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
 		
-	}
-	
-	public static class ForJava17 extends ForJava9 {
-
-		public ForJava17(Driver driver) {
-			super(driver);
-		}
-		
 		@Override
 		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
