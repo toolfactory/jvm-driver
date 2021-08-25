@@ -30,9 +30,5 @@ set JAVA_HOME=%1
 set RESOURCES_FOLDER=%2
 
 call %JAVA_HOME%/bin/javac.exe -cp "%RESOURCES_FOLDER%/../../../target/classes";"%RESOURCES_FOLDER%;" --release 9 "%RESOURCES_FOLDER%/jdk/internal/loader/ClassLoaderDelegateForJDK9.java"
-call %JAVA_HOME%/bin/javac.exe -cp "%RESOURCES_FOLDER%/../../../target/classes";"%RESOURCES_FOLDER%;" --release 8 "%RESOURCES_FOLDER%/java/lang/reflect/AccessibleSetterInvokerForJDK9.java"
-call %JAVA_HOME%/bin/javac.exe -cp "%RESOURCES_FOLDER%/../../../target/classes";"%RESOURCES_FOLDER%;" --release 8 "%RESOURCES_FOLDER%/java/lang/ConsulterRetrieverForJDK9.java"
 
 move "%RESOURCES_FOLDER%/jdk/internal/loader\ClassLoaderDelegateForJDK9.class" "%RESOURCES_FOLDER%/../../../target/classes/org/burningwave/jvm/ClassLoaderDelegateForJDK9.bwc"
-move "%RESOURCES_FOLDER%/java/lang/reflect\AccessibleSetterInvokerForJDK9.class" "%RESOURCES_FOLDER%/../../../target/classes/org/burningwave/jvm/AccessibleSetterInvokerForJDK9.bwc"
-move "%RESOURCES_FOLDER%/java/lang\ConsulterRetrieverForJDK9.class" "%RESOURCES_FOLDER%/../../../target/classes/org/burningwave/jvm/ConsulterRetrieverForJDK9.bwc"
