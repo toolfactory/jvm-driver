@@ -44,7 +44,7 @@ import java.util.function.Supplier;
 
 public interface NativeFunctionSupplier extends Closeable {
 
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle privateLookupInMethodHandle);
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
 	
 	public BiFunction<Object, Field, Object> getFieldValueFunction();
 

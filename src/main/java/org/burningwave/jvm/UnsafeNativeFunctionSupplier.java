@@ -30,6 +30,7 @@ package org.burningwave.jvm;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -61,10 +62,9 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup mainConsulter, MethodHandle privateLookupInMethodHandle) {
-		sun.misc.Unsafe unsafe = this.unsafe;
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
 		try {
-			MethodHandle defineHookClassMethodHandle = ((MethodHandles.Lookup)privateLookupInMethodHandle.invoke(unsafe.getClass(), mainConsulter)).findSpecial(
+			MethodHandle defineHookClassMethodHandle = retrieveConsulter(consulter, privateLookupInMethodHandle).findSpecial(
 				unsafe.getClass(),
 				"defineAnonymousClass",
 				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
@@ -81,6 +81,11 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			return Throwables.throwException(exc);
 		}
 		
+	}
+
+	Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle)
+			throws Throwable {
+		return (Lookup) privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
 	}
 	
 	@Override
@@ -264,6 +269,19 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		this.driver = null;
 	}
 	
+	public static class ForJava9 extends UnsafeNativeFunctionSupplier {
+		
+		public ForJava9(Driver driver) {
+			super(driver);
+		}
+
+		@Override
+		Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod)
+				throws Throwable {
+			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
+		}
+		
+	}
 	
 	public static class ForJava17 extends UnsafeNativeFunctionSupplier {
 

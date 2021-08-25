@@ -61,7 +61,7 @@ public class DefaultDriver implements Driver {
 	MethodHandle constructorInvoker;
 	
 	Function<ClassLoader, Collection<Class<?>>> retrieveLoadedClassesFunction;
-	Function<ClassLoader, Map<String, ?>> retrieveLoadedPackagesFunction;
+	Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 	Function<Class<?>, Object> allocateInstanceFunction;
 	BiFunction<Object, Field, Object> getFieldValueFunction;
 	Function<Object, BiConsumer<Field, Object>> setFieldValueFunction;
@@ -119,7 +119,7 @@ public class DefaultDriver implements Driver {
 	
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
-		return retrieveLoadedPackagesFunction.apply(classLoader);
+		return loadedPackagesRetriever.apply(classLoader);
 	}
 	
 	@Override
@@ -248,6 +248,7 @@ public class DefaultDriver implements Driver {
 			driver.allocateInstanceFunction = nativeFunctionSupplier.getAllocateInstanceFunction();
 			driver.getFieldValueFunction = nativeFunctionSupplier.getFieldValueFunction();
 			driver.setFieldValueFunction = nativeFunctionSupplier.getSetFieldValueFunction();
+			initDefineHookClassFunction();
 			initConsulterRetriever();
 			initMembersRetrievers();
 			initAccessibleSetter();
@@ -255,9 +256,11 @@ public class DefaultDriver implements Driver {
 			initMethodInvoker();
 			initSpecificElements();			
 			driver.retrieveLoadedClassesFunction = nativeFunctionSupplier.getRetrieveLoadedClassesFunction();
-			driver.retrieveLoadedPackagesFunction = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
+			driver.loadedPackagesRetriever = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
 			return this;
 		}
+
+		protected abstract void initDefineHookClassFunction();
 
 		protected abstract void initConsulterRetriever();
 		
@@ -328,6 +331,25 @@ public class DefaultDriver implements Driver {
 				}
 			}
 			
+			@Override
+			protected void initDefineHookClassFunction() {
+				try {
+					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+					MethodHandles.Lookup consulter = MethodHandles.lookup();
+					modes.setAccessible(true);
+					modes.setInt(consulter, -1);
+					MethodHandle privateLookupInMethodHandle = consulter.findSpecial(
+						MethodHandles.Lookup.class, "in",
+						MethodType.methodType(MethodHandles.Lookup.class, Class.class),
+						MethodHandles.Lookup.class
+					);
+					driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(consulter, privateLookupInMethodHandle);
+				} catch (Throwable exc) {
+					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+				}
+								
+			}
+			
 			protected void initAccessibleSetter() {
 				try {
 					final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
@@ -375,8 +397,8 @@ public class DefaultDriver implements Driver {
 		}
 		
 		protected static class ForJava9 extends Initializer {
-			MethodHandle privateLookupInMethodHandle;
 			MethodHandles.Lookup mainConsulter;
+			MethodHandle privateLookupInMethodHandle;
 			
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
@@ -391,19 +413,13 @@ public class DefaultDriver implements Driver {
 				}
 			}
 			
+			@Override
+			void initNativeFunctionSupplier() {
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava9(this.driver);
+			}	
+			
 			protected void initDefineHookClassFunction() {
 				driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
-			}
-			
-			protected void initPrivateLookupInMethodHandle() {
-				try {
-					privateLookupInMethodHandle = mainConsulter.findStatic(
-						MethodHandles.class, "privateLookupIn",
-						MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
-					);
-				} catch (Throwable exc) {
-					Throwables.throwException(exc);
-				}
 			}
 			
 			protected void initConsulterRetriever() {
@@ -412,7 +428,6 @@ public class DefaultDriver implements Driver {
 						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
 					);
 				) {
-					initDefineHookClassFunction();
 					Class<?> methodHandleWrapperClass = driver.defineHookClass(
 						Class.class, Streams.toByteArray(inputStream)
 					);
