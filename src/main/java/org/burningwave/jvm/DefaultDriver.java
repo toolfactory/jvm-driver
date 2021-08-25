@@ -306,16 +306,14 @@ public class DefaultDriver implements Driver {
 		}
 		
 		protected static class ForJava8 extends Initializer {
-			MethodHandles.Lookup mainConsulter;
-			MethodHandle consulterClassConstructor;
-			
+			MethodHandle consulterClassConstructor;			
 			
 			protected ForJava8(DefaultDriver driver) {
 				super(driver);
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-					mainConsulter = MethodHandles.lookup();
 					modes.setAccessible(true);
+					MethodHandles.Lookup mainConsulter = MethodHandles.lookup();
 					modes.setInt(mainConsulter, -1);
 					consulterClassConstructor = mainConsulter.findConstructor(
 						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
@@ -394,17 +392,21 @@ public class DefaultDriver implements Driver {
 				driver.packageRetriever = (classLoader, object) -> (packageName) -> (Package)object;	
 			}
 			
+			@Override
+			public void close() {
+				super.close();
+				this.consulterClassConstructor = null;
+			}
+			
 		}
 		
 		protected static class ForJava9 extends Initializer {
-			MethodHandles.Lookup mainConsulter;
 			MethodHandle consulterClassConstructor;
 			
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
 				try {
-					mainConsulter = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
-					consulterClassConstructor = mainConsulter.findConstructor(
+					consulterClassConstructor = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get().findConstructor(
 						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class)
 					);
 				} catch (Throwable exc) {
@@ -446,7 +448,11 @@ public class DefaultDriver implements Driver {
 			
 			protected void initAccessibleSetter() {
 				try {
-					MethodHandle accessibleSetter = mainConsulter.findSpecial(AccessibleObject.class, "setAccessible0",  MethodType.methodType(boolean.class, boolean.class), AccessibleObject.class);
+					MethodHandle accessibleSetter = driver.getConsulter(AccessibleObject.class).findSpecial(
+						AccessibleObject.class, "setAccessible0",  
+						MethodType.methodType(boolean.class, boolean.class), 
+						AccessibleObject.class
+					);
 					driver.accessibleSetter = (accessibleObject, flag) -> {
 						try {
 							accessibleSetter.invoke(accessibleObject, flag);
@@ -463,9 +469,9 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initConstructorInvoker() {
 				try {
-					driver.constructorInvoker = mainConsulter.findStatic(
-						Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl"), 
-						"newInstance0", MethodType.methodType(Object.class, Constructor.class, Object[].class)						
+					Class<?> cls = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
+					driver.constructorInvoker = driver.getConsulter(cls).findStatic(
+						cls, "newInstance0", MethodType.methodType(Object.class, Constructor.class, Object[].class)						
 					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
@@ -474,8 +480,9 @@ public class DefaultDriver implements Driver {
 			
 			protected void initMethodInvoker() {
 				try {
-					driver.methodInvoker =  mainConsulter.findStatic(
-						Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl"), 
+					Class<?> cls = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
+					driver.methodInvoker =  driver.getConsulter(cls).findStatic(
+						cls, 
 						"invoke0", MethodType.methodType(Object.class, Method.class, Object.class, Object[].class)						
 					);
 				} catch (Throwable exc) {
@@ -525,7 +532,6 @@ public class DefaultDriver implements Driver {
 			@Override
 			public void close() {
 				super.close();
-				this.mainConsulter = null;
 				this.consulterClassConstructor = null;
 			}
 
@@ -540,7 +546,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
-					MethodHandle defineClassMethodHandle = mainConsulter.findSpecial(
+					MethodHandle defineClassMethodHandle = driver.getConsulter(MethodHandles.Lookup.class).findSpecial(
 						MethodHandles.Lookup.class,
 						"defineClass",
 						MethodType.methodType(Class.class, byte[].class),
