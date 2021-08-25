@@ -81,8 +81,10 @@ public class DefaultDriver implements Driver {
 		JVMInfo jVMInfo = JVMInfo.create();
 		return 
 			(jVMInfo.getVersion() > 8 ?
-				jVMInfo.getVersion() > 16 ?
-					new Initializer.ForJava17(this):
+				jVMInfo.getVersion() > 14 ?
+					jVMInfo.getVersion() > 16 ?
+						new Initializer.ForJava17(this):
+					new Initializer.ForJava15(this):
 				new Initializer.ForJava9(this):
 			new Initializer.ForJava8(this));
 	}
@@ -523,11 +525,24 @@ public class DefaultDriver implements Driver {
 
 		}
 		
-		protected static class ForJava17 extends ForJava9 {
+		protected static class ForJava15 extends ForJava9 {
+			
+			protected ForJava15(DefaultDriver driver) {
+				super(driver);
+			}
+
+			@Override
+			protected void initNativeFunctionSupplier() {
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava15(this.driver);
+			}
+			
+		}
+		
+		protected static class ForJava17 extends ForJava15 {
 			
 			protected ForJava17(DefaultDriver driver) {
 				super(driver);
-			}
+			}	
 			
 			@Override
 			protected void initDefineHookClassFunction() {

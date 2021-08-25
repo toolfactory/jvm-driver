@@ -296,9 +296,25 @@ abstract class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			sun.misc.Unsafe unsafe = this.unsafe;
 			return () -> {
 				MethodHandles.Lookup consulter = MethodHandles.lookup();
-				unsafe.putInt(consulter, 12L, -1);
+				setAllowModes(unsafe, consulter);
 				return consulter;
 			};
+		}
+
+		void setAllowModes(sun.misc.Unsafe unsafe, MethodHandles.Lookup consulter) {
+			unsafe.putInt(consulter, 16L, -1);
+		}
+		
+	}
+	
+	static class ForJava15 extends ForJava9 {
+		
+		public ForJava15(Driver driver) {
+			super(driver);
+		}
+		
+		void setAllowModes(sun.misc.Unsafe unsafe, MethodHandles.Lookup consulter) {
+			unsafe.putInt(consulter, 12L, -1);
 		}
 		
 	}
