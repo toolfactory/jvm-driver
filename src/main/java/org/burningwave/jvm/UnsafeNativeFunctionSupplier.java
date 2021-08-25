@@ -45,7 +45,7 @@ import org.burningwave.jvm.Driver.InitializationException;
 
 import sun.misc.Unsafe;
 
-@SuppressWarnings({"restriction", "null", "unchecked"})
+@SuppressWarnings({"all"})
 public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
