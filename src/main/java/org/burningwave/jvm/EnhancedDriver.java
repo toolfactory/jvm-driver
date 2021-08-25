@@ -527,11 +527,6 @@ public class EnhancedDriver implements Driver {
 			}
 			
 			@Override
-			void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new EnhanchedUnsafeNativeFunctionSupplier.ForJava17(this.driver);
-			}	
-			
-			@Override
 			protected void initDefineHookClassFunction() {
 				try {
 					MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
