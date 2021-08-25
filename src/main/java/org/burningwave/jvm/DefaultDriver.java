@@ -537,11 +537,6 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava17(this.driver);
-			}	
-			
-			@Override
 			protected void initDefineHookClassFunction() {
 				try {
 					MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;

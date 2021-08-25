@@ -296,18 +296,5 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		}
 		
 	}
-	
-	public static class ForJava17 extends ForJava9 {
-		
-		public ForJava17(Driver driver) {
-			super(driver);
-		}
-		
-
-		long getMethodHandlesLookupAllowModesFieldOffset() {
-			return 12L;
-		}
-		
-	}
 
 }
