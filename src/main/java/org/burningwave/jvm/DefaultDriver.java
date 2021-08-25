@@ -308,23 +308,35 @@ public class DefaultDriver implements Driver {
 		}
 		
 		protected static class ForJava8 extends Initializer {
-
+			MethodHandles.Lookup mainConsulter;
+			MethodHandle privateLookupInMethodHandle;
+			
+			
 			protected ForJava8(DefaultDriver driver) {
 				super(driver);
+				try {
+					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+					mainConsulter = MethodHandles.lookup();
+					modes.setAccessible(true);
+					modes.setInt(mainConsulter, -1);
+					privateLookupInMethodHandle = mainConsulter.findSpecial(
+						MethodHandles.Lookup.class, "in",
+						MethodType.methodType(MethodHandles.Lookup.class, Class.class),
+						MethodHandles.Lookup.class
+					);
+				} catch (Throwable exc) {
+					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+				}
 			}
 
 			protected void initConsulterRetriever() {
 				try {
-					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-					modes.setAccessible(true);
 					driver.consulterRetriever = (cls) -> {
-						MethodHandles.Lookup consulter = MethodHandles.lookup().in(cls);
 						try {
-							modes.setInt(consulter, -1);
+							return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
 						}
-						return consulter;
 					};
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
@@ -334,16 +346,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
-					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-					MethodHandles.Lookup consulter = MethodHandles.lookup();
-					modes.setAccessible(true);
-					modes.setInt(consulter, -1);
-					MethodHandle privateLookupInMethodHandle = consulter.findSpecial(
-						MethodHandles.Lookup.class, "in",
-						MethodType.methodType(MethodHandles.Lookup.class, Class.class),
-						MethodHandles.Lookup.class
-					);
-					driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(consulter, privateLookupInMethodHandle);
+					driver.defineHookClassFunction = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
