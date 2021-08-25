@@ -81,10 +81,12 @@ public class DefaultDriver implements Driver {
 		JVMInfo jVMInfo = JVMInfo.create();
 		return 
 			(jVMInfo.getVersion() > 8 ?
-				jVMInfo.getVersion() > 16 ?
-					new Initializer.ForJava17(this):
-				new Initializer.ForJava9(this):
-			new Initializer.ForJava8(this));
+				jVMInfo.getVersion() > 13 ?
+					jVMInfo.getVersion() > 16 ?
+						new Initializer.ForJava17(this):
+						new Initializer.ForJava14(this):
+					new Initializer.ForJava9(this):
+				new Initializer.ForJava8(this));
 	}
 	
 	@Override
@@ -424,28 +426,33 @@ public class DefaultDriver implements Driver {
 			}
 			
 			protected void initConsulterRetriever() {
-				MethodHandles.Lookup mainConsulter = this.mainConsulter;
-				MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
-				driver.consulterRetriever = (cls) -> {
-					try {
-						return (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(cls, mainConsulter);
-					} catch (Throwable exc) {
-						return Throwables.throwException(exc);
-					}
-				};
+				try (
+					InputStream inputStream =
+						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
+					);
+				) {
+					Class<?> methodHandleWrapperClass = driver.defineHookClass(
+						Class.class, Streams.toByteArray(inputStream)
+					);
+					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"), privateLookupInMethodHandle);
+					driver.consulterRetriever = driver.allocateInstance(methodHandleWrapperClass);
+				} catch (Throwable exc) {
+					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+				}
 				
 			}
 			
 			protected void initAccessibleSetter() {
-				try {
-					MethodHandle accessibleSetter = mainConsulter.findSpecial(AccessibleObject.class, "setAccessible0",  MethodType.methodType(boolean.class, boolean.class), AccessibleObject.class);
-					driver.accessibleSetter = (accessibleObject, flag) -> {
-						try {
-							accessibleSetter.invoke(accessibleObject, flag);
-						} catch (Throwable exc) {
-							Throwables.throwException(exc);
-						}
-					};
+				try (
+					InputStream inputStream =
+						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
+					);
+				) {	
+					Class<?> methodHandleWrapperClass = driver.defineHookClass(
+						AccessibleObject.class, Streams.toByteArray(inputStream)
+					);
+					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"), driver.getConsulter(methodHandleWrapperClass));				
+					driver.accessibleSetter = driver.allocateInstance(methodHandleWrapperClass);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
@@ -455,10 +462,10 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initConstructorInvoker() {
 				try {
-					driver.constructorInvoker = mainConsulter.findStatic(
-						Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl"), 
-						"newInstance0", MethodType.methodType(Object.class, Constructor.class, Object[].class)						
-					);
+					Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
+					Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+					MethodHandles.Lookup consulter = driver.getConsulter(nativeAccessorImplClass);
+					driver.constructorInvoker = consulter.unreflect(method);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
 				}	
@@ -466,10 +473,10 @@ public class DefaultDriver implements Driver {
 			
 			protected void initMethodInvoker() {
 				try {
-					driver.methodInvoker =  mainConsulter.findStatic(
-						Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl"), 
-						"invoke0", MethodType.methodType(Object.class, Method.class, Object.class, Object[].class)						
-					);
+					Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
+					Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
+					MethodHandles.Lookup consulter = driver.getConsulter(nativeMethodAccessorImplClass);
+					driver.methodInvoker = consulter.unreflect(invoker);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize method invoker", exc));
 				}
@@ -480,11 +487,8 @@ public class DefaultDriver implements Driver {
 			protected void initSpecificElements() {
 				try {
 					MethodHandles.Lookup classLoaderConsulter = driver.consulterRetriever.apply(ClassLoader.class);
-					MethodHandle methodHandle = classLoaderConsulter.findSpecial(
-						ClassLoader.class, "getDefinedPackage",
-						MethodType.methodType(Package.class, String.class),
-						ClassLoader.class
-					);
+					MethodType methodType = MethodType.methodType(Package.class, String.class);
+					MethodHandle methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
 					driver.packageRetriever = (classLoader, object) -> (packageName) -> {
 						try {
 							return (Package)methodHandle.invokeExact(classLoader, packageName);
@@ -511,8 +515,30 @@ public class DefaultDriver implements Driver {
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize class loader delegate class", exc));
 				}
+				try {
+					initDeepConsulterRetriever();
+				} catch (Throwable exc) {
+					Throwables.throwException(new InitializationException("Could not initialize deep consulter retriever", exc));
+				}
 			}
 
+			protected void initDeepConsulterRetriever() throws Throwable {
+				Field fullPowerModeConstant = MethodHandles.Lookup.class.getDeclaredField("FULL_POWER_MODES");
+				driver.setAccessible(fullPowerModeConstant, true);
+				int fullPowerModeConstantValue = fullPowerModeConstant.getInt(null);
+				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+				driver.setAccessible(lookupCtor, true);
+				MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, fullPowerModeConstantValue).findConstructor(
+					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
+				);
+				driver.consulterRetriever = cls -> {
+					try {
+						return (MethodHandles.Lookup)methodHandle.invoke(cls, fullPowerModeConstantValue);
+					} catch (Throwable exc) {
+						return Throwables.throwException(exc);
+					}
+				};
+			}
 			
 			@Override
 			public void close() {
@@ -523,7 +549,33 @@ public class DefaultDriver implements Driver {
 
 		}
 		
-		protected static class ForJava17 extends ForJava9 {
+		protected static class ForJava14 extends ForJava9 {
+			
+			protected ForJava14(DefaultDriver driver) {
+				super(driver);
+			}
+			
+			@Override
+			protected void initDeepConsulterRetriever() throws Throwable {
+				Field fullPowerModeConstant = MethodHandles.Lookup.class.getDeclaredField("FULL_POWER_MODES");
+				driver.setAccessible(fullPowerModeConstant, true);
+				int fullPowerModeConstantValue = fullPowerModeConstant.getInt(null);
+				Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
+				driver.setAccessible(lookupCtor, true);
+				MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, fullPowerModeConstantValue)).findConstructor(
+					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
+				);
+				driver.consulterRetriever = cls -> {
+					try {
+						return (MethodHandles.Lookup)mthHandle.invoke(cls, null, fullPowerModeConstantValue);
+					} catch (Throwable exc) {
+						return Throwables.throwException(exc);
+					}
+				};
+			}
+		}
+		
+		protected static class ForJava17 extends ForJava14 {
 			
 			protected ForJava17(DefaultDriver driver) {
 				super(driver);
