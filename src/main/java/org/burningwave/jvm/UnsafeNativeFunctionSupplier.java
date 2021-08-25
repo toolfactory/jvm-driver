@@ -292,7 +292,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		}
 
 		long getMethodHandlesLookupAllowModesFieldOffset() {
-			return 16L;
+			return 12L;
 		}
 		
 	}
