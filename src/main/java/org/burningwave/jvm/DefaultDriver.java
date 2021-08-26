@@ -534,7 +534,7 @@ public class DefaultDriver implements Driver {
 				nativeFunctionSupplier.getAllowedModesSetter().accept(consulter, -1);
 				driver.consulterRetriever = (cls) -> {
 					try {
-						return consulter;
+						return MethodHandles.privateLookupIn(cls, consulter);
 					} catch (Throwable exc) {
 						return Throwables.throwException(exc);
 					}
@@ -543,33 +543,54 @@ public class DefaultDriver implements Driver {
 
 			@Override
 			protected void initDefineHookClassFunction() {
-				try {
-					MethodHandle defineClassMethodHandle = driver.getConsulter(MethodHandles.Lookup.class).findSpecial(
-						MethodHandles.Lookup.class,
-						"defineClass",
-						MethodType.methodType(Class.class, byte[].class),
-						MethodHandles.Lookup.class
-					);
-					driver.hookClassDefiner = (clientClass, byteCode) -> {
-						try {
+				if (driver.hookClassDefiner == null) {
+					try {
+						MethodHandle defineClassMethodHandle = driver.getConsulter(MethodHandles.Lookup.class).findSpecial(
+							MethodHandles.Lookup.class,
+							"defineClass",
+							MethodType.methodType(Class.class, byte[].class),
+							MethodHandles.Lookup.class
+						);
+						driver.hookClassDefiner = (clientClass, byteCode) -> {
 							try {
-								return (Class<?>) defineClassMethodHandle.invoke(driver.getConsulter(clientClass), byteCode);
-							} catch (LinkageError exc) {
-								return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
-									try {
-										return Class.forName(javaClass.getName());
-									} catch (Throwable inExc) {
-										return Throwables.throwException(inExc);
-									}
-								});
+								try {
+									return (Class<?>) defineClassMethodHandle.invoke(driver.getConsulter(clientClass), byteCode);
+								} catch (LinkageError exc) {
+									return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
+										try {
+											return Class.forName(javaClass.getName());
+										} catch (Throwable inExc) {
+											return Throwables.throwException(inExc);
+										}
+									});
+								}
+							} catch (Throwable exc) {
+								return Throwables.throwException(exc);
 							}
+						};
+						try (InputStream inputStream = Resources.getAsInputStream(
+							this.getClass().getClassLoader(),
+							this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterConstructorSupplierForJDK9.bwc"
+						);){
+							Class<?> constructorClass = driver.defineHookClass(
+								java.lang.invoke.MethodHandles.class, Streams.toByteArray(inputStream)
+							);
+							MethodHandle consulterConstructor = ((Supplier<MethodHandle>)driver.allocateInstance(constructorClass)).get();
+							driver.consulterRetriever = (cls) -> {
+								try {
+									return (MethodHandles.Lookup)consulterConstructor.invoke(cls);
+								} catch (Throwable exc) {
+									return Throwables.throwException(exc);
+								}
+							};
 						} catch (Throwable exc) {
-							return Throwables.throwException(exc);
+							Throwables.throwException(exc);
 						}
-					};
-				} catch (Throwable exc) {
-					Throwables.throwException(exc);
+					} catch (Throwable exc) {
+						Throwables.throwException(exc);
+					}
 				}
+				
 			}
 
 

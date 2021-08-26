@@ -1,0 +1,39 @@
+name: Build and Test -> Compute coverage -> Release if requested
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/main/**.java"
+      - "src/test/**.java"
+      - ".github/workflows/**"
+      - "**.properties"
+      - "**.xml"
+
+jobs:
+       
+  release:
+    name: Build and release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 16
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Publish to the Maven Central repository
+        run: |
+          export GPG_TTY=$(tty)
+          echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          chmod +x ./src/main/resources/compileExternalClasses.sh
+          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase=${{ secrets.gpg_passphrase }} -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
+        env:
+          MAVEN_USERNAME: ${{ secrets.nexus_username }}
+          MAVEN_PASSWORD: ${{ secrets.nexus_password }}
