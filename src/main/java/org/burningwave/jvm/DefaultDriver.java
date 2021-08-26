@@ -529,6 +529,19 @@ public class DefaultDriver implements Driver {
 			}
 
 			@Override
+			protected void initConsulterRetriever() {
+				MethodHandles.Lookup consulter = MethodHandles.lookup();
+				nativeFunctionSupplier.getAllowedModesSetter().accept(consulter, -1);
+				driver.consulterRetriever = (cls) -> {
+					try {
+						return consulter;
+					} catch (Throwable exc) {
+						return Throwables.throwException(exc);
+					}
+				};
+			}
+
+			@Override
 			protected void initDefineHookClassFunction() {
 				try {
 					MethodHandle defineClassMethodHandle = driver.getConsulter(MethodHandles.Lookup.class).findSpecial(

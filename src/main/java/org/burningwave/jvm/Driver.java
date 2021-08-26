@@ -112,6 +112,10 @@ public interface Driver extends Closeable {
 
 		private static final long serialVersionUID = -3348641464676904231L;
 		
+	    public InitializationException(String message) {
+	        super(message);
+	    }
+		
 	    public InitializationException(String message, Throwable cause) {
 	        super(message, cause);
 	    }

@@ -28,10 +28,7 @@
  */
 package org.burningwave.jvm;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -39,7 +36,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.burningwave.jvm.Driver.InitializationException;
 
@@ -49,6 +45,7 @@ import sun.misc.Unsafe;
 class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
+	JVMInfo jVMInfo;
 	
 	public UnsafeNativeFunctionSupplier(Driver driver) {
 		try {
@@ -56,6 +53,7 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
 			theUnsafeField.setAccessible(true);
 			this.unsafe = (Unsafe)theUnsafeField.get(null);
+			jVMInfo = JVMInfo.create();
 		} catch (Throwable exc) {
 			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
@@ -246,11 +244,22 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			}
 		};
 	}
+		
+	@Override
+	public BiConsumer<Lookup, Integer> getAllowedModesSetter() {
+		if (jVMInfo.getVersion() < 17) {
+			return Throwables.throwException(new Driver.InitializationException("Could not obtain allowedModesSetter for java versions less than " + jVMInfo.getVersion()));
+		}
+		return (consulter, modes) -> {
+			unsafe.putInt(consulter, 12L, -1);
+		};
+	}	
 	
 	@Override
 	public void close() {
 		unsafe = null;
 		this.driver = null;
-	}	
+		this.jVMInfo = null;
+	}
 
 }
