@@ -562,24 +562,6 @@ public class DefaultDriver implements Driver {
 								return Throwables.throwException(exc);
 							}
 						};
-						try (InputStream inputStream = Resources.getAsInputStream(
-							this.getClass().getClassLoader(),
-							this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterConstructorSupplierForJDK9.bwc"
-						);){
-							Class<?> constructorClass = driver.defineHookClass(
-								java.lang.invoke.MethodHandles.class, Streams.toByteArray(inputStream)
-							);
-							MethodHandle consulterConstructor = ((Supplier<MethodHandle>)driver.allocateInstance(constructorClass)).get();
-							driver.consulterRetriever = (cls) -> {
-								try {
-									return (MethodHandles.Lookup)consulterConstructor.invoke(cls);
-								} catch (Throwable exc) {
-									return Throwables.throwException(exc);
-								}
-							};
-						} catch (Throwable exc) {
-							Throwables.throwException(exc);
-						}
 					} catch (Throwable exc) {
 						Throwables.throwException(exc);
 					}
