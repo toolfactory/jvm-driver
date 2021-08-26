@@ -30,19 +30,17 @@ package org.burningwave.jvm;
 
 
 import java.io.Closeable;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 public interface NativeFunctionSupplier extends Closeable {
 
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Function<Class<?>, MethodHandles.Lookup>  consulterSupplier);
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction();
 	
 	public BiFunction<Object, Field, Object> getFieldValueFunction();
 
@@ -53,8 +51,6 @@ public interface NativeFunctionSupplier extends Closeable {
 	public Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
 
 	public <T> T getAllocateInstanceFunction();
-	
-	public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
 	
 	public void close();
 

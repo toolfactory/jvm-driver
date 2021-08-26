@@ -30,7 +30,6 @@ package org.burningwave.jvm;
 
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -47,8 +46,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import sun.misc.Unsafe;
 
 
 @SuppressWarnings("all")
@@ -81,10 +78,8 @@ public class DefaultDriver implements Driver {
 		JVMInfo jVMInfo = JVMInfo.create();
 		return 
 			(jVMInfo.getVersion() > 8 ?
-				jVMInfo.getVersion() > 14 ?
 					jVMInfo.getVersion() > 16 ?
 						new Initializer.ForJava17(this):
-					new Initializer.ForJava15(this):
 				new Initializer.ForJava9(this):
 			new Initializer.ForJava8(this));
 	}
@@ -305,30 +300,28 @@ public class DefaultDriver implements Driver {
 			driver = null;
 		}
 		
-		protected static class ForJava8 extends Initializer {
-			MethodHandle consulterClassConstructor;			
+		protected static class ForJava8 extends Initializer {			
 			
 			protected ForJava8(DefaultDriver driver) {
 				super(driver);
-				try {
-					consulterClassConstructor = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get().findConstructor(
-						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
-					);
-				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
-				}
 			}
 			
 			protected void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava8(this.driver);
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
 			}	
 
 			protected void initConsulterRetriever() {
 				try {
-					MethodHandle consulterClassConstructor = this.consulterClassConstructor;
+					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+					modes.setAccessible(true);
+					MethodHandles.Lookup mainConsulter = MethodHandles.lookup();
+					modes.setInt(mainConsulter, -1);
+					MethodHandle consulterConstructor = mainConsulter.findConstructor(
+						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
+					);
 					driver.consulterRetriever = (cls) -> {
 						try {
-							return (Lookup) consulterClassConstructor.invoke(cls, -1);
+							return (Lookup) consulterConstructor.invoke(cls, -1);
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
 						}
@@ -340,7 +333,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			protected void initDefineHookClassFunction() {
-				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(driver.consulterRetriever);								
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction();								
 			}
 			
 			protected void initAccessibleSetter() {
@@ -390,48 +383,44 @@ public class DefaultDriver implements Driver {
 			@Override
 			public void close() {
 				super.close();
-				this.consulterClassConstructor = null;
 			}
 			
 		}
 		
 		protected static class ForJava9 extends Initializer {
-			MethodHandle consulterClassConstructor;
 			
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
-				try {
-					consulterClassConstructor = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get().findConstructor(
-						MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class)
-					);
-				} catch (Throwable exc) {
-					Throwables.throwException(exc);
-				}
 			}
 			
 			@Override
 			protected void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava9(this.driver);
+				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
 			}	
 			
 			protected void initDefineHookClassFunction() {
-				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(driver.consulterRetriever);
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction();
 			}
 			
 			protected void initConsulterRetriever() {
-				try {
-					MethodHandle consulterClassConstructor = this.consulterClassConstructor;
+				try (InputStream inputStream = Resources.getAsInputStream(
+					this.getClass().getClassLoader(), 
+					this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterConstructorSupplierForJDK9.bwc"
+				);){
+					Class<?> constructorClass = nativeFunctionSupplier.getDefineHookClassFunction().apply(
+						java.lang.invoke.MethodHandles.class, Streams.toByteArray(inputStream)
+					);
+					MethodHandle consulterConstructor = ((Supplier<MethodHandle>)driver.allocateInstance(constructorClass)).get();	
 					driver.consulterRetriever = (cls) -> {
 						try {
-							return (MethodHandles.Lookup)consulterClassConstructor.invoke(cls);
+							return (MethodHandles.Lookup)consulterConstructor.invoke(cls);
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
 						}
 					};
 				} catch (Throwable exc) {
 					Throwables.throwException(exc);
-				}
-				
+				}				
 			}
 			
 			protected void initAccessibleSetter() {
@@ -520,25 +509,11 @@ public class DefaultDriver implements Driver {
 			@Override
 			public void close() {
 				super.close();
-				this.consulterClassConstructor = null;
 			}
 
 		}
 		
-		protected static class ForJava15 extends ForJava9 {
-			
-			protected ForJava15(DefaultDriver driver) {
-				super(driver);
-			}
-
-			@Override
-			protected void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava15(this.driver);
-			}
-			
-		}
-		
-		protected static class ForJava17 extends ForJava15 {
+		protected static class ForJava17 extends ForJava9 {
 			
 			protected ForJava17(DefaultDriver driver) {
 				super(driver);
@@ -574,6 +549,9 @@ public class DefaultDriver implements Driver {
 					Throwables.throwException(exc);
 				}
 			}
+			
+		   
+			
 		}
 	
 		

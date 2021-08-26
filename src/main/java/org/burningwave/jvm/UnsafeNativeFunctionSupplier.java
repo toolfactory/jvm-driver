@@ -46,7 +46,7 @@ import org.burningwave.jvm.Driver.InitializationException;
 import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
-abstract class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
+class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	
@@ -62,17 +62,11 @@ abstract class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Function<Class<?>, MethodHandles.Lookup>  consulterSupplier) {
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction() {
 		try {
-			MethodHandle defineHookClassMethodHandle = consulterSupplier.apply(unsafe.getClass()).findSpecial(
-				unsafe.getClass(),
-				"defineAnonymousClass",
-				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-				unsafe.getClass()
-			);
 			return (clientClass, byteCode) -> {
 				try {
-					return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
+					return (Class<?>) unsafe.defineAnonymousClass(clientClass, byteCode, null);
 				} catch (Throwable exc) {
 					return Throwables.throwException(exc);
 				}
@@ -254,69 +248,9 @@ abstract class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-		return MethodHandles::lookup;
-	}
-	
-	@Override
 	public void close() {
 		unsafe = null;
 		this.driver = null;
-	}
-	
-	static class ForJava8 extends UnsafeNativeFunctionSupplier {
-		
-		public ForJava8(Driver driver) {
-			super(driver);
-		}
-
-		@Override
-		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-			try {
-				Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-				modes.setAccessible(true);
-				MethodHandles.Lookup mainConsulter = MethodHandles.lookup();
-				modes.setInt(mainConsulter, -1);
-				return () -> mainConsulter;
-			} catch (Throwable exc) {
-				return Throwables.throwException(exc);
-			}
-		}
-		
-	}
-	
-	static class ForJava9 extends UnsafeNativeFunctionSupplier {
-		
-		public ForJava9(Driver driver) {
-			super(driver);
-		}
-		
-		@Override
-		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-			sun.misc.Unsafe unsafe = this.unsafe;
-			return () -> {
-				MethodHandles.Lookup consulter = MethodHandles.lookup();
-				setAllowModes(unsafe, consulter);
-				return consulter;
-			};
-		}
-
-		void setAllowModes(sun.misc.Unsafe unsafe, MethodHandles.Lookup consulter) {
-			unsafe.putInt(consulter, 16L, -1);
-		}
-		
-	}
-	
-	static class ForJava15 extends ForJava9 {
-		
-		public ForJava15(Driver driver) {
-			super(driver);
-		}
-		
-		void setAllowModes(sun.misc.Unsafe unsafe, MethodHandles.Lookup consulter) {
-			unsafe.putInt(consulter, 12L, -1);
-		}
-		
 	}
 
 }
