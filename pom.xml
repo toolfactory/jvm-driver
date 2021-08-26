@@ -80,7 +80,7 @@
 	<properties>
 		<copyright.holder>Roberto Gentili</copyright.holder>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project_jdk_version>16</project_jdk_version>
+		<!-- The project must be compiled with JDK 16 -->
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
 		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
@@ -224,8 +224,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${project_jdk_version}</source>
-					<target>${project_jdk_version}</target>
+					<source>8</source>
+					<target>8</target>
 					<verbose>true</verbose>
 				</configuration>
 			</plugin>
