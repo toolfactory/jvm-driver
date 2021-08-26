@@ -81,7 +81,7 @@
 		<copyright.holder>Roberto Gentili</copyright.holder>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Can be changed with one of this values: 9, 10, 11, 12, 13, 14, 15, 16, 17 -->
-		<project_jdk_version>15</project_jdk_version>
+		<project_jdk_version>16</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
 		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
@@ -225,8 +225,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>8</source>
-					<target>8</target>
+					<source>${project_jdk_version}</source>
+					<target>${project_jdk_version}</target>
 					<verbose>true</verbose>
 				</configuration>
 			</plugin>
@@ -318,6 +318,7 @@
 				<configuration>
 					<excludes>
 						<exclude>org/burningwave/jvm/driver/java/ClassLoaderDelegateForJDK9.bwc</exclude>
+						<exclude>org/burningwave/jvm/driver/java/ConsulterConstructorSupplierForJDK9.bwc</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -428,6 +429,7 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*ClassLoaderDelegateForJDK9.*</exclude>
+								<exclude>**/*ConsulterConstructorSupplierForJDK9.*</exclude>
 							</excludes>
 						</configuration>
 					</plugin>
