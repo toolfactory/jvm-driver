@@ -252,5 +252,7 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		unsafe = null;
 		this.driver = null;
 	}
+	
+	public static class	
 
 }
