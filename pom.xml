@@ -31,7 +31,7 @@
 
 	<groupId>org.burningwave</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>0.13.1-SNAPSHOT</version>
+	<version>0.13.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Burningwave JVM driver</name>
@@ -80,7 +80,6 @@
 	<properties>
 		<copyright.holder>Roberto Gentili</copyright.holder>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Can be changed with one of this values: 9, 10, 11, 12, 13, 14, 15, 16, 17 -->
 		<project_jdk_version>16</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
@@ -105,7 +104,7 @@
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven-scm-provider-gitexe.version>1.9.5</maven-scm-provider-gitexe.version>
 		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
-		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.9</nexus-staging-maven-plugin.version>
 		<slf4j.version>1.7.30</slf4j.version>
 	</properties>
 
