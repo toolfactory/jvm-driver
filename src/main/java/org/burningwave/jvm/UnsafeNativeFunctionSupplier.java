@@ -251,8 +251,6 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	public void close() {
 		unsafe = null;
 		this.driver = null;
-	}
-	
-	public static class	
+	}	
 
 }

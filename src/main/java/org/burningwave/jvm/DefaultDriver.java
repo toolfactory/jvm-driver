@@ -50,13 +50,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("all")
 public class DefaultDriver implements Driver {
-	
+
 	MethodHandle getDeclaredFieldsRetriever;
 	MethodHandle getDeclaredMethodsRetriever;
 	MethodHandle getDeclaredConstructorsRetriever;
 	MethodHandle methodInvoker;
 	MethodHandle constructorInvoker;
-	
+
 	Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
 	Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 	Function<Class<?>, Object> allocateInstanceInvoker;
@@ -66,24 +66,24 @@ public class DefaultDriver implements Driver {
 	Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
 	BiFunction<ClassLoader, Object, Function<String, Package>> packageRetriever;
 	BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
-	
+
 	Class<?> classLoaderDelegateClass;
 	Class<?> builtinClassLoaderClass;
-	
+
 	public DefaultDriver() {
 		retrieveInitializer().start().close();
 	}
-	
+
 	protected Initializer retrieveInitializer() {
 		JVMInfo jVMInfo = JVMInfo.create();
-		return 
+		return
 			(jVMInfo.getVersion() > 8 ?
 					jVMInfo.getVersion() > 16 ?
 						new Initializer.ForJava17(this):
 				new Initializer.ForJava9(this):
 			new Initializer.ForJava8(this));
 	}
-	
+
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
 		try {
@@ -92,7 +92,7 @@ public class DefaultDriver implements Driver {
 			Throwables.throwException(exc);
 		}
 	}
-	
+
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
 		try {
@@ -101,65 +101,65 @@ public class DefaultDriver implements Driver {
 			return Throwables.throwException(exc);
 		}
 	}
-	
+
 	@Override
 	public Package retrieveLoadedPackage(ClassLoader classLoader, Object packageToFind, String packageName) {
 		return packageRetriever.apply(classLoader, packageToFind).apply(packageName);
 	}
-	
+
 	@Override
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
 		return loadedClassesRetriever.apply(classLoader);
 	}
-	
+
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
 		return loadedPackagesRetriever.apply(classLoader);
 	}
-	
+
 	@Override
 	public boolean isBuiltinClassLoader(ClassLoader classLoader) {
 		return builtinClassLoaderClass != null && builtinClassLoaderClass.isAssignableFrom(classLoader.getClass());
 	}
-	
+
 	@Override
 	public boolean isClassLoaderDelegate(ClassLoader classLoader) {
 		return classLoaderDelegateClass != null && classLoaderDelegateClass.isAssignableFrom(classLoader.getClass());
 	}
-	
+
 	@Override
 	public Class<?> getBuiltinClassLoaderClass() {
 		return builtinClassLoaderClass;
 	}
-	
+
 	@Override
 	public Class getClassLoaderDelegateClass() {
 		return classLoaderDelegateClass;
 	}
-	
+
 	@Override
 	public Lookup getConsulter(Class<?> cls) {
 		return consulterRetriever.apply(cls);
 	}
-	
+
 	@Override
 	public Object invoke(Method method, Object target, Object[] params) {
 		try {
 			return methodInvoker.invoke(method, target, params);
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
-		}			
+		}
 	}
-	
+
 	@Override
 	public <T> T newInstance(Constructor<T> ctor, Object[] params) {
 		try {
 			return (T)constructorInvoker.invoke(ctor, params);
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
-		}			
+		}
 	}
-	
+
 	@Override
 	public Field getDeclaredField(Class<?> cls, String name) {
 		for (Field field : getDeclaredFields(cls)) {
@@ -169,16 +169,16 @@ public class DefaultDriver implements Driver {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Field[] getDeclaredFields(Class<?> cls)  {
 		try {
 			return (Field[])getDeclaredFieldsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
-		}		
+		}
 	}
-	
+
 	@Override
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
 		try {
@@ -187,7 +187,7 @@ public class DefaultDriver implements Driver {
 			return Throwables.throwException(exc);
 		}
 	}
-	
+
 	@Override
 	public Method[] getDeclaredMethods(Class<?> cls) {
 		try {
@@ -196,44 +196,45 @@ public class DefaultDriver implements Driver {
 			return Throwables.throwException(exc);
 		}
 	}
-	
+
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
 		return (T)fieldValueRetriever.apply(target, field);
 	}
-	
+
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
 		fieldValueSetter.apply(target).accept(field, value);
 	}
-	
+
+	@Override
 	public <T> T allocateInstance(Class<?> cls) {
 		return (T)allocateInstanceInvoker.apply(cls);
 	}
-	
+
 	@Override
 	public void close() {
 		getDeclaredFieldsRetriever = null;
 		getDeclaredMethodsRetriever = null;
 		getDeclaredConstructorsRetriever = null;
-		packageRetriever = null;	
+		packageRetriever = null;
 		methodInvoker = null;
 		constructorInvoker = null;
-		accessibleSetter = null;	
+		accessibleSetter = null;
 		consulterRetriever = null;
 		classLoaderDelegateClass = null;
 		builtinClassLoaderClass = null;
 		hookClassDefiner = null;
 	}
-	
+
 	protected abstract static class Initializer implements Closeable {
 		DefaultDriver driver;
 		NativeFunctionSupplier nativeFunctionSupplier;
-		
+
 		protected Initializer(DefaultDriver driver) {
 			this.driver = driver;
 			initNativeFunctionSupplier();
-		}	
+		}
 
 		protected Initializer start() {
 			driver.allocateInstanceInvoker = nativeFunctionSupplier.getAllocateInstanceFunction();
@@ -245,26 +246,26 @@ public class DefaultDriver implements Driver {
 			initAccessibleSetter();
 			initConstructorInvoker();
 			initMethodInvoker();
-			initSpecificElements();			
+			initSpecificElements();
 			driver.loadedClassesRetriever = nativeFunctionSupplier.getRetrieveLoadedClassesFunction();
 			driver.loadedPackagesRetriever = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
 			return this;
 		}
-		
+
 		protected abstract void initNativeFunctionSupplier();
-		
+
 		protected abstract void initDefineHookClassFunction();
 
 		protected abstract void initConsulterRetriever();
-		
+
 		protected abstract void initAccessibleSetter();
-		
+
 		protected abstract void initSpecificElements();
-		
-		protected abstract void initConstructorInvoker();	
-		
-		protected abstract void initMethodInvoker();			
-		
+
+		protected abstract void initConstructorInvoker();
+
+		protected abstract void initMethodInvoker();
+
 		protected void initMembersRetrievers() {
 			try {
 				MethodHandles.Lookup consulter = driver.getConsulter(Class.class);
@@ -274,7 +275,7 @@ public class DefaultDriver implements Driver {
 					MethodType.methodType(Field[].class, boolean.class),
 					Class.class
 				);
-				
+
 				driver.getDeclaredMethodsRetriever = consulter.findSpecial(
 					Class.class,
 					"getDeclaredMethods0",
@@ -292,24 +293,26 @@ public class DefaultDriver implements Driver {
 				Throwables.throwException(exc);
 			}
 		}
-		
+
 		@Override
 		public void close() {
 			nativeFunctionSupplier.close();
 			nativeFunctionSupplier = null;
 			driver = null;
 		}
-		
-		protected static class ForJava8 extends Initializer {			
-			
+
+		protected static class ForJava8 extends Initializer {
+
 			protected ForJava8(DefaultDriver driver) {
 				super(driver);
 			}
-			
+
+			@Override
 			protected void initNativeFunctionSupplier() {
 				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
-			}	
+			}
 
+			@Override
 			protected void initConsulterRetriever() {
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
@@ -330,12 +333,13 @@ public class DefaultDriver implements Driver {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
 			}
-			
+
 			@Override
 			protected void initDefineHookClassFunction() {
-				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction();								
+				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction();
 			}
-			
+
+			@Override
 			protected void initAccessibleSetter() {
 				try {
 					final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
@@ -351,7 +355,7 @@ public class DefaultDriver implements Driver {
 					Throwables.throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
 			}
-			
+
 			@Override
 			protected void initConstructorInvoker() {
 				try {
@@ -361,9 +365,10 @@ public class DefaultDriver implements Driver {
 					driver.constructorInvoker = consulter.unreflect(method);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
-				}				
-			}			
-			
+				}
+			}
+
+			@Override
 			protected void initMethodInvoker() {
 				try {
 					Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
@@ -374,43 +379,45 @@ public class DefaultDriver implements Driver {
 					Throwables.throwException(new InitializationException("Could not initialize method invoker", exc));
 				}
 			}
-			
+
 			@Override
 			protected void initSpecificElements() {
-				driver.packageRetriever = (classLoader, object) -> (packageName) -> (Package)object;	
+				driver.packageRetriever = (classLoader, object) -> (packageName) -> (Package)object;
 			}
-			
+
 			@Override
 			public void close() {
 				super.close();
 			}
-			
+
 		}
-		
+
 		protected static class ForJava9 extends Initializer {
-			
+
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
 			}
-			
+
 			@Override
 			protected void initNativeFunctionSupplier() {
 				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
-			}	
-			
+			}
+
+			@Override
 			protected void initDefineHookClassFunction() {
 				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction();
 			}
-			
+
+			@Override
 			protected void initConsulterRetriever() {
 				try (InputStream inputStream = Resources.getAsInputStream(
-					this.getClass().getClassLoader(), 
+					this.getClass().getClassLoader(),
 					this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterConstructorSupplierForJDK9.bwc"
 				);){
 					Class<?> constructorClass = nativeFunctionSupplier.getDefineHookClassFunction().apply(
 						java.lang.invoke.MethodHandles.class, Streams.toByteArray(inputStream)
 					);
-					MethodHandle consulterConstructor = ((Supplier<MethodHandle>)driver.allocateInstance(constructorClass)).get();	
+					MethodHandle consulterConstructor = ((Supplier<MethodHandle>)driver.allocateInstance(constructorClass)).get();
 					driver.consulterRetriever = (cls) -> {
 						try {
 							return (MethodHandles.Lookup)consulterConstructor.invoke(cls);
@@ -420,14 +427,15 @@ public class DefaultDriver implements Driver {
 					};
 				} catch (Throwable exc) {
 					Throwables.throwException(exc);
-				}				
+				}
 			}
-			
+
+			@Override
 			protected void initAccessibleSetter() {
 				try {
 					MethodHandle accessibleSetter = driver.getConsulter(AccessibleObject.class).findSpecial(
-						AccessibleObject.class, "setAccessible0",  
-						MethodType.methodType(boolean.class, boolean.class), 
+						AccessibleObject.class, "setAccessible0",
+						MethodType.methodType(boolean.class, boolean.class),
 						AccessibleObject.class
 					);
 					driver.accessibleSetter = (accessibleObject, flag) -> {
@@ -441,33 +449,34 @@ public class DefaultDriver implements Driver {
 					Throwables.throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
 			}
-			
+
 
 			@Override
 			protected void initConstructorInvoker() {
 				try {
 					Class<?> cls = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
 					driver.constructorInvoker = driver.getConsulter(cls).findStatic(
-						cls, "newInstance0", MethodType.methodType(Object.class, Constructor.class, Object[].class)						
+						cls, "newInstance0", MethodType.methodType(Object.class, Constructor.class, Object[].class)
 					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
-				}	
+				}
 			}
-			
+
+			@Override
 			protected void initMethodInvoker() {
 				try {
 					Class<?> cls = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 					driver.methodInvoker =  driver.getConsulter(cls).findStatic(
-						cls, 
-						"invoke0", MethodType.methodType(Object.class, Method.class, Object.class, Object[].class)						
+						cls,
+						"invoke0", MethodType.methodType(Object.class, Method.class, Object.class, Object[].class)
 					);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize method invoker", exc));
 				}
 			}
 
-			
+
 			@Override
 			protected void initSpecificElements() {
 				try {
@@ -505,20 +514,20 @@ public class DefaultDriver implements Driver {
 				}
 			}
 
-			
+
 			@Override
 			public void close() {
 				super.close();
 			}
 
 		}
-		
+
 		protected static class ForJava17 extends ForJava9 {
-			
+
 			protected ForJava17(DefaultDriver driver) {
 				super(driver);
-			}	
-			
+			}
+
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
@@ -543,18 +552,18 @@ public class DefaultDriver implements Driver {
 							}
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
-						}						
+						}
 					};
 				} catch (Throwable exc) {
 					Throwables.throwException(exc);
 				}
 			}
-			
-		   
-			
+
+
+
 		}
-	
-		
+
+
 	}
 
 }
