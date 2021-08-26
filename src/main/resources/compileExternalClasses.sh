@@ -34,4 +34,4 @@ $JAVA_HOME/bin/javac -cp "$RESOURCES_FOLDER/../../../target/classes":"$RESOURCES
 
 
 mv "$RESOURCES_FOLDER/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/ClassLoaderDelegateForJDK9.bwc"
-mv "$RESOURCES_FOLDER/java/lang/invoke/ClassLoaderDelegateForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/ConsulterConstructorSupplierForJDK9.bwc"
+mv "$RESOURCES_FOLDER/java/lang/invoke/ConsulterConstructorSupplierForJDK9.class" "$RESOURCES_FOLDER/../../../target/classes/org/burningwave/jvm/ConsulterConstructorSupplierForJDK9.bwc"
