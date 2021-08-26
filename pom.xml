@@ -86,7 +86,6 @@
 		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
-		<project.generated.artifacts.prefix>bw</project.generated.artifacts.prefix>
 		<repository.url>https://burningwave@github.com/burningwave/jvm-driver.git</repository.url>
 
 		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
@@ -164,7 +163,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.generated.artifacts.prefix}-${project.artifactId}-${project.version}</finalName>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<resources>
 			<resource>
 				<directory>${project.basedir}</directory>
