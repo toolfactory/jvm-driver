@@ -545,16 +545,10 @@ public class DefaultDriver implements Driver {
 			protected void initDefineHookClassFunction() {
 				if (driver.hookClassDefiner == null) {
 					try {
-						MethodHandle defineClassMethodHandle = driver.getConsulter(MethodHandles.Lookup.class).findSpecial(
-							MethodHandles.Lookup.class,
-							"defineClass",
-							MethodType.methodType(Class.class, byte[].class),
-							MethodHandles.Lookup.class
-						);
 						driver.hookClassDefiner = (clientClass, byteCode) -> {
 							try {
 								try {
-									return (Class<?>) defineClassMethodHandle.invoke(driver.getConsulter(clientClass), byteCode);
+									return (Class<?>) driver.getConsulter(clientClass).defineClass(byteCode);
 								} catch (LinkageError exc) {
 									return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
 										try {
