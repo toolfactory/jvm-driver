@@ -26,6 +26,7 @@ A driver to allow deep interaction with the JVM **without any restrictions**.
 
 To create a Driver instance you should use this code:
 ```java
+
 Driver driver = new DefaultDriver();
 ```
 
