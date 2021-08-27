@@ -36,7 +36,7 @@
 
 	<name>Burningwave JVM driver</name>
 	<description>
-		A driver to allow deep interaction with the JVM without any restriction
+		A driver to allow deep interaction with the JVM without any restrictions
 	</description>
 	<url>https://www.burningwave.org/</url>
 
