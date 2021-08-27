@@ -46,7 +46,7 @@ import org.burningwave.jvm.Driver.InitializationException;
 import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
-public class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
+class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	
@@ -266,12 +266,9 @@ public class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 	@Override
 	public void close() {
 		unsafe = null;
-		this.driver = null;
-	}
-	
-	public static class ForJava9 extends UnsafeNativeFunctionSupplier {
+		this.driver = null;class ForJava9 extends UnsafeNativeFunctionSupplier {
 		
-		public ForJava9(Driver driver) {
+		ForJava9(Driver driver) {
 			super(driver);
 		}
 
