@@ -31,7 +31,7 @@
 
 	<groupId>org.burningwave</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>0.15.0</version>
+	<version>0.15.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Burningwave JVM driver</name>
@@ -225,8 +225,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>8</source>
-					<target>8</target>
+					<source>${project_jdk_version}</source>
+					<target>${project_jdk_version}</target>
 					<verbose>true</verbose>
 				</configuration>
 			</plugin>
