@@ -266,7 +266,10 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 	@Override
 	public void close() {
 		unsafe = null;
-		this.driver = null;class ForJava9 extends UnsafeNativeFunctionSupplier {
+		this.driver = null;
+	}
+	
+	class ForJava9 extends UnsafeNativeFunctionSupplier {
 		
 		ForJava9(Driver driver) {
 			super(driver);
@@ -277,7 +280,7 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 				throws Throwable {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
-		
+	
 	}
 	
 	static class ForJava17 extends ForJava9 {
