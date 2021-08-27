@@ -431,7 +431,6 @@ public class DefaultDriver implements Driver {
 					);
 					driver.consulterRetriever = (cls) -> {
 						try {
-
 							return (MethodHandles.Lookup)methodHandlesLookupConstructor.invoke(cls);
 						} catch (Throwable exc) {
 							return Throwables.throwException(exc);
