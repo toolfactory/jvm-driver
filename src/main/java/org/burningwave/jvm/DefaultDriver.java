@@ -314,7 +314,7 @@ public class DefaultDriver implements Driver {
 				super(driver);
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-					mainConsulter = MethodHandles.lookup();
+					mainConsulter = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
 					modes.setAccessible(true);
 					modes.setInt(mainConsulter, -1);
 					privateLookupInMethodHandle = mainConsulter.findSpecial(
