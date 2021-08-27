@@ -281,18 +281,22 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
 		
+	}
+	
+	public static class ForJava17 extends ForJava9 {
+
+		public ForJava17(Driver driver) {
+			super(driver);
+		}
+		
 		@Override
 		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
 			return () -> {
 				MethodHandles.Lookup consulter = MethodHandles.lookup();
-				setAllowModes(consulter, -1);
+				unsafe.putInt(consulter, 12L, -1);
 				return consulter;
 			};
-		}
-
-		private void setAllowModes(Lookup consulter, int i) {
-			unsafe.putInt(consulter, -12L, -1);
 		}
 		
 	}
