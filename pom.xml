@@ -31,7 +31,7 @@
 
 	<groupId>org.burningwave</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>0.13.3-SNAPSHOT</version>
+	<version>0.14.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Burningwave JVM driver</name>
@@ -80,12 +80,14 @@
 	<properties>
 		<copyright.holder>Roberto Gentili</copyright.holder>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- The project must be compiled with JDK 16 -->
+		<!-- Can be changed with one of this values: 9, 10, 11, 12, 13, 14, 15, 16, 17 -->
+		<project_jdk_version>9</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
 		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
+		<project.generated.artifacts.prefix>bw</project.generated.artifacts.prefix>
 		<repository.url>https://burningwave@github.com/burningwave/jvm-driver.git</repository.url>
 
 		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
@@ -127,7 +129,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/burningwave/jvm-driver</url>
-		<tag>HEAD</tag>
+		<tag>jvm-driver-0.10.2</tag>
 	</scm>
 	
 	<dependencies>
@@ -163,7 +165,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.artifactId}-${project.version}</finalName>
+		<finalName>${project.generated.artifacts.prefix}-${project.artifactId}-${project.version}</finalName>
 		<resources>
 			<resource>
 				<directory>${project.basedir}</directory>
@@ -316,7 +318,6 @@
 				<configuration>
 					<excludes>
 						<exclude>org/burningwave/jvm/driver/java/ClassLoaderDelegateForJDK9.bwc</exclude>
-						<exclude>org/burningwave/jvm/driver/java/ConsulterConstructorSupplierForJDK9.bwc</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -427,7 +428,6 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*ClassLoaderDelegateForJDK9.*</exclude>
-								<exclude>**/*ConsulterConstructorSupplierForJDK9.*</exclude>
 							</excludes>
 						</configuration>
 					</plugin>
