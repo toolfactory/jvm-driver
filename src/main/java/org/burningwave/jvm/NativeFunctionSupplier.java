@@ -54,7 +54,7 @@ abstract class NativeFunctionSupplier implements Closeable {
 
 	abstract Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
 
-	abstract <T> T getAllocateInstanceFunction();
+	<T> abstract T getAllocateInstanceFunction();
 	
 	abstract Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
 	
