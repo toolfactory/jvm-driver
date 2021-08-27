@@ -53,6 +53,11 @@ public void setAccessible(AccessibleObject object, boolean flag);
 public <T> T allocateInstance(Class<?> cls);                                                            
 ```
 
+##Compilation requirements
+
+**A JDK version 9 or higher is required to compile the project** and the property 'project_jdk_version' must be set to 8.
+
+##Using
 To create a Driver instance you should use this code
 ```java
 Driver driver = new DefaultDriver();
