@@ -329,6 +329,7 @@ public class DefaultDriver implements Driver {
 
 			protected void initConsulterRetriever() {
 				try {
+					MethodHandles.Lookup mainConsulter = this.mainConsulter;
 					driver.consulterRetriever = (cls) -> {
 						try {
 							return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
@@ -344,6 +345,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
+					MethodHandles.Lookup mainConsulter = this.mainConsulter;
 					driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
@@ -393,6 +395,13 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initSpecificElements() {
 				driver.packageRetriever = (classLoader, object) -> (packageName) -> (Package)object;	
+			}
+			
+			@Override
+			public void close() {
+				super.close();
+				this.mainConsulter = null;
+				this.privateLookupInMethodHandle = null;
 			}
 			
 		}
