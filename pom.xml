@@ -31,7 +31,7 @@
 
 	<groupId>org.burningwave</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>0.14.2-SNAPSHOT</version>
+	<version>0.15.0</version>
 	<packaging>jar</packaging>
 
 	<name>Burningwave JVM driver</name>
@@ -81,7 +81,7 @@
 		<copyright.holder>Roberto Gentili</copyright.holder>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Can be changed with one of this values: 9, 10, 11, 12, 13, 14, 15, 16, 17 -->
-		<project_jdk_version>9</project_jdk_version>
+		<project_jdk_version>15</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
 		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
@@ -129,7 +129,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/burningwave/jvm-driver</url>
-		<tag>jvm-driver-0.10.2</tag>
+		<tag>jvm-driver-0.11.0</tag>
 	</scm>
 	
 	<dependencies>
@@ -225,8 +225,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${project_jdk_version}</source>
-					<target>${project_jdk_version}</target>
+					<source>8</source>
+					<target>8</target>
 					<verbose>true</verbose>
 				</configuration>
 			</plugin>
@@ -317,7 +317,9 @@
 				<version>${maven-source-plugin.version}</version>
 				<configuration>
 					<excludes>
+						<exclude>org/burningwave/jvm/driver/java/AccessibleSetterRetrieverForJDK9.bwc</exclude>
 						<exclude>org/burningwave/jvm/driver/java/ClassLoaderDelegateForJDK9.bwc</exclude>
+						<exclude>org/burningwave/jvm/driver/java/ConsulterRetrieverForJDK9.bwc</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -427,7 +429,9 @@
 						</executions>
 						<configuration>
 							<excludes>
+								<exclude>**/*AccessibleSetterInvokerForJDK9.*</exclude>
 								<exclude>**/*ClassLoaderDelegateForJDK9.*</exclude>
+								<exclude>**/*ConsulterRetrieverForJDK9.*</exclude>
 							</excludes>
 						</configuration>
 					</plugin>
