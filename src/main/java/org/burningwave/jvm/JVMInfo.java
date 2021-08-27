@@ -28,10 +28,11 @@
  */
 package org.burningwave.jvm;
 
+
 import java.lang.reflect.Method;
 
-public class JVMInfo {
 
+class JVMInfo {
 
     private final String osArch;
     private boolean is64Bit;

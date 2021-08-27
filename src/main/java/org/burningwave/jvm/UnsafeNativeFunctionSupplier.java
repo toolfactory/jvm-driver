@@ -28,6 +28,7 @@
  */
 package org.burningwave.jvm;
 
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
@@ -44,6 +45,7 @@ import java.util.function.Supplier;
 import org.burningwave.jvm.Driver.InitializationException;
 
 import sun.misc.Unsafe;
+
 
 @SuppressWarnings({"all"})
 class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
