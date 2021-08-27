@@ -42,21 +42,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 
-public interface NativeFunctionSupplier extends Closeable {
+abstract class NativeFunctionSupplier implements Closeable {
 
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
+	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
 	
-	public BiFunction<Object, Field, Object> getFieldValueFunction();
+	abstract BiFunction<Object, Field, Object> getFieldValueFunction();
 
-	public Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
+	abstract Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
 
-	public Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
+	abstract Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
 
-	public Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
+	abstract public Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
 
-	public <T> T getAllocateInstanceFunction();
+	abstract <T> T getAllocateInstanceFunction();
 	
-	public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
+	abstract Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
 	
 	public void close();
 
