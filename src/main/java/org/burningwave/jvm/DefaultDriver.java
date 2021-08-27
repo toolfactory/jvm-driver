@@ -330,6 +330,7 @@ public class DefaultDriver implements Driver {
 			protected void initConsulterRetriever() {
 				try {
 					MethodHandles.Lookup mainConsulter = this.mainConsulter;
+					MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
 					driver.consulterRetriever = (cls) -> {
 						try {
 							return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
