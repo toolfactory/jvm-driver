@@ -16,7 +16,7 @@ A driver to allow deep interaction with the JVM **without any restrictions**.
 
 ## Compilation requirements
 
-**A JDK version 9 or higher is required to compile the project** and the property 'project_jdk_version' must be set to 8.
+**A JDK version 9 or higher is required to compile the project** and the property 'project_jdk_version' inside pom.xml must be set to 8.
 
 ## Using
 
