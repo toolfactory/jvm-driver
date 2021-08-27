@@ -269,7 +269,7 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 		this.driver = null;
 	}
 	
-	class ForJava9 extends UnsafeNativeFunctionSupplier {
+	static class ForJava9 extends UnsafeNativeFunctionSupplier {
 		
 		ForJava9(Driver driver) {
 			super(driver);
