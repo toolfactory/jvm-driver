@@ -12,7 +12,20 @@
 [![Supported JVM](https://img.shields.io/badge/supported%20JVM-8%2C%209%2C%2010%2C%2011%2C%2012%2C%2013%2C%2014%2C%2015%2C%2016%2C%2017-blueviolet)](https://github.com/burningwave/jvm-driver/actions/runs/1161537104)
 
 
-A driver to allow deep interaction with the JVM **without any restrictions**. The methods exposed by the driver are the following:
+A driver to allow deep interaction with the JVM **without any restrictions**.
+
+## Compilation requirements
+
+**A JDK version 9 or higher is required to compile the project** and the property 'project_jdk_version' must be set to 8.
+
+## Using
+
+To create a Driver instance you should use this code
+```java
+Driver driver = new DefaultDriver();
+```
+
+The methods exposed by the driver are the following:
 ```java                                                                                                     
 public void setFieldValue(Object target, Field field, Object value);                                    
                                                                                                         
@@ -51,15 +64,5 @@ public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 public void setAccessible(AccessibleObject object, boolean flag);                                       
                                                                                                         
 public <T> T allocateInstance(Class<?> cls);                                                            
-```
-
-##Compilation requirements
-
-**A JDK version 9 or higher is required to compile the project** and the property 'project_jdk_version' must be set to 8.
-
-##Using
-To create a Driver instance you should use this code
-```java
-Driver driver = new DefaultDriver();
 ```
 
