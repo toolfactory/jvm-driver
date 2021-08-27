@@ -46,11 +46,11 @@ import org.burningwave.jvm.Driver.InitializationException;
 import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
-public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
+public class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	
-	public UnsafeNativeFunctionSupplier(Driver driver) {
+	UnsafeNativeFunctionSupplier(Driver driver) {
 		try {
 			this.driver = driver;
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
@@ -62,7 +62,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
+	BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
 		try {
 			MethodHandle defineHookClassMethodHandle = retrieveConsulter(consulter, privateLookupInMethodHandle).findSpecial(
 				unsafe.getClass(),
@@ -89,7 +89,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction() {
+	Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
 		try {
 			Long loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
@@ -103,7 +103,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction() {
+	Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
 		try {
 			Long loadedPackagesMapMemoryOffset = unsafe.objectFieldOffset(
@@ -117,7 +117,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public BiFunction<Object, Field, Object> getFieldValueFunction() {
+	BiFunction<Object, Field, Object> getFieldValueFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
 		return (target, field) -> {
 			target = Modifier.isStatic(field.getModifiers())?
@@ -180,7 +180,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
+	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
 		return origTarget -> (field, value) -> {
 			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
@@ -247,7 +247,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 
 
 	@Override
-	public Function<Class<?>, Object> getAllocateInstanceFunction() {
+	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
 		return cls -> {
 			try {
@@ -259,7 +259,7 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	}
 	
 	@Override
-	public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 		return MethodHandles::lookup;
 	}
 	
@@ -283,14 +283,14 @@ public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 		
 	}
 	
-	public static class ForJava17 extends ForJava9 {
+	static class ForJava17 extends ForJava9 {
 
-		public ForJava17(Driver driver) {
+		ForJava17(Driver driver) {
 			super(driver);
 		}
 		
 		@Override
-		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
 			return () -> {
 				MethodHandles.Lookup consulter = MethodHandles.lookup();
