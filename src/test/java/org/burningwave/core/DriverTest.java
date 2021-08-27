@@ -5,7 +5,6 @@ import org.burningwave.jvm.Driver;
 import org.junit.jupiter.api.Test;
 import java.lang.invoke.MethodHandle;
 
-@SuppressWarnings("unused")
 public class DriverTest{
 
 	

@@ -28,7 +28,10 @@
  */
 package org.burningwave.jvm;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -36,16 +39,16 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.burningwave.jvm.Driver.InitializationException;
 
 import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
-class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
+public class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
-	JVMInfo jVMInfo;
 	
 	public UnsafeNativeFunctionSupplier(Driver driver) {
 		try {
@@ -53,18 +56,23 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
 			theUnsafeField.setAccessible(true);
 			this.unsafe = (Unsafe)theUnsafeField.get(null);
-			jVMInfo = JVMInfo.create();
 		} catch (Throwable exc) {
 			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
 	}
 	
 	@Override
-	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction() {
+	public BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
 		try {
+			MethodHandle defineHookClassMethodHandle = retrieveConsulter(consulter, privateLookupInMethodHandle).findSpecial(
+				unsafe.getClass(),
+				"defineAnonymousClass",
+				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
+				unsafe.getClass()
+			);
 			return (clientClass, byteCode) -> {
 				try {
-					return (Class<?>) unsafe.defineAnonymousClass(clientClass, byteCode, null);
+					return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
 				} catch (Throwable exc) {
 					return Throwables.throwException(exc);
 				}
@@ -73,6 +81,11 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			return Throwables.throwException(exc);
 		}
 		
+	}
+
+	Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle)
+			throws Throwable {
+		return (Lookup) privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
 	}
 	
 	@Override
@@ -244,22 +257,44 @@ class UnsafeNativeFunctionSupplier implements NativeFunctionSupplier {
 			}
 		};
 	}
-		
+	
 	@Override
-	public BiConsumer<Lookup, Integer> getAllowedModesSetter() {
-		if (jVMInfo.getVersion() < 17) {
-			return Throwables.throwException(new Driver.InitializationException("Could not obtain allowedModesSetter for java versions less than " + jVMInfo.getVersion()));
-		}
-		return (consulter, modes) -> {
-			unsafe.putInt(consulter, 12L, -1);
-		};
-	}	
+	public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+		return MethodHandles::lookup;
+	}
 	
 	@Override
 	public void close() {
 		unsafe = null;
 		this.driver = null;
-		this.jVMInfo = null;
+	}
+	
+	public static class ForJava9 extends UnsafeNativeFunctionSupplier {
+		
+		public ForJava9(Driver driver) {
+			super(driver);
+		}
+
+		@Override
+		Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod)
+				throws Throwable {
+			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
+		}
+		
+		@Override
+		public Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+			sun.misc.Unsafe unsafe = this.unsafe;
+			return () -> {
+				MethodHandles.Lookup consulter = MethodHandles.lookup();
+				setAllowModes(consulter, -1);
+				return consulter;
+			};
+		}
+
+		private void setAllowModes(Lookup consulter, int i) {
+			unsafe.putInt(consulter, -12L, -1);
+		}
+		
 	}
 
 }
