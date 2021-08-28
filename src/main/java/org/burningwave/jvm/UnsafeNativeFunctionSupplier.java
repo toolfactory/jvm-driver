@@ -296,7 +296,7 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 		@Override
 		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
-			long allowedModesFieldMemoryOffset = jVMInfo.is64Bit() ? 12L : 16L;
+			long allowedModesFieldMemoryOffset = jVMInfo.is64Bit() ? 12L : 8L;
 			return () -> {
 				MethodHandles.Lookup consulter = MethodHandles.lookup();
 				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
