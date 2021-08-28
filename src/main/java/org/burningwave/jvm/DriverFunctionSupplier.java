@@ -42,7 +42,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 
-abstract class NativeFunctionSupplier implements Closeable {
+abstract class DriverFunctionSupplier implements Closeable {
 
 	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
 	

@@ -233,7 +233,7 @@ public class DefaultDriver implements Driver {
 	
 	protected abstract static class Initializer implements Closeable {
 		DefaultDriver driver;
-		NativeFunctionSupplier nativeFunctionSupplier;
+		DriverFunctionSupplier driverFunctionSupplier;
 		
 		protected Initializer(DefaultDriver driver) {
 			this.driver = driver;
@@ -241,13 +241,13 @@ public class DefaultDriver implements Driver {
 		}
 		
 		void initNativeFunctionSupplier() {
-			this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier(this.driver);
+			this.driverFunctionSupplier = new UnsafeFunctionSupplier(this.driver);
 		}		
 
 		protected Initializer start() {
-			driver.allocateInstanceInvoker = nativeFunctionSupplier.getAllocateInstanceFunction();
-			driver.fieldValueRetriever = nativeFunctionSupplier.getFieldValueFunction();
-			driver.fieldValueSetter = nativeFunctionSupplier.getSetFieldValueFunction();
+			driver.allocateInstanceInvoker = driverFunctionSupplier.getAllocateInstanceFunction();
+			driver.fieldValueRetriever = driverFunctionSupplier.getFieldValueFunction();
+			driver.fieldValueSetter = driverFunctionSupplier.getSetFieldValueFunction();
 			initDefineHookClassFunction();
 			initConsulterRetriever();
 			initMembersRetrievers();
@@ -255,8 +255,8 @@ public class DefaultDriver implements Driver {
 			initConstructorInvoker();
 			initMethodInvoker();
 			initSpecificElements();			
-			driver.loadedClassesRetriever = nativeFunctionSupplier.getRetrieveLoadedClassesFunction();
-			driver.loadedPackagesRetriever = nativeFunctionSupplier.getRetrieveLoadedPackagesFunction();
+			driver.loadedClassesRetriever = driverFunctionSupplier.getRetrieveLoadedClassesFunction();
+			driver.loadedPackagesRetriever = driverFunctionSupplier.getRetrieveLoadedPackagesFunction();
 			return this;
 		}
 
@@ -302,8 +302,8 @@ public class DefaultDriver implements Driver {
 		
 		@Override
 		public void close() {
-			nativeFunctionSupplier.close();
-			nativeFunctionSupplier = null;
+			driverFunctionSupplier.close();
+			driverFunctionSupplier = null;
 			driver = null;
 		}
 		
@@ -346,7 +346,7 @@ public class DefaultDriver implements Driver {
 			@Override
 			protected void initDefineHookClassFunction() {
 				try {
-					driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
+					driver.hookClassDefiner = driverFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
@@ -412,7 +412,7 @@ public class DefaultDriver implements Driver {
 			
 			protected ForJava9(DefaultDriver driver) {
 				super(driver);
-				mainConsulter = nativeFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
+				mainConsulter = driverFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
 				try {
 					privateLookupInMethodHandle = mainConsulter.findStatic(
 						MethodHandles.class, "privateLookupIn",
@@ -425,11 +425,11 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava9(this.driver);
+				this.driverFunctionSupplier = new UnsafeFunctionSupplier.ForJava9(this.driver);
 			}	
 			
 			protected void initDefineHookClassFunction() {
-				driver.hookClassDefiner = nativeFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
+				driver.hookClassDefiner = driverFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 			}
 			
 			protected void initConsulterRetriever() {
@@ -584,7 +584,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			void initNativeFunctionSupplier() {
-				this.nativeFunctionSupplier = new UnsafeNativeFunctionSupplier.ForJava17(this.driver);
+				this.driverFunctionSupplier = new UnsafeFunctionSupplier.ForJava17(this.driver);
 			}	
 			
 			@Override
