@@ -46,6 +46,10 @@ public class JVMInfo {
     	init();
     }
     
+    public static JVMInfo getInstance() {
+    	return LazyHolder.getJVMInfo();
+    }
+    
     public static JVMInfo create() {
     	return new JVMInfo();
     }
@@ -125,4 +129,12 @@ public class JVMInfo {
     public int getVersion() {
     	return version;
     }
+    
+	private static class LazyHolder {
+		private static final JVMInfo JVM_INFO_INSTANCE = JVMInfo.create();
+		
+		private static JVMInfo getJVMInfo() {
+			return JVM_INFO_INSTANCE;
+		}
+	}
 }

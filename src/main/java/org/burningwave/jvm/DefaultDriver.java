@@ -78,7 +78,7 @@ public class DefaultDriver implements Driver {
 	}
 	
 	protected Initializer retrieveInitializer() {
-		JVMInfo jVMInfo = JVMInfo.create();
+		JVMInfo jVMInfo = JVMInfo.getInstance();
 		return 
 			(jVMInfo.getVersion() > 8 ?
 				jVMInfo.getVersion() > 13 ?

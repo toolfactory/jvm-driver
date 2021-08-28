@@ -59,7 +59,7 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
 			theUnsafeField.setAccessible(true);
 			this.unsafe = (Unsafe)theUnsafeField.get(null);
-			jVMInfo = JVMInfo.create();
+			jVMInfo = JVMInfo.getInstance();
 		} catch (Throwable exc) {
 			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
