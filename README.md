@@ -48,7 +48,7 @@ public <T> T newInstance(Constructor<T> ctor, Object[] params);
                                                                                                         
 public Object invoke(Method method, Object target, Object[] params);                                    
                                                                                                         
-public Lookup getConsulter(Class<?> cls);                                                               
+public MethodHandles.Lookup getConsulter(Class<?> cls);                                                               
                                                                                                         
 public Class<?> getClassLoaderDelegateClass();                                                          
                                                                                                         

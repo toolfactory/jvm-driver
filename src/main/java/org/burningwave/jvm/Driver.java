@@ -58,7 +58,7 @@ package org.burningwave.jvm;
 
 
 import java.io.Closeable;
-import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -83,9 +83,9 @@ public interface Driver extends Closeable {
 
 	public <T> T newInstance(Constructor<T> ctor, Object[] params);
 
-	public Object invoke(Method method, Object target, Object[] params);
+	public <T> T invoke(Method method, Object target, Object[] params);
 
-	public Lookup getConsulter(Class<?> cls);
+	public MethodHandles.Lookup getConsulter(Class<?> cls);
 
 	public Class<?> getClassLoaderDelegateClass();
 

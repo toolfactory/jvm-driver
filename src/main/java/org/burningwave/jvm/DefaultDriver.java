@@ -144,9 +144,9 @@ public class DefaultDriver implements Driver {
 	}
 	
 	@Override
-	public Object invoke(Method method, Object target, Object[] params) {
+	public <T> T invoke(Method method, Object target, Object[] params) {
 		try {
-			return methodInvoker.invoke(method, target, params);
+			return (T)methodInvoker.invoke(method, target, params);
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
 		}			
