@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
 #        java: [9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
-         java: [17-ea, 18-ea]
+        java: [17-ea, 18-ea]
         architecture: [x86, x64]
     runs-on: ${{ matrix.os }}
     steps:
