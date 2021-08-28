@@ -51,6 +51,7 @@ import sun.misc.Unsafe;
 class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
+	JVMInfo jVMInfo;
 	
 	UnsafeNativeFunctionSupplier(Driver driver) {
 		try {
@@ -58,6 +59,7 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
 			theUnsafeField.setAccessible(true);
 			this.unsafe = (Unsafe)theUnsafeField.get(null);
+			jVMInfo = JVMInfo.create();
 		} catch (Throwable exc) {
 			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
@@ -294,9 +296,10 @@ class UnsafeNativeFunctionSupplier extends NativeFunctionSupplier {
 		@Override
 		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
+			long allowedModesFieldMemoryOffset = jVMInfo.is64Bit() ? 12L : 8L;
 			return () -> {
 				MethodHandles.Lookup consulter = MethodHandles.lookup();
-				unsafe.putInt(consulter, 12L, -1);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
 				return consulter;
 			};
 		}
