@@ -241,7 +241,7 @@ public class DefaultDriver implements Driver {
 		}
 		
 		void initNativeFunctionSupplier() {
-			this.driverFunctionSupplier = new UnsafeFunctionSupplier(this.driver);
+			this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe(this.driver);
 		}		
 
 		protected Initializer start() {
@@ -425,7 +425,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			void initNativeFunctionSupplier() {
-				this.driverFunctionSupplier = new UnsafeFunctionSupplier.ForJava9(this.driver);
+				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava9(this.driver);
 			}	
 			
 			protected void initDefineHookClassFunction() {
@@ -584,7 +584,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			void initNativeFunctionSupplier() {
-				this.driverFunctionSupplier = new UnsafeFunctionSupplier.ForJava17(this.driver);
+				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver);
 			}	
 			
 			@Override

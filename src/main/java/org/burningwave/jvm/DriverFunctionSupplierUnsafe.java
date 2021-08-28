@@ -48,12 +48,12 @@ import sun.misc.Unsafe;
 
 
 @SuppressWarnings({"all"})
-class UnsafeFunctionSupplier extends DriverFunctionSupplier {
+class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	JVMInfo jVMInfo;
 	
-	UnsafeFunctionSupplier(Driver driver) {
+	DriverFunctionSupplierUnsafe(Driver driver) {
 		try {
 			this.driver = driver;
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
@@ -273,7 +273,7 @@ class UnsafeFunctionSupplier extends DriverFunctionSupplier {
 		this.driver = null;
 	}
 	
-	static class ForJava9 extends UnsafeFunctionSupplier {
+	static class ForJava9 extends DriverFunctionSupplierUnsafe {
 		
 		ForJava9(Driver driver) {
 			super(driver);
