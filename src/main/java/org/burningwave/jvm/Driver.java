@@ -99,7 +99,7 @@ public interface Driver extends Closeable {
 
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
 
-	public Package retrieveLoadedPackage(ClassLoader classLoader, String packageName);
+	public Package getPackage(ClassLoader classLoader, String packageName);
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 

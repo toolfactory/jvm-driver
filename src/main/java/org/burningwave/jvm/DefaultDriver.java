@@ -104,7 +104,7 @@ public class DefaultDriver implements Driver {
 	}
 	
 	@Override
-	public Package retrieveLoadedPackage(ClassLoader classLoader, String packageName) {
+	public Package getPackage(ClassLoader classLoader, String packageName) {
 		return packageRetriever.apply(classLoader, packageName);
 	}
 	
