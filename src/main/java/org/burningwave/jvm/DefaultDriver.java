@@ -30,7 +30,6 @@ package org.burningwave.jvm;
 
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -46,9 +45,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
-
-import sun.misc.Unsafe;
 
 
 @SuppressWarnings("all")
@@ -67,7 +63,7 @@ public class DefaultDriver implements Driver {
 	Function<Object, BiConsumer<Field, Object>> fieldValueSetter;
 	BiConsumer<AccessibleObject, Boolean> accessibleSetter;
 	Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
-	BiFunction<ClassLoader, Object, Function<String, Package>> packageRetriever;
+	BiFunction<ClassLoader, String, Package> packageRetriever;
 	BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
 	
 	Class<?> classLoaderDelegateClass;
@@ -108,8 +104,8 @@ public class DefaultDriver implements Driver {
 	}
 	
 	@Override
-	public Package retrieveLoadedPackage(ClassLoader classLoader, Object packageToFind, String packageName) {
-		return packageRetriever.apply(classLoader, packageToFind).apply(packageName);
+	public Package retrieveLoadedPackage(ClassLoader classLoader, String packageName) {
+		return packageRetriever.apply(classLoader, packageName);
 	}
 	
 	@Override
@@ -394,7 +390,7 @@ public class DefaultDriver implements Driver {
 			
 			@Override
 			protected void initSpecificElements() {
-				driver.packageRetriever = (classLoader, object) -> (packageName) -> (Package)object;	
+				driver.packageRetriever = (classLoader, packageName) -> Package.getPackage(packageName);	
 			}
 			
 			@Override
@@ -496,7 +492,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup classLoaderConsulter = driver.consulterRetriever.apply(ClassLoader.class);
 					MethodType methodType = MethodType.methodType(Package.class, String.class);
 					MethodHandle methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
-					driver.packageRetriever = (classLoader, object) -> (packageName) -> {
+					driver.packageRetriever = (classLoader, packageName) -> {
 						try {
 							return (Package)methodHandle.invokeExact(classLoader, packageName);
 						} catch (Throwable exc) {
