@@ -74,6 +74,7 @@ class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
 				unsafe.getClass()
 			);
+			sun.misc.Unsafe unsafe = this.unsafe;
 			return (clientClass, byteCode) -> {
 				try {
 					return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
