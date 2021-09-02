@@ -203,7 +203,6 @@
 		</testResources>
 		<plugins>
 			<plugin>
-                <?m2e execute ?>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>${maven-antrun-plugin.version}</version>
                 <executions>
