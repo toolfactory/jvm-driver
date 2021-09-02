@@ -18,8 +18,23 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-/target/
 /.project
 /.settings
 /.classpath
+/target/
+
+/java/.project
+/java/.settings
+/java/.classpath
+/java/target/
+
+/java-hook/.project
+/java-hook/.settings
+/java-hook/.classpath
+/java-hook/target/
+
+/native/.project
+/native/.settings
+/native/.classpath
+/native/target/
 *.bwc

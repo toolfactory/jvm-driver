@@ -1,27 +1,100 @@
-name: Build and Test -> Compute coverage -> Release if requested
+#	This file is part of Burningwave JVM driver.                                                                      
+#	                                                                                                            
+#	Author: Roberto Gentili                                                                                     
+#	                                                                                                            
+#	Hosted at: https://github.com/burningwave/jvm-driver                                                              
+#	                                                                                                            
+#	- -                                                                                                          
+#	                                                                                                            
+#	The MIT License (MIT)                                                                                       
+#	                                                                                                            
+#	Copyright (c) 2019-2021 Roberto Gentili                                                                          
+#	                                                                                                            
+#	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+#	documentation files (the "Software"), to deal in the Software without restriction, including without        
+#	limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of   
+#	the Software, and to permit persons to whom the Software is furnished to do so, subject to the following    
+#	conditions:                                                                                                 
+#	                                                                                                            
+#	The above copyright notice and this permission notice shall be included in all copies or substantial        
+#	portions of the Software.                                                                                   
+#	                                                                                                            
+#	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       
+#	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO   
+#	EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+#	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+#	OR OTHER DEALINGS IN THE SOFTWARE.
+#
+name: Build and release if requested
 
 on:
   push:
     branches:
-      - main
+      - experimental
     paths:
-      - "src/main/**.java"
-      - "src/test/**.java"
+      - "**.sh"
+      - "**.cmd"
+      - "**.c"
+      - "**.java"
       - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
 jobs:
-    
-  build-and-test-with-Java-9-and-later:
-    name: Build -> Test (JVM ${{ matrix.java }}, ${{ matrix.os }})
+
+  elaborate-native-module:
+    name: Elaborate native module (${{ matrix.os }} ${{ matrix.architecture }})
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 2
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+        java: [16]
+        architecture: [x86, x64]
+        exclude:
+          - os: macOS-latest
+            architecture: x86
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+      - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
+        name: Set up C/C++ compiler
+        run: |
+          sudo apt update
+          sudo apt-get -y install doxygen vera++ zlib1g-dev libsnappy-dev \
+            g++-multilib
+      - if: startsWith(matrix.os, 'windows-latest') && startsWith(matrix.architecture, 'x86')
+        name: Set up C/C++ compiler
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: ${{ matrix.architecture }}
+      - uses: actions/checkout@v2
+      - name: Build native library
+        run: mvn -B clean compile -Dproject_jdk_version=${{ matrix.java }} -DskipTests=true --file ./native/pom.xml
+      - if: github.event_name == 'push' && (endsWith(github.event.head_commit.message, 'Releasing new version') || contains(github.event.head_commit.message, 'Generating external artifacts'))
+        name: Push native library
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}
+          git add .
+          git commit -am "Generated native library on ${{ matrix.os }} ${{ matrix.architecture }}" --allow-empty
+          git push
+          
+   
+  elaborate-java-hook-module:
+    name: Elaborate java hook module (${{ matrix.os }})
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
         architecture: [x64]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [16]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -30,22 +103,61 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
-      - if: startsWith(matrix.os, 'ubuntu') == true || startsWith(matrix.os, 'macOS') == true
+      - if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
         name: Change the permissions of the build script of external classes
-        run: chmod +x ./src/main/resources/compileExternalClasses.sh
+        run: chmod +x ./java-hook/compileExternalClasses.sh
+      - name: Build hook classes
+        run: mvn -B clean compile -Dproject_jdk_version=${{ matrix.java }} -DskipTests=true --file ./java-hook/pom.xml
+      - if: github.event_name == 'push' && (endsWith(github.event.head_commit.message, 'Releasing new version') || contains(github.event.head_commit.message, 'Generating external artifacts')) && startsWith(matrix.os, 'windows')
+        name: Push hook classes
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}
+          git add .
+          git commit -am "Generated hook classes" --allow-empty
+          git push
+          
+
+  build-and-test-with-Java-8-and-later:
+    name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
+    needs: [elaborate-native-module, elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x86, x64]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
+        exclude:
+          - os: macOS-latest
+            architecture: x86
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin experimental  
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
-        run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file pom.xml
+        run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file ./java/pom.xml
       - if: endsWith(matrix.java, '17-ea') == true 
         name: Build and test with early access version JDK
-        run: mvn -B clean test -Dproject_jdk_version=17 -DskipTests=false --file pom.xml
+        run: mvn -B clean test -Dproject_jdk_version=17 -DskipTests=false --file ./java/pom.xml
       - if: endsWith(matrix.java, '18-ea') == true 
         name: Build and test with early access version JDK
-        run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file pom.xml
-       
+        run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml          
+
   release:
+    needs: [build-and-test-with-Java-8-and-later]
     name: Release if requested
-    needs: [build-and-test-with-Java-9-and-later]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
     steps:
@@ -57,14 +169,14 @@ jobs:
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-      - name: Publish to the Maven Central repository
+      - name: Publish to the Maven central repository
         run: |
           export GPG_TTY=$(tty)
           echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
-          chmod +x ./src/main/resources/compileExternalClasses.sh
-          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase=${{ secrets.gpg_passphrase }} -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git
+          git pull origin ${{github.ref}} 
+          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase=${{ secrets.gpg_passphrase }} -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
         env:
           MAVEN_USERNAME: ${{ secrets.nexus_username }}
           MAVEN_PASSWORD: ${{ secrets.nexus_password }}

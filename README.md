@@ -15,21 +15,44 @@ A driver to allow deep interaction with the JVM **without any restrictions**.
 
 </br>
 
-## Compilation requirements
+To include Burningwave JVM driver in your projects simply use with **Apache Maven**:
+```xml
+<dependency>
+    <groupId>org.burningwave</groupId>
+    <artifactId>jvm-driver</artifactId>
+    <version>0.19.0</version>
+</dependency>	
+```
 
-**A JDK version 9 or higher is required to compile the project** and the property 'project_jdk_version' inside pom.xml must be set to 8.
+</br>
+
+## Overview
+
+There are two kinds of driver:
+
+* the **default driver** completely based on Java api
+* the **hybrid driver** that extends the default driver and uses some custom JNI code that works on the following system configuration:
+    * Windows (x86, x64)
+    * Linux (x86, x64)
+    * MacOs
 
 </br>
 
 ## Using
 
-To create a Driver instance you should use this code:
+To create a default driver instance you should use this code:
 ```java
 
-Driver driver = new DefaultDriver();
+org.burningwave.jvm.Driver driver = new org.burningwave.jvm.DefaultDriver();
 ```
 
-The methods exposed by the driver are the following:
+To create a hybrid driver instance you should use this code:
+```java
+
+org.burningwave.jvm.Driver driver = new org.burningwave.jvm.HybridDriver();
+```
+
+The methods exposed by the Driver interface are the following:
 ```java                                                                                                     
 public void setFieldValue(Object target, Field field, Object value);                                    
                                                                                                         
@@ -69,4 +92,10 @@ public void setAccessible(AccessibleObject object, boolean flag);
                                                                                                         
 public <T> T allocateInstance(Class<?> cls);                                                            
 ```
+
+</br>
+
+## Compilation requirements
+
+**A JDK version 9 or higher and a GCC compiler are required to compile the project**. On Windows you can find compiler and GDB debugger from [**MinGW-W64 project**](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/).
 
