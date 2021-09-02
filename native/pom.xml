@@ -36,8 +36,8 @@
 		<artifactId>jvm-driver-parent</artifactId>
 		<version>${revision}</version>
 	</parent>
-
-	<artifactId>native</artifactId>
+	
+	<artifactId>jvm-driver-native</artifactId>
 	<name>native</name>
 
 	<properties>

@@ -34,8 +34,8 @@
     	<artifactId>jvm-driver-parent</artifactId>
         <version>${revision}</version>
     </parent>
-
-	<artifactId>java-hook</artifactId>
+	
+	<artifactId>jvm-driver-hook</artifactId>
 	
 	<packaging>pom</packaging>
 		
