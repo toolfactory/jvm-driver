@@ -10,6 +10,7 @@
 [![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/burningwave/jvm-driver/actions/runs/1195696540)
 
 [![Supported JVM](https://img.shields.io/badge/supported%20JVM-8%2C%209%2C%2010%2C%2011%2C%2012%2C%2013%2C%2014%2C%2015%2C%2016%2C%2017-blueviolet)](https://github.com/burningwave/jvm-driver/actions/runs/1195696540)
+[![Repository dependents](https://badgen.net/github/dependents-repo/burningwave/jvm-driver)](https://github.com/burningwave/jvm-driver/network/dependents)
 
 A driver to allow deep interaction with the JVM **without any restrictions**.
 
