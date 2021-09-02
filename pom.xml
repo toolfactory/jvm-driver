@@ -26,82 +26,19 @@
 	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 	OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>org.burningwave.parent</groupId>
     <artifactId>jvm-driver</artifactId>
     <version>${revision}</version>
-	
-		<description>
-		A driver to allow deep interaction with the JVM without any restrictions
-	</description>
-	<url>https://www.burningwave.org/</url>
 
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<url>https://github.com/burningwave/jvm-driver/blob/master/LICENSE</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<organization>
-		<name>Burningwave</name>
-		<url>https://www.burningwave.org/</url>
-	</organization>
-
-	<developers>
-		<developer>
-			<name>Roberto Gentili</name>
-			<id>roberto.gentili</id>
-			<email>info@burningwave.org</email>
-			<organization>Burningwave</organization>
-			<organizationUrl>https://www.burningwave.org/</organizationUrl>
-			<roles>
-				<role>Administrator</role>
-				<role>Developer</role>
-			</roles>
-		</developer>
-		<developer>
-			<name>Alessio Perrotta</name>
-			<email>info@burningwave.org</email>
-			<organization>Burningwave</organization>
-			<organizationUrl>https://www.burningwave.org/</organizationUrl>
-			<roles>
-				<role>External relationship manager</role>
-				<role>Developer</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<issueManagement>
-		<system>github.com</system>
-		<url>https://github.com/burningwave/jvm-driver/issues</url>
-	</issueManagement>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
-	<scm>
-		<connection>scm:git:${repository.url}</connection>
-		<developerConnection>scm:git:${repository.url}</developerConnection>
-		<url>https://github.com/burningwave/jvm-driver</url>
-		<tag>jvm-driver-0.19.0</tag>
-	</scm>
-	
     <properties>
         <revision>0.19.0-SNAPSHOT</revision>
         <project_jdk_version>9</project_jdk_version>
-        <repository.url>https://burningwave@github.com/burningwave/jvm-driver.git</repository.url>
     </properties>
 
     <packaging>pom</packaging>
