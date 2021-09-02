@@ -38,7 +38,7 @@ There are two kinds of driver:
 
 </br>
 
-## Usage
+## Using
 
 To create a default driver instance you should use this code:
 ```java
