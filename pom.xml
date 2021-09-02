@@ -31,7 +31,7 @@
     
     <groupId>org.burningwave.parent</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>0.19.1-SNAPSHOT</version>
+    <version>${revision}</version>
 	
 		<description>
 		A driver to allow deep interaction with the JVM without any restrictions
