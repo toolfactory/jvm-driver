@@ -33,12 +33,11 @@
 
 	<parent>
 		<groupId>org.burningwave</groupId>
-		<artifactId>jvm-driver-parent</artifactId>
+		<artifactId>jvm-driver</artifactId>
 		<version>${revision}</version>
 	</parent>
 
 	<artifactId>native</artifactId>
-	<name>native</name>
 
 	<properties>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
