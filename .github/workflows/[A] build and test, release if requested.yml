@@ -30,7 +30,7 @@ name: Build and release if requested
 on:
   push:
     branches:
-      - experimental
+      - main
     paths:
       - "**.sh"
       - "**.cmd"
