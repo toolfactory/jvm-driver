@@ -31,7 +31,7 @@ To include Burningwave JVM driver in your projects simply use with **Apache Mave
 There are two kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **hybrid driver** that extends the default driver and uses some custom JNI code that works on the following system configuration:
+* the **hybrid driver** that extends the default driver and uses some custom JNI code that works on the following system configurations:
     * Windows (x86, x64)
     * Linux (x86, x64)
     * MacOs
