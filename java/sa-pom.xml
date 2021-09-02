@@ -128,7 +128,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/burningwave/jvm-driver</url>
-		<tag>jvm-driver-0.19.1</tag>
+		<tag>jvm-driver-0.19.0</tag>
 	</scm>
 	
 	<dependencies>
