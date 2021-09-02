@@ -32,7 +32,7 @@
 	<parent>
 		<groupId>org.burningwave.parent</groupId>
 		<artifactId>jvm-driver</artifactId>
-		<version>${revision}</version>
+		<version>0.19.0</version>
 	</parent>
 	
 	<groupId>org.burningwave</groupId>
