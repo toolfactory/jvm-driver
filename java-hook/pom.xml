@@ -31,7 +31,7 @@
 	
 	<parent>
     	<groupId>org.burningwave</groupId>
-    	<artifactId>jvm-driver-parent</artifactId>
+    	<artifactId>jvm-driver</artifactId>
         <version>${revision}</version>
     </parent>
 
