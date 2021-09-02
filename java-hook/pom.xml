@@ -30,12 +30,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<parent>
-    	<groupId>org.burningwave</groupId>
+    	<groupId>org.burningwave.parent</groupId>
     	<artifactId>jvm-driver</artifactId>
         <version>${revision}</version>
     </parent>
-
-	<artifactId>java-hook</artifactId>
+	
+	<groupId>org.burningwave</groupId>
+	<artifactId>jvm-driver-hook</artifactId>
 	
 	<packaging>pom</packaging>
 		
