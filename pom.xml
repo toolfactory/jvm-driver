@@ -35,7 +35,72 @@
     <groupId>org.burningwave.parent</groupId>
     <artifactId>jvm-driver</artifactId>
     <version>${revision}</version>
+	
+		<description>
+		A driver to allow deep interaction with the JVM without any restrictions
+	</description>
+	<url>https://www.burningwave.org/</url>
 
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://github.com/burningwave/jvm-driver/blob/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Burningwave</name>
+		<url>https://www.burningwave.org/</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<name>Roberto Gentili</name>
+			<id>roberto.gentili</id>
+			<email>info@burningwave.org</email>
+			<organization>Burningwave</organization>
+			<organizationUrl>https://www.burningwave.org/</organizationUrl>
+			<roles>
+				<role>Administrator</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Alessio Perrotta</name>
+			<email>info@burningwave.org</email>
+			<organization>Burningwave</organization>
+			<organizationUrl>https://www.burningwave.org/</organizationUrl>
+			<roles>
+				<role>External relationship manager</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<issueManagement>
+		<system>github.com</system>
+		<url>https://github.com/burningwave/jvm-driver/issues</url>
+	</issueManagement>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:git:${repository.url}</connection>
+		<developerConnection>scm:git:${repository.url}</developerConnection>
+		<url>https://github.com/burningwave/jvm-driver</url>
+		<tag>HEAD</tag>
+	</scm>
+	
     <properties>
         <revision>0.19.0-SNAPSHOT</revision>
         <project_jdk_version>9</project_jdk_version>
