@@ -37,7 +37,7 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>0.19.0-SNAPSHOT</revision>
+        <revision>0.19.1-SNAPSHOT</revision>
         <project_jdk_version>9</project_jdk_version>
     </properties>
 
