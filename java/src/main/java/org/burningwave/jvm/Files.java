@@ -60,13 +60,11 @@ class Files {
             } catch (Throwable e) {}
 
             byte[] buffer = new byte[1024];
-            OutputStream os = new FileOutputStream(tempFile);
-            try {
+
+            try ( OutputStream os = new FileOutputStream(tempFile)) {
                 for (int readBytes; (readBytes = inputSream.read(buffer)) != -1;) {
                     os.write(buffer, 0, readBytes);
                 }
-            } finally {
-                os.close();
             }
             
             extractedFileConsumer.accept(tempFile);
