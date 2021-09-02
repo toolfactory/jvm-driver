@@ -36,7 +36,7 @@
     <artifactId>jvm-driver-parent</artifactId>
     <version>${revision}</version>
 	
-	<name>Burningwave JVM driver</name>
+	<name>Burningwave JVM Driver</name>
 	<description>
 		A driver to allow deep interaction with the JVM without any restrictions
 	</description>

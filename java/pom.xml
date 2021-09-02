@@ -36,11 +36,11 @@
     </parent>
 	
 	<artifactId>jvm-driver</artifactId>
-  	<version>0.19.2-SNAPSHOT</version>
+  	<version>0.19.1-SNAPSHOT</version>
 	
 	<packaging>jar</packaging>
 	
-	<name>Burningwave JVM driver</name>
+	<name>Burningwave JVM Driver</name>
 	<description>
 		A driver to allow deep interaction with the JVM without any restrictions
 	</description>
