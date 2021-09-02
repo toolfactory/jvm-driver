@@ -89,7 +89,7 @@
 	
 	<properties>
 		<copyright.holder>Roberto Gentili</copyright.holder>
-        <revision>0.19.0-SNAPSHOT</revision>
+        <revision>1.0.0</revision>
         <project_jdk_version>9</project_jdk_version>
         <repository.url>https://burningwave@github.com/burningwave/jvm-driver.git</repository.url>
 	</properties>
