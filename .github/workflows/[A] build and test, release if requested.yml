@@ -184,8 +184,8 @@ jobs:
           mv ./java/pom.xml ./java/temp-pom.xml
           mv ./java/sa-pom.xml ./java/pom.xml
           mv ./java/temp-pom.xml ./java/sa-pom.xml
-          newVersion=$(sed -r -n 's/<version>(.*-SNAPSHOT)<\/version>/\1/p' sa-pom.xml)
-          find ./pom.xml -type f -exec sed -r -i -e "s/<version>(.*-SNAPSHOT)<\/version>/<version>${newVersion}<\/version>/g" {} \;
+          newVersion=$(sed -r -n 's/<version>(.*-SNAPSHOT)<\/version>/\1/p' ./java/sa-pom.xml)
+          find ./java/pom.xml -type f -exec sed -r -i -e "s/<version>(.*-SNAPSHOT)<\/version>/<version>${newVersion}<\/version>/g" {} \;
           git commit -am "Released new version"
           git push    
         env:
