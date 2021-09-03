@@ -39,10 +39,10 @@ import java.util.function.Consumer;
 
 class Files {
 	
-	public static void extractAndExecute(String resourcePath, Consumer<File> extractedFileConsumer) {
+	public static void extractAndExecute(Class<?> callerClass, String resourcePath, Consumer<File> extractedFileConsumer) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
-        try (InputStream inputSream = Files.class.getResourceAsStream(resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath);) {
+        try (InputStream inputSream = callerClass.getResourceAsStream(resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath);) {
             
             if (inputSream == null) {
                 throw new FileNotFoundException("Could not find file: " + resourcePath);

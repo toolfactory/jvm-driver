@@ -61,16 +61,13 @@ public class Libraries {
     	return new Libraries();
     }
 	
-	public void load(String libName) {
+	public void loadFor(Class<?> clazz) {
 		Files.extractAndExecute(
-			libName + "-" + conventionedSuffix + "." + extension,
+			Libraries.class,
+			clazz.getName().replace(".", "/") + "-" + conventionedSuffix + "." + extension,
 			file ->
 				System.load(file.getAbsolutePath())
 		);
-	}
-	
-	public void loadFor(Class<?> clazz) {
-		load(clazz.getName().replace(".", "/"));
 	}
 	
 	private static class Holder {
