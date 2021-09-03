@@ -156,7 +156,6 @@ jobs:
         run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml          
 
   release:
-    needs: [build-and-test-with-Java-8-and-later]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
@@ -179,12 +178,14 @@ jobs:
           mv ./java/pom.xml ./java/temp-pom.xml
           mv ./java/sa-pom.xml ./java/pom.xml
           mv ./java/temp-pom.xml ./java/sa-pom.xml
-          git commit -am "Renamed poms for releasing"
+          git commit -am "Swithcing pom for releasing"
           git push          
           mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase=${{ secrets.gpg_passphrase }} -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
           mv ./java/pom.xml ./java/temp-pom.xml
           mv ./java/sa-pom.xml ./java/pom.xml
           mv ./java/temp-pom.xml ./java/sa-pom.xml
+          newVersion=$(sed -r -n 's/<version>(.*-SNAPSHOT)<\/version>/\1/p' sa-pom.xml)
+          find ./pom.xml -type f -exec sed -r -i -e "s/<version>(.*-SNAPSHOT)<\/version>/<version>${newVersion}<\/version>/g" {} \;
           git commit -am "Released new version"
           git push    
         env:
