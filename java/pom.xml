@@ -36,7 +36,7 @@
     </parent>
 	
 	<artifactId>jvm-driver</artifactId>
-  	<version>0.19.5-SNAPSHOT</version>
+  	<version>0.19.5</version>
 	
 	<packaging>jar</packaging>
 	
@@ -133,7 +133,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/burningwave/jvm-driver</url>
-		<tag>HEAD</tag>
+		<tag>jvm-driver-0.19.5</tag>
 	</scm>
 	
 	<dependencies>
