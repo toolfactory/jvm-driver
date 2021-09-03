@@ -31,7 +31,7 @@
 	
 	<groupId>org.burningwave</groupId>
 	<artifactId>jvm-driver</artifactId>
-  	<version>0.19.6</version>
+  	<version>0.19.7-SNAPSHOT</version>
 	
 	<packaging>jar</packaging>
 	
@@ -128,7 +128,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/burningwave/jvm-driver</url>
-		<tag>jvm-driver-0.19.6</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<dependencies>
