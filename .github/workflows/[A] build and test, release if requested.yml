@@ -35,6 +35,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.c"
+      - "**.cpp"
       - "**.java"
       - ".github/workflows/**"
       - "**.properties"

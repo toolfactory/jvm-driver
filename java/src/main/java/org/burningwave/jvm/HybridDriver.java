@@ -30,6 +30,10 @@ package org.burningwave.jvm;
 
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -55,7 +59,27 @@ public class HybridDriver extends DefaultDriver {
 					return DriverFunctionSupplierNative.getInstance().getMethodHandlesLookupSupplyingFunction();
 				}
 				
+				@Override
+				BiFunction<Object, Field, Object> getFieldValueFunction() {
+					return DriverFunctionSupplierNative.getInstance().getFieldValueFunction();
+				}
+				
+				@Override
+				Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
+					return DriverFunctionSupplierNative.getInstance().getSetFieldValueFunction();
+				}
+				
+				@Override
+				Function<Class<?>, Object> getAllocateInstanceFunction() {
+					return DriverFunctionSupplierNative.getInstance().getAllocateInstanceFunction();
+				}
+				
 			};
+		}
+		
+		@Override
+		protected void initAccessibleSetter() {
+			driver.accessibleSetter = DriverFunctionSupplierNative.getInstance().getSetAccessibleFunction();
 		}
 	
 	}

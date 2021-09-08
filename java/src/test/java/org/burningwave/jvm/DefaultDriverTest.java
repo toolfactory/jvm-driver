@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
-public class DefaultDriverTest{
+public class DefaultDriverTest {
 
 	
 	@Test
