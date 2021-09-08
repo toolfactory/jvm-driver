@@ -91,6 +91,21 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>windows-x86</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+				<property>
+					<name>sun.arch.data.model</name>
+					<value>32</value>
+				</property>
+			</activation>
+			<properties>
+				<org.codehaus.mojo.option.gcc-linker.flags>-Wl,--kill-at -fPIC -shared -static</org.codehaus.mojo.option.gcc-linker.flags>
+			</properties>
+		</profile>
+		<profile>
 			<id>x86</id>
 			<activation>
 				<property>
@@ -122,7 +137,6 @@
 					<compilerEndOptions>
 						<compilerEndOption>${org.codehaus.mojo.option.gcc-target-artifact-arch}</compilerEndOption>
 						<compilerEndOption>-fPIC</compilerEndOption>
-						<compilerEndOption>-std=c99</compilerEndOption>
 					</compilerEndOptions>
 					<linkerStartOptions>
 						<linkerStartOption>${org.codehaus.mojo.option.gcc-linker.flags}</linkerStartOption>
@@ -132,6 +146,7 @@
 					</linkerStartOptions>
 					<linkerEndOptions>
 						<linkerEndOption>${org.codehaus.mojo.option.gcc-target-artifact-arch}</linkerEndOption>
+						<linkerEndOption>-lstdc++</linkerEndOption>
 					</linkerEndOptions>
 					<linkerOutputDirectory>${project.basedir}/bin</linkerOutputDirectory>
 				</configuration>
@@ -148,7 +163,8 @@
 								<source>
 									<directory>${basedir}/src/main/c-c++</directory>
 									<fileNames>
-										<fileName>org/burningwave/jvm/DriverFunctionSupplierNative.c</fileName>
+										<fileName>org/burningwave/jvm/DriverFunctionSupplierNative.cpp</fileName>
+										<fileName>org/burningwave/jvm/Environment.cpp</fileName>
 									</fileNames>
 								</source>
 							</sources>
