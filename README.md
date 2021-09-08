@@ -36,7 +36,7 @@ There are two kinds of driver:
 * the **hybrid driver** that extends the default driver and uses some custom JNI code that works on the following system configurations:
     * Windows (x86, x64)
     * Linux (x86, x64)
-    * MacOs
+    * MacOs (x64)
 
 </br>
 
