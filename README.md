@@ -15,7 +15,7 @@
 
 A driver to allow deep interaction with the JVM **without any restrictions**.
 
-</br>
+<br/>
 
 To include Burningwave JVM driver in your projects simply use with **Apache Maven**:
 ```xml
@@ -26,7 +26,7 @@ To include Burningwave JVM driver in your projects simply use with **Apache Mave
 </dependency>	
 ```
 
-</br>
+<br/>
 
 ## Overview
 
@@ -38,7 +38,7 @@ There are two kinds of driver:
     * Linux (x86, x64)
     * MacOs (x64)
 
-</br>
+<br/>
 
 ## Using
 
@@ -95,7 +95,7 @@ public void setAccessible(AccessibleObject object, boolean flag);
 public <T> T allocateInstance(Class<?> cls);                                                            
 ```
 
-</br>
+<br/>
 
 ## Compilation requirements
 
