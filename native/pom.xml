@@ -49,7 +49,7 @@
 		<org.codehaus.mojo.option.spec-include-dir-one>${java.home}/include/</org.codehaus.mojo.option.spec-include-dir-one>
 		<org.codehaus.mojo.option.spec-include-dir-three>${java.home}/lib/</org.codehaus.mojo.option.spec-include-dir-three>
 		<org.codehaus.mojo.option.gcc-linker.flags>-fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
-		<org.codehaus.mojo.option.gcc-linker.final-name>JavaNativeEnvironment</org.codehaus.mojo.option.gcc-linker.final-name>
+		<org.codehaus.mojo.option.gcc-linker.artifact-name>JavaNativeEnvironment</org.codehaus.mojo.option.gcc-linker.artifact-name>
 	</properties>
 	
 	<profiles>
@@ -61,7 +61,7 @@
 				</os>
 			</activation>
 			<properties>
-				<org.codehaus.mojo.option.gcc-linker.final-name>lib${org.codehaus.mojo.option.gcc-linker.final-name}</org.codehaus.mojo.option.gcc-linker.final-name>
+				<org.codehaus.mojo.option.gcc-linker.final-name>lib${org.codehaus.mojo.option.gcc-linker.artifact-name}</org.codehaus.mojo.option.gcc-linker.final-name>
 				<packaging.type>dylib</packaging.type>
 				<org.codehaus.mojo.option.spec-include-dir-two>${java.home}/include/darwin/</org.codehaus.mojo.option.spec-include-dir-two>	
 			</properties>
@@ -75,7 +75,7 @@
 				</os>
 			</activation>
 			<properties>
-				<org.codehaus.mojo.option.gcc-linker.final-name>lib${org.codehaus.mojo.option.gcc-linker.final-name}</org.codehaus.mojo.option.gcc-linker.final-name>
+				<org.codehaus.mojo.option.gcc-linker.final-name>lib${org.codehaus.mojo.option.gcc-linker.artifact-name}</org.codehaus.mojo.option.gcc-linker.final-name>
 				<packaging.type>so</packaging.type>
 				<org.codehaus.mojo.option.spec-include-dir-two>${java.home}/include/linux/</org.codehaus.mojo.option.spec-include-dir-two>
 			</properties>
@@ -88,6 +88,7 @@
 				</os>
 			</activation>
 			<properties>
+				<org.codehaus.mojo.option.gcc-linker.final-name>${org.codehaus.mojo.option.gcc-linker.artifact-name}</org.codehaus.mojo.option.gcc-linker.final-name>
 				<packaging.type>dll</packaging.type>
 				<org.codehaus.mojo.option.spec-include-dir-two>${java.home}/include/win32/</org.codehaus.mojo.option.spec-include-dir-two>
 				<org.codehaus.mojo.option.gcc-linker.flags>-Wl,--kill-at -fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
