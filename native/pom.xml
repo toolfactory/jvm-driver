@@ -168,7 +168,7 @@
 									</fileNames>
 								</source>
 							</sources>
-							<linkerFinalName>libDriverFunctionSupplierNative-x${sun.arch.data.model}</linkerFinalName>
+							<linkerFinalName>DriverFunctionSupplierNative-x${sun.arch.data.model}</linkerFinalName>
 							<linkerFinalNameExt>${packaging.type}</linkerFinalNameExt>
 						</configuration>
 					</execution>
