@@ -36,6 +36,7 @@ import java.util.Optional;
 public class Libraries {
 	String conventionedSuffix;
 	String extension;
+	String prefix;
 	
 	private Libraries() {
 		JVMInfo jVMInfo = JVMInfo.getInstance();
@@ -45,9 +46,11 @@ public class Libraries {
 			conventionedSuffix = "x64";
 		}
 	    String operatingSystemName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+	    prefix = "lib";
 		if ((operatingSystemName.indexOf("mac") >= 0) || (operatingSystemName.indexOf("darwin") >= 0)) {
 			extension = "dylib";
 		} else if (operatingSystemName.indexOf("win") >= 0) {
+			prefix = null;
 			extension = "dll";
 		} else if (operatingSystemName.indexOf("nux") >= 0) {
 			extension = "so";
@@ -68,7 +71,7 @@ public class Libraries {
 		Files.extractAndExecute(
 			Libraries.class,
 			Optional.ofNullable(clazz.getPackage()).map(Package::getName).map(name -> name.replace(".", "/")).orElseGet(() -> "") + 
-			"/lib" + clazz.getSimpleName() + "-" + conventionedSuffix + "." + extension,
+			"/" + Optional.ofNullable(prefix).orElseGet(() -> "") + clazz.getSimpleName() + "-" + conventionedSuffix + "." + extension,
 			file ->
 				System.load(file.getAbsolutePath())
 		);

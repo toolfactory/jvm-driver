@@ -49,6 +49,7 @@
 		<org.codehaus.mojo.option.spec-include-dir-one>${java.home}/include/</org.codehaus.mojo.option.spec-include-dir-one>
 		<org.codehaus.mojo.option.spec-include-dir-three>${java.home}/lib/</org.codehaus.mojo.option.spec-include-dir-three>
 		<org.codehaus.mojo.option.gcc-linker.flags>-fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
+		<org.codehaus.mojo.option.gcc-linker.final-name>libJavaNativeEnvironment</org.codehaus.mojo.option.gcc-linker.final-name>
 	</properties>
 	
 	<profiles>
@@ -85,6 +86,7 @@
 				</os>
 			</activation>
 			<properties>
+				<org.codehaus.mojo.option.gcc-linker.final-name>JavaNativeEnvironment</org.codehaus.mojo.option.gcc-linker.final-name>
 				<packaging.type>dll</packaging.type>
 				<org.codehaus.mojo.option.spec-include-dir-two>${java.home}/include/win32/</org.codehaus.mojo.option.spec-include-dir-two>
 				<org.codehaus.mojo.option.gcc-linker.flags>-Wl,--kill-at -fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
@@ -168,7 +170,7 @@
 									</fileNames>
 								</source>
 							</sources>
-							<linkerFinalName>libJavaNativeEnvironment-x${sun.arch.data.model}</linkerFinalName>
+							<linkerFinalName>${org.codehaus.mojo.option.gcc-linker.final-name}-x${sun.arch.data.model}</linkerFinalName>
 							<linkerFinalNameExt>${packaging.type}</linkerFinalNameExt>
 						</configuration>
 					</execution>
