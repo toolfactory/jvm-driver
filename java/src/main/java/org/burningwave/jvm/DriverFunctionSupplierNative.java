@@ -40,61 +40,61 @@ import java.util.function.Supplier;
 class DriverFunctionSupplierNative {
 	
 	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-		NativeExecutor javaNativeEnvironment = NativeExecutor.getInstance();
+		NativeExecutor nativeExecutor = NativeExecutor.getInstance();
 		return () -> {
 			MethodHandles.Lookup consulter = MethodHandles.lookup();
-			javaNativeEnvironment.setAllowedModes(consulter, -1);
+			nativeExecutor.setAllowedModes(consulter, -1);
 			return consulter;
 		};
 	}
 	
 	BiFunction<Object, Field, Object> getFieldValueFunction() {
-		NativeExecutor javaNativeEnvironment = NativeExecutor.getInstance();
+		NativeExecutor nativeExecutor = NativeExecutor.getInstance();
 		return (target, field) -> {
 			Class<?> fieldType = field.getType();
 			if (Modifier.isStatic(field.getModifiers())) {
 				target = field.getDeclaringClass();
 				if(!fieldType.isPrimitive()) {
-					return javaNativeEnvironment.getStaticFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticFieldValue((Class<?>)target, field);
 				} else if (fieldType == int.class) {
-					return javaNativeEnvironment.getStaticIntegerFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticIntegerFieldValue((Class<?>)target, field);
 				} else if (fieldType == long.class) {
-					return javaNativeEnvironment.getStaticLongFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticLongFieldValue((Class<?>)target, field);
 				} else if (fieldType == float.class) {
-					return javaNativeEnvironment.getStaticFloatFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticFloatFieldValue((Class<?>)target, field);
 				} else if (fieldType == double.class) {
-					return javaNativeEnvironment.getStaticDoubleFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticDoubleFieldValue((Class<?>)target, field);
 				} else if (fieldType == boolean.class) {
-					return javaNativeEnvironment.getStaticBooleanFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticBooleanFieldValue((Class<?>)target, field);
 				} else if (fieldType == byte.class) {
-					return javaNativeEnvironment.getStaticByteFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticByteFieldValue((Class<?>)target, field);
 				} else {
-					return javaNativeEnvironment.getStaticCharacterFieldValue((Class<?>)target, field);
+					return nativeExecutor.getStaticCharacterFieldValue((Class<?>)target, field);
 				}
 			} else {
 				if(!fieldType.isPrimitive()) {
-					return javaNativeEnvironment.getFieldValue(target, field);
+					return nativeExecutor.getFieldValue(target, field);
 				} else if (fieldType == int.class) {
-					return javaNativeEnvironment.getIntegerFieldValue(target, field);
+					return nativeExecutor.getIntegerFieldValue(target, field);
 				} else if (fieldType == long.class) {
-					return javaNativeEnvironment.getLongFieldValue(target, field);
+					return nativeExecutor.getLongFieldValue(target, field);
 				} else if (fieldType == float.class) {
-					return javaNativeEnvironment.getFloatFieldValue(target, field);
+					return nativeExecutor.getFloatFieldValue(target, field);
 				} else if (fieldType == double.class) {
-					return javaNativeEnvironment.getDoubleFieldValue(target, field);
+					return nativeExecutor.getDoubleFieldValue(target, field);
 				} else if (fieldType == boolean.class) {
-					return javaNativeEnvironment.getBooleanFieldValue(target, field);
+					return nativeExecutor.getBooleanFieldValue(target, field);
 				} else if (fieldType == byte.class) {
-					return javaNativeEnvironment.getByteFieldValue(target, field);
+					return nativeExecutor.getByteFieldValue(target, field);
 				} else {
-					return javaNativeEnvironment.getCharacterFieldValue(target, field);
+					return nativeExecutor.getCharacterFieldValue(target, field);
 				}
 			}
 		};
 	}
 
 	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
-		NativeExecutor javaNativeEnvironment = NativeExecutor.getInstance();
+		NativeExecutor nativeExecutor = NativeExecutor.getInstance();
 		return origTarget -> (field, value) -> {
 			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
 				Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
@@ -106,39 +106,39 @@ class DriverFunctionSupplierNative {
 			if (Modifier.isStatic(field.getModifiers())) {
 				target = field.getDeclaringClass();
 				if(!fieldType.isPrimitive()) {
-					javaNativeEnvironment.setStaticFieldValue((Class<?>)target, field, value);
+					nativeExecutor.setStaticFieldValue((Class<?>)target, field, value);
 				} else if (fieldType == int.class) {
-					javaNativeEnvironment.setStaticIntegerFieldValue((Class<?>)target, field, (Integer)value);
+					nativeExecutor.setStaticIntegerFieldValue((Class<?>)target, field, (Integer)value);
 				} else if (fieldType == long.class) {
-					javaNativeEnvironment.setStaticLongFieldValue((Class<?>)target, field, (Long)value);
+					nativeExecutor.setStaticLongFieldValue((Class<?>)target, field, (Long)value);
 				} else if (fieldType == float.class) {
-					javaNativeEnvironment.setStaticFloatFieldValue((Class<?>)target, field, (Float)value);
+					nativeExecutor.setStaticFloatFieldValue((Class<?>)target, field, (Float)value);
 				} else if (fieldType == double.class) {
-					javaNativeEnvironment.setStaticDoubleFieldValue((Class<?>)target, field, (Double)value);
+					nativeExecutor.setStaticDoubleFieldValue((Class<?>)target, field, (Double)value);
 				} else if (fieldType == boolean.class) {
-					javaNativeEnvironment.setStaticBooleanFieldValue((Class<?>)target, field, (Boolean)value);
+					nativeExecutor.setStaticBooleanFieldValue((Class<?>)target, field, (Boolean)value);
 				} else if (fieldType == byte.class) {
-					javaNativeEnvironment.setStaticByteFieldValue((Class<?>)target, field, (Byte)value);
+					nativeExecutor.setStaticByteFieldValue((Class<?>)target, field, (Byte)value);
 				} else {
-					javaNativeEnvironment.setStaticCharacterFieldValue((Class<?>)target, field, (Character)value);
+					nativeExecutor.setStaticCharacterFieldValue((Class<?>)target, field, (Character)value);
 				}
 			} else {
 				if(!fieldType.isPrimitive()) {
-					javaNativeEnvironment.setFieldValue(target, field, value);
+					nativeExecutor.setFieldValue(target, field, value);
 				} else if (fieldType == int.class) {
-					javaNativeEnvironment.setIntegerFieldValue(target, field, (Integer)value);
+					nativeExecutor.setIntegerFieldValue(target, field, (Integer)value);
 				} else if (fieldType == long.class) {
-					javaNativeEnvironment.setLongFieldValue(target, field, (Long)value);
+					nativeExecutor.setLongFieldValue(target, field, (Long)value);
 				} else if (fieldType == float.class) {
-					javaNativeEnvironment.setFloatFieldValue(target, field, (Float)value);
+					nativeExecutor.setFloatFieldValue(target, field, (Float)value);
 				} else if (fieldType == double.class) {
-					javaNativeEnvironment.setDoubleFieldValue(target, field, (Double)value);
+					nativeExecutor.setDoubleFieldValue(target, field, (Double)value);
 				} else if (fieldType == boolean.class) {
-					javaNativeEnvironment.setBooleanFieldValue(target, field, (Boolean)value);
+					nativeExecutor.setBooleanFieldValue(target, field, (Boolean)value);
 				} else if (fieldType == byte.class) {
-					javaNativeEnvironment.setByteFieldValue(target, field, (Byte)value);
+					nativeExecutor.setByteFieldValue(target, field, (Byte)value);
 				} else {
-					javaNativeEnvironment.setCharacterFieldValue(target, field, (Character)value);
+					nativeExecutor.setCharacterFieldValue(target, field, (Character)value);
 				}
 			}
 		};
