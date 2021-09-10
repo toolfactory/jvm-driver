@@ -4,7 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 
-public final class NativeExecutor {
+final class NativeExecutor {
 	private final static NativeExecutor INSTANCE;
 	
 	private NativeExecutor() {}
@@ -14,7 +14,7 @@ public final class NativeExecutor {
 		INSTANCE = new NativeExecutor();
 	}
 	
-	public final static  NativeExecutor getInstance() {
+	final static  NativeExecutor getInstance() {
 		return INSTANCE;
 	}
 	
