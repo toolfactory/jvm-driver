@@ -30,6 +30,7 @@ package org.burningwave.jvm;
 
 
 import java.util.Locale;
+import java.util.Optional;
 
 
 public class Libraries {
@@ -66,7 +67,8 @@ public class Libraries {
 	public void loadFor(Class<?> clazz) {
 		Files.extractAndExecute(
 			Libraries.class,
-			clazz.getName().replace(".", "/") + "-" + conventionedSuffix + "." + extension,
+			Optional.ofNullable(clazz.getPackage()).map(Package::getName).map(name -> name.replace(".", "/")).orElseGet(() -> "") + 
+			"/lib" + clazz.getSimpleName() + "-" + conventionedSuffix + "." + extension,
 			file ->
 				System.load(file.getAbsolutePath())
 		);
