@@ -146,7 +146,7 @@ PrimitiveFieldAccessor<Type>::PrimitiveFieldAccessor (
 	Type (JNIEnv::*getStaticFieldValueFunction) (jclass, jfieldID),
 	void (JNIEnv::*setValueFunction) (jobject, jfieldID, Type),
 	void (JNIEnv::*setStaticValueFunction) (jclass , jfieldID, Type)
-) : FieldAccessor(jNIEnv), valueOfMethodSig{} {
+) : FieldAccessor(jNIEnv) {
 	this->wrapperClass = (jclass)jNIEnv->NewGlobalRef(jNIEnv->FindClass(name));
 	this->callStaticObjectMethod = &JNIEnv::CallStaticObjectMethod;
 	this->callTypeMethodFunction = callTypeMethodFunction;
