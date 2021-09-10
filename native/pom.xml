@@ -163,12 +163,12 @@
 								<source>
 									<directory>${basedir}/src/main/c-c++</directory>
 									<fileNames>
-										<fileName>org/burningwave/jvm/DriverFunctionSupplierNative.cpp</fileName>
+										<fileName>org/burningwave/jvm/JavaNativeEnvironment.cpp</fileName>
 										<fileName>org/burningwave/jvm/Environment.cpp</fileName>
 									</fileNames>
 								</source>
 							</sources>
-							<linkerFinalName>libDriverFunctionSupplierNative-x${sun.arch.data.model}</linkerFinalName>
+							<linkerFinalName>libJavaNativeEnvironment-x${sun.arch.data.model}</linkerFinalName>
 							<linkerFinalNameExt>${packaging.type}</linkerFinalNameExt>
 						</configuration>
 					</execution>

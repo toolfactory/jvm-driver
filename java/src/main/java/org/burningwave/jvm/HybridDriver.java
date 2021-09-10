@@ -45,33 +45,36 @@ public class HybridDriver extends DefaultDriver {
 	}
 	
 	protected static class ForJava17 extends DefaultDriver.Initializer.ForJava17 {
+		private DriverFunctionSupplierNative driverFunctionSupplierNative;
 		
 		protected ForJava17(DefaultDriver driver) {
 			super(driver);
+			driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 		}
 		
 		@Override
 		protected void initNativeFunctionSupplier() {
+			DriverFunctionSupplierNative driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 			this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver) {
 				
 				@Override
 				Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-					return DriverFunctionSupplierNative.getInstance().getMethodHandlesLookupSupplyingFunction();
+					return driverFunctionSupplierNative.getMethodHandlesLookupSupplyingFunction();
 				}
 				
 				@Override
 				BiFunction<Object, Field, Object> getFieldValueFunction() {
-					return DriverFunctionSupplierNative.getInstance().getFieldValueFunction();
+					return driverFunctionSupplierNative.getFieldValueFunction();
 				}
 				
 				@Override
 				Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
-					return DriverFunctionSupplierNative.getInstance().getSetFieldValueFunction();
+					return driverFunctionSupplierNative.getSetFieldValueFunction();
 				}
 				
 				@Override
 				Function<Class<?>, Object> getAllocateInstanceFunction() {
-					return DriverFunctionSupplierNative.getInstance().getAllocateInstanceFunction();
+					return driverFunctionSupplierNative.getAllocateInstanceFunction();
 				}
 				
 			};
@@ -79,7 +82,13 @@ public class HybridDriver extends DefaultDriver {
 		
 		@Override
 		protected void initAccessibleSetter() {
-			driver.accessibleSetter = DriverFunctionSupplierNative.getInstance().getSetAccessibleFunction();
+			driver.accessibleSetter = driverFunctionSupplierNative.getSetAccessibleFunction();
+		}
+		
+		@Override
+		public void close() {
+			driverFunctionSupplierNative = null;
+			super.close();
 		}
 	
 	}
