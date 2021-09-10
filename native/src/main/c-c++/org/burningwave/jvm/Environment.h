@@ -34,6 +34,8 @@ class FieldAccessor {
 	public:
 		FieldAccessor(JNIEnv* env);
 
+		virtual ~FieldAccessor();
+
 		virtual void destroy(JNIEnv* env);
 
 		virtual jobject getValue(JNIEnv* env, jobject, jobject) = 0;
@@ -58,6 +60,8 @@ class PrimitiveFieldAccessor : public FieldAccessor {
 			void (JNIEnv::*setValueFunction) (jobject, jfieldID, Type),
 			void (JNIEnv::*setStaticValueFunction) (jclass , jfieldID, Type)
 		);
+
+		~PrimitiveFieldAccessor();
 
 		void destroy(JNIEnv* env);
 
@@ -85,6 +89,8 @@ class PrimitiveFieldAccessor : public FieldAccessor {
 class ObjectFieldAccessor : public FieldAccessor {
 	public :
 		ObjectFieldAccessor (JNIEnv* env);
+
+		~ObjectFieldAccessor();
 
 		void destroy(JNIEnv* env);
 

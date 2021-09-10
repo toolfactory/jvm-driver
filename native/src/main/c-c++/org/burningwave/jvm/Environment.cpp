@@ -130,6 +130,9 @@ void Environment::init(JNIEnv* jNIEnv) {
 FieldAccessor::FieldAccessor(JNIEnv* env) {}
 
 
+FieldAccessor::~FieldAccessor() {}
+
+
 void FieldAccessor::destroy(JNIEnv* jNIEnv) {}
 
 
@@ -155,6 +158,8 @@ PrimitiveFieldAccessor<Type>::PrimitiveFieldAccessor (
 	this->setStaticValueFunction = setStaticValueFunction;
 }
 
+template<typename Type>
+PrimitiveFieldAccessor<Type>::~PrimitiveFieldAccessor() {}
 
 template<typename Type>
 void PrimitiveFieldAccessor<Type>::destroy(JNIEnv* jNIEnv) {
@@ -213,6 +218,9 @@ void PrimitiveFieldAccessor<Type>::setStaticValue(JNIEnv* jNIEnv, jclass target,
 
 
 ObjectFieldAccessor::ObjectFieldAccessor(JNIEnv* env) : FieldAccessor(env)  {}
+
+
+ObjectFieldAccessor::~ObjectFieldAccessor(){}
 
 
 void ObjectFieldAccessor::destroy(JNIEnv* jNIEnv) {}
