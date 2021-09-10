@@ -4,17 +4,17 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 
-public final class NativeEnvironment {
-	private final static NativeEnvironment INSTANCE;
+public final class JavaNativeEnvironment {
+	private final static JavaNativeEnvironment INSTANCE;
 	
-	private NativeEnvironment() {}
+	private JavaNativeEnvironment() {}
 	
 	static {
-		Libraries.getInstance().loadFor(NativeEnvironment.class);
-		INSTANCE = new NativeEnvironment();
+		Libraries.getInstance().loadFor(JavaNativeEnvironment.class);
+		INSTANCE = new JavaNativeEnvironment();
 	}
 	
-	public final static  NativeEnvironment getInstance() {
+	public final static  JavaNativeEnvironment getInstance() {
 		return INSTANCE;
 	}
 	
