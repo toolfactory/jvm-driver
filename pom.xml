@@ -40,7 +40,7 @@
 	<description>
 		A driver to allow deep interaction with the JVM without any restrictions
 	</description>
-	<url>https://www.burningwave.org/</url>
+	<url>https://burningwave.github.io/jvm-driver/</url>
 	
     <packaging>pom</packaging>
 
