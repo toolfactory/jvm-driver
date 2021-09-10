@@ -49,7 +49,7 @@
 		<org.codehaus.mojo.option.spec-include-dir-one>${java.home}/include/</org.codehaus.mojo.option.spec-include-dir-one>
 		<org.codehaus.mojo.option.spec-include-dir-three>${java.home}/lib/</org.codehaus.mojo.option.spec-include-dir-three>
 		<org.codehaus.mojo.option.gcc-linker.flags>-fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
-		<org.codehaus.mojo.option.gcc-linker.artifact-name>JavaNativeEnvironment</org.codehaus.mojo.option.gcc-linker.artifact-name>
+		<org.codehaus.mojo.option.gcc-linker.artifact-name>NativeEnvironment</org.codehaus.mojo.option.gcc-linker.artifact-name>
 	</properties>
 	
 	<profiles>
