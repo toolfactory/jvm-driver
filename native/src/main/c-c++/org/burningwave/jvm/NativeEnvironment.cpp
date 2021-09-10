@@ -26,15 +26,15 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#include "./Environment.h"
+#include "NativeEnvironment.h"
 
 
-Environment::Environment(JNIEnv* env) {
+NativeEnvironment::NativeEnvironment(JNIEnv* env) {
 	this->init(env);
 }
 
 
-void Environment::destroy(JNIEnv* jNIEnv){
+void NativeEnvironment::destroy(JNIEnv* jNIEnv){
 	delete(this->objectFieldAccessor);
 	this->objectFieldAccessor = NULL;
 
@@ -69,7 +69,7 @@ void Environment::destroy(JNIEnv* jNIEnv){
 	jNIEnv->DeleteGlobalRef(this->java_lang_NullPointerExceptionClass);
 }
 
-void Environment::init(JNIEnv* jNIEnv) {
+void NativeEnvironment::init(JNIEnv* jNIEnv) {
 	this->java_lang_NullPointerExceptionClass = (jclass)jNIEnv->NewGlobalRef(jNIEnv->FindClass("java/lang/NullPointerException"));
 	this->objectFieldAccessor = new ObjectFieldAccessor(jNIEnv);
 	this->jintFieldAccessor = new PrimitiveFieldAccessor<jint>(

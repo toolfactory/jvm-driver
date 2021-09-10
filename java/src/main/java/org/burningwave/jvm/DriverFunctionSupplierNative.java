@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 class DriverFunctionSupplierNative {
 	
 	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-		JavaNativeEnvironment javaNativeEnvironment = JavaNativeEnvironment.getInstance();
+		NativeExecutor javaNativeEnvironment = NativeExecutor.getInstance();
 		return () -> {
 			MethodHandles.Lookup consulter = MethodHandles.lookup();
 			javaNativeEnvironment.setAllowedModes(consulter, -1);
@@ -49,7 +49,7 @@ class DriverFunctionSupplierNative {
 	}
 	
 	BiFunction<Object, Field, Object> getFieldValueFunction() {
-		JavaNativeEnvironment javaNativeEnvironment = JavaNativeEnvironment.getInstance();
+		NativeExecutor javaNativeEnvironment = NativeExecutor.getInstance();
 		return (target, field) -> {
 			Class<?> fieldType = field.getType();
 			if (Modifier.isStatic(field.getModifiers())) {
@@ -94,7 +94,7 @@ class DriverFunctionSupplierNative {
 	}
 
 	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
-		JavaNativeEnvironment javaNativeEnvironment = JavaNativeEnvironment.getInstance();
+		NativeExecutor javaNativeEnvironment = NativeExecutor.getInstance();
 		return origTarget -> (field, value) -> {
 			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
 				Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
@@ -146,12 +146,12 @@ class DriverFunctionSupplierNative {
 	
 	
 	BiConsumer<AccessibleObject, Boolean> getSetAccessibleFunction() {
-		return JavaNativeEnvironment.getInstance()::setAccessible;
+		return NativeExecutor.getInstance()::setAccessible;
 	}
 	
 	
 	public Function<Class<?>, Object> getAllocateInstanceFunction() {
-		return JavaNativeEnvironment.getInstance()::allocateInstance;
+		return NativeExecutor.getInstance()::allocateInstance;
 	}
 
 }

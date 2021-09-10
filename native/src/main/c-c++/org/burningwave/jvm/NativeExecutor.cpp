@@ -26,11 +26,11 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#include "./JavaNativeEnvironment.h"
-#include "./Environment.h"
+#include "NativeExecutor.h"
+#include "NativeEnvironment.h"
 
 
-Environment* environment;
+NativeEnvironment* environment;
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -38,7 +38,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 	if (vm->GetEnv((void**)&jNIEnv, JNI_VERSION_9) != JNI_OK) {
 		return -1;
 	}
-	environment = new Environment(jNIEnv);
+	environment = new NativeEnvironment(jNIEnv);
 	return JNI_VERSION_9;
 }
 
@@ -113,159 +113,159 @@ void checkAndSetStaticFieldValue(
 }
 
 //Set object value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->objectFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->objectFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->objectFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->objectFieldAccessor);
 }
 
 
 //Get/set int value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getIntegerFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getIntegerFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jintFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticIntegerFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticIntegerFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jintFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setIntegerFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setIntegerFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jintFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticIntegerFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticIntegerFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jintFieldAccessor);
 }
 
 
 //Get/set long value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getLongFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getLongFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jlongFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticLongFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticLongFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jlongFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setLongFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setLongFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jlongFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticLongFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticLongFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jlongFieldAccessor);
 }
 
 
 //Get/set float value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getFloatFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getFloatFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jfloatFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticFloatFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticFloatFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jfloatFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setFloatFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setFloatFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jfloatFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticFloatFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticFloatFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jfloatFieldAccessor);
 }
 
 
 //Get/set double value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getDoubleFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getDoubleFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jdoubleFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticDoubleFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticDoubleFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jdoubleFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setDoubleFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setDoubleFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jdoubleFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticDoubleFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticDoubleFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jdoubleFieldAccessor);
 }
 
 
 //Get/set boolean value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getBooleanFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getBooleanFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jbooleanFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticBooleanFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticBooleanFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jbooleanFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setBooleanFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setBooleanFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jbooleanFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticBooleanFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticBooleanFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jbooleanFieldAccessor);
 }
 
 
 //Get/set byte value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getByteFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getByteFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jbyteFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticByteFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticByteFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jbyteFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setByteFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setByteFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jbyteFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticByteFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticByteFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jbyteFieldAccessor);
 }
 
 
 //Get/set char value
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getCharacterFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getCharacterFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field) {
 	return checkAndGetFieldValue(jNIEnv, target, field, environment->jcharFieldAccessor);
 }
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_getStaticCharacterFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(getStaticCharacterFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field) {
 	return checkAndGetStaticFieldValue(jNIEnv, target,  field, environment->jcharFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setCharacterFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setCharacterFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject target, jobject field, jobject value) {
 	checkAndSetFieldValue(jNIEnv, target,  field, value, environment->jcharFieldAccessor);
 }
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setStaticCharacterFieldValue(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass target, jobject field, jobject value) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setStaticCharacterFieldValue)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass target, jobject field, jobject value) {
 	checkAndSetStaticFieldValue(jNIEnv, target,  field, value, environment->jcharFieldAccessor);
 }
 
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setAllowedModes(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject consulter, jint modes) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setAllowedModes)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject consulter, jint modes) {
 	jNIEnv->SetIntField(consulter, environment->java_lang_invoke_MethodHandles$Lookup_allowedModesFieldId, modes);
 }
 
 
-JNIEXPORT void JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_setAccessible(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jobject accessibleObject, jboolean flag) {
+JNIEXPORT void JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(setAccessible)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jobject accessibleObject, jboolean flag) {
 	jNIEnv->SetBooleanField(accessibleObject, environment->java_lang_reflect_AccessibleObject_overrideFieldId, flag);
 }
 
 
-JNIEXPORT jobject JNICALL Java_org_burningwave_jvm_JavaNativeEnvironment_allocateInstance(JNIEnv* jNIEnv, jobject javaNativeEnvironmentInstance, jclass instanceType) {
+JNIEXPORT jobject JNICALL JNI_FUNCTION_NAME_OF_CLASS_00001(allocateInstance)(JNIEnv* jNIEnv, jobject nativeExecutorInstance, jclass instanceType) {
 	return jNIEnv->AllocObject(instanceType);
 }
