@@ -34,6 +34,7 @@
 		#define CLASS_00002_NAME org_burningwave_jvm_Environment
 	#endif
 
+
 	class FieldAccessor {
 
 		public:
@@ -52,6 +53,7 @@
 			virtual void setStaticValue(JNIEnv* env, jclass, jobject, jobject) = 0;
 
 	};
+
 
 	template<typename Type>
 	class PrimitiveFieldAccessor : public FieldAccessor {
@@ -90,6 +92,7 @@
 			void (JNIEnv::*setStaticValueFunction) (jclass, jfieldID, Type);
 	};
 
+
 	class ObjectFieldAccessor : public FieldAccessor {
 		public :
 			ObjectFieldAccessor (JNIEnv* env);
@@ -107,6 +110,7 @@
 			void setStaticValue(JNIEnv* env, jclass, jobject, jobject);
 
 	};
+
 
 	class NativeEnvironment {
 		public:
@@ -129,5 +133,20 @@
 
 			void init(JNIEnv*);
 	};
+
+
+	int throwNullPointerExceptionIfNull(NativeEnvironment*, JNIEnv*, jobject, const char[]);
+
+
+	jobject checkAndGetFieldValue(NativeEnvironment*, JNIEnv* jNIEnv, jobject, jobject,	FieldAccessor*);
+
+
+	jobject checkAndGetStaticFieldValue(NativeEnvironment*, JNIEnv*, jclass, jobject, FieldAccessor*);
+
+
+	void checkAndSetFieldValue(NativeEnvironment*, JNIEnv*, jobject, jobject, jobject, FieldAccessor*);
+
+
+	void checkAndSetStaticFieldValue(NativeEnvironment*, JNIEnv*, jclass, jobject, jobject,	FieldAccessor*);
 
 #endif

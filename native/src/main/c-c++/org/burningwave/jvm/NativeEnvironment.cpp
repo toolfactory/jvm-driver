@@ -248,3 +248,68 @@ void ObjectFieldAccessor::setStaticValue(JNIEnv* jNIEnv, jclass target, jobject 
 	jfieldID fieldId = jNIEnv->FromReflectedField(field);
 	jNIEnv->SetStaticObjectField(target, fieldId, value);
 }
+
+
+int throwNullPointerExceptionIfNull(NativeEnvironment* environment, JNIEnv* jNIEnv, jobject object, const char message[]) {
+	if (object == NULL) {
+		jNIEnv->ThrowNew(environment->java_lang_NullPointerExceptionClass, message);
+		return -1;
+	}
+	return 0;
+}
+
+
+jobject checkAndGetFieldValue(
+	NativeEnvironment* environment,
+	JNIEnv* jNIEnv,
+	jobject target, jobject field,
+	FieldAccessor* fieldAccessor
+) {
+	if (throwNullPointerExceptionIfNull(environment, jNIEnv, target, "Target is null") != 0) {
+		return NULL;
+	}
+	if (throwNullPointerExceptionIfNull(environment, jNIEnv, field, "Field is null") != 0) {
+		return NULL;
+	}
+    return fieldAccessor->getValue(jNIEnv, target, field);
+}
+
+
+jobject checkAndGetStaticFieldValue(
+	NativeEnvironment* environment,
+	JNIEnv* jNIEnv,
+	jclass target, jobject field,
+	FieldAccessor* fieldAccessor
+) {
+	if (throwNullPointerExceptionIfNull(environment, jNIEnv, target, "Target is null") != 0) {
+		return NULL;
+	}
+	if (throwNullPointerExceptionIfNull(environment, jNIEnv, field, "Field is null") != 0) {
+		return NULL;
+	}
+    return fieldAccessor->getStaticValue(jNIEnv, target, field);
+}
+
+
+void checkAndSetFieldValue(
+	NativeEnvironment* environment,
+	JNIEnv* jNIEnv,
+	jobject target, jobject field, jobject value,
+	FieldAccessor* fieldAccessor
+) {
+	if (throwNullPointerExceptionIfNull(environment, jNIEnv, target, "Target is null") == 0) {
+		fieldAccessor->setValue(jNIEnv, target, field, value);
+	}
+}
+
+
+void checkAndSetStaticFieldValue(
+	NativeEnvironment* environment,
+	JNIEnv* jNIEnv,
+	jclass target, jobject field, jobject value,
+	FieldAccessor* fieldAccessor
+) {
+	if (throwNullPointerExceptionIfNull(environment, jNIEnv, target, "Target is null") == 0) {
+		fieldAccessor->setStaticValue(jNIEnv, target, field, value);
+	}
+}
