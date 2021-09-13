@@ -16,3 +16,19 @@
     color: #e54d1d;
   }
 }
+
+.project-name {
+    font-family: 'Aldo Pro';
+    font-size: 5.25rem;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Aldo Pro';
+    src: local('Aldo Pro Medium'), local('Aldo-Pro-Medium'),
+        url('./../fonts/AldoPro-Medium.woff2') format('woff2'),
+        url('./../fonts/AldoPro-Medium.woff') format('woff'),
+        url('./../fonts/AldoPro-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
