@@ -1,5 +1,4 @@
 theme: jekyll-theme-cayman
 title: Burningwave JVM driver
 google_analytics: UA-154852845-4
-site.show_downloads: true
-show_downloads: true
+show_downloads: false
