@@ -253,7 +253,8 @@
 						<exclude>jdk/</exclude>
 						<exclude>java/</exclude>
 						<exclude>META-INF/maven/</exclude>
-						<exclude>**/*.c</exclude>						
+						<exclude>**/*.c</exclude>
+						<exclude>**/*.cpp</exclude>						
 						<exclude>**/*.h</exclude>
 					</excludes>
 					<archive>
