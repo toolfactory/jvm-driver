@@ -25,7 +25,7 @@ To include Burningwave JVM driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>org.burningwave</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>	
 ```
 
