@@ -166,7 +166,7 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>${project.basedir}</directory>
+				<directory>${project.basedir}/../</directory>
 				<includes>
 					<include>**LICENSE</include>
 				</includes>
