@@ -50,7 +50,7 @@ jobs:
       max-parallel: 2
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
-        java: [16]
+        java: [17]
         architecture: [x86, x64]
         exclude:
           - os: macOS-latest
@@ -129,7 +129,7 @@ jobs:
       matrix:
         architecture: [x86, x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17-ea, 18-ea]
+        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
@@ -149,9 +149,6 @@ jobs:
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
         run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file ./java/pom.xml
-      - if: endsWith(matrix.java, '17-ea') == true 
-        name: Build and test with early access version JDK
-        run: mvn -B clean test -Dproject_jdk_version=17 -DskipTests=false --file ./java/pom.xml
       - if: endsWith(matrix.java, '18-ea') == true 
         name: Build and test with early access version JDK
         run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml          
