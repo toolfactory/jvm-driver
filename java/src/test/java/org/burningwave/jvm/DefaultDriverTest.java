@@ -7,19 +7,23 @@ import org.junit.jupiter.api.Test;
 
 
 @SuppressWarnings("unused")
-public class DefaultDriverTest {
-
+public class DefaultDriverTest extends BaseTest {
+	private static Driver driver;
 	
-	@Test
-	public void getDeclaredField_getFieldValueTest() {
-		try {
-			Driver driver = new DefaultDriver();
-			MethodHandle methodHandle =
-				driver.getFieldValue(driver, driver.getDeclaredField(driver.getClass(), "constructorInvoker"));
-		} catch (Throwable exc) {
-			exc.printStackTrace();
-			Throwables.throwException(exc);
+	Driver getDriver() {
+		if (driver == null) {
+			try {
+				driver = new DefaultDriver();
+			} catch (Throwable exc) {
+				exc.printStackTrace();
+				return Throwables.throwException(exc);
+			}
 		}
+		return driver;
+	}	
+	@Test
+	public void getAndSetDirectVolatileTestOne() {
+		super.getAndSetDirectVolatileTestOne();
 	}
 	
 }
