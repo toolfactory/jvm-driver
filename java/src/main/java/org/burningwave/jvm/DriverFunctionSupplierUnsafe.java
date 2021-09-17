@@ -50,6 +50,7 @@ import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
 abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
+	
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	JVMInfo jVMInfo;
@@ -307,7 +308,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		ForJava17(Driver driver) {
 			super(driver);
 		}
-				
+
 		@Override
 		BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
 			try {
