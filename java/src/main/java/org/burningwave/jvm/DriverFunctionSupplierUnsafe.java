@@ -66,6 +66,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		}
 	}	
 	
+	
 	abstract Lookup retrieveConsulter(Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable;
 	
 	@Override
