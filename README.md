@@ -14,7 +14,6 @@
 [![GitHub open issues](https://img.shields.io/github/issues/burningwave/jvm-driver)](https://github.com/burningwave/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/burningwave/jvm-driver)](https://github.com/burningwave/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
 
-[![Artifact downloads](https://www.burningwave.org/generators/generate-burningwave-artifact-downloads-badge.php?type=svgg&artifactId=jvm-driver)](https://www.burningwave.org/artifact-downloads/?show-monthly-trend-chart=false)
 [![Repository dependents](https://badgen.net/github/dependents-repo/burningwave/jvm-driver)](https://github.com/burningwave/jvm-driver/network/dependents)
 
 A driver to allow deep interaction with the JVM **without any restrictions**.
