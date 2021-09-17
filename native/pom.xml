@@ -48,6 +48,7 @@
 		<org.codehaus.mojo.option.gcc-target-artifact-arch>-m64</org.codehaus.mojo.option.gcc-target-artifact-arch>
 		<org.codehaus.mojo.option.spec-include-dir-one>${java.home}/include/</org.codehaus.mojo.option.spec-include-dir-one>
 		<org.codehaus.mojo.option.spec-include-dir-three>${java.home}/lib/</org.codehaus.mojo.option.spec-include-dir-three>
+		<org.codehaus.mojo.option.gcc-compiler.flags>-O03 -fPIC</org.codehaus.mojo.option.gcc-compiler.flags>
 		<org.codehaus.mojo.option.gcc-linker.flags>-fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
 		<org.codehaus.mojo.option.gcc-linker.artifact-name>NativeExecutor</org.codehaus.mojo.option.gcc-linker.artifact-name>
 	</properties>
@@ -121,6 +122,18 @@
 				<org.codehaus.mojo.option.gcc-target-artifact-arch>-m32</org.codehaus.mojo.option.gcc-target-artifact-arch>
 			</properties>
 		</profile>
+		<profile>
+			<id>debug</id>
+			<activation>
+				<property>
+					<name>maven.compiler.debug</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<properties>
+				<org.codehaus.mojo.option.gcc-compiler.flags>-O0 -g3 -fPIC</org.codehaus.mojo.option.gcc-compiler.flags>
+			</properties>
+		</profile>
 	</profiles>
 
 	<build>
@@ -140,7 +153,7 @@
 					</compilerStartOptions>
 					<compilerEndOptions>
 						<compilerEndOption>${org.codehaus.mojo.option.gcc-target-artifact-arch}</compilerEndOption>
-						<compilerEndOption>-fPIC</compilerEndOption>
+						<compilerEndOption>${org.codehaus.mojo.option.gcc-compiler.flags}</compilerEndOption>
 					</compilerEndOptions>
 					<linkerStartOptions>
 						<linkerStartOption>${org.codehaus.mojo.option.gcc-linker.flags}</linkerStartOption>
