@@ -48,7 +48,7 @@
 		<org.codehaus.mojo.option.gcc-target-artifact-arch>-m64</org.codehaus.mojo.option.gcc-target-artifact-arch>
 		<org.codehaus.mojo.option.spec-include-dir-one>${java.home}/include/</org.codehaus.mojo.option.spec-include-dir-one>
 		<org.codehaus.mojo.option.spec-include-dir-three>${java.home}/lib/</org.codehaus.mojo.option.spec-include-dir-three>
-		<org.codehaus.mojo.option.gcc-compiler.flags>-O03 -fPIC</org.codehaus.mojo.option.gcc-compiler.flags>
+		<org.codehaus.mojo.option.gcc-compiler.flags>-O3 -fPIC</org.codehaus.mojo.option.gcc-compiler.flags>
 		<org.codehaus.mojo.option.gcc-linker.flags>-fPIC -shared</org.codehaus.mojo.option.gcc-linker.flags>
 		<org.codehaus.mojo.option.gcc-linker.artifact-name>NativeExecutor</org.codehaus.mojo.option.gcc-linker.artifact-name>
 	</properties>
