@@ -369,8 +369,7 @@ public class DefaultDriver implements Driver {
 					driver.hookClassDefiner = driverFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
 					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
-				}
-								
+				}								
 			}
 			
 			@Override
@@ -613,41 +612,7 @@ public class DefaultDriver implements Driver {
 				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver);
 			}	
 			
-			@Override
-			protected void initDefineHookClassFunction() {
-				try {
-					MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
-					MethodHandles.Lookup mainConsulter = this.mainConsulter;
-					MethodHandle defineClassMethodHandle = mainConsulter.findSpecial(
-						MethodHandles.Lookup.class,
-						"defineClass",
-						MethodType.methodType(Class.class, byte[].class),
-						MethodHandles.Lookup.class
-					);
-					driver.hookClassDefiner = (clientClass, byteCode) -> {
-						try {
-							MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, mainConsulter);
-							try {
-								return (Class<?>) defineClassMethodHandle.invoke(lookup, byteCode);
-							} catch (LinkageError exc) {
-								return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
-									try {
-										return Class.forName(javaClass.getName());
-									} catch (Throwable inExc) {
-										return Throwables.throwException(inExc);
-									}
-								});
-							}
-						} catch (Throwable exc) {
-							return Throwables.throwException(exc);
-						}						
-					};
-				} catch (Throwable exc) {
-					Throwables.throwException(exc);
-				}
-			}
-		}
-	
+		}	
 		
 	}
 

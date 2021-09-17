@@ -35,6 +35,7 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -63,10 +64,10 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		} catch (Throwable exc) {
 			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
-	}
+	}	
 	
 	abstract Lookup retrieveConsulter(Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable;
-
+	
 	@Override
 	BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
 		try {
@@ -87,8 +88,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
 		}
-		
-	}
+	}	
 	
 	@Override
 	Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction() {
@@ -102,7 +102,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		} catch (Throwable exc) {
 			return Throwables.throwException(new InitializationException("Could not initialize field memory offset of packages map", exc));
 		}
-	}
+	}	
 	
 	@Override
 	Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction() {
@@ -116,7 +116,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		} catch (Throwable exc) {
 			return Throwables.throwException(new InitializationException("Could not initialize field memory offset of loaded classes vector", exc));
 		}
-	}
+	}	
 	
 	@Override
 	BiFunction<Object, Field, Object> getFieldValueFunction() {
@@ -247,7 +247,6 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		};
 	}
 
-
 	@Override
 	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
@@ -258,18 +257,19 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				return Throwables.throwException(exc);
 			}
 		};
-	}
+	}	
 	
 	@Override
 	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 		return MethodHandles::lookup;
 	}
-	
+		
 	@Override
 	public void close() {
 		unsafe = null;
 		this.driver = null;
-	}
+	}	
+	
 	
 	static class ForJava8 extends DriverFunctionSupplierUnsafe {
 
@@ -285,6 +285,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		
 	}
 	
+	
 	static class ForJava9 extends DriverFunctionSupplierUnsafe {
 		
 		ForJava9(Driver driver) {
@@ -297,14 +298,47 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
 	
-	}
+	}	
+	
 	
 	static class ForJava17 extends ForJava9 {
 
 		ForJava17(Driver driver) {
 			super(driver);
 		}
-		
+				
+		@Override
+		BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
+			try {
+				MethodHandle defineClassMethodHandle = consulter.findSpecial(
+					MethodHandles.Lookup.class,
+					"defineClass",
+					MethodType.methodType(Class.class, byte[].class),
+					MethodHandles.Lookup.class
+				);
+				return (clientClass, byteCode) -> {
+					try {
+						MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, consulter);
+						try {
+							return (Class<?>) defineClassMethodHandle.invoke(lookup, byteCode);
+						} catch (LinkageError exc) {
+							return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), javaClass -> {
+								try {
+									return Class.forName(javaClass.getName());
+								} catch (Throwable inExc) {
+									return Throwables.throwException(inExc);
+								}
+							});
+						}
+					} catch (Throwable exc) {
+						return Throwables.throwException(exc);
+					}						
+				};
+			} catch (Throwable exc) {
+				return Throwables.throwException(exc);
+			}
+		}
+				
 		@Override
 		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
@@ -317,4 +351,6 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		}
 		
 	}
+	
+	
 }
