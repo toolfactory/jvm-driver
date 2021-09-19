@@ -1,0 +1,13 @@
+name: Clear cache
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+ clear-camo-cache:
+    name: Clear Camo cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear Cached image
+        run: curl -X PURGE https://camo.githubusercontent.com/ea88fe45784db00ce8fed60ea22f1a208cb50588ae7db0d8a74c9508ba0d7b25/68747470733a2f2f7777772e6275726e696e67776176652e6f72672f67656e657261746f72732f67656e65726174652d6275726e696e67776176652d61727469666163742d646f776e6c6f6164732d62616467652e7068703f747970653d73766726617274696661637449643d6a766d2d647269766572
