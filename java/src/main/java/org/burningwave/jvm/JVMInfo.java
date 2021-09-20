@@ -40,20 +40,20 @@ public class JVMInfo {
     private boolean is32Bit;
     private boolean compressedRefsEnabled;
     private int version;
-    
+
     public JVMInfo() {
     	osArch = System.getProperty("os.arch");
     	init();
     }
-    
+
     public static JVMInfo getInstance() {
     	return Holder.getWithinInstance();
     }
-    
+
     public static JVMInfo create() {
     	return new JVMInfo();
     }
-    
+
     private void init() {
     	String version = System.getProperty("java.version");
         if(version.startsWith("1.")) {
@@ -113,7 +113,7 @@ public class JVMInfo {
     public boolean isCompressedOopsOffOn64BitHotspot() {
         return is64BitHotspot && !compressedRefsEnabled;
     }
-    
+
     public boolean isCompressedOopsOffOn64Bit() {
         return is64Bit && !compressedRefsEnabled;
     }
@@ -121,18 +121,18 @@ public class JVMInfo {
     public boolean is32Bit() {
     	return is32Bit;
     }
-    
+
     public boolean is64Bit() {
     	return is64Bit;
     }
-    
+
     public int getVersion() {
     	return version;
     }
-    
+
 	private static class Holder {
 		private static final JVMInfo INSTANCE = JVMInfo.create();
-		
+
 		private static JVMInfo getWithinInstance() {
 			return INSTANCE;
 		}

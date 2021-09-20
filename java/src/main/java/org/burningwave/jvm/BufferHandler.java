@@ -35,36 +35,36 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("unchecked")
 class BufferHandler {
-	
+
 	static ByteBuffer shareContent(ByteBuffer byteBuffer) {
 		ByteBuffer duplicated = duplicate(byteBuffer);
 		if (position(byteBuffer) > 0) {
 			flip(duplicated);
-		}		
+		}
 		return duplicated;
 	}
-	
+
 	static <T extends Buffer> T flip(T buffer) {
 		return (T)((Buffer)buffer).flip();
 	}
-	
+
 	static <T extends Buffer> int position(T buffer) {
 		return ((Buffer)buffer).position();
 	}
-	
+
 	static ByteBuffer duplicate(ByteBuffer buffer) {
 		return buffer.duplicate();
 	}
-	
+
 	static <T extends Buffer> int limit(T buffer) {
 		return ((Buffer)buffer).limit();
 	}
-	
+
 	static byte[] toByteArray(ByteBuffer byteBuffer) {
     	byteBuffer = shareContent(byteBuffer);
     	byte[] result = new byte[limit(byteBuffer)];
     	byteBuffer.get(result, 0, result.length);
         return result;
 	}
-	
+
 }

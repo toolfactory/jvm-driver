@@ -32,7 +32,7 @@ import java.nio.ByteBuffer;
 import java.util.function.Function;
 
 class Classes {
-	
+
 	static class Symbol{
 		static class Tag {
 			static final byte UTF8 = 1;
@@ -53,13 +53,13 @@ class Classes {
 			static final byte MODULE = 19;
 			static final byte PACKAGE = 20;
 
-	    }		
+	    }
 	}
-	
+
 	static boolean isAssignableFrom(Class<?> cls_01, Class<?> cls_02) {
 		return getClassOrWrapper(cls_01).isAssignableFrom(getClassOrWrapper(cls_02));
 	}
-	
+
 	static Class<?> getClassOrWrapper(Class<?> cls) {
 		if (cls.isPrimitive()) {
 			if (cls == int.class) {
@@ -80,20 +80,20 @@ class Classes {
 		}
 		return cls;
 	}
-	
-	
+
+
 	static String retrieveName(
 		final byte[] classFileBuffer
 	) {
 		return retrieveName((index) -> classFileBuffer[index]);
 	}
-	
+
 	static String retrieveName(
 		final ByteBuffer classFileBuffer
 	) {
 		return retrieveName(classFileBuffer::get);
 	}
-		
+
 	private static String retrieveName(
 		final Function<Integer, Byte> byteSupplier
 	) {
@@ -134,7 +134,7 @@ class Classes {
 				currentCpInfoValue == Symbol.Tag.STRING ||
 				currentCpInfoValue == Symbol.Tag.METHOD_TYPE ||
 				currentCpInfoValue == Symbol.Tag.MODULE ||
-				currentCpInfoValue == Symbol.Tag.PACKAGE			
+				currentCpInfoValue == Symbol.Tag.PACKAGE
 			) {
 				cpInfoSize = 3;
 			} else {
@@ -145,7 +145,7 @@ class Classes {
 		int maxStringLength = currentMaxStringLength;
 		int header = currentCpInfoOffset;
 		return readUTF8(
-			byteSupplier, 
+			byteSupplier,
 			cpInfoOffsets[readUnsignedShort(byteSupplier, header + 2)], new char[maxStringLength], constantUtf8Values, cpInfoOffsets
 		);
 	}

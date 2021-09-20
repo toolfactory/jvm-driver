@@ -104,19 +104,20 @@ public interface Driver extends Closeable {
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 
 	public void setAccessible(AccessibleObject object, boolean flag);
-	
+
 	public <T> T allocateInstance(Class<?> cls);
-	
+
+	@Override
 	public void close();
-	
+
 	public static class InitializationException extends Exception {
 
 		private static final long serialVersionUID = -3348641464676904231L;
-		
+
 	    public InitializationException(String message, Throwable cause) {
 	        super(message, cause);
 	    }
-		
+
 	}
-	
+
 }

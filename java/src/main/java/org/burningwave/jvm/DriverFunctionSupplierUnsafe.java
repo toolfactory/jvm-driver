@@ -50,11 +50,11 @@ import sun.misc.Unsafe;
 
 @SuppressWarnings({"all"})
 abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
-	
+
 	sun.misc.Unsafe unsafe;
 	Driver driver;
 	JVMInfo jVMInfo;
-	
+
 	DriverFunctionSupplierUnsafe(Driver driver) {
 		try {
 			this.driver = driver;
@@ -65,11 +65,11 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		} catch (Throwable exc) {
 			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
-	}	
-	
-	
+	}
+
+
 	abstract Lookup retrieveConsulter(Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable;
-	
+
 	@Override
 	BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
 		try {
@@ -90,8 +90,8 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
 		}
-	}	
-	
+	}
+
 	@Override
 	Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
@@ -99,13 +99,13 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			Long loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				this.driver.getDeclaredField(ClassLoader.class, "classes")
 			);
-			return classLoader -> 
+			return classLoader ->
 				(Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
 		} catch (Throwable exc) {
 			return Throwables.throwException(new InitializationException("Could not initialize field memory offset of packages map", exc));
 		}
-	}	
-	
+	}
+
 	@Override
 	Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
@@ -113,13 +113,13 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			Long loadedPackagesMapMemoryOffset = unsafe.objectFieldOffset(
 				this.driver.getDeclaredField(ClassLoader.class, "packages")
 			);
-			return classLoader -> 
+			return classLoader ->
 				(Map<String, ?>)unsafe.getObject(classLoader, loadedPackagesMapMemoryOffset);
 		} catch (Throwable exc) {
 			return Throwables.throwException(new InitializationException("Could not initialize field memory offset of loaded classes vector", exc));
 		}
-	}	
-	
+	}
+
 	@Override
 	BiFunction<Object, Field, Object> getFieldValueFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
@@ -182,7 +182,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			}
 		};
 	}
-	
+
 	@Override
 	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
 		sun.misc.Unsafe unsafe = this.unsafe;
@@ -202,7 +202,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 					unsafe.putObject(target, fieldOffset, value);
 				} else {
 					unsafe.putObjectVolatile(target, fieldOffset, value);
-				}			
+				}
 			} else if (cls == int.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
 					unsafe.putInt(target, fieldOffset, ((Integer)value).intValue());
@@ -259,37 +259,37 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				return Throwables.throwException(exc);
 			}
 		};
-	}	
-	
+	}
+
 	@Override
 	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 		return MethodHandles::lookup;
 	}
-		
+
 	@Override
 	public void close() {
 		unsafe = null;
 		this.driver = null;
-	}	
-	
-	
+	}
+
+
 	static class ForJava8 extends DriverFunctionSupplierUnsafe {
 
 		ForJava8(Driver driver) {
 			super(driver);
 		}
-		
+
 		@Override
 		Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle)
 				throws Throwable {
 			return (Lookup) privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
 		}
-		
+
 	}
-	
-	
+
+
 	static class ForJava9 extends DriverFunctionSupplierUnsafe {
-		
+
 		ForJava9(Driver driver) {
 			super(driver);
 		}
@@ -299,10 +299,10 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				throws Throwable {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
-	
-	}	
-	
-	
+
+	}
+
+
 	static class ForJava17 extends ForJava9 {
 
 		ForJava17(Driver driver) {
@@ -334,13 +334,13 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 						}
 					} catch (Throwable exc) {
 						return Throwables.throwException(exc);
-					}						
+					}
 				};
 			} catch (Throwable exc) {
 				return Throwables.throwException(exc);
 			}
 		}
-				
+
 		@Override
 		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 			sun.misc.Unsafe unsafe = this.unsafe;
@@ -351,8 +351,8 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				return consulter;
 			};
 		}
-		
+
 	}
-	
-	
+
+
 }

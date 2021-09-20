@@ -38,27 +38,27 @@ import java.util.function.Function;
 class JavaClass {
 	private String classNameSlashed;
 	private String className;
-	
+
 	private JavaClass(String className, ByteBuffer byteCode) {
 		this.classNameSlashed = className;
 	}
-	
+
 	JavaClass(ByteBuffer byteCode) {
 		this(Classes.retrieveName(byteCode), BufferHandler.shareContent(byteCode));
 	}
-	
+
 	static JavaClass create(ByteBuffer byteCode) {
 		return new JavaClass(byteCode);
 	}
-	
+
 	static void use(ByteBuffer byteCode, Consumer<JavaClass> javaClassConsumer) {
 		javaClassConsumer.accept(JavaClass.create(byteCode));
 	}
-	
+
 	static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
 		return javaClassConsumer.apply(JavaClass.create(byteCode));
 	}
-	
+
 	private  String _getPackageName() {
 		return classNameSlashed.contains("/") ?
 			classNameSlashed.substring(0, classNameSlashed.lastIndexOf("/")) :
@@ -69,17 +69,17 @@ class JavaClass {
 		return classNameSlashed.contains("/") ?
 			classNameSlashed.substring(classNameSlashed.lastIndexOf("/") + 1) :
 			classNameSlashed;
-	}	
-	
+	}
+
 	String getPackageName() {
 		return Optional.ofNullable(_getPackageName()).map(value -> value.replace("/", ".")).orElse(null);
 	}
-	
+
 	String getSimpleName() {
 		return Optional.ofNullable(_getSimpleName()).orElse(null);
 	}
-	
-	
+
+
 	String getName() {
 		if (className == null) {
 			String packageName = getPackageName();
@@ -97,7 +97,7 @@ class JavaClass {
 				name += classSimpleName;
 			}
 			className = name;
-		}		
+		}
 		return className;
 	}
 

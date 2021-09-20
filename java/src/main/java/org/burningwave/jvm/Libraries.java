@@ -37,7 +37,7 @@ class Libraries {
 	String conventionedSuffix;
 	String extension;
 	String prefix;
-	
+
 	private Libraries() {
 		JVMInfo jVMInfo = JVMInfo.getInstance();
 		if (jVMInfo.is32Bit()) {
@@ -58,28 +58,28 @@ class Libraries {
 			Throwables.throwException("Unable to initialize {}: unsupported operating system ('{}')", this, operatingSystemName);
 		}
 	}
-	
+
     static Libraries getInstance() {
     	return Holder.getWithinInstance();
     }
-    
+
     static Libraries create() {
     	return new Libraries();
     }
-	
+
 	void loadFor(Class<?> clazz) {
 		Files.extractAndExecute(
 			Libraries.class,
-			Optional.ofNullable(clazz.getPackage()).map(Package::getName).map(name -> name.replace(".", "/")).orElseGet(() -> "") + 
+			Optional.ofNullable(clazz.getPackage()).map(Package::getName).map(name -> name.replace(".", "/")).orElseGet(() -> "") +
 			"/" + Optional.ofNullable(prefix).orElseGet(() -> "") + clazz.getSimpleName() + "-" + conventionedSuffix + "." + extension,
 			file ->
 				System.load(file.getAbsolutePath())
 		);
 	}
-	
+
 	private static class Holder {
 		private static final Libraries INSTANCE = Libraries.create();
-		
+
 		private static Libraries getWithinInstance() {
 			return INSTANCE;
 		}

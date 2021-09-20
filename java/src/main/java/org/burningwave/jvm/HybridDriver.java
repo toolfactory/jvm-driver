@@ -38,59 +38,59 @@ import java.util.function.Supplier;
 
 
 public class HybridDriver extends DefaultDriver {
-	
+
 	@Override
 	Initializer newInitializerForJava17() {
 		return new ForJava17(this);
 	}
-	
+
 	static class ForJava17 extends DefaultDriver.Initializer.ForJava17 {
 		private DriverFunctionSupplierNative driverFunctionSupplierNative;
-		
+
 		ForJava17(DefaultDriver driver) {
 			super(driver);
 			driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 		}
-		
+
 		@Override
 		void initNativeFunctionSupplier() {
 			DriverFunctionSupplierNative driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 			this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver) {
-				
+
 				@Override
 				Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 					return driverFunctionSupplierNative.getMethodHandlesLookupSupplyingFunction();
 				}
-				
+
 				@Override
 				BiFunction<Object, Field, Object> getFieldValueFunction() {
 					return driverFunctionSupplierNative.getFieldValueFunction();
 				}
-				
+
 				@Override
 				Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
 					return driverFunctionSupplierNative.getSetFieldValueFunction();
 				}
-				
+
 				@Override
 				Function<Class<?>, Object> getAllocateInstanceFunction() {
 					return driverFunctionSupplierNative.getAllocateInstanceFunction();
 				}
-				
+
 			};
 		}
-		
+
 		@Override
 		void initAccessibleSetter() {
 			driver.accessibleSetter = driverFunctionSupplierNative.getSetAccessibleFunction();
 		}
-		
+
 		@Override
 		public void close() {
 			driverFunctionSupplierNative = null;
 			super.close();
 		}
-	
+
 	}
-	
+
 }

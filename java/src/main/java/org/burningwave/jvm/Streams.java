@@ -36,7 +36,7 @@ import java.io.OutputStream;
 
 
 class Streams {
-	
+
 	static byte[] toByteArray(InputStream inputStream) {
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			copy(inputStream, outputStream);
@@ -45,7 +45,7 @@ class Streams {
 			return Throwables.throwException(exc);
 		}
 	}
-	
+
 	static void copy(InputStream input, OutputStream output) throws IOException {
 		byte[] buffer = new byte[1024];
 		int bytesRead = 0;
@@ -53,5 +53,5 @@ class Streams {
 			output.write(buffer, 0, bytesRead);
 		}
 	}
-	
+
 }

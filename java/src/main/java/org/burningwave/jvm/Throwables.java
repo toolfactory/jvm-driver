@@ -31,11 +31,11 @@ package org.burningwave.jvm;
 
 @SuppressWarnings("unchecked")
 class Throwables {
-	
+
 	static Throwables create() {
 		return new Throwables();
 	}
-	
+
 	static <T> T throwException(Object obj, Object... arguments) {
 		Throwable exception = null;
 		StackTraceElement[] stackTraceOfException = null;
@@ -47,22 +47,22 @@ class Throwables {
 			}
 			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
-			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);	
+			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
 		} else {
 			exception = (Throwable)obj;
 			StackTraceElement[] stackTrace = exception.getStackTrace();
 			stackTraceOfException = new StackTraceElement[stackTrace.length + 1];
 			stackTraceOfException[0] = Thread.currentThread().getStackTrace()[2];
-			System.arraycopy(stackTrace, 0, stackTraceOfException, 1, stackTrace.length);			
+			System.arraycopy(stackTrace, 0, stackTraceOfException, 1, stackTrace.length);
 		}
-		exception.setStackTrace(stackTraceOfException);				
+		exception.setStackTrace(stackTraceOfException);
 		throwException(exception);
 		return null;
 	}
-	
-	
+
+
 	private static <E extends Throwable> void throwException(Throwable exc) throws E {
 		throw (E)exc;
 	}
-	
+
 }

@@ -38,7 +38,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 class DriverFunctionSupplierNative {
-	
+
 	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 		NativeExecutor nativeExecutor = NativeExecutor.getInstance();
 		return () -> {
@@ -47,7 +47,7 @@ class DriverFunctionSupplierNative {
 			return consulter;
 		};
 	}
-	
+
 	BiFunction<Object, Field, Object> getFieldValueFunction() {
 		NativeExecutor nativeExecutor = NativeExecutor.getInstance();
 		return (target, field) -> {
@@ -143,13 +143,13 @@ class DriverFunctionSupplierNative {
 			}
 		};
 	}
-	
-	
+
+
 	BiConsumer<AccessibleObject, Boolean> getSetAccessibleFunction() {
 		return NativeExecutor.getInstance()::setAccessible;
 	}
-	
-	
+
+
 	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		return NativeExecutor.getInstance()::allocateInstance;
 	}

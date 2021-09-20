@@ -33,14 +33,14 @@ import java.util.Objects;
 
 
 class Strings {
-	
+
 	static String compile(String message, Object... arguments) {
 		for (Object obj : arguments) {
 			message = message.replaceFirst("\\{\\}", Objects.isNull(obj) ? "null" : clear(obj.toString()));
 		}
 		return message;
 	}
-	
+
 	private static String clear(String text) {
 		return text
 		.replace("\\", "\\\\\\")
@@ -50,6 +50,6 @@ class Strings {
 		.replace(")", "\\)")
 		.replace(".", "\\.")
 		.replace("$", "\\$");
-	}	
-	
+	}
+
 }

@@ -38,12 +38,12 @@ import java.util.function.Consumer;
 
 
 class Files {
-	
+
 	static void extractAndExecute(Class<?> callerClass, String resourcePath, Consumer<File> extractedFileConsumer) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
         try (InputStream inputSream = callerClass.getResourceAsStream(resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath);) {
-            
+
             if (inputSream == null) {
                 throw new FileNotFoundException("Could not find file: " + resourcePath);
             }
@@ -68,7 +68,7 @@ class Files {
             } finally {
                 os.close();
             }
-            
+
             extractedFileConsumer.accept(tempFile);
         } catch (Throwable exc) {
         	Throwables.throwException(exc);
@@ -84,5 +84,5 @@ class Files {
             }
         }
     }
-	
+
 }
