@@ -47,7 +47,7 @@ public class HybridDriver extends DefaultDriver {
 	static class ForJava17 extends DefaultDriver.Initializer.ForJava17 {
 		private DriverFunctionSupplierNative driverFunctionSupplierNative;
 		
-		protected ForJava17(DefaultDriver driver) {
+		ForJava17(DefaultDriver driver) {
 			super(driver);
 			driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 		}

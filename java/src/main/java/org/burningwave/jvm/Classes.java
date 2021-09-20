@@ -33,8 +33,8 @@ import java.util.function.Function;
 
 class Classes {
 	
-	public static class Symbol{
-		public static class Tag {
+	static class Symbol{
+		static class Tag {
 			static final byte UTF8 = 1;
 			static final byte INTEGER = 3;
 			static final byte FLOAT = 4;
