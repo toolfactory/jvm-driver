@@ -28,13 +28,14 @@
  */
 package org.burningwave.jvm;
 
-import java.io.Closeable;
+
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-class JavaClass implements Closeable {
+
+class JavaClass {
 	private String classNameSlashed;
 	private String className;
 	
@@ -46,20 +47,16 @@ class JavaClass implements Closeable {
 		this(Classes.retrieveName(byteCode), BufferHandler.shareContent(byteCode));
 	}
 	
-	public static JavaClass create(ByteBuffer byteCode) {
+	static JavaClass create(ByteBuffer byteCode) {
 		return new JavaClass(byteCode);
 	}
 	
-	public static void use(ByteBuffer byteCode, Consumer<JavaClass> javaClassConsumer) {
-		try(JavaClass javaClass = JavaClass.create(byteCode)) {
-			javaClassConsumer.accept(javaClass);
-		}
+	static void use(ByteBuffer byteCode, Consumer<JavaClass> javaClassConsumer) {
+		javaClassConsumer.accept(JavaClass.create(byteCode));
 	}
 	
-	public static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
-		try(JavaClass javaClass = JavaClass.create(byteCode)) {
-			return javaClassConsumer.apply(javaClass);
-		}
+	static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
+		return javaClassConsumer.apply(JavaClass.create(byteCode));
 	}
 	
 	private  String _getPackageName() {
@@ -74,16 +71,16 @@ class JavaClass implements Closeable {
 			classNameSlashed;
 	}	
 	
-	public String getPackageName() {
+	String getPackageName() {
 		return Optional.ofNullable(_getPackageName()).map(value -> value.replace("/", ".")).orElse(null);
 	}
 	
-	public String getSimpleName() {
+	String getSimpleName() {
 		return Optional.ofNullable(_getSimpleName()).orElse(null);
 	}
 	
 	
-	public String getName() {
+	String getName() {
 		if (className == null) {
 			String packageName = getPackageName();
 			String classSimpleName = getSimpleName();
@@ -103,9 +100,5 @@ class JavaClass implements Closeable {
 		}		
 		return className;
 	}
-	
-	@Override
-	public void close() {
-		classNameSlashed = null;	
-	}
+
 }

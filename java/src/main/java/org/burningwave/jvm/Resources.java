@@ -35,7 +35,7 @@ import java.util.Optional;
 
 class Resources {
 
-	public static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
+	static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
 		return Optional.ofNullable(
 			resourceClassLoader
 		).orElseGet(() -> ClassLoader.getSystemClassLoader()).getResourceAsStream(

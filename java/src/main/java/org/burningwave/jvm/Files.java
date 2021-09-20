@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 
 class Files {
 	
-	public static void extractAndExecute(Class<?> callerClass, String resourcePath, Consumer<File> extractedFileConsumer) {
+	static void extractAndExecute(Class<?> callerClass, String resourcePath, Consumer<File> extractedFileConsumer) {
         File tempFile = null;
         boolean tempFileIsPosix = false;
         try (InputStream inputSream = callerClass.getResourceAsStream(resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath);) {

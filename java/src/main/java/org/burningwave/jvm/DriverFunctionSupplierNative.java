@@ -150,7 +150,7 @@ class DriverFunctionSupplierNative {
 	}
 	
 	
-	public Function<Class<?>, Object> getAllocateInstanceFunction() {
+	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		return NativeExecutor.getInstance()::allocateInstance;
 	}
 

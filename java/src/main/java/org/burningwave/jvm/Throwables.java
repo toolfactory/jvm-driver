@@ -32,11 +32,11 @@ package org.burningwave.jvm;
 @SuppressWarnings("unchecked")
 class Throwables {
 	
-	public static Throwables create() {
+	static Throwables create() {
 		return new Throwables();
 	}
 	
-	public static <T> T throwException(Object obj, Object... arguments) {
+	static <T> T throwException(Object obj, Object... arguments) {
 		Throwable exception = null;
 		StackTraceElement[] stackTraceOfException = null;
 		if (obj instanceof String) {

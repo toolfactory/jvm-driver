@@ -36,7 +36,7 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("unchecked")
 class BufferHandler {
 	
-	public static ByteBuffer shareContent(ByteBuffer byteBuffer) {
+	static ByteBuffer shareContent(ByteBuffer byteBuffer) {
 		ByteBuffer duplicated = duplicate(byteBuffer);
 		if (position(byteBuffer) > 0) {
 			flip(duplicated);
@@ -44,23 +44,23 @@ class BufferHandler {
 		return duplicated;
 	}
 	
-	public static <T extends Buffer> T flip(T buffer) {
+	static <T extends Buffer> T flip(T buffer) {
 		return (T)((Buffer)buffer).flip();
 	}
 	
-	public static <T extends Buffer> int position(T buffer) {
+	static <T extends Buffer> int position(T buffer) {
 		return ((Buffer)buffer).position();
 	}
 	
-	public static ByteBuffer duplicate(ByteBuffer buffer) {
+	static ByteBuffer duplicate(ByteBuffer buffer) {
 		return buffer.duplicate();
 	}
 	
-	public static <T extends Buffer> int limit(T buffer) {
+	static <T extends Buffer> int limit(T buffer) {
 		return ((Buffer)buffer).limit();
 	}
 	
-	public static byte[] toByteArray(ByteBuffer byteBuffer) {
+	static byte[] toByteArray(ByteBuffer byteBuffer) {
     	byteBuffer = shareContent(byteBuffer);
     	byte[] result = new byte[limit(byteBuffer)];
     	byteBuffer.get(result, 0, result.length);

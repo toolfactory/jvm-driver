@@ -40,11 +40,11 @@ import java.util.function.Supplier;
 public class HybridDriver extends DefaultDriver {
 	
 	@Override
-	protected Initializer newInitializerForJava17() {
+	Initializer newInitializerForJava17() {
 		return new ForJava17(this);
 	}
 	
-	protected static class ForJava17 extends DefaultDriver.Initializer.ForJava17 {
+	static class ForJava17 extends DefaultDriver.Initializer.ForJava17 {
 		private DriverFunctionSupplierNative driverFunctionSupplierNative;
 		
 		protected ForJava17(DefaultDriver driver) {
@@ -53,7 +53,7 @@ public class HybridDriver extends DefaultDriver {
 		}
 		
 		@Override
-		protected void initNativeFunctionSupplier() {
+		void initNativeFunctionSupplier() {
 			DriverFunctionSupplierNative driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 			this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver) {
 				
@@ -81,7 +81,7 @@ public class HybridDriver extends DefaultDriver {
 		}
 		
 		@Override
-		protected void initAccessibleSetter() {
+		void initAccessibleSetter() {
 			driver.accessibleSetter = driverFunctionSupplierNative.getSetAccessibleFunction();
 		}
 		

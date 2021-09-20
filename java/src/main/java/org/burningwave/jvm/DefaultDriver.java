@@ -78,7 +78,7 @@ public class DefaultDriver implements Driver {
 		retrieveInitializer().start().close();
 	}
 	
-	protected Initializer retrieveInitializer() {
+	Initializer retrieveInitializer() {
 		JVMInfo jVMInfo = JVMInfo.getInstance();
 		return 
 			(jVMInfo.getVersion() > 8 ?
@@ -90,19 +90,19 @@ public class DefaultDriver implements Driver {
 				newInitializerForJava8());
 	}
 
-	protected Initializer newInitializerForJava8() {
+	Initializer newInitializerForJava8() {
 		return new Initializer.ForJava8(this);
 	}
 
-	protected Initializer newInitializerForJava9() {
+	Initializer newInitializerForJava9() {
 		return new Initializer.ForJava9(this);
 	}
 
-	protected Initializer newInitializerForJava14() {
+	Initializer newInitializerForJava14() {
 		return new Initializer.ForJava14(this);
 	}
 
-	protected Initializer newInitializerForJava17() {
+	Initializer newInitializerForJava17() {
 		return new Initializer.ForJava17(this);
 	}
 	
@@ -248,18 +248,18 @@ public class DefaultDriver implements Driver {
 		hookClassDefiner = null;
 	}
 	
-	protected abstract static class Initializer implements Closeable {
+	abstract static class Initializer implements Closeable {
 		DefaultDriver driver;
 		DriverFunctionSupplier driverFunctionSupplier;
 		
-		protected Initializer(DefaultDriver driver) {
+		Initializer(DefaultDriver driver) {
 			this.driver = driver;
 			initNativeFunctionSupplier();
 		}
 		
-		abstract protected void initNativeFunctionSupplier();
+		abstract void initNativeFunctionSupplier();
 
-		protected Initializer start() {
+		Initializer start() {
 			driver.allocateInstanceInvoker = driverFunctionSupplier.getAllocateInstanceFunction();
 			driver.fieldValueRetriever = driverFunctionSupplier.getFieldValueFunction();
 			driver.fieldValueSetter = driverFunctionSupplier.getSetFieldValueFunction();
@@ -275,19 +275,19 @@ public class DefaultDriver implements Driver {
 			return this;
 		}
 
-		protected abstract void initDefineHookClassFunction();
+		abstract void initDefineHookClassFunction();
 
-		protected abstract void initConsulterRetriever();
+		abstract void initConsulterRetriever();
 		
-		protected abstract void initAccessibleSetter();
+		abstract void initAccessibleSetter();
 		
-		protected abstract void initSpecificElements();
+		abstract void initSpecificElements();
 		
-		protected abstract void initConstructorInvoker();	
+		abstract void initConstructorInvoker();	
 		
-		protected abstract void initMethodInvoker();			
+		abstract void initMethodInvoker();			
 		
-		protected void initMembersRetrievers() {
+		void initMembersRetrievers() {
 			try {
 				MethodHandles.Lookup consulter = driver.getConsulter(Class.class);
 				driver.getDeclaredFieldsRetriever = consulter.findSpecial(
@@ -322,11 +322,11 @@ public class DefaultDriver implements Driver {
 			driver = null;
 		}
 		
-		protected static class ForJava8 extends Initializer {
+		static class ForJava8 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
 			MethodHandle privateLookupInMethodHandle;
 			
-			protected ForJava8(DefaultDriver driver) {
+			ForJava8(DefaultDriver driver) {
 				super(driver);
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
@@ -344,12 +344,12 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initNativeFunctionSupplier()  {
+			void initNativeFunctionSupplier()  {
 				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava8(this.driver);
 			}
 			
 			@Override
-			protected void initConsulterRetriever() {
+			void initConsulterRetriever() {
 				try {
 					driver.consulterRetriever = (cls) -> {
 						try {
@@ -364,7 +364,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initDefineHookClassFunction() {
+			void initDefineHookClassFunction() {
 				try {
 					driver.hookClassDefiner = driverFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
@@ -373,7 +373,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initAccessibleSetter() {
+			void initAccessibleSetter() {
 				try {
 					final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 					MethodHandle accessibleSetterMethodHandle = driver.getConsulter(AccessibleObject.class).unreflect(accessibleSetterMethod);
@@ -390,7 +390,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initConstructorInvoker() {
+			void initConstructorInvoker() {
 				try {
 					Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
 					Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
@@ -402,7 +402,7 @@ public class DefaultDriver implements Driver {
 			}			
 			
 			@Override
-			protected void initMethodInvoker() {
+			void initMethodInvoker() {
 				try {
 					Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
 					Method method = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
@@ -414,7 +414,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initSpecificElements() {
+			void initSpecificElements() {
 				driver.packageRetriever = (classLoader, packageName) -> Package.getPackage(packageName);	
 			}
 			
@@ -427,11 +427,11 @@ public class DefaultDriver implements Driver {
 			
 		}
 		
-		protected static class ForJava9 extends Initializer {
+		static class ForJava9 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
 			MethodHandle privateLookupInMethodHandle;
 			
-			protected ForJava9(DefaultDriver driver) {
+			ForJava9(DefaultDriver driver) {
 				super(driver);
 				mainConsulter = driverFunctionSupplier.getMethodHandlesLookupSupplyingFunction().get();
 				try {
@@ -445,17 +445,17 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initNativeFunctionSupplier() {
+			void initNativeFunctionSupplier() {
 				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava9(this.driver);
 			}	
 			
 			@Override
-			protected void initDefineHookClassFunction() {
+			void initDefineHookClassFunction() {
 				driver.hookClassDefiner = driverFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 			}
 			
 			@Override
-			protected void initConsulterRetriever() {
+			void initConsulterRetriever() {
 				try (
 					InputStream inputStream =
 						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
@@ -473,7 +473,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initAccessibleSetter() {
+			void initAccessibleSetter() {
 				try (
 					InputStream inputStream =
 						Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
@@ -491,7 +491,7 @@ public class DefaultDriver implements Driver {
 			
 
 			@Override
-			protected void initConstructorInvoker() {
+			void initConstructorInvoker() {
 				try {
 					Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
 					Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
@@ -503,7 +503,7 @@ public class DefaultDriver implements Driver {
 			}
 			
 			@Override
-			protected void initMethodInvoker() {
+			void initMethodInvoker() {
 				try {
 					Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 					Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
@@ -516,7 +516,7 @@ public class DefaultDriver implements Driver {
 
 			
 			@Override
-			protected void initSpecificElements() {
+			void initSpecificElements() {
 				try {
 					MethodHandles.Lookup classLoaderConsulter = driver.consulterRetriever.apply(ClassLoader.class);
 					MethodType methodType = MethodType.methodType(Package.class, String.class);
@@ -554,7 +554,7 @@ public class DefaultDriver implements Driver {
 				}
 			}
 			
-			protected void initDeepConsulterRetriever() throws Throwable {
+			void initDeepConsulterRetriever() throws Throwable {
 				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 				driver.setAccessible(lookupCtor, true);
 				MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
@@ -578,14 +578,14 @@ public class DefaultDriver implements Driver {
 
 		}
 		
-		protected static class ForJava14 extends ForJava9 {
+		static class ForJava14 extends ForJava9 {
 			
-			protected ForJava14(DefaultDriver driver) {
+			ForJava14(DefaultDriver driver) {
 				super(driver);
 			}
 			
 			@Override
-			protected void initDeepConsulterRetriever() throws Throwable {
+			void initDeepConsulterRetriever() throws Throwable {
 				Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
 				driver.setAccessible(lookupCtor, true);
 				MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
@@ -601,14 +601,14 @@ public class DefaultDriver implements Driver {
 			}
 		}
 		
-		protected static class ForJava17 extends ForJava14 {
+		static class ForJava17 extends ForJava14 {
 			
-			protected ForJava17(DefaultDriver driver) {
+			ForJava17(DefaultDriver driver) {
 				super(driver);
 			}
 			
 			@Override
-			protected void initNativeFunctionSupplier() {
+			void initNativeFunctionSupplier() {
 				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver);
 			}	
 			

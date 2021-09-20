@@ -34,7 +34,7 @@ import java.util.Objects;
 
 class Strings {
 	
-	public static String compile(String message, Object... arguments) {
+	static String compile(String message, Object... arguments) {
 		for (Object obj : arguments) {
 			message = message.replaceFirst("\\{\\}", Objects.isNull(obj) ? "null" : clear(obj.toString()));
 		}

@@ -56,11 +56,11 @@ class Classes {
 	    }		
 	}
 	
-	public static boolean isAssignableFrom(Class<?> cls_01, Class<?> cls_02) {
+	static boolean isAssignableFrom(Class<?> cls_01, Class<?> cls_02) {
 		return getClassOrWrapper(cls_01).isAssignableFrom(getClassOrWrapper(cls_02));
 	}
 	
-	public static Class<?> getClassOrWrapper(Class<?> cls) {
+	static Class<?> getClassOrWrapper(Class<?> cls) {
 		if (cls.isPrimitive()) {
 			if (cls == int.class) {
 				return Integer.class;
@@ -82,13 +82,13 @@ class Classes {
 	}
 	
 	
-	public static String retrieveName(
+	static String retrieveName(
 		final byte[] classFileBuffer
 	) {
 		return retrieveName((index) -> classFileBuffer[index]);
 	}
 	
-	public static String retrieveName(
+	static String retrieveName(
 		final ByteBuffer classFileBuffer
 	) {
 		return retrieveName(classFileBuffer::get);

@@ -33,7 +33,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 
-public class Libraries {
+class Libraries {
 	String conventionedSuffix;
 	String extension;
 	String prefix;
@@ -59,15 +59,15 @@ public class Libraries {
 		}
 	}
 	
-    public static Libraries getInstance() {
+    static Libraries getInstance() {
     	return Holder.getWithinInstance();
     }
     
-    public static Libraries create() {
+    static Libraries create() {
     	return new Libraries();
     }
 	
-	public void loadFor(Class<?> clazz) {
+	void loadFor(Class<?> clazz) {
 		Files.extractAndExecute(
 			Libraries.class,
 			Optional.ofNullable(clazz.getPackage()).map(Package::getName).map(name -> name.replace(".", "/")).orElseGet(() -> "") + 
