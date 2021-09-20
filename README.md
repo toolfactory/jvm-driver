@@ -107,8 +107,7 @@ public <T> T allocateInstance(Class<?> cls);
 
 <br />
 
-## Ask for assistance
-
+# <a name="Ask-for-assistance"></a>Ask for assistance
 **For assistance you can**:
 * [subscribe](https://www.burningwave.org/registration/) to the [forum](https://www.burningwave.org/forum/) and then ask in the topic ["How to do?"](https://www.burningwave.org/forum/forum/how-to-do-3/)
 * [open a discussion](https://github.com/burningwave/jvm-driver/discussions) here on GitHub
