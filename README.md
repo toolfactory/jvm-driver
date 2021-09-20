@@ -105,6 +105,8 @@ public <T> T allocateInstance(Class<?> cls);
 
 **A JDK version 9 or higher and a GCC compiler are required to compile the project**. On Windows you can find compiler and GDB debugger from [**MinGW-W64 project**](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/).
 
+<br />
+
 ## Ask for assistance
 
 **For assistance you can**:
