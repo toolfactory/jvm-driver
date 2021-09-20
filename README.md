@@ -105,4 +105,7 @@ public <T> T allocateInstance(Class<?> cls);
 
 **A JDK version 9 or higher and a GCC compiler are required to compile the project**. On Windows you can find compiler and GDB debugger from [**MinGW-W64 project**](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/).
 
-**For assistance you can [subscribe](https://www.burningwave.org/registration/) to the [forum](https://www.burningwave.org/forum/) and then ask in the topic ["How to do?"](https://www.burningwave.org/forum/forum/how-to-do-3/) or you can ask on [Stack Overflow](https://stackoverflow.com/search?q=burningwave)**.
+**For assistance you can:
+* [subscribe](https://www.burningwave.org/registration/) to the [forum](https://www.burningwave.org/forum/) and then ask in the topic ["How to do?"](https://www.burningwave.org/forum/forum/how-to-do-3/)
+* [open a discussion here on GitHub](https://github.com/burningwave/jvm-driver/discussions)
+* ask on [Stack Overflow](https://stackoverflow.com/search?q=burningwave)**.
