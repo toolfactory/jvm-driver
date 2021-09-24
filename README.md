@@ -1,6 +1,6 @@
 # ToolFactory JVM driver [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=%40ToolFactory_fw%20JVM%20driver%2C%20a%20%23driver%20to%20allow%20deep%20interaction%20with%20the%20JVM%20without%20any%20restrictions%20%28works%20on%20%23Java8%20%23Java9%20%23Java10%20%23Java11%20%23Java12%20%23Java13%20%23Java14%20%23Java15%20%23Java16%20%23Java17%29&url=https://toolfactory.github.io/jvm-driver/)
 
-<a href="https://toolfactory.github.io/jvm-driver">
+<a href="https://github.com/toolfactory">
 <img src="https://raw.githubusercontent.com/toolfactory/jvm-driver/master/docs/logo.png" alt="logo.png" height="180px" align="right"/>
 </a>
 
