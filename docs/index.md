@@ -14,7 +14,6 @@
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
 
-[![Artifact downloads](https://www.toolfactory.org/generators/generate-toolfactory-artifact-downloads-badge.php?type=svg&artifactId=jvm-driver)](https://www.toolfactory.org/artifact-downloads/?show-monthly-trend-chart=false)
 [![Repository dependents](https://badgen.net/github/dependents-repo/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/network/dependents)
 
 A driver to allow deep interaction with the JVM **without any restrictions**.
