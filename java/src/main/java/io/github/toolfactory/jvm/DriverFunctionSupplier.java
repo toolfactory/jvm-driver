@@ -24,40 +24,39 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package java.lang.reflect;
+package io.github.toolfactory.jvm;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
+
+import java.io.Closeable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-@SuppressWarnings("unchecked")
-public class AccessibleSetterInvokerForJDK9 implements BiConsumer<AccessibleObject, Boolean> {
-	private static MethodHandle accessibleSetterMethodHandle;
-	private static MethodHandles.Lookup methodHandleRetriever;
-	
-	static {
-		try {
-			Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
-			accessibleSetterMethodHandle = methodHandleRetriever.unreflect(accessibleSetterMethod);
-		} catch (Throwable exc) {
-			throwException(exc);
-		}
-		
-	}
 
-	private static <E extends Throwable> void throwException(Throwable exc) throws E{
-		throw (E)exc;
-	}
+abstract class DriverFunctionSupplier implements Closeable {
+
+	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
+
+	abstract BiFunction<Object, Field, Object> getFieldValueFunction();
+
+	abstract Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
+
+	abstract Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
+
+	abstract Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
+
+	abstract <T> T getAllocateInstanceFunction();
+
+	abstract Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
 
 	@Override
-	public void accept(AccessibleObject accessibleObject, Boolean flag) {
-		try {
-			accessibleSetterMethodHandle.invoke(accessibleObject, flag);
-		} catch (Throwable exc) {
-			throwException(exc);
-		}		
-	}
+	public abstract void close();
 
 }

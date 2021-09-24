@@ -3,7 +3,7 @@
 
 @import "{{ site.theme }}";
 .page-header {
-  background-image: linear-gradient(120deg, #e54d1d, #f7bc12);
+  background-image: linear-gradient(120deg, #183153, #158fcc);
 }
 
 h1.project-name {
@@ -15,13 +15,13 @@ h1.project-name {
 
 .main-content {
 	h1 {
-		color: #e54d1d;
+		color: #158fcc;
 	}
 	h2 {
-		color: #e54d1d;
+		color: #158fcc;
 	}
 	h3 {
-		color: #e54d1d;
+		color: #158fcc;
 	}
 }
 

@@ -24,40 +24,21 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package java.lang.reflect;
+package io.github.toolfactory.jvm;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.util.function.BiConsumer;
 
-@SuppressWarnings("unchecked")
-public class AccessibleSetterInvokerForJDK9 implements BiConsumer<AccessibleObject, Boolean> {
-	private static MethodHandle accessibleSetterMethodHandle;
-	private static MethodHandles.Lookup methodHandleRetriever;
-	
-	static {
-		try {
-			Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
-			accessibleSetterMethodHandle = methodHandleRetriever.unreflect(accessibleSetterMethod);
-		} catch (Throwable exc) {
-			throwException(exc);
-		}
-		
-	}
+import java.io.InputStream;
+import java.util.Optional;
 
-	private static <E extends Throwable> void throwException(Throwable exc) throws E{
-		throw (E)exc;
-	}
 
-	@Override
-	public void accept(AccessibleObject accessibleObject, Boolean flag) {
-		try {
-			accessibleSetterMethodHandle.invoke(accessibleObject, flag);
-		} catch (Throwable exc) {
-			throwException(exc);
-		}		
+class Resources {
+
+	static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
+		return Optional.ofNullable(
+			resourceClassLoader
+		).orElseGet(() -> ClassLoader.getSystemClassLoader()).getResourceAsStream(
+			resourceRelativePath
+		);
 	}
 
 }

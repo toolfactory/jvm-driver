@@ -1,14 +1,12 @@
-#	This file is part of Burningwave JVM driver.                                                                      
-#	                                                                                                            
-#	Author: Roberto Gentili                                                                                     
-#	                                                                                                            
-#	Hosted at: https://github.com/burningwave/jvm-driver                                                              
+#	This file is part of ToolFactory JVM driver.                                                                      
+#                                                                   
+#	Hosted at: https://github.com/toolfactory/jvm-driver                                                              
 #	                                                                                                            
 #	- -                                                                                                          
 #	                                                                                                            
 #	The MIT License (MIT)                                                                                       
 #	                                                                                                            
-#	Copyright (c) 2019-2021 Roberto Gentili                                                                          
+#	Copyright (c) 2019-2021 Luke Hutchison, Roberto Gentili                                                                          
 #	                                                                                                            
 #	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 #	documentation files (the "Software"), to deal in the Software without restriction, including without        
@@ -34,8 +32,6 @@ on:
     paths:
       - "**.sh"
       - "**.cmd"
-      - "**.c"
-      - "**.cpp"
       - "**.java"
       - ".github/workflows/**"
       - "**.properties"
@@ -43,50 +39,6 @@ on:
 
 jobs:
 
-  elaborate-native-module:
-    name: Elaborate native module (${{ matrix.os }} ${{ matrix.architecture }})
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        os: [windows-latest, ubuntu-latest, macOS-latest]
-        java: [17]
-        architecture: [x86, x64]
-        exclude:
-          - os: macOS-latest
-            architecture: x86
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-          architecture: ${{ matrix.architecture }}
-      - if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.architecture, 'x86')
-        name: Set up C/C++ compiler
-        run: |
-          sudo apt update
-          sudo apt-get -y install doxygen vera++ zlib1g-dev libsnappy-dev \
-            g++-multilib
-      - if: startsWith(matrix.os, 'windows-latest') && startsWith(matrix.architecture, 'x86')
-        name: Set up C/C++ compiler
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: ${{ matrix.architecture }}
-      - uses: actions/checkout@v2
-      - name: Build native library
-        run: mvn -B clean compile -Dproject_jdk_version=${{ matrix.java }} -DskipTests=true --file ./native/pom.xml
-      - if: github.event_name == 'push' && (endsWith(github.event.head_commit.message, 'Releasing new version') || contains(github.event.head_commit.message, 'Generating external artifacts'))
-        name: Push native library
-        run: |
-          git config user.name "${{ github.event.head_commit.committer.name }}"
-          git config user.email "${{ github.event.head_commit.committer.email }}"
-          git pull origin ${{github.ref}}
-          git add .
-          git commit -am "Generated native library on ${{ matrix.os }} ${{ matrix.architecture }}" --allow-empty
-          git push
-          
-   
   elaborate-java-hook-module:
     name: Elaborate java hook module (${{ matrix.os }})
     strategy:
@@ -122,7 +74,7 @@ jobs:
 
   build-and-test-with-Java-8-and-later:
     name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
-    needs: [elaborate-native-module, elaborate-java-hook-module]
+    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -179,7 +131,7 @@ jobs:
           mv ./java/temp-pom.xml ./java/sa-pom.xml
           git commit -am "Swithcing pom for releasing"
           git push          
-          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase=${{ secrets.gpg_passphrase }} -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
+          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
           mv ./java/pom.xml ./java/temp-pom.xml
           mv ./java/sa-pom.xml ./java/pom.xml
           mv ./java/temp-pom.xml ./java/sa-pom.xml

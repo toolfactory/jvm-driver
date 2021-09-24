@@ -24,40 +24,45 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package java.lang.reflect;
+package io.github.toolfactory.jvm;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.util.function.BiConsumer;
+
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+
 
 @SuppressWarnings("unchecked")
-public class AccessibleSetterInvokerForJDK9 implements BiConsumer<AccessibleObject, Boolean> {
-	private static MethodHandle accessibleSetterMethodHandle;
-	private static MethodHandles.Lookup methodHandleRetriever;
-	
-	static {
-		try {
-			Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
-			accessibleSetterMethodHandle = methodHandleRetriever.unreflect(accessibleSetterMethod);
-		} catch (Throwable exc) {
-			throwException(exc);
+class BufferHandler {
+
+	static ByteBuffer shareContent(ByteBuffer byteBuffer) {
+		ByteBuffer duplicated = duplicate(byteBuffer);
+		if (position(byteBuffer) > 0) {
+			flip(duplicated);
 		}
-		
+		return duplicated;
 	}
 
-	private static <E extends Throwable> void throwException(Throwable exc) throws E{
-		throw (E)exc;
+	static <T extends Buffer> T flip(T buffer) {
+		return (T)((Buffer)buffer).flip();
 	}
 
-	@Override
-	public void accept(AccessibleObject accessibleObject, Boolean flag) {
-		try {
-			accessibleSetterMethodHandle.invoke(accessibleObject, flag);
-		} catch (Throwable exc) {
-			throwException(exc);
-		}		
+	static <T extends Buffer> int position(T buffer) {
+		return ((Buffer)buffer).position();
+	}
+
+	static ByteBuffer duplicate(ByteBuffer buffer) {
+		return buffer.duplicate();
+	}
+
+	static <T extends Buffer> int limit(T buffer) {
+		return ((Buffer)buffer).limit();
+	}
+
+	static byte[] toByteArray(ByteBuffer byteBuffer) {
+    	byteBuffer = shareContent(byteBuffer);
+    	byte[] result = new byte[limit(byteBuffer)];
+    	byteBuffer.get(result, 0, result.length);
+        return result;
 	}
 
 }

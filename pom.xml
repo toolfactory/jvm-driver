@@ -1,15 +1,13 @@
 <!-- 
-	This file is part of Burningwave JVM driver.                                                                      
-	                                                                                                            
-	Author: Roberto Gentili                                                                                     
-	                                                                                                            
-	Hosted at: https://github.com/burningwave/jvm-driver                                                              
+	This file is part of ToolFactory JVM driver.                                                                      
+                                                                    
+	Hosted at: https://github.com/toolfactory/jvm-driver                                                              
 	                                                                                                            
 	- -                                                                                                          
 	                                                                                                            
 	The MIT License (MIT)                                                                                       
 	                                                                                                            
-	Copyright (c) 2019-2021 Roberto Gentili                                                                          
+	Copyright (c) 2021 Luke Hutchison, Roberto Gentili                                                                          
 	                                                                                                            
 	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 	documentation files (the "Software"), to deal in the Software without restriction, including without        
@@ -26,77 +24,75 @@
 	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 	OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    
-    <groupId>org.burningwave</groupId>
-    <artifactId>jvm-driver-parent</artifactId>
-    <version>${revision}</version>
-	
-	<name>Burningwave JVM Driver</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.github.toolfactory</groupId>
+	<artifactId>jvm-driver-parent</artifactId>
+	<version>${revision}</version>
+
+	<name>ToolFactory JVM Driver</name>
 	<description>
 		A driver to allow deep interaction with the JVM without any restrictions
 	</description>
-	<url>https://burningwave.github.io/jvm-driver/</url>
-	
-    <packaging>pom</packaging>
+	<url>https://toolfactory.github.io/jvm-driver/</url>
 
-    <modules>
-        <module>native</module>
+	<packaging>pom</packaging>
+
+	<modules>
 		<module>java-hook</module>
-        <module>java</module>
-    </modules>
+		<module>java</module>
+	</modules>
 
 	<licenses>
 		<license>
 			<name>MIT License</name>
-			<url>https://github.com/burningwave/jvm-driver/blob/master/LICENSE</url>
+			<url>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
 	<organization>
-		<name>Burningwave</name>
-		<url>https://www.burningwave.org/</url>
+		<name>ToolFactory</name>
+		<url>https://github.com/toolfactory</url>
 	</organization>
 
 	<developers>
 		<developer>
-			<name>Roberto Gentili</name>
-			<id>roberto.gentili</id>
-			<email>info@burningwave.org</email>
-			<organization>Burningwave</organization>
-			<organizationUrl>https://www.burningwave.org/</organizationUrl>
+			<name>Luke Hutchison</name>
+			<email>tool.factory.heads@gmail.com</email>
+			<organization>ToolFactory</organization>
+			<organizationUrl>https://github.com/toolfactory</organizationUrl>
 			<roles>
 				<role>Administrator</role>
 				<role>Developer</role>
 			</roles>
 		</developer>
 		<developer>
-			<name>Alessio Perrotta</name>
-			<email>info@burningwave.org</email>
-			<organization>Burningwave</organization>
-			<organizationUrl>https://www.burningwave.org/</organizationUrl>
+			<name>Roberto Gentili</name>
+			<id>roberto.gentili</id>
+			<email>tool.factory.heads@gmail.com</email>
+			<organization>ToolFactory</organization>
+			<organizationUrl>https://github.com/toolfactory</organizationUrl>
 			<roles>
-				<role>External relationship manager</role>
+				<role>Administrator</role>
 				<role>Developer</role>
 			</roles>
 		</developer>
 	</developers>
-	
+
 	<properties>
-		<copyright.holder>Roberto Gentili</copyright.holder>
-        <revision>1.0.0</revision>
-        <project_jdk_version>9</project_jdk_version>
-        <repository.url>https://burningwave@github.com/burningwave/jvm-driver.git</repository.url>
+		<copyright.holder>Luke Hutchison, Roberto Gentili</copyright.holder>
+		<revision>1.0.0</revision>
+		<project_jdk_version>9</project_jdk_version>
+		<repository.url>https://toolfactory@github.com/toolfactory/jvm-driver.git</repository.url>
 	</properties>
-	
+
 	<issueManagement>
 		<system>github.com</system>
-		<url>https://github.com/burningwave/jvm-driver/issues</url>
+		<url>https://github.com/toolfactory/jvm-driver/issues</url>
 	</issueManagement>
 
 	<distributionManagement>
@@ -113,8 +109,8 @@
 	<scm>
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
-		<url>https://github.com/burningwave/jvm-driver</url>
+		<url>https://github.com/toolfactory/jvm-driver</url>
 		<tag>HEAD</tag>
 	</scm>
-	
+
 </project>

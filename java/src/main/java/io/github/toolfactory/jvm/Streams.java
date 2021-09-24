@@ -24,40 +24,32 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package java.lang.reflect;
+package io.github.toolfactory.jvm;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.util.function.BiConsumer;
 
-@SuppressWarnings("unchecked")
-public class AccessibleSetterInvokerForJDK9 implements BiConsumer<AccessibleObject, Boolean> {
-	private static MethodHandle accessibleSetterMethodHandle;
-	private static MethodHandles.Lookup methodHandleRetriever;
-	
-	static {
-		try {
-			Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
-			accessibleSetterMethodHandle = methodHandleRetriever.unreflect(accessibleSetterMethod);
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+
+class Streams {
+
+	static byte[] toByteArray(InputStream inputStream) {
+		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+			copy(inputStream, outputStream);
+			return outputStream.toByteArray();
 		} catch (Throwable exc) {
-			throwException(exc);
+			return Throwables.throwException(exc);
 		}
-		
 	}
 
-	private static <E extends Throwable> void throwException(Throwable exc) throws E{
-		throw (E)exc;
-	}
-
-	@Override
-	public void accept(AccessibleObject accessibleObject, Boolean flag) {
-		try {
-			accessibleSetterMethodHandle.invoke(accessibleObject, flag);
-		} catch (Throwable exc) {
-			throwException(exc);
-		}		
+	static void copy(InputStream input, OutputStream output) throws IOException {
+		byte[] buffer = new byte[1024];
+		int bytesRead = 0;
+		while (-1 != (bytesRead = input.read(buffer))) {
+			output.write(buffer, 0, bytesRead);
+		}
 	}
 
 }
