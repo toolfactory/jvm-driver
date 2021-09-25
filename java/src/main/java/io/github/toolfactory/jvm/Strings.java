@@ -27,14 +27,11 @@
 package io.github.toolfactory.jvm;
 
 
-import java.util.Objects;
-
-
 class Strings {
 
 	static String compile(String message, Object... arguments) {
 		for (Object obj : arguments) {
-			message = message.replaceFirst("\\{\\}", Objects.isNull(obj) ? "null" : clear(obj.toString()));
+			message = message.replaceFirst("\\{\\}", obj == null ? "null" : clear(obj.toString()));
 		}
 		return message;
 	}
