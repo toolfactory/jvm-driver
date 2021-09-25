@@ -80,7 +80,7 @@ jobs:
       matrix:
         architecture: [x86, x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
@@ -110,7 +110,7 @@ jobs:
       matrix:
         architecture: [x86, x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
