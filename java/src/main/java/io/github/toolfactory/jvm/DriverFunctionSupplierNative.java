@@ -28,7 +28,6 @@ package io.github.toolfactory.jvm;
 
 
 import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.MethodHandles.Lookup;
@@ -81,7 +80,7 @@ class DriverFunctionSupplierNative {
 	BiConsumer<AccessibleObject, Boolean> getSetAccessibleFunction() {
 		try {
 			MethodHandles.Lookup lookup = MethodHandles.lookup();
-			CallSite callSite = LambdaMetafactory.metafactory(
+			CallSite callSite = java.lang.invoke.LambdaMetafactory.metafactory(
 				lookup, "accept", MethodType.methodType(BiConsumer.class),
 				MethodType.methodType(void.class, Object.class, Object.class),
 				lookup.findStatic(
@@ -100,7 +99,7 @@ class DriverFunctionSupplierNative {
 	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		try {
 			MethodHandles.Lookup lookup = MethodHandles.lookup();
-			CallSite callSite = LambdaMetafactory.metafactory(
+			CallSite callSite = java.lang.invoke.LambdaMetafactory.metafactory(
 				lookup, "apply", MethodType.methodType(Function.class),
 				MethodType.methodType(Object.class, Object.class),
 				lookup.findStatic(

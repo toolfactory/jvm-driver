@@ -28,10 +28,8 @@ package io.github.toolfactory.jvm;
 
 
 import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -39,13 +37,12 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
 
-
 import io.github.toolfactory.jvm.Driver.InitializationException;
-import io.github.toolfactory.narcissus.Narcissus;
 import sun.misc.Unsafe;
 
 
-@SuppressWarnings({"all"})
+
+@SuppressWarnings("all")
 abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 
 	sun.misc.Unsafe unsafe;
@@ -65,7 +62,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 
-	abstract Lookup retrieveConsulter(Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable;
+	abstract MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable;
 
 	@Override
 	BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) {
@@ -281,22 +278,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			}
 		};
 	}
-
-	@Override
-	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-		try {
-			MethodHandles.Lookup lookup = MethodHandles.lookup();
-			CallSite callSite = LambdaMetafactory.metafactory(
-			   lookup, "get", MethodType.methodType(Supplier.class), 
-			   MethodType.methodType(Object.class),
-			   lookup.findStatic(MethodHandles.class,"lookup", MethodType.methodType(MethodHandles.Lookup.class)),
-			   MethodType.methodType(MethodHandles.Lookup.class)
-			);
-			return (Supplier<MethodHandles.Lookup>)callSite.getTarget().invoke();
-		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
-		}
-	}
+	
 
 	@Override
 	public void close() {
@@ -305,16 +287,26 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 
-	static class ForJava8 extends DriverFunctionSupplierUnsafe {
+	static class ForJava7 extends DriverFunctionSupplierUnsafe {
 
-		ForJava8(Driver driver) {
+		ForJava7(Driver driver) {
 			super(driver);
 		}
 
 		@Override
-		Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle)
+		MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle)
 				throws Throwable {
-			return (Lookup) privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
+			return (MethodHandles.Lookup) privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
+		}
+
+		@Override
+		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+			return new Supplier<MethodHandles.Lookup>() {
+				@Override
+				public MethodHandles.Lookup get() {
+					return MethodHandles.lookup();
+				}
+			};
 		}
 
 	}
@@ -327,9 +319,25 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 		}
 
 		@Override
-		Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod)
+		MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod)
 				throws Throwable {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
+		}
+		
+		@Override
+		Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+			try {
+				MethodHandles.Lookup lookup = MethodHandles.lookup();
+				CallSite callSite = java.lang.invoke.LambdaMetafactory.metafactory(
+				   lookup, "get", MethodType.methodType(Supplier.class), 
+				   MethodType.methodType(Object.class),
+				   lookup.findStatic(MethodHandles.class,"lookup", MethodType.methodType(MethodHandles.Lookup.class)),
+				   MethodType.methodType(MethodHandles.Lookup.class)
+				);
+				return (Supplier<MethodHandles.Lookup>)callSite.getTarget().invoke();
+			} catch (Throwable exc) {
+				return Throwables.getInstance().throwException(exc);
+			}
 		}
 
 	}
@@ -387,7 +395,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			final long allowedModesFieldMemoryOffset = jVMInfo.is64Bit() ? 12L : 8L;
 			return new Supplier<MethodHandles.Lookup>() {
 				@Override
-				public Lookup get() {
+				public MethodHandles.Lookup get() {
 					MethodHandles.Lookup consulter = MethodHandles.lookup();
 					unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
 					return consulter;

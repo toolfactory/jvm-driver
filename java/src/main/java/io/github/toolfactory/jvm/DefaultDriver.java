@@ -41,7 +41,8 @@ import java.util.Collection;
 import java.util.Map;
 
 
-@SuppressWarnings("all")
+
+@SuppressWarnings("unchecked")
 public class DefaultDriver implements Driver {
 
 	MethodHandle getDeclaredFieldsRetriever;
@@ -77,11 +78,11 @@ public class DefaultDriver implements Driver {
 						newInitializerForJava17():
 						newInitializerForJava14():
 					newInitializerForJava9():
-				newInitializerForJava8());
+				newInitializerForJava7());
 	}
 
-	Initializer newInitializerForJava8() {
-		return new Initializer.ForJava8(this);
+	Initializer newInitializerForJava7() {
+		return new Initializer.ForJava7(this);
 	}
 
 	Initializer newInitializerForJava9() {
@@ -153,7 +154,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	@Override
-	public Class getClassLoaderDelegateClass() {
+	public Class<?> getClassLoaderDelegateClass() {
 		return classLoaderDelegateClass;
 	}
 
@@ -306,11 +307,11 @@ public class DefaultDriver implements Driver {
 			driver = null;
 		}
 
-		static class ForJava8 extends Initializer {
+		static class ForJava7 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
 			MethodHandle privateLookupInMethodHandle;
 
-			ForJava8(DefaultDriver driver) {
+			ForJava7(DefaultDriver driver) {
 				super(driver);
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
@@ -329,7 +330,7 @@ public class DefaultDriver implements Driver {
 
 			@Override
 			void initNativeFunctionSupplier()  {
-				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava8(this.driver);
+				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava7(this.driver);
 			}
 
 			@Override
@@ -429,8 +430,8 @@ public class DefaultDriver implements Driver {
 			@Override
 			public void close() {
 				super.close();
-				MethodHandles.Lookup mainConsulter = null;
-				MethodHandle privateLookupInMethodHandle =null;
+				mainConsulter = null;
+				privateLookupInMethodHandle =null;
 			}
 
 		}
