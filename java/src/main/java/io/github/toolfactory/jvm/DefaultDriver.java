@@ -97,20 +97,12 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
-		try {
-			((java.util.function.BiConsumer<AccessibleObject, Boolean>)accessibleSetter).accept(object, flag);
-		} catch (Throwable exc) {
-			Throwables.throwException(exc);
-		}
+		((java.util.function.BiConsumer<AccessibleObject, Boolean>)accessibleSetter).accept(object, flag);
 	}
 
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
-		try {
-			return ((java.util.function.BiFunction<Class<?>, byte[], Class<?>>)hookClassDefiner).apply(clientClass, byteCode);
-		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
-		}
+		return ((java.util.function.BiFunction<Class<?>, byte[], Class<?>>)hookClassDefiner).apply(clientClass, byteCode);
 	}
 
 	@Override
@@ -125,7 +117,23 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
-		return ((java.util.function.Function<ClassLoader, Map<String, ?>>) loadedPackagesRetriever).apply(classLoader);
+		return ((java.util.function.Function<ClassLoader, Map<String, ?>>)loadedPackagesRetriever).apply(classLoader);
+	}
+	
+
+	@Override
+	public <T> T getFieldValue(Object target, Field field) {
+		return (T)((java.util.function.BiFunction<Object, Field, Object>)fieldValueRetriever).apply(target, field);
+	}
+
+	@Override
+	public void setFieldValue(Object target, Field field, Object value) {
+		((java.util.function.Function<Object, java.util.function.BiConsumer<Field, Object>>)fieldValueSetter).apply(target).accept(field, value);
+	}
+
+	@Override
+	public <T> T allocateInstance(Class<?> cls) {
+		return (T)((java.util.function.Function<Class<?>, Object>)allocateInstanceInvoker).apply(cls);
 	}
 
 	@Override
@@ -206,21 +214,6 @@ public class DefaultDriver implements Driver {
 		} catch (Throwable exc) {
 			return Throwables.throwException(exc);
 		}
-	}
-
-	@Override
-	public <T> T getFieldValue(Object target, Field field) {
-		return (T)((java.util.function.BiFunction<Object, Field, Object>) fieldValueRetriever).apply(target, field);
-	}
-
-	@Override
-	public void setFieldValue(Object target, Field field, Object value) {
-		((java.util.function.Function<Object, java.util.function.BiConsumer<Field, Object>>)fieldValueSetter).apply(target).accept(field, value);
-	}
-
-	@Override
-	public <T> T allocateInstance(Class<?> cls) {
-		return (T)((java.util.function.Function<Class<?>, Object>) allocateInstanceInvoker).apply(cls);
 	}
 
 	@Override
