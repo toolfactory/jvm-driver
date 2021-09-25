@@ -63,7 +63,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			this.unsafe = (Unsafe)theUnsafeField.get(null);
 			jVMInfo = JVMInfo.getInstance();
 		} catch (Throwable exc) {
-			Throwables.throwException(new InitializationException("Exception while retrieving unsafe", exc));
+			Throwables.getInstance().throwException(new InitializationException("Exception while retrieving unsafe", exc));
 		}
 	}
 
@@ -86,13 +86,13 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 					try {
 						return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
 					} catch (Throwable exc) {
-						return Throwables.throwException(exc);
+						return Throwables.getInstance().throwException(exc);
 					}
 				}
 				
 			};
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -109,7 +109,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				}
 			};				
 		} catch (Throwable exc) {
-			return Throwables.throwException(new InitializationException("Could not initialize field memory offset of packages map", exc));
+			return Throwables.getInstance().throwException(new InitializationException("Could not initialize field memory offset of packages map", exc));
 		}
 	}
 
@@ -126,7 +126,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				}
 			};				
 		} catch (Throwable exc) {
-			return Throwables.throwException(new InitializationException("Could not initialize field memory offset of loaded classes vector", exc));
+			return Throwables.getInstance().throwException(new InitializationException("Could not initialize field memory offset of loaded classes vector", exc));
 		}
 	}
 
@@ -206,7 +206,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 					@Override
 					public void accept(Field field, Object value) {
 						if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-							Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
+							Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
 						}
 						Object target = Modifier.isStatic(field.getModifiers())?
 							field.getDeclaringClass() :
@@ -279,7 +279,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 				try {
 					return unsafe.allocateInstance(cls);
 				} catch (InstantiationException exc) {
-					return Throwables.throwException(exc);
+					return Throwables.getInstance().throwException(exc);
 				}
 			}
 		};
@@ -297,7 +297,7 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 			);
 			return (Supplier<MethodHandles.Lookup>)callSite.getTarget().invoke();
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -369,18 +369,18 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 										try {
 											return Class.forName(javaClass.getName());
 										} catch (Throwable inExc) {
-											return Throwables.throwException(inExc);
+											return Throwables.getInstance().throwException(inExc);
 										}
 									};
 								});
 							}
 						} catch (Throwable exc) {
-							return Throwables.throwException(exc);
+							return Throwables.getInstance().throwException(exc);
 						}
 					}
 				};
 			} catch (Throwable exc) {
-				return Throwables.throwException(exc);
+				return Throwables.getInstance().throwException(exc);
 			}
 		}
 

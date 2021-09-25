@@ -166,7 +166,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (T)methodInvoker.invoke(method, target, params);
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (T)constructorInvoker.invoke(ctor, params);
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -194,7 +194,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (Field[])getDeclaredFieldsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (Constructor<T>[])getDeclaredConstructorsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -212,7 +212,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (Method[])getDeclaredMethodsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -294,7 +294,7 @@ public class DefaultDriver implements Driver {
 					Class.class
 				);
 			} catch (Throwable exc) {
-				Throwables.throwException(exc);
+				Throwables.getInstance().throwException(exc);
 			}
 		}
 
@@ -322,7 +322,7 @@ public class DefaultDriver implements Driver {
 						MethodHandles.Lookup.class
 					);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
 			}
 
@@ -340,12 +340,12 @@ public class DefaultDriver implements Driver {
 							try {
 								return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
 							} catch (Throwable exc) {
-								return Throwables.throwException(exc);
+								return Throwables.getInstance().throwException(exc);
 							}
 						}
 					};
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
 			}
 
@@ -354,7 +354,7 @@ public class DefaultDriver implements Driver {
 				try {
 					driver.hookClassDefiner = driverFunctionSupplier.getDefineHookClassFunction(mainConsulter, privateLookupInMethodHandle);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
 			}
 
@@ -369,12 +369,12 @@ public class DefaultDriver implements Driver {
 							try {
 								accessibleSetterMethodHandle.invoke(accessibleObject, flag);
 							} catch (Throwable exc) {
-								Throwables.throwException(exc);
+								Throwables.getInstance().throwException(exc);
 							}
 						}
 					};
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize accessible setter", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
 			}
 
@@ -386,7 +386,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup consulter = driver.getConsulter(nativeAccessorImplClass);
 					driver.constructorInvoker = consulter.unreflect(method);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize constructor invoker", exc));
 				}
 			}
 
@@ -398,7 +398,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup consulter = driver.getConsulter(nativeAccessorImplClass);
 					driver.methodInvoker = consulter.unreflect(method);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize method invoker", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize method invoker", exc));
 				}
 			}
 
@@ -434,7 +434,7 @@ public class DefaultDriver implements Driver {
 						MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
 					);
 				} catch (Throwable exc) {
-					Throwables.throwException(exc);
+					Throwables.getInstance().throwException(exc);
 				}
 			}
 
@@ -461,7 +461,7 @@ public class DefaultDriver implements Driver {
 					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"), privateLookupInMethodHandle);
 					driver.consulterRetriever = driver.allocateInstance(methodHandleWrapperClass);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize consulter retriever", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
 
 			}
@@ -479,7 +479,7 @@ public class DefaultDriver implements Driver {
 					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"), driver.getConsulter(methodHandleWrapperClass));
 					driver.accessibleSetter = driver.allocateInstance(methodHandleWrapperClass);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize accessible setter", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
 			}
 
@@ -492,7 +492,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup consulter = driver.getConsulter(nativeAccessorImplClass);
 					driver.constructorInvoker = consulter.unreflect(method);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize constructor invoker", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize constructor invoker", exc));
 				}
 			}
 
@@ -504,7 +504,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup consulter = driver.getConsulter(nativeMethodAccessorImplClass);
 					driver.methodInvoker = consulter.unreflect(invoker);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize method invoker", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize method invoker", exc));
 				}
 			}
 
@@ -521,17 +521,17 @@ public class DefaultDriver implements Driver {
 							try {
 								return (Package)methodHandle.invokeExact(classLoader, packageName);
 							} catch (Throwable exc) {
-								return Throwables.throwException(exc);
+								return Throwables.getInstance().throwException(exc);
 							}
 						}
 					};
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize package retriever", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize package retriever", exc));
 				}
 				try {
 					driver.builtinClassLoaderClass = Class.forName("jdk.internal.loader.BuiltinClassLoader");
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize builtin class loader class", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize builtin class loader class", exc));
 				}
 				try (
 					InputStream inputStream =
@@ -542,12 +542,12 @@ public class DefaultDriver implements Driver {
 						driver.builtinClassLoaderClass, Streams.toByteArray(inputStream)
 					);
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize class loader delegate class", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize class loader delegate class", exc));
 				}
 				try {
 					initDeepConsulterRetriever();
 				} catch (Throwable exc) {
-					Throwables.throwException(new InitializationException("Could not initialize deep consulter retriever", exc));
+					Throwables.getInstance().throwException(new InitializationException("Could not initialize deep consulter retriever", exc));
 				}
 			}
 
@@ -563,7 +563,7 @@ public class DefaultDriver implements Driver {
 						try {
 							return (MethodHandles.Lookup)methodHandle.invoke(cls, -1);
 						} catch (Throwable exc) {
-							return Throwables.throwException(exc);
+							return Throwables.getInstance().throwException(exc);
 						}
 					}
 				};
@@ -597,7 +597,7 @@ public class DefaultDriver implements Driver {
 						try {
 							return (MethodHandles.Lookup)mthHandle.invoke(cls, null, -1);
 						} catch (Throwable exc) {
-							return Throwables.throwException(exc);
+							return Throwables.getInstance().throwException(exc);
 						}
 					}
 				};

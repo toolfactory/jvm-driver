@@ -20,7 +20,7 @@ public class DefaultDriverTest extends BaseTest {
 				driver = new DefaultDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
-				return Throwables.throwException(exc);
+				return Throwables.getInstance().throwException(exc);
 			}
 		}
 		return driver;

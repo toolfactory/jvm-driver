@@ -27,14 +27,20 @@
 package io.github.toolfactory.jvm;
 
 import java.lang.reflect.Field;
-import java.util.function.Consumer;
 
 import sun.misc.Unsafe;
 
 @SuppressWarnings("all")
 class Throwables {
-	private static Consumer<Throwable> exceptionThrower;
 	private static Unsafe unsafe;
+	
+	private Throwables() {
+		
+	}
+	
+	public static Throwables getInstance() {
+		return Holder.getWithinInstance();
+	}
 	
 	static {
 		try {
@@ -46,14 +52,14 @@ class Throwables {
 		}
 	}
 
-	static <T> T throwException(Object obj, Object... arguments) {
+	<T> T throwException(Object obj, Object... arguments) {
 		Throwable exception = null;
 		StackTraceElement[] stackTraceOfException = null;
 		if (obj instanceof String) {
 			if (arguments == null || arguments.length == 0) {
-				exception = new RuntimeException((String)obj);
+				exception = new Exception((String)obj);
 			} else {
-				exception = new RuntimeException(Strings.compile((String)obj, arguments));
+				exception = new Exception(Strings.compile((String)obj, arguments));
 			}
 			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
@@ -68,6 +74,14 @@ class Throwables {
 		exception.setStackTrace(stackTraceOfException);
 		unsafe.throwException(exception);
 		return null;
+	}
+	
+	private static class Holder {
+		private static final Throwables INSTANCE = new Throwables();
+
+		private static Throwables getWithinInstance() {
+			return INSTANCE;
+		}
 	}
 
 }

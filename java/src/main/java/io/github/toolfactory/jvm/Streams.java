@@ -40,7 +40,7 @@ class Streams {
 			copy(inputStream, outputStream);
 			return outputStream.toByteArray();
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 

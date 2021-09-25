@@ -67,7 +67,7 @@ class DriverFunctionSupplierNative {
 					@Override
 					public void accept(Field field, Object value) {
 						if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-							Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
+							Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
 						}
 						if (Modifier.isStatic(field.getModifiers())) {
 							Narcissus.setStaticField(field, value);
@@ -95,7 +95,7 @@ class DriverFunctionSupplierNative {
 			);
 		return (BiConsumer<AccessibleObject, Boolean>) callSite.getTarget().invoke();
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 
@@ -114,7 +114,7 @@ class DriverFunctionSupplierNative {
 			);
 			return (Function<Class<?>, Object>) callSite.getTarget().invoke();
 		} catch (Throwable exc) {
-			return Throwables.throwException(exc);
+			return Throwables.getInstance().throwException(exc);
 		}
 	}
 	

@@ -103,7 +103,7 @@ abstract class BaseTest {
 			assertTrue(charValue == 'a');
 		} catch (Throwable exc) {
 			exc.printStackTrace();
-			Throwables.throwException(exc);
+			Throwables.getInstance().throwException(exc);
 		}
 	}
 	
