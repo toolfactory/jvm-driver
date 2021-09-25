@@ -28,7 +28,6 @@ package io.github.toolfactory.jvm;
 
 
 import java.nio.ByteBuffer;
-import java.util.Optional;
 
 
 class JavaClass {
@@ -76,7 +75,7 @@ class JavaClass {
 	}
 
 	String getSimpleName() {
-		return Optional.ofNullable(_getSimpleName()).orElse(null);
+		return _getSimpleName();
 	}
 
 
