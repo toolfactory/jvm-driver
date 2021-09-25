@@ -29,8 +29,6 @@ package io.github.toolfactory.jvm;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 
 class JavaClass {

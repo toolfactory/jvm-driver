@@ -28,6 +28,7 @@ package io.github.toolfactory.jvm;
 
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 
 
@@ -51,22 +52,22 @@ public class HybridDriver extends DefaultDriver {
 			this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver) {
 
 				@Override
-				java.util.function.Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+				Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 					return driverFunctionSupplierNative.getMethodHandlesLookupSupplyingFunction();
 				}
-				
+
 				@Override
-				BiFunctionWrapper<?, Object, Field, Object> getFieldValueFunction() {
+				BiFunction<Object, Field, Object> getFieldValueFunction() {
 					return driverFunctionSupplierNative.getFieldValueFunction();
 				}
 
 				@Override
-				java.util.function.Function<Object, java.util.function.BiConsumer<Field, Object>> getSetFieldValueFunction() {
+				Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
 					return driverFunctionSupplierNative.getSetFieldValueFunction();
 				}
 
 				@Override
-				FunctionWrapper<?, Class<?>, Object> getAllocateInstanceFunction() {
+				Function<Class<?>, Object> getAllocateInstanceFunction() {
 					return driverFunctionSupplierNative.getAllocateInstanceFunction();
 				}
 
@@ -75,7 +76,13 @@ public class HybridDriver extends DefaultDriver {
 
 		@Override
 		void initAccessibleSetter() {
-			driver.accessibleSetter = driverFunctionSupplierNative.getSetAccessibleFunction();
+			driver.accessibleSetter = new BiConsumerWrapper<BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
+				driverFunctionSupplierNative.getSetAccessibleFunction()
+			) {
+				void accept(AccessibleObject inputOne, Boolean inputTwo) {
+					function.accept(inputOne, inputTwo);
+				};
+			};
 		}
 
 		@Override

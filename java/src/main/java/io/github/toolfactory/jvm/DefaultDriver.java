@@ -49,16 +49,17 @@ public class DefaultDriver implements Driver {
 	MethodHandle getDeclaredConstructorsRetriever;
 	MethodHandle methodInvoker;
 	MethodHandle constructorInvoker;
-
-	FunctionWrapper<?, ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
-	FunctionWrapper<?, ClassLoader, Map<String, ?>> loadedPackagesRetriever;
-	FunctionWrapper<?, Class<?>, Object> allocateInstanceInvoker;
-	BiFunctionWrapper<?, Object, Field, Object> fieldValueRetriever;
-	Object fieldValueSetter;
-	Object accessibleSetter;
-	Object consulterRetriever;
-	Object packageRetriever;
-	Object hookClassDefiner;
+	
+	FunctionWrapper<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
+	BiConsumerWrapper<?, AccessibleObject, Boolean> accessibleSetter;
+	
+	Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
+	Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
+	Function<Class<?>, Object> allocateInstanceInvoker;
+	BiFunction<Object, Field, Object> fieldValueRetriever;
+	Function<Object, BiConsumer<Field, Object>> fieldValueSetter;
+	BiFunction<ClassLoader, String, Package> packageRetriever;
+	BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
 
 	Class<?> classLoaderDelegateClass;
 	Class<?> builtinClassLoaderClass;
@@ -76,11 +77,11 @@ public class DefaultDriver implements Driver {
 						newInitializerForJava17():
 						newInitializerForJava14():
 					newInitializerForJava9():
-				newInitializerForJava7());
+				newInitializerForJava8());
 	}
 
-	Initializer newInitializerForJava7() {
-		return new Initializer.ForJava7(this);
+	Initializer newInitializerForJava8() {
+		return new Initializer.ForJava8(this);
 	}
 
 	Initializer newInitializerForJava9() {
@@ -97,17 +98,17 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
-		((java.util.function.BiConsumer<AccessibleObject, Boolean>)accessibleSetter).accept(object, flag);
+		accessibleSetter.accept(object, flag);
 	}
 
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
-		return ((java.util.function.BiFunction<Class<?>, byte[], Class<?>>)hookClassDefiner).apply(clientClass, byteCode);
+		return hookClassDefiner.apply(clientClass, byteCode);
 	}
 
 	@Override
 	public Package getPackage(ClassLoader classLoader, String packageName) {
-		return ((java.util.function.BiFunction<ClassLoader, String, Package>)packageRetriever).apply(classLoader, packageName);
+		return packageRetriever.apply(classLoader, packageName);
 	}
 
 	@Override
@@ -128,7 +129,7 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
-		((java.util.function.Function<Object, java.util.function.BiConsumer<Field, Object>>)fieldValueSetter).apply(target).accept(field, value);
+		fieldValueSetter.apply(target).accept(field, value);
 	}
 
 	@Override
@@ -158,7 +159,7 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public Lookup getConsulter(Class<?> cls) {
-		return ((java.util.function.Function<Class<?>, MethodHandles.Lookup>)consulterRetriever).apply(cls);
+		return consulterRetriever.apply(cls);
 	}
 
 	@Override
@@ -305,11 +306,11 @@ public class DefaultDriver implements Driver {
 			driver = null;
 		}
 
-		static class ForJava7 extends Initializer {
+		static class ForJava8 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
 			MethodHandle privateLookupInMethodHandle;
 
-			ForJava7(DefaultDriver driver) {
+			ForJava8(DefaultDriver driver) {
 				super(driver);
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
@@ -328,20 +329,27 @@ public class DefaultDriver implements Driver {
 
 			@Override
 			void initNativeFunctionSupplier()  {
-				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava7(this.driver);
+				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava8(this.driver);
 			}
 
 			@Override
 			void initConsulterRetriever() {
 				try {
-					driver.consulterRetriever = new java.util.function.Function<Class<?>, MethodHandles.Lookup>() { 
-						@Override
-						public Lookup apply(Class<?> cls) {
-							try {
-								return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
-							} catch (Throwable exc) {
-								return Throwables.getInstance().throwException(exc);
+					driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+						new Function<Class<?>, MethodHandles.Lookup>() { 
+							@Override
+							public Lookup apply(Class<?> cls) {
+								try {
+									return (Lookup) privateLookupInMethodHandle.invoke(mainConsulter, cls);
+								} catch (Throwable exc) {
+									return Throwables.getInstance().throwException(exc);
+								}
 							}
+						}
+					) {
+						@Override
+						Lookup apply(Class<?> input) {
+							return function.apply(input);
 						}
 					};
 				} catch (Throwable exc) {
@@ -363,15 +371,21 @@ public class DefaultDriver implements Driver {
 				try {
 					final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 					final MethodHandle accessibleSetterMethodHandle = driver.getConsulter(AccessibleObject.class).unreflect(accessibleSetterMethod);
-					driver.accessibleSetter = new java.util.function.BiConsumer<AccessibleObject, Boolean>() {
-						@Override
-						public void accept(AccessibleObject accessibleObject, Boolean flag) {
-							try {
-								accessibleSetterMethodHandle.invoke(accessibleObject, flag);
-							} catch (Throwable exc) {
-								Throwables.getInstance().throwException(exc);
+					driver.accessibleSetter = new BiConsumerWrapper<BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
+						new BiConsumer<AccessibleObject, Boolean>() {
+							@Override
+							public void accept(AccessibleObject accessibleObject, Boolean flag) {
+								try {
+									accessibleSetterMethodHandle.invoke(accessibleObject, flag);
+								} catch (Throwable exc) {
+									Throwables.getInstance().throwException(exc);
+								}
 							}
-						}
+						}		
+					) {
+						void accept(AccessibleObject inputOne, Boolean inputTwo) {
+							function.accept(inputOne, inputTwo);
+						};
 					};
 				} catch (Throwable exc) {
 					Throwables.getInstance().throwException(new InitializationException("Could not initialize accessible setter", exc));
@@ -404,7 +418,7 @@ public class DefaultDriver implements Driver {
 
 			@Override
 			void initSpecificElements() {
-				driver.packageRetriever = new java.util.function.BiFunction<ClassLoader, String, Package>() {
+				driver.packageRetriever = new BiFunction<ClassLoader, String, Package>() {
 					@Override
 					public Package apply(ClassLoader t, String packageName) {
 						return Package.getPackage(packageName);
@@ -459,7 +473,14 @@ public class DefaultDriver implements Driver {
 						Class.class, Streams.toByteArray(inputStream)
 					);
 					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"), privateLookupInMethodHandle);
-					driver.consulterRetriever = driver.allocateInstance(methodHandleWrapperClass);
+					driver.consulterRetriever = new FunctionWrapper<java.util.function.Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+						(java.util.function.Function<Class<?>, MethodHandles.Lookup>)driver.allocateInstance(methodHandleWrapperClass) 
+					) {
+						@Override
+						Lookup apply(Class<?> input) {
+							return function.apply(input);
+						}
+					};
 				} catch (Throwable exc) {
 					Throwables.getInstance().throwException(new InitializationException("Could not initialize consulter retriever", exc));
 				}
@@ -477,7 +498,13 @@ public class DefaultDriver implements Driver {
 						AccessibleObject.class, Streams.toByteArray(inputStream)
 					);
 					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"), driver.getConsulter(methodHandleWrapperClass));
-					driver.accessibleSetter = driver.allocateInstance(methodHandleWrapperClass);
+					driver.accessibleSetter = new BiConsumerWrapper<java.util.function.BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
+						(java.util.function.BiConsumer<AccessibleObject, Boolean>)driver.allocateInstance(methodHandleWrapperClass)
+					) {
+						void accept(AccessibleObject inputOne, Boolean inputTwo) {
+							function.accept(inputOne, inputTwo);
+						};
+					};
 				} catch (Throwable exc) {
 					Throwables.getInstance().throwException(new InitializationException("Could not initialize accessible setter", exc));
 				}
@@ -515,7 +542,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup classLoaderConsulter = driver.getConsulter(ClassLoader.class);
 					MethodType methodType = MethodType.methodType(Package.class, String.class);
 					final MethodHandle methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
-					driver.packageRetriever = new java.util.function.BiFunction<ClassLoader, String, Package>() {
+					driver.packageRetriever = new BiFunction<ClassLoader, String, Package>() {
 						@Override
 						public Package apply(ClassLoader classLoader, String packageName) {
 							try {
@@ -557,14 +584,21 @@ public class DefaultDriver implements Driver {
 				final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 				);
-				driver.consulterRetriever = new java.util.function.Function<Class<?>, MethodHandles.Lookup>() {
-					@Override
-					public Lookup apply(Class<?> cls) {
-						try {
-							return (MethodHandles.Lookup)methodHandle.invoke(cls, -1);
-						} catch (Throwable exc) {
-							return Throwables.getInstance().throwException(exc);
+				driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+					new Function<Class<?>, MethodHandles.Lookup>() {
+						@Override
+						public Lookup apply(Class<?> cls) {
+							try {
+								return (MethodHandles.Lookup)methodHandle.invoke(cls, -1);
+							} catch (Throwable exc) {
+								return Throwables.getInstance().throwException(exc);
+							}
 						}
+					}
+				) {
+					@Override
+					Lookup apply(Class<?> input) {
+						return function.apply(input);
 					}
 				};
 			}
@@ -591,14 +625,22 @@ public class DefaultDriver implements Driver {
 				final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 				);
-				driver.consulterRetriever = new java.util.function.Function<Class<?>, MethodHandles.Lookup>() {
-					@Override
-					public Lookup apply(Class<?> cls) {
-						try {
-							return (MethodHandles.Lookup)mthHandle.invoke(cls, null, -1);
-						} catch (Throwable exc) {
-							return Throwables.getInstance().throwException(exc);
+				
+				driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+					new Function<Class<?>, MethodHandles.Lookup>() {
+						@Override
+						public Lookup apply(Class<?> cls) {
+							try {
+								return (MethodHandles.Lookup)mthHandle.invoke(cls, null, -1);
+							} catch (Throwable exc) {
+								return Throwables.getInstance().throwException(exc);
+							}
 						}
+					}
+				) {
+					@Override
+					Lookup apply(Class<?> input) {
+						return function.apply(input);
 					}
 				};
 			}

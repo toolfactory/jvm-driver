@@ -27,32 +27,8 @@
 package io.github.toolfactory.jvm;
 
 
-import java.io.Closeable;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Map;
+interface Function<T, R> {
 
-
-abstract class DriverFunctionSupplier implements Closeable {
-
-	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
-
-	abstract BiFunction<Object, Field, Object> getFieldValueFunction();
-
-	abstract Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
-
-	abstract Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
-
-	abstract Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
-
-	abstract Function<Class<?>, Object> getAllocateInstanceFunction();
-
-	abstract Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
-
-	@Override
-	public abstract void close();
+    R apply(T t);
 
 }

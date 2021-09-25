@@ -30,38 +30,28 @@ package io.github.toolfactory.jvm;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
+
 
 import io.github.toolfactory.narcissus.Narcissus;
 
 
 class DriverFunctionSupplierNative {
-	
-	BiFunctionWrapper<?, Object, Field, Object> getFieldValueFunction() {
-		return new BiFunctionWrapper<BiFunction<Object, Field, Object>, Object, Field, Object>(
-			new BiFunction<Object, Field, Object>() {
-				@Override
-				public Object apply(Object target, Field field) {
-					if (Modifier.isStatic(field.getModifiers())) {
-						return Narcissus.getStaticField(field);
-					} else {
-						return Narcissus.getField(target, field);
-					}
-				}
-			}
-		){
+
+	BiFunction<Object, Field, Object> getFieldValueFunction() {
+		return new BiFunction<Object, Field, Object>() {
 			@Override
-			Object apply(Object inputOne, Field inputTwo) {
-				return function.apply(inputOne, inputTwo);
-			}
+			public Object apply(Object target, Field field) {
+				if (Modifier.isStatic(field.getModifiers())) {
+					return Narcissus.getStaticField(field);
+				} else {
+					return Narcissus.getField(target, field);
+				}
+			}			
 		};
 	}
 
@@ -107,7 +97,7 @@ class DriverFunctionSupplierNative {
 	}
 
 
-	FunctionWrapper<Function<Class<?>, Object>, Class<?>, Object> getAllocateInstanceFunction() {
+	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		try {
 			MethodHandles.Lookup lookup = MethodHandles.lookup();
 			CallSite callSite = LambdaMetafactory.metafactory(
@@ -119,14 +109,7 @@ class DriverFunctionSupplierNative {
 				),
 				MethodType.methodType(Object.class, Class.class)
 			);
-			return new FunctionWrapper<Function<Class<?>, Object>, Class<?>, Object> (
-				(Function<Class<?>, Object>) callSite.getTarget().invoke()
-			) {
-				@Override
-				Object apply(Class<?> input) {
-					return function.apply(input);
-				}
-			};
+			return (Function<Class<?>, Object>) callSite.getTarget().invoke();
 		} catch (Throwable exc) {
 			return Throwables.getInstance().throwException(exc);
 		}

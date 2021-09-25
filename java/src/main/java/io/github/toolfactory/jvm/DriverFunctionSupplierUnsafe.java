@@ -38,10 +38,7 @@ import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
+
 
 import io.github.toolfactory.jvm.Driver.InitializationException;
 import io.github.toolfactory.narcissus.Narcissus;
@@ -97,46 +94,32 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 	@Override
-	FunctionWrapper<?, ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction() {
+	Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction() {
 		try {
 			final sun.misc.Unsafe unsafe = this.unsafe;
 			final Long loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				this.driver.getDeclaredField(ClassLoader.class, "classes")
 			);
-			return new FunctionWrapper<Function<ClassLoader, Collection<Class<?>>>, ClassLoader, Collection<Class<?>>>(
-				new Function<ClassLoader, Collection<Class<?>>>() {
-					public java.util.Collection<java.lang.Class<?>> apply(ClassLoader classLoader) {
-						return (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
-					}
-				}		
-			) {
-				@Override
-				Collection<Class<?>> apply(ClassLoader input) {
-					return function.apply(input);
+			return new Function<ClassLoader, Collection<Class<?>>>() {
+				public java.util.Collection<java.lang.Class<?>> apply(ClassLoader classLoader) {
+					return (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
 				}
-			};
+			};				
 		} catch (Throwable exc) {
 			return Throwables.getInstance().throwException(new InitializationException("Could not initialize field memory offset of packages map", exc));
 		}
 	}
 
 	@Override
-	FunctionWrapper<?, ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction() {
+	Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction() {
 		try {
 			final sun.misc.Unsafe unsafe = this.unsafe;
 			final Long loadedPackagesMapMemoryOffset = unsafe.objectFieldOffset(
 				this.driver.getDeclaredField(ClassLoader.class, "packages")
 			);
-			return new FunctionWrapper<Function<ClassLoader, Map<String, ?>>, ClassLoader, Map<String, ?>>(
-				new Function<ClassLoader, Map<String, ?>>() {
-					public java.util.Map<String,?> apply(ClassLoader classLoader) {
-						return (Map<String, ?>)unsafe.getObject(classLoader, loadedPackagesMapMemoryOffset);
-					}
-				}	
-			) {
-				@Override
-				Map<String, ?> apply(ClassLoader input) {
-					return function.apply(input);
+			return new Function<ClassLoader, Map<String, ?>>() {
+				public java.util.Map<String,?> apply(ClassLoader classLoader) {
+					return (Map<String, ?>)unsafe.getObject(classLoader, loadedPackagesMapMemoryOffset);
 				}
 			};				
 		} catch (Throwable exc) {
@@ -145,74 +128,67 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 	@Override
-	BiFunctionWrapper<?, Object, Field, Object> getFieldValueFunction() {
+	BiFunction<Object, Field, Object> getFieldValueFunction() {
 		final sun.misc.Unsafe unsafe = this.unsafe;
-		return new BiFunctionWrapper<BiFunction<Object, Field, Object>, Object, Field, Object>(
-			new BiFunction<Object, Field, Object>() {
-				@Override
-				public Object apply(Object target, Field field) {
-					target = Modifier.isStatic(field.getModifiers())?
-						field.getDeclaringClass() :
-						target;
-					long fieldOffset = Modifier.isStatic(field.getModifiers())?
-						unsafe.staticFieldOffset(field) :
-						unsafe.objectFieldOffset(field);
-					Class<?> cls = field.getType();
-					if(!cls.isPrimitive()) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return unsafe.getObject(target, fieldOffset);
-						} else {
-							return unsafe.getObjectVolatile(target, fieldOffset);
-						}
-					} else if (cls == int.class) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Integer.valueOf(unsafe.getInt(target, fieldOffset));
-						} else {
-							return Integer.valueOf(unsafe.getIntVolatile(target, fieldOffset));
-						}
-					} else if (cls == long.class) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Long.valueOf(unsafe.getLong(target, fieldOffset));
-						} else {
-							return Long.valueOf(unsafe.getLongVolatile(target, fieldOffset));
-						}
-					} else if (cls == float.class) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Float.valueOf(unsafe.getFloat(target, fieldOffset));
-						} else {
-							return Float.valueOf(unsafe.getFloatVolatile(target, fieldOffset));
-						}
-					} else if (cls == double.class) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Double.valueOf(unsafe.getDouble(target, fieldOffset));
-						} else {
-							return Double.valueOf(unsafe.getDoubleVolatile(target, fieldOffset));
-						}
-					} else if (cls == boolean.class) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Boolean.valueOf(unsafe.getBoolean(target, fieldOffset));
-						} else {
-							return Boolean.valueOf(unsafe.getBooleanVolatile(target, fieldOffset));
-						}
-					} else if (cls == byte.class) {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Byte.valueOf(unsafe.getByte(target, fieldOffset));
-						} else {
-							return Byte.valueOf(unsafe.getByteVolatile(target, fieldOffset));
-						}
+		return new BiFunction<Object, Field, Object>() {
+			@Override
+			public Object apply(Object target, Field field) {
+				target = Modifier.isStatic(field.getModifiers())?
+					field.getDeclaringClass() :
+					target;
+				long fieldOffset = Modifier.isStatic(field.getModifiers())?
+					unsafe.staticFieldOffset(field) :
+					unsafe.objectFieldOffset(field);
+				Class<?> cls = field.getType();
+				if(!cls.isPrimitive()) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return unsafe.getObject(target, fieldOffset);
 					} else {
-						if (!Modifier.isVolatile(field.getModifiers())) {
-							return Character.valueOf(unsafe.getChar(target, fieldOffset));
-						} else {
-							return Character.valueOf(unsafe.getCharVolatile(target, fieldOffset));
-						}
+						return unsafe.getObjectVolatile(target, fieldOffset);
+					}
+				} else if (cls == int.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Integer.valueOf(unsafe.getInt(target, fieldOffset));
+					} else {
+						return Integer.valueOf(unsafe.getIntVolatile(target, fieldOffset));
+					}
+				} else if (cls == long.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Long.valueOf(unsafe.getLong(target, fieldOffset));
+					} else {
+						return Long.valueOf(unsafe.getLongVolatile(target, fieldOffset));
+					}
+				} else if (cls == float.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Float.valueOf(unsafe.getFloat(target, fieldOffset));
+					} else {
+						return Float.valueOf(unsafe.getFloatVolatile(target, fieldOffset));
+					}
+				} else if (cls == double.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Double.valueOf(unsafe.getDouble(target, fieldOffset));
+					} else {
+						return Double.valueOf(unsafe.getDoubleVolatile(target, fieldOffset));
+					}
+				} else if (cls == boolean.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Boolean.valueOf(unsafe.getBoolean(target, fieldOffset));
+					} else {
+						return Boolean.valueOf(unsafe.getBooleanVolatile(target, fieldOffset));
+					}
+				} else if (cls == byte.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Byte.valueOf(unsafe.getByte(target, fieldOffset));
+					} else {
+						return Byte.valueOf(unsafe.getByteVolatile(target, fieldOffset));
+					}
+				} else {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						return Character.valueOf(unsafe.getChar(target, fieldOffset));
+					} else {
+						return Character.valueOf(unsafe.getCharVolatile(target, fieldOffset));
 					}
 				}
-			}
-		){
-			@Override
-			Object apply(Object inputOne, Field inputTwo) {
-				return function.apply(inputOne, inputTwo);
 			}
 		};
 	}
@@ -292,23 +268,16 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 	@Override
-	FunctionWrapper<?, Class<?>, Object> getAllocateInstanceFunction() {
+	Function<Class<?>, Object> getAllocateInstanceFunction() {
 		final sun.misc.Unsafe unsafe = this.unsafe;
-		return new FunctionWrapper<Function<Class<?>, Object>, Class<?>, Object>(
-			new Function<Class<?>, Object>() {
-				@Override
-				public Object apply(Class<?> cls) {
-					try {
-						return unsafe.allocateInstance(cls);
-					} catch (InstantiationException exc) {
-						return Throwables.getInstance().throwException(exc);
-					}
-				}
-			}	
-		) {
+		return new Function<Class<?>, Object>() {
 			@Override
-			Object apply(Class<?> input) {
-				return function.apply(input);
+			public Object apply(Class<?> cls) {
+				try {
+					return unsafe.allocateInstance(cls);
+				} catch (InstantiationException exc) {
+					return Throwables.getInstance().throwException(exc);
+				}
 			}
 		};
 	}
@@ -336,9 +305,9 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 
-	static class ForJava7 extends DriverFunctionSupplierUnsafe {
+	static class ForJava8 extends DriverFunctionSupplierUnsafe {
 
-		ForJava7(Driver driver) {
+		ForJava8(Driver driver) {
 			super(driver);
 		}
 
