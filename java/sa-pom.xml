@@ -80,7 +80,7 @@
 		<copyright.holder>Luke Hutchison, Roberto Gentili</copyright.holder>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!--<project_jdk_version>8</project_jdk_version>-->
+		<project_jdk_version>7</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
 		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
