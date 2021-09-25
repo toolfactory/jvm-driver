@@ -42,17 +42,21 @@ import java.util.function.Supplier;
 
 abstract class DriverFunctionSupplier implements Closeable {
 
-	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
-
-	abstract BiFunction<Object, Field, Object> getFieldValueFunction();
-
 	abstract Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
 
-	abstract Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
+	abstract FunctionWrapper<?, ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
 
-	abstract Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
+	abstract FunctionWrapper<?, ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
 
-	abstract <T> T getAllocateInstanceFunction();
+	abstract FunctionWrapper<?, Class<?>, Object> getAllocateInstanceFunction();
+	
+	abstract BiFunctionWrapper<?, Object, Field, Object> getFieldValueFunction();
+	
+	
+	
+	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(
+		Lookup mainConsulter, MethodHandle lookupMethod
+	);
 
 	abstract Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
 

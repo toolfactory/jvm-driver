@@ -30,8 +30,8 @@ package io.github.toolfactory.jvm;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -44,17 +44,24 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 
 class DriverFunctionSupplierNative {
-
-	BiFunction<Object, Field, Object> getFieldValueFunction() {
-		return new BiFunction<Object, Field, Object>() {
-			@Override
-			public Object apply(Object target, Field field) {
-				if (Modifier.isStatic(field.getModifiers())) {
-					return Narcissus.getStaticField(field);
-				} else {
-					return Narcissus.getField(target, field);
+	
+	BiFunctionWrapper<?, Object, Field, Object> getFieldValueFunction() {
+		return new BiFunctionWrapper<BiFunction<Object, Field, Object>, Object, Field, Object>(
+			new BiFunction<Object, Field, Object>() {
+				@Override
+				public Object apply(Object target, Field field) {
+					if (Modifier.isStatic(field.getModifiers())) {
+						return Narcissus.getStaticField(field);
+					} else {
+						return Narcissus.getField(target, field);
+					}
 				}
-			}			
+			}
+		){
+			@Override
+			Object apply(Object inputOne, Field inputTwo) {
+				return function.apply(inputOne, inputTwo);
+			}
 		};
 	}
 
@@ -100,7 +107,7 @@ class DriverFunctionSupplierNative {
 	}
 
 
-	Function<Class<?>, Object> getAllocateInstanceFunction() {
+	FunctionWrapper<Function<Class<?>, Object>, Class<?>, Object> getAllocateInstanceFunction() {
 		try {
 			MethodHandles.Lookup lookup = MethodHandles.lookup();
 			CallSite callSite = LambdaMetafactory.metafactory(
@@ -112,7 +119,14 @@ class DriverFunctionSupplierNative {
 				),
 				MethodType.methodType(Object.class, Class.class)
 			);
-			return (Function<Class<?>, Object>) callSite.getTarget().invoke();
+			return new FunctionWrapper<Function<Class<?>, Object>, Class<?>, Object> (
+				(Function<Class<?>, Object>) callSite.getTarget().invoke()
+			) {
+				@Override
+				Object apply(Class<?> input) {
+					return function.apply(input);
+				}
+			};
 		} catch (Throwable exc) {
 			return Throwables.getInstance().throwException(exc);
 		}

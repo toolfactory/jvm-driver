@@ -50,10 +50,10 @@ public class DefaultDriver implements Driver {
 	MethodHandle methodInvoker;
 	MethodHandle constructorInvoker;
 
-	Object loadedClassesRetriever;
-	Object loadedPackagesRetriever;
-	Object allocateInstanceInvoker;
-	Object fieldValueRetriever;
+	FunctionWrapper<?, ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
+	FunctionWrapper<?, ClassLoader, Map<String, ?>> loadedPackagesRetriever;
+	FunctionWrapper<?, Class<?>, Object> allocateInstanceInvoker;
+	BiFunctionWrapper<?, Object, Field, Object> fieldValueRetriever;
 	Object fieldValueSetter;
 	Object accessibleSetter;
 	Object consulterRetriever;
@@ -76,11 +76,11 @@ public class DefaultDriver implements Driver {
 						newInitializerForJava17():
 						newInitializerForJava14():
 					newInitializerForJava9():
-				newInitializerForJava8());
+				newInitializerForJava7());
 	}
 
-	Initializer newInitializerForJava8() {
-		return new Initializer.ForJava8(this);
+	Initializer newInitializerForJava7() {
+		return new Initializer.ForJava7(this);
 	}
 
 	Initializer newInitializerForJava9() {
@@ -112,18 +112,18 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
-		return ((java.util.function.Function<ClassLoader, Collection<Class<?>>>)loadedClassesRetriever).apply(classLoader);
+		return loadedClassesRetriever.apply(classLoader);
 	}
 
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
-		return ((java.util.function.Function<ClassLoader, Map<String, ?>>)loadedPackagesRetriever).apply(classLoader);
+		return loadedPackagesRetriever.apply(classLoader);
 	}
 	
 
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
-		return (T)((java.util.function.BiFunction<Object, Field, Object>)fieldValueRetriever).apply(target, field);
+		return (T)fieldValueRetriever.apply(target, field);
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public <T> T allocateInstance(Class<?> cls) {
-		return (T)((java.util.function.Function<Class<?>, Object>)allocateInstanceInvoker).apply(cls);
+		return (T)allocateInstanceInvoker.apply(cls);
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public Lookup getConsulter(Class<?> cls) {
-		return ((java.util.function.Function<Class<?>, MethodHandles.Lookup>) consulterRetriever).apply(cls);
+		return ((java.util.function.Function<Class<?>, MethodHandles.Lookup>)consulterRetriever).apply(cls);
 	}
 
 	@Override
@@ -305,11 +305,11 @@ public class DefaultDriver implements Driver {
 			driver = null;
 		}
 
-		static class ForJava8 extends Initializer {
+		static class ForJava7 extends Initializer {
 			MethodHandles.Lookup mainConsulter;
 			MethodHandle privateLookupInMethodHandle;
 
-			ForJava8(DefaultDriver driver) {
+			ForJava7(DefaultDriver driver) {
 				super(driver);
 				try {
 					Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
@@ -328,7 +328,7 @@ public class DefaultDriver implements Driver {
 
 			@Override
 			void initNativeFunctionSupplier()  {
-				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava8(this.driver);
+				this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava7(this.driver);
 			}
 
 			@Override

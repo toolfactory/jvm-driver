@@ -54,9 +54,9 @@ public class HybridDriver extends DefaultDriver {
 				java.util.function.Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 					return driverFunctionSupplierNative.getMethodHandlesLookupSupplyingFunction();
 				}
-
+				
 				@Override
-				java.util.function.BiFunction<Object, Field, Object> getFieldValueFunction() {
+				BiFunctionWrapper<?, Object, Field, Object> getFieldValueFunction() {
 					return driverFunctionSupplierNative.getFieldValueFunction();
 				}
 
@@ -66,7 +66,7 @@ public class HybridDriver extends DefaultDriver {
 				}
 
 				@Override
-				java.util.function.Function<Class<?>, Object> getAllocateInstanceFunction() {
+				FunctionWrapper<?, Class<?>, Object> getAllocateInstanceFunction() {
 					return driverFunctionSupplierNative.getAllocateInstanceFunction();
 				}
 
