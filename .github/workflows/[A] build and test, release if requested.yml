@@ -71,10 +71,39 @@ jobs:
           git commit -am "Generated hook classes" --allow-empty
           git push
           
-
+  build-and-test-with-Java-8-and-later-with-7-target:
+    name: Build and test with 7 target (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
+    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x86, x64]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        exclude:
+          - os: macOS-latest
+            architecture: x86
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}  
+      - if: endsWith(matrix.java, '-ea') != true 
+        name: Build and test with final version JDK
+        run: mvn -B clean test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
+  
   build-and-test-with-Java-8-and-later:
     name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
-    needs: [elaborate-java-hook-module]
+    needs: [build-and-test-with-Java-8-and-later-with-7-target]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -103,8 +132,8 @@ jobs:
         run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file ./java/pom.xml
       - if: endsWith(matrix.java, '18-ea') == true 
         name: Build and test with early access version JDK
-        run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml          
-
+        run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml  
+  
   release:
     needs: [build-and-test-with-Java-8-and-later]
     name: Release if requested
@@ -131,7 +160,7 @@ jobs:
           mv ./java/temp-pom.xml ./java/sa-pom.xml
           git commit -am "Swithcing pom for releasing"
           git push          
-          mvn -B release:prepare release:perform -Dproject_jdk_version=8 -DskipTests=true -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
+          mvn -B release:prepare release:perform -Dproject_jdk_version=7 -DskipTests=true -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
           mv ./java/pom.xml ./java/temp-pom.xml
           mv ./java/sa-pom.xml ./java/pom.xml
           mv ./java/temp-pom.xml ./java/sa-pom.xml
