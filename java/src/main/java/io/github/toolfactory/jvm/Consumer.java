@@ -27,7 +27,7 @@
 package io.github.toolfactory.jvm;
 
 
-public interface Consumer<T> {
+interface Consumer<T> {
 
     void accept(T t);
 
