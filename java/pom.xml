@@ -32,7 +32,9 @@
     	<artifactId>jvm-driver-parent</artifactId>
         <version>${revision}</version>
     </parent>
-
+	
+	<artifactId>jvm-driver</artifactId>
+	
 	<packaging>jar</packaging>
 
 	<name>ToolFactory JVM Driver</name>
