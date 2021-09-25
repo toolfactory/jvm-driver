@@ -26,12 +26,24 @@
  */
 package io.github.toolfactory.jvm;
 
+import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
+import sun.misc.Unsafe;
+
+@SuppressWarnings("all")
 class Throwables {
-
-	static Throwables create() {
-		return new Throwables();
+	private static Consumer<Throwable> exceptionThrower;
+	private static Unsafe unsafe;
+	
+	static {
+		try {
+			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+			theUnsafeField.setAccessible(true);
+			unsafe = (Unsafe)theUnsafeField.get(null);
+		} catch (Throwable exc) {
+			throw new RuntimeException("");
+		}
 	}
 
 	static <T> T throwException(Object obj, Object... arguments) {
@@ -54,13 +66,8 @@ class Throwables {
 			System.arraycopy(stackTrace, 0, stackTraceOfException, 1, stackTrace.length);
 		}
 		exception.setStackTrace(stackTraceOfException);
-		throwException(exception);
+		unsafe.throwException(exception);
 		return null;
-	}
-
-
-	private static <E extends Throwable> void throwException(Throwable exc) throws E {
-		throw (E)exc;
 	}
 
 }

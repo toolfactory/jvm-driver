@@ -29,10 +29,6 @@ package io.github.toolfactory.jvm;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 public class HybridDriver extends DefaultDriver {
@@ -47,31 +43,30 @@ public class HybridDriver extends DefaultDriver {
 
 		ForJava17(DefaultDriver driver) {
 			super(driver);
-			driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 		}
 
 		@Override
 		void initNativeFunctionSupplier() {
-			DriverFunctionSupplierNative driverFunctionSupplierNative = new DriverFunctionSupplierNative();
+			final DriverFunctionSupplierNative driverFunctionSupplierNative = this.driverFunctionSupplierNative = new DriverFunctionSupplierNative();
 			this.driverFunctionSupplier = new DriverFunctionSupplierUnsafe.ForJava17(this.driver) {
 
 				@Override
-				Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
+				java.util.function.Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
 					return driverFunctionSupplierNative.getMethodHandlesLookupSupplyingFunction();
 				}
 
 				@Override
-				BiFunction<Object, Field, Object> getFieldValueFunction() {
+				java.util.function.BiFunction<Object, Field, Object> getFieldValueFunction() {
 					return driverFunctionSupplierNative.getFieldValueFunction();
 				}
 
 				@Override
-				Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
+				java.util.function.Function<Object, java.util.function.BiConsumer<Field, Object>> getSetFieldValueFunction() {
 					return driverFunctionSupplierNative.getSetFieldValueFunction();
 				}
 
 				@Override
-				Function<Class<?>, Object> getAllocateInstanceFunction() {
+				java.util.function.Function<Class<?>, Object> getAllocateInstanceFunction() {
 					return driverFunctionSupplierNative.getAllocateInstanceFunction();
 				}
 

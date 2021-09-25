@@ -83,13 +83,21 @@ class Classes {
 	static String retrieveName(
 		final byte[] classFileBuffer
 	) {
-		return retrieveName((index) -> classFileBuffer[index]);
+		return retrieveName(new Function<Integer, Byte>() {
+			public Byte apply(Integer index) {
+				return classFileBuffer[index];
+			};
+		});
 	}
 
 	static String retrieveName(
 		final ByteBuffer classFileBuffer
 	) {
-		return retrieveName(classFileBuffer::get);
+		return retrieveName(new Function<Integer, Byte>() {
+			public Byte apply(Integer index) {
+				return classFileBuffer.get(index);
+			};
+		});
 	}
 
 	private static String retrieveName(

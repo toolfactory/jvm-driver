@@ -70,7 +70,11 @@ class JavaClass {
 	}
 
 	String getPackageName() {
-		return Optional.ofNullable(_getPackageName()).map(value -> value.replace("/", ".")).orElse(null);
+		String pckgName = _getPackageName();
+		if (pckgName != null) {
+			pckgName = pckgName.replace("/", ".");
+		}
+		return pckgName;
 	}
 
 	String getSimpleName() {

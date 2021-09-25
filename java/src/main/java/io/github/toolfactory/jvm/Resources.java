@@ -28,17 +28,15 @@ package io.github.toolfactory.jvm;
 
 
 import java.io.InputStream;
-import java.util.Optional;
 
 
 class Resources {
 
 	static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
-		return Optional.ofNullable(
-			resourceClassLoader
-		).orElseGet(() -> ClassLoader.getSystemClassLoader()).getResourceAsStream(
-			resourceRelativePath
-		);
+		if (resourceClassLoader == null) {
+			resourceClassLoader = ClassLoader.getSystemClassLoader();
+		}
+		return resourceClassLoader.getResourceAsStream(resourceRelativePath);
 	}
 
 }

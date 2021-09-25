@@ -27,7 +27,11 @@
 package io.github.toolfactory.jvm;
 
 
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -42,44 +46,86 @@ import io.github.toolfactory.narcissus.Narcissus;
 class DriverFunctionSupplierNative {
 
 	BiFunction<Object, Field, Object> getFieldValueFunction() {
-		return (target, field) -> {
-			if (Modifier.isStatic(field.getModifiers())) {
-				return Narcissus.getStaticField(field);
-			} else {
-				return Narcissus.getField(target, field);
-			}
+		return new BiFunction<Object, Field, Object>() {
+			@Override
+			public Object apply(Object target, Field field) {
+				if (Modifier.isStatic(field.getModifiers())) {
+					return Narcissus.getStaticField(field);
+				} else {
+					return Narcissus.getField(target, field);
+				}
+			}			
 		};
 	}
 
 	
 	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
-		return origTarget -> (field, value) -> {
-			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-				Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
-			}
-			if (Modifier.isStatic(field.getModifiers())) {
-				Narcissus.setStaticField(field, value);
-			} else {
-				Narcissus.setField(origTarget, field, value);
+		return new Function<Object, BiConsumer<Field, Object>>() {
+			@Override
+			public BiConsumer<Field, Object> apply(final Object target) {
+				return new BiConsumer<Field, Object>() {
+					@Override
+					public void accept(Field field, Object value) {
+						if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
+							Throwables.throwException("Value {} is not assignable to {}", value , field.getName());
+						}
+						if (Modifier.isStatic(field.getModifiers())) {
+							Narcissus.setStaticField(field, value);
+						} else {
+							Narcissus.setField(target, field, value);
+						}					
+					}					
+				};
 			}
 		};
 	}
 
 
 	BiConsumer<AccessibleObject, Boolean> getSetAccessibleFunction() {
-		return Narcissus::setAccessible;
+		try {
+			MethodHandles.Lookup lookup = MethodHandles.lookup();
+			CallSite callSite = LambdaMetafactory.metafactory(
+				lookup, "accept", MethodType.methodType(BiConsumer.class),
+				MethodType.methodType(void.class, Object.class, Object.class),
+				lookup.findStatic(
+					Narcissus.class, "setAccessible",
+					MethodType.methodType(void.class, AccessibleObject.class, boolean.class)
+				),
+				MethodType.methodType(void.class, AccessibleObject.class, Boolean.class)
+			);
+		return (BiConsumer<AccessibleObject, Boolean>) callSite.getTarget().invoke();
+		} catch (Throwable exc) {
+			return Throwables.throwException(exc);
+		}
 	}
 
 
 	Function<Class<?>, Object> getAllocateInstanceFunction() {
-		return Narcissus::allocateInstance;
+		try {
+			MethodHandles.Lookup lookup = MethodHandles.lookup();
+			CallSite callSite = LambdaMetafactory.metafactory(
+				lookup, "apply", MethodType.methodType(Function.class),
+				MethodType.methodType(Object.class, Object.class),
+				lookup.findStatic(
+					Narcissus.class, "allocateInstance",
+					MethodType.methodType(Object.class, Class.class)
+				),
+				MethodType.methodType(Object.class, Class.class)
+			);
+			return (Function<Class<?>, Object>) callSite.getTarget().invoke();
+		} catch (Throwable exc) {
+			return Throwables.throwException(exc);
+		}
 	}
 	
 	Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction() {
-		return () -> {
-			MethodHandles.Lookup consulter = MethodHandles.lookup();
-			Narcissus.setAllowedModes(consulter, -1);
-			return consulter;
+		return new Supplier<MethodHandles.Lookup>() {
+			@Override
+			public Lookup get() {
+				MethodHandles.Lookup consulter = MethodHandles.lookup();
+				Narcissus.setAllowedModes(consulter, -1);
+				return consulter;
+			}
 		};
 	}
 
