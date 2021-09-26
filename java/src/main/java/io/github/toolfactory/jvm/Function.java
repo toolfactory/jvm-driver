@@ -27,8 +27,8 @@
 package io.github.toolfactory.jvm;
 
 
-interface Function<T, R> {
+interface Function<I, R> {
 
-    R apply(T t);
+    R apply(I input);
 
 }

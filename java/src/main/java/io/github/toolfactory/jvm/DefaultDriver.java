@@ -52,13 +52,13 @@ public class DefaultDriver implements Driver {
 	MethodHandle constructorInvoker;
 	
 	FunctionWrapper<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
-	BiConsumerWrapper<?, AccessibleObject, Boolean> accessibleSetter;
+	BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
 	
 	Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
 	Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 	Function<Class<?>, Object> allocateInstanceInvoker;
 	BiFunction<Object, Field, Object> fieldValueRetriever;
-	Function<Object, BiConsumer<Field, Object>> fieldValueSetter;
+	TriConsumer<Object, Field, Object> fieldValueSetter;
 	BiFunction<ClassLoader, String, Package> packageRetriever;
 	BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
 
@@ -130,7 +130,7 @@ public class DefaultDriver implements Driver {
 
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
-		fieldValueSetter.apply(target).accept(field, value);
+		fieldValueSetter.accept(target, field, value);
 	}
 
 	@Override
@@ -372,7 +372,7 @@ public class DefaultDriver implements Driver {
 				try {
 					final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 					final MethodHandle accessibleSetterMethodHandle = driver.getConsulter(AccessibleObject.class).unreflect(accessibleSetterMethod);
-					driver.accessibleSetter = new BiConsumerWrapper<BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
+					driver.accessibleSetter = new BiConsumerAdapter<BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
 						new BiConsumer<AccessibleObject, Boolean>() {
 							@Override
 							public void accept(AccessibleObject accessibleObject, Boolean flag) {
@@ -499,7 +499,7 @@ public class DefaultDriver implements Driver {
 						AccessibleObject.class, Streams.toByteArray(inputStream)
 					);
 					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"), driver.getConsulter(methodHandleWrapperClass));
-					driver.accessibleSetter = new BiConsumerWrapper<java.util.function.BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
+					driver.accessibleSetter = new BiConsumerAdapter<java.util.function.BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
 						(java.util.function.BiConsumer<AccessibleObject, Boolean>)driver.allocateInstance(methodHandleWrapperClass)
 					) {
 						void accept(AccessibleObject inputOne, Boolean inputTwo) {

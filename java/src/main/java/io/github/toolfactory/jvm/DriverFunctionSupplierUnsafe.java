@@ -191,75 +191,71 @@ abstract class DriverFunctionSupplierUnsafe extends DriverFunctionSupplier {
 	}
 
 	@Override
-	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
+	TriConsumer<Object, Field, Object> getSetFieldValueFunction() {
 		final sun.misc.Unsafe unsafe = this.unsafe;
-		return new Function<Object, BiConsumer<Field, Object>>() {
+		return new TriConsumer<Object, Field, Object>() {
 			@Override
-			public BiConsumer<Field, Object> apply(final Object origTarget) {
-				return new BiConsumer<Field, Object>() {
-					@Override
-					public void accept(Field field, Object value) {
-						if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-							Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
-						}
-						Object target = Modifier.isStatic(field.getModifiers())?
-							field.getDeclaringClass() :
-							origTarget;
-						long fieldOffset = Modifier.isStatic(field.getModifiers())?
-							unsafe.staticFieldOffset(field) :
-							unsafe.objectFieldOffset(field);
-						Class<?> cls = field.getType();
-						if(!cls.isPrimitive()) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putObject(target, fieldOffset, value);
-							} else {
-								unsafe.putObjectVolatile(target, fieldOffset, value);
-							}
-						} else if (cls == int.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putInt(target, fieldOffset, ((Integer)value).intValue());
-							} else {
-								unsafe.putIntVolatile(target, fieldOffset, ((Integer)value).intValue());
-							}
-						} else if (cls == long.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putLong(target, fieldOffset, ((Long)value).longValue());
-							} else {
-								unsafe.putLongVolatile(target, fieldOffset, ((Long)value).longValue());
-							}
-						} else if (cls == float.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putFloat(target, fieldOffset, ((Float)value).floatValue());
-							} else {
-								unsafe.putFloatVolatile(target, fieldOffset, ((Float)value).floatValue());
-							}
-						} else if (cls == double.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putDouble(target, fieldOffset, ((Double)value).doubleValue());
-							} else {
-								unsafe.putDoubleVolatile(target, fieldOffset, ((Double)value).doubleValue());
-							}
-						} else if (cls == boolean.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putBoolean(target, fieldOffset, ((Boolean)value).booleanValue());
-							} else {
-								unsafe.putBooleanVolatile(target, fieldOffset, ((Boolean)value).booleanValue());
-							}
-						} else if (cls == byte.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putByte(target, fieldOffset, ((Byte)value).byteValue());
-							} else {
-								unsafe.putByteVolatile(target, fieldOffset, ((Byte)value).byteValue());
-							}
-						} else if (cls == char.class) {
-							if (!Modifier.isVolatile(field.getModifiers())) {
-								unsafe.putChar(target, fieldOffset, ((Character)value).charValue());
-							} else {
-								unsafe.putCharVolatile(target, fieldOffset, ((Character)value).charValue());
-							}
-						}				
-					}					
-				};
+			public void accept(Object origTarget, Field field, Object value) {
+				if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
+					Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
+				}
+				Object target = Modifier.isStatic(field.getModifiers())?
+					field.getDeclaringClass() :
+					origTarget;
+				long fieldOffset = Modifier.isStatic(field.getModifiers())?
+					unsafe.staticFieldOffset(field) :
+					unsafe.objectFieldOffset(field);
+				Class<?> cls = field.getType();
+				if(!cls.isPrimitive()) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putObject(target, fieldOffset, value);
+					} else {
+						unsafe.putObjectVolatile(target, fieldOffset, value);
+					}
+				} else if (cls == int.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putInt(target, fieldOffset, ((Integer)value).intValue());
+					} else {
+						unsafe.putIntVolatile(target, fieldOffset, ((Integer)value).intValue());
+					}
+				} else if (cls == long.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putLong(target, fieldOffset, ((Long)value).longValue());
+					} else {
+						unsafe.putLongVolatile(target, fieldOffset, ((Long)value).longValue());
+					}
+				} else if (cls == float.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putFloat(target, fieldOffset, ((Float)value).floatValue());
+					} else {
+						unsafe.putFloatVolatile(target, fieldOffset, ((Float)value).floatValue());
+					}
+				} else if (cls == double.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putDouble(target, fieldOffset, ((Double)value).doubleValue());
+					} else {
+						unsafe.putDoubleVolatile(target, fieldOffset, ((Double)value).doubleValue());
+					}
+				} else if (cls == boolean.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putBoolean(target, fieldOffset, ((Boolean)value).booleanValue());
+					} else {
+						unsafe.putBooleanVolatile(target, fieldOffset, ((Boolean)value).booleanValue());
+					}
+				} else if (cls == byte.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putByte(target, fieldOffset, ((Byte)value).byteValue());
+					} else {
+						unsafe.putByteVolatile(target, fieldOffset, ((Byte)value).byteValue());
+					}
+				} else if (cls == char.class) {
+					if (!Modifier.isVolatile(field.getModifiers())) {
+						unsafe.putChar(target, fieldOffset, ((Character)value).charValue());
+					} else {
+						unsafe.putCharVolatile(target, fieldOffset, ((Character)value).charValue());
+					}
+				}	
+				
 			}
 		};
 	}

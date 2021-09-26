@@ -55,23 +55,19 @@ class DriverFunctionSupplierNative {
 	}
 
 	
-	Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
-		return new Function<Object, BiConsumer<Field, Object>>() {
+	TriConsumer<Object, Field, Object> getSetFieldValueFunction() {
+		return new TriConsumer<Object, Field, Object>() {
 			@Override
-			public BiConsumer<Field, Object> apply(final Object target) {
-				return new BiConsumer<Field, Object>() {
-					@Override
-					public void accept(Field field, Object value) {
-						if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-							Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
-						}
-						if (Modifier.isStatic(field.getModifiers())) {
-							Narcissus.setStaticField(field, value);
-						} else {
-							Narcissus.setField(target, field, value);
-						}					
-					}					
-				};
+			public void accept(Object target, Field field, Object value) {
+				if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
+					Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
+				}
+				if (Modifier.isStatic(field.getModifiers())) {
+					Narcissus.setStaticField(field, value);
+				} else {
+					Narcissus.setField(target, field, value);
+				}	
+				
 			}
 		};
 	}

@@ -27,14 +27,8 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class BiConsumerWrapper<F, I, J> {
-	
-	F function;
-	
-	BiConsumerWrapper(F function) {
-		this.function = function;
-	}
-	
-	abstract void accept(I inputOne, J inputTwo);
-	
+interface TriConsumer<I, J, K> {
+
+    void accept(I inputOne, J inputTwo, K inputThree);
+
 }

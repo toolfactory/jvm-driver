@@ -42,7 +42,7 @@ abstract class DriverFunctionSupplier implements Closeable {
 
 	abstract BiFunction<Object, Field, Object> getFieldValueFunction();
 
-	abstract Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction();
+	abstract TriConsumer<Object, Field, Object> getSetFieldValueFunction();
 
 	abstract Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
 

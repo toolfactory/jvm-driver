@@ -27,8 +27,14 @@
 package io.github.toolfactory.jvm;
 
 
-interface BiFunction<I, J, R> {
-
-	R apply(I inputOne, J inputTwo);
-
+abstract class BiConsumerAdapter<F, I, J> {
+	
+	F function;
+	
+	BiConsumerAdapter(F function) {
+		this.function = function;
+	}
+	
+	abstract void accept(I inputOne, J inputTwo);
+	
 }

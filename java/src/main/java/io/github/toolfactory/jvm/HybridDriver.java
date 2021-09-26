@@ -62,7 +62,7 @@ public class HybridDriver extends DefaultDriver {
 				}
 
 				@Override
-				Function<Object, BiConsumer<Field, Object>> getSetFieldValueFunction() {
+				TriConsumer<Object, Field, Object> getSetFieldValueFunction() {
 					return driverFunctionSupplierNative.getSetFieldValueFunction();
 				}
 
@@ -76,7 +76,7 @@ public class HybridDriver extends DefaultDriver {
 
 		@Override
 		void initAccessibleSetter() {
-			driver.accessibleSetter = new BiConsumerWrapper<BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
+			driver.accessibleSetter = new BiConsumerAdapter<BiConsumer<AccessibleObject, Boolean>, AccessibleObject, Boolean>(
 				driverFunctionSupplierNative.getSetAccessibleFunction()
 			) {
 				void accept(AccessibleObject inputOne, Boolean inputTwo) {
