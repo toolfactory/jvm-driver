@@ -30,7 +30,7 @@ on:
     branches:
       - main
     paths:
-      - "README.md"
+      - "**README.md"
 
 jobs:
   update-index-page:
