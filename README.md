@@ -9,7 +9,7 @@
 
 [![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/3711944184)
 
-[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209%20%20-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/3711944184)
+[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209%20%2D-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/3711944184)
 
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
