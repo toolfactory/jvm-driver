@@ -7,9 +7,9 @@
 [![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/3)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
 [![GitHub](https://img.shields.io/github/license/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/blob/main/LICENSE)
 
-[![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/3711944184)
+[![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1274750957)
 
-[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209%20%96%3E%2017-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/3711944184)
+[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209%20%96%3E%2017-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/1274750957)
 
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
