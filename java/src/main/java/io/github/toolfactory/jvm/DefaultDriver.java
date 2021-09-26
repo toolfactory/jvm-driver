@@ -336,6 +336,8 @@ public class DefaultDriver implements Driver {
 			@Override
 			void initConsulterRetriever() {
 				try {
+					final MethodHandles.Lookup mainConsulter = this.mainConsulter;
+					final MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
 					driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
 						new Function<Class<?>, MethodHandles.Lookup>() { 
 							@Override
