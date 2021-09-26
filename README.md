@@ -109,4 +109,4 @@ public <T> T allocateInstance(Class<?> cls);
 **For assistance you can**:
 * [open a discussion](https://github.com/toolfactory/jvm-driver/discussions) here on GitHub
 * [report a bug](https://github.com/toolfactory/jvm-driver/issues) here on GitHub
-* ask on [Stack Overflow](https://stackoverflow.com/search?q=toolfactory)
+* ask on [Stack Overflow](https://stackoverflow.com/questions/ask)
