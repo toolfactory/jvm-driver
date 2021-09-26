@@ -205,8 +205,8 @@
 							<goal>run</goal>
 						</goals>
 						<phase>
-                            compile
-                        </phase>
+							compile
+						</phase>
 						<configuration>
 							<target>
 								<copy file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/ConsulterRetrieverForJDK9.bwc" />
