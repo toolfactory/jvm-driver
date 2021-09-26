@@ -34,6 +34,7 @@ on:
 
 jobs:
   update-index-page:
+    runs-on: ubuntu-latest
     name: Update index page
     steps:
       - uses: actions/checkout@master
