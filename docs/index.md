@@ -20,7 +20,7 @@ A driver to allow deep interaction with the JVM **without any restrictions**.
 
 <br/>
 
-To include ToolFactory JVM driver in your projects simply use with **Apache Maven**:
+To include ToolFactory JVM Driver in your projects simply use with **Apache Maven**:
 ```xml
 <dependency>
     <groupId>io.github.toolfactory</groupId>
