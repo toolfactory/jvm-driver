@@ -27,11 +27,11 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class FunctionWrapper<F, I, O> {
+abstract class FunctionAdapter<F, I, O> {
 	
 	F function;
 	
-	FunctionWrapper(F function) {
+	FunctionAdapter(F function) {
 		this.function = function;
 	}
 	

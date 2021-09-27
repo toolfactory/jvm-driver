@@ -51,7 +51,7 @@ public class DefaultDriver implements Driver {
 	MethodHandle methodInvoker;
 	MethodHandle constructorInvoker;
 	
-	FunctionWrapper<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
+	FunctionAdapter<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
 	BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
 	
 	Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
@@ -338,7 +338,7 @@ public class DefaultDriver implements Driver {
 				try {
 					final MethodHandles.Lookup mainConsulter = this.mainConsulter;
 					final MethodHandle privateLookupInMethodHandle = this.privateLookupInMethodHandle;
-					driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+					driver.consulterRetriever = new FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
 						new Function<Class<?>, MethodHandles.Lookup>() { 
 							@Override
 							public Lookup apply(Class<?> cls) {
@@ -476,7 +476,7 @@ public class DefaultDriver implements Driver {
 						Class.class, Streams.toByteArray(inputStream)
 					);
 					driver.setFieldValue(methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"), privateLookupInMethodHandle);
-					driver.consulterRetriever = new FunctionWrapper<java.util.function.Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+					driver.consulterRetriever = new FunctionAdapter<java.util.function.Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
 						(java.util.function.Function<Class<?>, MethodHandles.Lookup>)driver.allocateInstance(methodHandleWrapperClass) 
 					) {
 						@Override
@@ -587,7 +587,7 @@ public class DefaultDriver implements Driver {
 				final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 				);
-				driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+				driver.consulterRetriever = new FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
 					new Function<Class<?>, MethodHandles.Lookup>() {
 						@Override
 						public Lookup apply(Class<?> cls) {
@@ -629,7 +629,7 @@ public class DefaultDriver implements Driver {
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 				);
 				
-				driver.consulterRetriever = new FunctionWrapper<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
+				driver.consulterRetriever = new FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup>(
 					new Function<Class<?>, MethodHandles.Lookup>() {
 						@Override
 						public Lookup apply(Class<?> cls) {
