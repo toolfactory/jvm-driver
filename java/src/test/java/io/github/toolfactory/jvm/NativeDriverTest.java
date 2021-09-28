@@ -15,7 +15,7 @@ public class NativeDriverTest extends BaseTest {
 				driver = new NativeDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
-				return getDriver().throwException(exc);
+				System.exit(0);
 			}
 		}
 		return driver;

@@ -58,9 +58,16 @@ public class Provider {
 				throw new FunctionBuildingException("Unable to build the related function of " + functionClass.getName(), exc);
 			}
 		}
-		functionClass = functionClass.getSuperclass();
-		if (functionClass != null && !functionClass.equals(Object.class)) {
-			return getOrBuildFunction(functionClass, context);
+		Class<?> functionSuperClass = functionClass.getSuperclass();
+		if (functionSuperClass != null && !functionSuperClass.equals(Object.class)) {
+			try {
+				return getOrBuildFunction(functionSuperClass, context);
+			} catch (FunctionBuildingException exc) {
+				throw new FunctionBuildingException(
+					"Unable to build the related function of " + functionClass.getName() + ": " + String.join(", ", searchedClasses) + " have been searched without success",
+					exc
+				);
+			}
 		} else {
 			throw new FunctionBuildingException(
 				"Unable to build the related function of " + functionClass.getName() + ": " + String.join(", ", searchedClasses) + " have been searched without success"
