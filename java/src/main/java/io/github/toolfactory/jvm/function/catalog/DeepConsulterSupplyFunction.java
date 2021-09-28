@@ -94,7 +94,8 @@ public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, 
 	}
 	
 	public static class ForJava14 extends DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
-		ForJava14(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
+		
+		public ForJava14(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 			Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
 			Provider functionProvider = Provider.get(context);
 			functionProvider.getFunctionAdapter(SetAccessibleFunction.class, context).accept (lookupCtor, true);
