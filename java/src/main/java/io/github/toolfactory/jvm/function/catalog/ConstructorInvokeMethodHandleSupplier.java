@@ -51,7 +51,7 @@ public class ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHan
 			Provider functionProvider = Provider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuild(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
@@ -64,7 +64,7 @@ public class ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHan
 			Provider functionProvider = Provider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuild(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}

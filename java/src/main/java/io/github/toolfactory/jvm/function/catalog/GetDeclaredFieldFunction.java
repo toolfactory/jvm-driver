@@ -43,9 +43,9 @@ public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, S
 		
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			getDeclaredFields = functionProvider.getOrBuild(GetDeclaredFieldsMethodHandleSupplier.class, context).get();
+			getDeclaredFields = functionProvider.getOrBuildFunction(GetDeclaredFieldsMethodHandleSupplier.class, context).get();
 			throwExceptionFunction =
-				functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context); 
 		}
 
 		@Override

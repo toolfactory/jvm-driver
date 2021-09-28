@@ -49,7 +49,7 @@ public class NativeDriver extends HybridDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		exceptionThrower = functionProvider.getOrBuild(
+		exceptionThrower = functionProvider.getOrBuildFunction(
 			ThrowExceptionFunction.Native.class, initializationContext
 		);
 	}
@@ -59,7 +59,7 @@ public class NativeDriver extends HybridDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedPackagesRetriever = functionProvider.getOrBuild(
+		loadedPackagesRetriever = functionProvider.getOrBuildFunction(
 			GetLoadedPackagesFunction.Native.class, initializationContext
 		);
 	}
@@ -70,7 +70,7 @@ public class NativeDriver extends HybridDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedClassesRetriever = functionProvider.getOrBuild(
+		loadedClassesRetriever = functionProvider.getOrBuildFunction(
 			GetLoadedClassesFunction.Native.class, initializationContext
 		);
 	}
@@ -81,7 +81,7 @@ public class NativeDriver extends HybridDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueSetter = functionProvider.getOrBuild(
+		fieldValueSetter = functionProvider.getOrBuildFunction(
 			SetFieldValueFunction.Native.class, initializationContext
 		);
 	}
@@ -92,7 +92,7 @@ public class NativeDriver extends HybridDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueRetriever = functionProvider.getOrBuild(
+		fieldValueRetriever = functionProvider.getOrBuildFunction(
 			GetFieldValueFunction.Native.class, initializationContext
 		);
 	}
@@ -103,7 +103,7 @@ public class NativeDriver extends HybridDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		allocateInstanceInvoker = functionProvider.getOrBuild(
+		allocateInstanceInvoker = functionProvider.getOrBuildFunction(
 			AllocateInstanceFunction.Native.class, initializationContext
 		);
 	}
@@ -115,7 +115,7 @@ public class NativeDriver extends HybridDriver {
 		Map<Object, Object> initializationContext
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuild(
+		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildFunction(
 			SetAccessibleFunction.Native.class, initializationContext
 		);
 	}

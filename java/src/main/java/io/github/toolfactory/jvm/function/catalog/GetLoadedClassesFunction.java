@@ -46,8 +46,8 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 		
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getOrBuild(UnsafeSupplier.class, context).get();
-			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuild(GetDeclaredFieldFunction.class, context);
+			unsafe = functionProvider.getOrBuildFunction(UnsafeSupplier.class, context).get();
+			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildFunction(GetDeclaredFieldFunction.class, context);
 			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
@@ -67,7 +67,7 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 			
 			public ForJava7(Map<Object, Object> context) {
 				Provider functionProvider = Provider.get(context);
-				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuild(GetDeclaredFieldFunction.class, context);
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildFunction(GetDeclaredFieldFunction.class, context);
 				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
 

@@ -48,7 +48,7 @@ public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, 
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
 			setFunction(
-				(Function<Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuild(ConsulterSupplyFunction.class, context).getFunction()
+				(Function<Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context).getFunction()
 			);
 		}
 		
@@ -64,12 +64,12 @@ public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, 
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 			Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 			Provider functionProvider = Provider.get(context);
-			functionProvider.getOrBuild(SetAccessibleFunction.class, context).accept (lookupCtor, true);
+			functionProvider.getOrBuildFunction(SetAccessibleFunction.class, context).accept (lookupCtor, true);
 			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 			);
 			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context); 
 			setFunction(
 				new Function<Class<?>, MethodHandles.Lookup>() {
 					@Override
@@ -98,12 +98,12 @@ public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, 
 		public ForJava14(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 			Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
 			Provider functionProvider = Provider.get(context);
-			functionProvider.getOrBuild(SetAccessibleFunction.class, context).accept (lookupCtor, true);
+			functionProvider.getOrBuildFunction(SetAccessibleFunction.class, context).accept (lookupCtor, true);
 			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 			);
 			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context); 
 			setFunction(
 				new Function<Class<?>, MethodHandles.Lookup>() {
 					@Override

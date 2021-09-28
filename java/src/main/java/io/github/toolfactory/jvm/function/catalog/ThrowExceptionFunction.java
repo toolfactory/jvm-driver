@@ -65,7 +65,7 @@ public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
 		final sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
-			unsafe = Provider.get(context).getOrBuild(UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getOrBuildFunction(UnsafeSupplier.class, context).get();
 		}
 
 		@Override

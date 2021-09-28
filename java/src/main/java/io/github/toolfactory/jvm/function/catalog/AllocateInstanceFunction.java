@@ -46,9 +46,9 @@ public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
 		
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getOrBuild(UnsafeSupplier.class, context).get();
+			unsafe = functionProvider.getOrBuildFunction(UnsafeSupplier.class, context).get();
 			throwExceptionFunction =
-				functionProvider.getOrBuild(ThrowExceptionFunction.class, context);
+				functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context);
 		}
 
 		@Override

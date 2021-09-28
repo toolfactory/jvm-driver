@@ -61,10 +61,10 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 				);
 			) {
 				Provider functionProvider = Provider.get(context);
-				cls = functionProvider.getOrBuild(
+				cls = functionProvider.getOrBuildFunction(
 					DefineHookClassFunction.class, context
 				).apply(
-					functionProvider.getOrBuild(BuiltinClassLoaderClassSupplier.class, context).get(), 
+					functionProvider.getOrBuildFunction(BuiltinClassLoaderClassSupplier.class, context).get(), 
 					Streams.toByteArray(inputStream)
 				);
 			}

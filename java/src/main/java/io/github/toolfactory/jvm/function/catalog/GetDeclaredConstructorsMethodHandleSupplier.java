@@ -50,7 +50,7 @@ public abstract class GetDeclaredConstructorsMethodHandleSupplier implements Sup
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			Provider functionProvider = Provider.get(context);
 			ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getOrBuild(ConsulterSupplyFunction.class, context);
+				functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
 			methodHandle = consulter.findSpecial(
 				Class.class,

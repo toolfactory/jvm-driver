@@ -130,7 +130,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		exceptionThrower = functionProvider.getOrBuild(
+		exceptionThrower = functionProvider.getOrBuildFunction(
 			ThrowExceptionFunction.class, initializationContext
 		);
 	}
@@ -140,7 +140,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedPackagesRetriever = functionProvider.getOrBuild(
+		loadedPackagesRetriever = functionProvider.getOrBuildFunction(
 			GetLoadedPackagesFunction.class, initializationContext
 		);
 	}
@@ -150,7 +150,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedClassesRetriever = functionProvider.getOrBuild(
+		loadedClassesRetriever = functionProvider.getOrBuildFunction(
 			GetLoadedClassesFunction.class, initializationContext
 		);
 	}
@@ -161,7 +161,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuild(
+		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildFunction(
 			DeepConsulterSupplyFunction.class, initializationContext
 		);
 	}
@@ -171,7 +171,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		classLoaderDelegateClass = functionProvider.getOrBuild(
+		classLoaderDelegateClass = functionProvider.getOrBuildFunction(
 			ClassLoaderDelegateClassSupplier.class, initializationContext
 		).get();
 	}
@@ -181,7 +181,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		builtinClassLoaderClass = functionProvider.getOrBuild(
+		builtinClassLoaderClass = functionProvider.getOrBuildFunction(
 			BuiltinClassLoaderClassSupplier.class, initializationContext
 		).get();
 	}
@@ -191,7 +191,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		packageRetriever = functionProvider.getOrBuild(
+		packageRetriever = functionProvider.getOrBuildFunction(
 			GetPackageFunction.class, initializationContext
 		);
 	}
@@ -201,7 +201,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueSetter = functionProvider.getOrBuild(
+		fieldValueSetter = functionProvider.getOrBuildFunction(
 			SetFieldValueFunction.class, initializationContext
 		);
 	}
@@ -211,7 +211,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueRetriever = functionProvider.getOrBuild(
+		fieldValueRetriever = functionProvider.getOrBuildFunction(
 			GetFieldValueFunction.class, initializationContext
 		);
 	}
@@ -221,7 +221,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		allocateInstanceInvoker = functionProvider.getOrBuild(
+		allocateInstanceInvoker = functionProvider.getOrBuildFunction(
 			AllocateInstanceFunction.class, initializationContext
 		);
 	}
@@ -231,7 +231,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		methodInvoker = functionProvider.getOrBuild(
+		methodInvoker = functionProvider.getOrBuildFunction(
 			MethodInvokeMethodHandleSupplier.class, initializationContext
 		).get();
 	}
@@ -241,7 +241,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		constructorInvoker = functionProvider.getOrBuild(
+		constructorInvoker = functionProvider.getOrBuildFunction(
 			ConstructorInvokeMethodHandleSupplier.class, initializationContext
 		).get();
 	}
@@ -252,7 +252,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuild(
+		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildFunction(
 			SetAccessibleFunction.class, initializationContext
 		);
 	}
@@ -262,7 +262,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredFieldRetriever = functionProvider.getOrBuild(
+		declaredFieldRetriever = functionProvider.getOrBuildFunction(
 			GetDeclaredFieldFunction.class, initializationContext
 		);
 	}
@@ -272,7 +272,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredConstructorsRetriever = functionProvider.getOrBuild(
+		declaredConstructorsRetriever = functionProvider.getOrBuildFunction(
 			GetDeclaredConstructorsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
@@ -282,7 +282,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredMethodsRetriever = functionProvider.getOrBuild(
+		declaredMethodsRetriever = functionProvider.getOrBuildFunction(
 			GetDeclaredMethodsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
@@ -292,7 +292,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredFieldsRetriever = functionProvider.getOrBuild(
+		declaredFieldsRetriever = functionProvider.getOrBuildFunction(
 			GetDeclaredFieldsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
@@ -302,7 +302,7 @@ public class DefaultDriver implements Driver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		hookClassDefiner = functionProvider.getOrBuild(
+		hookClassDefiner = functionProvider.getOrBuildFunction(
 			DefineHookClassFunction.class, initializationContext
 		);
 	}
@@ -313,7 +313,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuild(
+		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildFunction(
 			ConsulterSupplyFunction.class, initializationContext
 		);
 	}

@@ -33,10 +33,10 @@ public class Provider {
 	}
 
 	
-	public <F> F getOrBuild(Class<? super F> functionClass, Map<Object, Object> context) {
+	public <F> F getOrBuildFunction(Class<? super F> functionClass, Map<Object, Object> context) {
 		String className = functionClass.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		F functionAdapter = find(functionClass, context);		
+		F functionAdapter = getFunction(functionClass, context);		
 		context.put(CLASS_NAME, this);
 		for (int version : registeredVersions) {
 			String clsName = className + "$" +  innerClassSuffix + version;
@@ -47,7 +47,7 @@ public class Provider {
 			} catch (ClassNotFoundException exc) {
 				searchedClasses.add(clsName);
 			} catch (Throwable exc) {
-				ThrowExceptionFunction throwingFunction = find(ThrowExceptionFunction.class, context);
+				ThrowExceptionFunction throwingFunction = getFunction(ThrowExceptionFunction.class, context);
 				if (throwingFunction != null) {
 					throwingFunction.apply(exc);
 				} else {
@@ -57,11 +57,11 @@ public class Provider {
 			}
 		}
 		functionClass = functionClass.getSuperclass();
-		return functionClass != null && !functionClass.equals(Object.class)? getOrBuild(functionClass, context) : null;
+		return functionClass != null && !functionClass.equals(Object.class)? getOrBuildFunction(functionClass, context) : null;
 	}
 
 
-	public static <F> F find(Class<? super F> functionClass, Map<Object, Object> context) {
+	public static <F> F getFunction(Class<? super F> functionClass, Map<Object, Object> context) {
 		F functionAdapter = (F) context.get(functionClass.getName());
 		if (functionAdapter != null) {
 			return functionAdapter;
