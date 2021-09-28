@@ -33,19 +33,10 @@ public class Provider {
 	}
 
 	
-	public <F> F getFunctionAdapter(Class<? super F> cls, Map<Object, Object> context) {
-		String className = cls.getName();
+	public <F> F getFunctionAdapter(Class<? super F> functionClass, Map<Object, Object> context) {
+		String className = functionClass.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		F functionAdapter = (F) context.get(className);
-		if (functionAdapter != null) {
-			return functionAdapter;
-		} else {
-			for (Object function : context.values()) {
-				if (cls.isAssignableFrom(function.getClass())) {
-					return (F)function;
-				}
-			}
-		}
+		F functionAdapter = find(functionClass, context);		
 		context.put(CLASS_NAME, this);
 		for (int version : registeredVersions) {
 			String clsName = className + "$" +  innerClassSuffix + version;
@@ -56,12 +47,7 @@ public class Provider {
 			} catch (ClassNotFoundException exc) {
 				searchedClasses.add(clsName);
 			} catch (Throwable exc) {
-				ThrowExceptionFunction throwingFunction = null;
-				for (Object function : context.values()) {
-					if (ThrowExceptionFunction.class.isAssignableFrom(function.getClass())) {
-						throwingFunction = (ThrowExceptionFunction)function;
-					}
-				}
+				ThrowExceptionFunction throwingFunction = find(ThrowExceptionFunction.class, context);
 				if (throwingFunction != null) {
 					throwingFunction.apply(exc);
 				} else {
@@ -70,8 +56,23 @@ public class Provider {
 				
 			}
 		}
-		cls = cls.getSuperclass();
-		return cls != null && !cls.equals(Object.class)? getFunctionAdapter(cls, context) : null;
+		functionClass = functionClass.getSuperclass();
+		return functionClass != null && !functionClass.equals(Object.class)? getFunctionAdapter(functionClass, context) : null;
+	}
+
+
+	public static <F> F find(Class<? super F> functionClass, Map<Object, Object> context) {
+		F functionAdapter = (F) context.get(functionClass.getName());
+		if (functionAdapter != null) {
+			return functionAdapter;
+		} else {
+			for (Object function : context.values()) {
+				if (functionClass.isAssignableFrom(function.getClass())) {
+					return (F)function;
+				}
+			}
+		}
+		return null;
 	}
 	
 	public static Provider get(Map<Object, Object> context) {
