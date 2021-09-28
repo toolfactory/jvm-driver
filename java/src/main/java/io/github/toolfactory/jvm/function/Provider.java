@@ -1,25 +1,25 @@
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
-import io.github.toolfactory.jvm.function._ThrowExceptionFunction;
+import io.github.toolfactory.jvm.JVMInfo;
 
 
 
 @SuppressWarnings("all")
-public class FunctionProvider {
+public class Provider {
 	private final String innerClassSuffix;
 	private final static String CLASS_NAME;
 	final Integer[] registeredVersions;
 	
 	static {
-		CLASS_NAME = FunctionProvider.class.getName();
+		CLASS_NAME = Provider.class.getName();
 	}
 	
-	public FunctionProvider(String innerClassSuffix, int... versions) {
+	public Provider(String innerClassSuffix, int... versions) {
 		this.innerClassSuffix = innerClassSuffix;
 		int jVMVersion = JVMInfo.getInstance().getVersion();
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
@@ -69,8 +69,8 @@ public class FunctionProvider {
 		return cls != null && !cls.equals(Object.class)? getFunctionAdapter(cls, context) : null;
 	}
 	
-	public static FunctionProvider get(Map<Object, Object> context) {
-		return (FunctionProvider)context.get(CLASS_NAME);
+	public static Provider get(Map<Object, Object> context) {
+		return (Provider)context.get(CLASS_NAME);
 	}
 	
 }

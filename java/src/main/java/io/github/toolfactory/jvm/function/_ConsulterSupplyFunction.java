@@ -33,11 +33,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Driver.InitializationException;
-import io.github.toolfactory.jvm.Function;
-import io.github.toolfactory.jvm.FunctionAdapter;
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Resources;
-import io.github.toolfactory.jvm.Streams;
+import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.util.FunctionAdapter;
+import io.github.toolfactory.jvm.function.util.Resources;
+import io.github.toolfactory.jvm.function.util.Streams;
 
 
 @SuppressWarnings("unchecked")
@@ -46,7 +45,7 @@ public abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Cla
 	
 	public static class ForJava7 extends _ConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
 		public ForJava7(Map<Object, Object> context) {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();
 			final MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(_PrivateLookupInMethodHandleSupplier.class, context).get();
 			final _ThrowExceptionFunction throwExceptionFunction =
@@ -75,7 +74,7 @@ public abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Cla
 	public static class ForJava9 extends _ConsulterSupplyFunction<java.util.function.Function<Class<?>, MethodHandles.Lookup>> {
 		
 		public ForJava9(Map<Object, Object> context) {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			final _ThrowExceptionFunction throwExceptionFunction =
 				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 			try (

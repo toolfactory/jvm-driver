@@ -33,12 +33,11 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.BiConsumer;
-import io.github.toolfactory.jvm.BiConsumerAdapter;
 import io.github.toolfactory.jvm.Driver.InitializationException;
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Resources;
-import io.github.toolfactory.jvm.Streams;
+import io.github.toolfactory.jvm.function.template.BiConsumer;
+import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.function.util.Resources;
+import io.github.toolfactory.jvm.function.util.Streams;
 
 
 @SuppressWarnings("unchecked")
@@ -46,7 +45,7 @@ public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acc
 	_ThrowExceptionFunction throwExceptionFunction;
 	
 	public _SetAccessibleFunction(Map<Object, Object> context) {
-		FunctionProvider functionProvider = FunctionProvider.get(context);
+		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
 			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 	}
@@ -56,7 +55,7 @@ public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acc
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
 			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			final MethodHandle accessibleSetterMethodHandle = functionProvider.getFunctionAdapter(
 				_ConsulterSupplier.class, context
 			).get().unreflect(accessibleSetterMethod);
@@ -91,7 +90,7 @@ public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acc
 					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
 				);
 			) {	
-				FunctionProvider functionProvider = FunctionProvider.get(context);
+				Provider functionProvider = Provider.get(context);
 				Class<?> methodHandleWrapperClass = functionProvider.getFunctionAdapter(
 					_DefineHookClassFunction.class, context
 				).apply(AccessibleObject.class, Streams.toByteArray(inputStream));

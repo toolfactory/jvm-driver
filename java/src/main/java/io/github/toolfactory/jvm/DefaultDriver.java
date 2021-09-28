@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function._AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function._BuiltinClassLoaderClassSupplier;
 import io.github.toolfactory.jvm.function._ClassLoaderDelegateClassSupplier;
@@ -57,6 +58,11 @@ import io.github.toolfactory.jvm.function._MethodInvokeMethodHandleSupplier;
 import io.github.toolfactory.jvm.function._SetAccessibleFunction;
 import io.github.toolfactory.jvm.function._SetFieldValueFunction;
 import io.github.toolfactory.jvm.function._ThrowExceptionFunction;
+import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.template.TriConsumer;
+import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.function.util.FunctionAdapter;
 
 
 
@@ -84,8 +90,8 @@ public class DefaultDriver implements Driver {
 
 
 	public DefaultDriver() {
-		FunctionProvider functionProvider =
-			new FunctionProvider(
+		Provider functionProvider =
+			new Provider(
 				"ForJava", 7, 9, 14, 17
 			);
 		Map<Object, Object> initializationContext = new HashMap<>();
@@ -112,7 +118,7 @@ public class DefaultDriver implements Driver {
 	
 	
 	void initExceptionThrower(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		exceptionThrower = functionProvider.getFunctionAdapter(
@@ -122,7 +128,7 @@ public class DefaultDriver implements Driver {
 	
 	
 	void initLoadedPackagesRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		loadedPackagesRetriever = functionProvider.getFunctionAdapter(
@@ -132,7 +138,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initLoadedClassesRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		loadedClassesRetriever = functionProvider.getFunctionAdapter(
@@ -142,7 +148,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void replaceConsulterWithDeepConsulter(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
@@ -153,7 +159,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initClassLoaderDelegateClass(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		classLoaderDelegateClass = functionProvider.getFunctionAdapter(
@@ -163,7 +169,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initBuiltinClassLoaderClass(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		builtinClassLoaderClass = functionProvider.getFunctionAdapter(
@@ -173,7 +179,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initPackageRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		packageRetriever = functionProvider.getFunctionAdapter(
@@ -183,7 +189,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initFieldValueSetter(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueSetter = functionProvider.getFunctionAdapter(
@@ -193,7 +199,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initFieldValueRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueRetriever = functionProvider.getFunctionAdapter(
@@ -203,7 +209,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initAllocateInstanceInvoker(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		allocateInstanceInvoker = functionProvider.getFunctionAdapter(
@@ -213,7 +219,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initMethodInvoker(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		methodInvoker = functionProvider.getFunctionAdapter(
@@ -223,7 +229,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initConstructorInvoker(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		constructorInvoker = functionProvider.getFunctionAdapter(
@@ -233,7 +239,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initAccessibleSetter(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
@@ -244,7 +250,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initDeclaredFieldRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		declaredFieldRetriever = functionProvider.getFunctionAdapter(
@@ -254,7 +260,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initDeclaredConstructorsRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		declaredConstructorsRetriever = functionProvider.getFunctionAdapter(
@@ -264,7 +270,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initDeclaredMethodsRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		declaredMethodsRetriever = functionProvider.getFunctionAdapter(
@@ -274,7 +280,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initDeclaredFieldsRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		declaredFieldsRetriever = functionProvider.getFunctionAdapter(
@@ -284,7 +290,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initHookClassDefiner(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		hookClassDefiner = functionProvider.getFunctionAdapter(
@@ -294,7 +300,7 @@ public class DefaultDriver implements Driver {
 
 	
 	void initConsulterRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)

@@ -33,10 +33,9 @@ import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.BiFunction;
-import io.github.toolfactory.jvm.Function;
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.JavaClass;
+import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.util.JavaClass;
 
 
 @SuppressWarnings("restriction")
@@ -45,7 +44,7 @@ public abstract class _DefineHookClassFunction implements BiFunction<Class<?>, b
 	_ThrowExceptionFunction throwExceptionFunction;
 	
 	public _DefineHookClassFunction(Map<Object, Object> context) {
-		FunctionProvider functionProvider = FunctionProvider.get(context);
+		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
 			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 	}
@@ -56,7 +55,7 @@ public abstract class _DefineHookClassFunction implements BiFunction<Class<?>, b
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
 			defineHookClassMethodHandle = retrieveConsulter(
 				functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get(),
@@ -105,7 +104,7 @@ public abstract class _DefineHookClassFunction implements BiFunction<Class<?>, b
 		
 		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();
 			defineHookClassMethodHandle = consulter.findSpecial(
 				MethodHandles.Lookup.class,

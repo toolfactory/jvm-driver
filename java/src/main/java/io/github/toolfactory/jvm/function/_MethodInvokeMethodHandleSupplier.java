@@ -32,8 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Supplier;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
 public abstract class _MethodInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
@@ -49,7 +48,7 @@ public abstract class _MethodInvokeMethodHandleSupplier implements Supplier<Meth
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
@@ -62,7 +61,7 @@ public abstract class _MethodInvokeMethodHandleSupplier implements Supplier<Meth
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
 			methodHandle = consulter.unreflect(invoker);

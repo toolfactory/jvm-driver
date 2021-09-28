@@ -31,8 +31,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.BiFunction;
-import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
 @SuppressWarnings("restriction")
@@ -43,7 +42,7 @@ public interface _GetFieldValueFunction extends BiFunction<Object, Field, Object
 		final sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
-			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
 		}
 
 		@Override

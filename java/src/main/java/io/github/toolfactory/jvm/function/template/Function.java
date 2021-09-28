@@ -24,45 +24,11 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.template;
 
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
+public interface Function<I, R> {
 
-
-@SuppressWarnings("unchecked")
-class BufferHandler {
-
-	static ByteBuffer shareContent(ByteBuffer byteBuffer) {
-		ByteBuffer duplicated = duplicate(byteBuffer);
-		if (position(byteBuffer) > 0) {
-			flip(duplicated);
-		}
-		return duplicated;
-	}
-
-	static <T extends Buffer> T flip(T buffer) {
-		return (T)((Buffer)buffer).flip();
-	}
-
-	static <T extends Buffer> int position(T buffer) {
-		return ((Buffer)buffer).position();
-	}
-
-	static ByteBuffer duplicate(ByteBuffer buffer) {
-		return buffer.duplicate();
-	}
-
-	static <T extends Buffer> int limit(T buffer) {
-		return ((Buffer)buffer).limit();
-	}
-
-	static byte[] toByteArray(ByteBuffer byteBuffer) {
-    	byteBuffer = shareContent(byteBuffer);
-    	byte[] result = new byte[limit(byteBuffer)];
-    	byteBuffer.get(result, 0, result.length);
-        return result;
-	}
+	public R apply(I input);
 
 }

@@ -24,24 +24,45 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.util;
 
 
-public abstract class BiConsumerAdapter<F, I, J> {
-	
-	protected F function;
-	
-	public BiConsumerAdapter(){}
-	
-	public BiConsumerAdapter(F function) {
-		this.function = function;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+
+
+@SuppressWarnings("unchecked")
+public class BufferHandler {
+
+	public static ByteBuffer shareContent(ByteBuffer byteBuffer) {
+		ByteBuffer duplicated = duplicate(byteBuffer);
+		if (position(byteBuffer) > 0) {
+			flip(duplicated);
+		}
+		return duplicated;
 	}
-	
-	public BiConsumerAdapter<F, I, J> setFunction(F function) {
-		this.function = function;
-		return this;
+
+	public static <T extends Buffer> T flip(T buffer) {
+		return (T)((Buffer)buffer).flip();
 	}
-	
-	public abstract void accept(I inputOne, J inputTwo);
-	
+
+	public static <T extends Buffer> int position(T buffer) {
+		return ((Buffer)buffer).position();
+	}
+
+	public static ByteBuffer duplicate(ByteBuffer buffer) {
+		return buffer.duplicate();
+	}
+
+	public static <T extends Buffer> int limit(T buffer) {
+		return ((Buffer)buffer).limit();
+	}
+
+	public static byte[] toByteArray(ByteBuffer byteBuffer) {
+    	byteBuffer = shareContent(byteBuffer);
+    	byte[] result = new byte[limit(byteBuffer)];
+    	byteBuffer.get(result, 0, result.length);
+        return result;
+	}
+
 }

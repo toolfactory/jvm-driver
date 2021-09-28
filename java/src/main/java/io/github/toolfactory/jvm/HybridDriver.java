@@ -29,6 +29,7 @@ package io.github.toolfactory.jvm;
 
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function._ConsulterSupplier;
 
 
@@ -36,7 +37,7 @@ public class HybridDriver extends DefaultDriver {
 	
 
 	void initHookClassDefiner(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		functionProvider.getFunctionAdapter(_ConsulterSupplier.Hybrid.class, initializationContext);

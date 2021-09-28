@@ -32,8 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.BiFunction;
-import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
 public interface _GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
@@ -55,7 +54,7 @@ public interface _GetPackageFunction extends BiFunction<ClassLoader, String, Pac
 		_ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
 			MethodType methodType = MethodType.methodType(Package.class, String.class);

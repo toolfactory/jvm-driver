@@ -138,9 +138,9 @@
                         </phase>
 						<configuration>
 							<target>
-								<copy file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/ConsulterRetrieverForJDK9.bwc" />
-								<copy file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/AccessibleSetterInvokerForJDK9.bwc" />
-								<copy file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/ClassLoaderDelegateForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/ConsulterRetrieverForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/AccessibleSetterInvokerForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/util/ClassLoaderDelegateForJDK9.bwc" />
 							</target>
 						</configuration>
 					</execution>

@@ -29,7 +29,7 @@ package io.github.toolfactory.jvm.function;
 
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Supplier;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
 public interface _BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {

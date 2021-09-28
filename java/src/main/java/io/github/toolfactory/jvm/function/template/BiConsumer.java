@@ -24,30 +24,11 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.template;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+public interface BiConsumer<T, U> {
 
-
-public class Streams {
-
-	public static byte[] toByteArray(InputStream inputStream) throws IOException {
-		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-			copy(inputStream, outputStream);
-			return outputStream.toByteArray();
-		}
-	}
-
-	public static void copy(InputStream input, OutputStream output) throws IOException {
-		byte[] buffer = new byte[1024];
-		int bytesRead = 0;
-		while (-1 != (bytesRead = input.read(buffer))) {
-			output.write(buffer, 0, bytesRead);
-		}
-	}
+	public void accept(T t, U u);
 
 }

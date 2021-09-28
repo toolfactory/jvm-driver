@@ -31,8 +31,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.BiFunction;
-import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
 public abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
@@ -42,7 +41,7 @@ public abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, 
 		_ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava7(Map<Object, Object> context) {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			getDeclaredFields = functionProvider.getFunctionAdapter(_GetDeclaredFieldsMethodHandleSupplier.class, context).get();
 			throwExceptionFunction =
 				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 

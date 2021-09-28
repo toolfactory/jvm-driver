@@ -30,12 +30,14 @@ package io.github.toolfactory.jvm;
 import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function._AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function._GetFieldValueFunction;
 import io.github.toolfactory.jvm.function._GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function._GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function._SetAccessibleFunction;
 import io.github.toolfactory.jvm.function._SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
 
 
 @SuppressWarnings("unchecked")
@@ -43,7 +45,7 @@ public class NativeDriver extends HybridDriver {
 	
 	
 	void initLoadedPackagesRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		loadedPackagesRetriever = functionProvider.getFunctionAdapter(
@@ -54,7 +56,7 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initLoadedClassesRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		loadedClassesRetriever = functionProvider.getFunctionAdapter(
@@ -65,7 +67,7 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initFieldValueSetter(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueSetter = functionProvider.getFunctionAdapter(
@@ -76,7 +78,7 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initFieldValueRetriever(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueRetriever = functionProvider.getFunctionAdapter(
@@ -87,7 +89,7 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override		
 	void initAllocateInstanceInvoker(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		allocateInstanceInvoker = functionProvider.getFunctionAdapter(
@@ -98,7 +100,7 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initAccessibleSetter(
-		FunctionProvider functionProvider,
+		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)

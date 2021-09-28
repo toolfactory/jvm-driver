@@ -33,8 +33,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Supplier;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
 public class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
@@ -48,7 +47,7 @@ public class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHa
 	public static class ForJava7 extends _ConstructorInvokeMethodHandleSupplier {
 		
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			_ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
@@ -61,7 +60,7 @@ public class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHa
 	public static class ForJava9 extends _ConstructorInvokeMethodHandleSupplier {
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			_ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);

@@ -24,11 +24,10 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.template;
 
 
-public interface BiFunction<I, J, R> {
+public interface Supplier<T> {
 
-	public R apply(I inputOne, J inputTwo);
-
+	public T get();
 }

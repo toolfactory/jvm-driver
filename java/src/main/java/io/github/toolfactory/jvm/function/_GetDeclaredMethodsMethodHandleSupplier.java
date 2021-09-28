@@ -33,8 +33,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Supplier;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
 public abstract class _GetDeclaredMethodsMethodHandleSupplier implements Supplier<MethodHandle> {
@@ -48,7 +47,7 @@ public abstract class _GetDeclaredMethodsMethodHandleSupplier implements Supplie
 	public static class ForJava7 extends _GetDeclaredMethodsMethodHandleSupplier {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			_ConsulterSupplyFunction<?> getConsulterFunction =
 				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);

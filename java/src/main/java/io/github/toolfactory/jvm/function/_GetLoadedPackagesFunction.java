@@ -31,9 +31,8 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Function;
-import io.github.toolfactory.jvm.FunctionProvider;
 import io.github.toolfactory.jvm.function._GetLoadedClassesFunction.Native;
+import io.github.toolfactory.jvm.function.template.Function;
 
 
 @SuppressWarnings("all")
@@ -44,7 +43,7 @@ public abstract class _GetLoadedPackagesFunction implements Function<ClassLoader
 		final Long fieldOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
+			Provider functionProvider = Provider.get(context);
 			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
 			_GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(_GetDeclaredFieldFunction.class, context);
 			fieldOffset = unsafe.objectFieldOffset(
@@ -65,7 +64,7 @@ public abstract class _GetLoadedPackagesFunction implements Function<ClassLoader
 		public static class ForJava7 extends Native {
 			Field packagesField;
 			ForJava7(Map<Object, Object> context) {
-				FunctionProvider functionProvider = FunctionProvider.get(context);
+				Provider functionProvider = Provider.get(context);
 				_GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(_GetDeclaredFieldFunction.class, context);
 				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
 			}

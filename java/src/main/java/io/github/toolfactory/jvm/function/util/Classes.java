@@ -24,9 +24,11 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.util;
 
 import java.nio.ByteBuffer;
+
+import io.github.toolfactory.jvm.function.template.Function;
 
 
 public class Classes {

@@ -31,10 +31,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Resources;
-import io.github.toolfactory.jvm.Streams;
-import io.github.toolfactory.jvm.Supplier;
+import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.util.Classes;
+import io.github.toolfactory.jvm.function.util.Resources;
+import io.github.toolfactory.jvm.function.util.Streams;
 
 
 public interface _ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
@@ -56,10 +56,10 @@ public interface _ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
 			try (
 				InputStream inputStream =
-					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
+					Resources.getAsInputStream(this.getClass().getClassLoader(), Classes.class.getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
 				);
 			) {
-				FunctionProvider functionProvider = FunctionProvider.get(context);
+				Provider functionProvider = Provider.get(context);
 				cls = functionProvider.getFunctionAdapter(
 					_DefineHookClassFunction.class, context
 				).apply(

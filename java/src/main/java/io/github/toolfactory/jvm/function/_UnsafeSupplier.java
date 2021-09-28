@@ -31,9 +31,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Driver;
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.Supplier;
 import io.github.toolfactory.jvm.Driver.InitializationException;
+import io.github.toolfactory.jvm.function.template.Supplier;
 import sun.misc.Unsafe;
 
 
@@ -49,7 +48,7 @@ public interface _UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
 				theUnsafeField.setAccessible(true);
 				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
 			} catch (Throwable exc) {
-				FunctionProvider functionProvider = FunctionProvider.get(context);
+				Provider functionProvider = Provider.get(context);
 				_ThrowExceptionFunction throwExceptionFunction =
 					functionProvider.getFunctionAdapter(_ThrowExceptionFunction.Native.class, context);
 				throwExceptionFunction.apply(new InitializationException("Exception while retrieving unsafe", exc));

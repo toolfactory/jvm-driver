@@ -24,19 +24,27 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.util;
 
 
-import java.io.InputStream;
+public class Strings {
 
-
-public class Resources {
-
-	public static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
-		if (resourceClassLoader == null) {
-			resourceClassLoader = ClassLoader.getSystemClassLoader();
+	public static String compile(String message, Object... arguments) {
+		for (Object obj : arguments) {
+			message = message.replaceFirst("\\{\\}", obj == null ? "null" : clear(obj.toString()));
 		}
-		return resourceClassLoader.getResourceAsStream(resourceRelativePath);
+		return message;
+	}
+
+	private static String clear(String text) {
+		return text
+		.replace("\\", "\\\\\\")
+		.replace("{", "\\{")
+		.replace("}", "\\}")
+		.replace("(", "\\(")
+		.replace(")", "\\)")
+		.replace(".", "\\.")
+		.replace("$", "\\$");
 	}
 
 }

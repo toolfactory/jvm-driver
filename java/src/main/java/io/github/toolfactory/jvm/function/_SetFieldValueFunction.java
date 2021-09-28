@@ -31,9 +31,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Classes;
-import io.github.toolfactory.jvm.FunctionProvider;
-import io.github.toolfactory.jvm.TriConsumer;
+import io.github.toolfactory.jvm.function.template.TriConsumer;
+import io.github.toolfactory.jvm.function.util.Classes;
 
 
 @SuppressWarnings({"restriction", "null"})
@@ -41,7 +40,7 @@ public abstract class _SetFieldValueFunction implements TriConsumer<Object, Fiel
 	_ThrowExceptionFunction throwExceptionFunction;
 	
 	public _SetFieldValueFunction(Map<Object, Object> context) {
-		FunctionProvider functionProvider = FunctionProvider.get(context);
+		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
 			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 	}
@@ -51,7 +50,7 @@ public abstract class _SetFieldValueFunction implements TriConsumer<Object, Fiel
 		
 		public ForJava7(Map<Object, Object> context) {
 			super(context);
-			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
 		}
 
 		@Override
