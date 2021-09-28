@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
@@ -55,13 +55,13 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 		ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
 			MethodType methodType = MethodType.methodType(Package.class, String.class);
 			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
 			throwExceptionFunction =
-				functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
 		}
 
 		@Override

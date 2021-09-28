@@ -33,7 +33,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Info;
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
@@ -71,7 +71,7 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 	public static class ForJava17 extends ConsulterSupplier {
 		
 		public ForJava17(Map<Object, Object> context) {
-			sun.misc.Unsafe unsafe = Provider.get(context).getOrBuildFunction(UnsafeSupplier.class, context).get();
+			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 			final long allowedModesFieldMemoryOffset = Info.getInstance().is64Bit() ? 12L : 8L;
 			consulter = MethodHandles.lookup();
 			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);

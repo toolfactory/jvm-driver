@@ -31,7 +31,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
 
@@ -44,9 +44,9 @@ public abstract class GetLoadedPackagesFunction implements Function<ClassLoader,
 		final Long fieldOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
-			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getOrBuildFunction(UnsafeSupplier.class, context).get();
-			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildFunction(GetDeclaredFieldFunction.class, context);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 			fieldOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
 			);
@@ -66,8 +66,8 @@ public abstract class GetLoadedPackagesFunction implements Function<ClassLoader,
 			Field packagesField;
 			
 			public ForJava7(Map<Object, Object> context) {
-				Provider functionProvider = Provider.get(context);
-				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildFunction(GetDeclaredFieldFunction.class, context);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
 			}
 

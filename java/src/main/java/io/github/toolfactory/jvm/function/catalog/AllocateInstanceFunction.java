@@ -33,7 +33,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Function;
 
 
@@ -45,10 +45,10 @@ public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
 		final ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava7(Map<Object, Object> context) {
-			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getOrBuildFunction(UnsafeSupplier.class, context).get();
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			throwExceptionFunction =
-				functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context);
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override

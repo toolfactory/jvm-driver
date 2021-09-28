@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.BuiltinClassLoaderClassSupplier;
 import io.github.toolfactory.jvm.function.catalog.ClassLoaderDelegateClassSupplier;
@@ -90,7 +89,7 @@ public class DefaultDriver implements Driver {
 
 
 	public DefaultDriver() {
-		Provider functionProvider = new Provider(
+		ObjectProvider functionProvider = new ObjectProvider(
 			"ForJava", 7, 9, 14, 17
 		);
 		
@@ -127,193 +126,193 @@ public class DefaultDriver implements Driver {
 	
 	//Initializers
 	void initExceptionThrower(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		exceptionThrower = functionProvider.getOrBuildFunction(
+		exceptionThrower = functionProvider.getOrBuildObject(
 			ThrowExceptionFunction.class, initializationContext
 		);
 	}
 	
 	
 	void initLoadedPackagesRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedPackagesRetriever = functionProvider.getOrBuildFunction(
+		loadedPackagesRetriever = functionProvider.getOrBuildObject(
 			GetLoadedPackagesFunction.class, initializationContext
 		);
 	}
 
 	
 	void initLoadedClassesRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedClassesRetriever = functionProvider.getOrBuildFunction(
+		loadedClassesRetriever = functionProvider.getOrBuildObject(
 			GetLoadedClassesFunction.class, initializationContext
 		);
 	}
 
 	
 	void replaceConsulterWithDeepConsulter(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildFunction(
+		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildObject(
 			DeepConsulterSupplyFunction.class, initializationContext
 		);
 	}
 
 	
 	void initClassLoaderDelegateClass(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		classLoaderDelegateClass = functionProvider.getOrBuildFunction(
+		classLoaderDelegateClass = functionProvider.getOrBuildObject(
 			ClassLoaderDelegateClassSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initBuiltinClassLoaderClass(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		builtinClassLoaderClass = functionProvider.getOrBuildFunction(
+		builtinClassLoaderClass = functionProvider.getOrBuildObject(
 			BuiltinClassLoaderClassSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initPackageRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		packageRetriever = functionProvider.getOrBuildFunction(
+		packageRetriever = functionProvider.getOrBuildObject(
 			GetPackageFunction.class, initializationContext
 		);
 	}
 
 	
 	void initFieldValueSetter(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueSetter = functionProvider.getOrBuildFunction(
+		fieldValueSetter = functionProvider.getOrBuildObject(
 			SetFieldValueFunction.class, initializationContext
 		);
 	}
 
 	
 	void initFieldValueRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueRetriever = functionProvider.getOrBuildFunction(
+		fieldValueRetriever = functionProvider.getOrBuildObject(
 			GetFieldValueFunction.class, initializationContext
 		);
 	}
 
 	
 	void initAllocateInstanceInvoker(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		allocateInstanceInvoker = functionProvider.getOrBuildFunction(
+		allocateInstanceInvoker = functionProvider.getOrBuildObject(
 			AllocateInstanceFunction.class, initializationContext
 		);
 	}
 
 	
 	void initMethodInvoker(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		methodInvoker = functionProvider.getOrBuildFunction(
+		methodInvoker = functionProvider.getOrBuildObject(
 			MethodInvokeMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initConstructorInvoker(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		constructorInvoker = functionProvider.getOrBuildFunction(
+		constructorInvoker = functionProvider.getOrBuildObject(
 			ConstructorInvokeMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initAccessibleSetter(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildFunction(
+		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildObject(
 			SetAccessibleFunction.class, initializationContext
 		);
 	}
 
 	
 	void initDeclaredFieldRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredFieldRetriever = functionProvider.getOrBuildFunction(
+		declaredFieldRetriever = functionProvider.getOrBuildObject(
 			GetDeclaredFieldFunction.class, initializationContext
 		);
 	}
 
 	
 	void initDeclaredConstructorsRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredConstructorsRetriever = functionProvider.getOrBuildFunction(
+		declaredConstructorsRetriever = functionProvider.getOrBuildObject(
 			GetDeclaredConstructorsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initDeclaredMethodsRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredMethodsRetriever = functionProvider.getOrBuildFunction(
+		declaredMethodsRetriever = functionProvider.getOrBuildObject(
 			GetDeclaredMethodsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initDeclaredFieldsRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		declaredFieldsRetriever = functionProvider.getOrBuildFunction(
+		declaredFieldsRetriever = functionProvider.getOrBuildObject(
 			GetDeclaredFieldsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
 	
 	void initHookClassDefiner(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		hookClassDefiner = functionProvider.getOrBuildFunction(
+		hookClassDefiner = functionProvider.getOrBuildObject(
 			DefineHookClassFunction.class, initializationContext
 		);
 	}
 
 	
 	void initConsulterRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildFunction(
+		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildObject(
 			ConsulterSupplyFunction.class, initializationContext
 		);
 	}

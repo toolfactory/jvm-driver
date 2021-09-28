@@ -34,7 +34,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.function.util.Resources;
@@ -46,9 +46,9 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 	ThrowExceptionFunction throwExceptionFunction;
 	
 	public SetAccessibleFunction(Map<Object, Object> context) {
-		Provider functionProvider = Provider.get(context);
+		ObjectProvider functionProvider = ObjectProvider.get(context);
 		throwExceptionFunction =
-			functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context); 
+			functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
 	}
 	
 	public static class ForJava7 extends SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
@@ -56,8 +56,8 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
 			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
-			Provider functionProvider = Provider.get(context);
-			final MethodHandle accessibleSetterMethodHandle = functionProvider.getOrBuildFunction(
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			final MethodHandle accessibleSetterMethodHandle = functionProvider.getOrBuildObject(
 				ConsulterSupplier.class, context
 			).get().unreflect(accessibleSetterMethod);
 			setFunction(
@@ -91,16 +91,16 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
 				);
 			) {	
-				Provider functionProvider = Provider.get(context);
-				Class<?> methodHandleWrapperClass = functionProvider.getOrBuildFunction(
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				Class<?> methodHandleWrapperClass = functionProvider.getOrBuildObject(
 					DefineHookClassFunction.class, context
 				).apply(AccessibleObject.class, Streams.toByteArray(inputStream));
-				functionProvider.getOrBuildFunction(SetFieldValueFunction.class, context).accept(
+				functionProvider.getOrBuildObject(SetFieldValueFunction.class, context).accept(
 					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"),
-					functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
+					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
 				);
 				setFunction((java.util.function.BiConsumer<AccessibleObject, Boolean>)
-					functionProvider.getOrBuildFunction(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
+					functionProvider.getOrBuildObject(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			}
 		}
 		

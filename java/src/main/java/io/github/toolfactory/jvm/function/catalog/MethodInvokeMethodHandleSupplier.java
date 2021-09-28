@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
@@ -49,8 +49,8 @@ public abstract class MethodInvokeMethodHandleSupplier implements Supplier<Metho
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
@@ -62,8 +62,8 @@ public abstract class MethodInvokeMethodHandleSupplier implements Supplier<Metho
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildFunction(ConsulterSupplyFunction.class, context);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
 			methodHandle = consulter.unreflect(invoker);
 		}

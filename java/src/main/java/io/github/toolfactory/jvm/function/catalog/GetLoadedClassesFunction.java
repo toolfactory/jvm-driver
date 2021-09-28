@@ -32,7 +32,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
 
@@ -45,9 +45,9 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 		final Long loadedClassesVectorMemoryOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
-			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getOrBuildFunction(UnsafeSupplier.class, context).get();
-			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildFunction(GetDeclaredFieldFunction.class, context);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
@@ -66,8 +66,8 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 			Field classesField;
 			
 			public ForJava7(Map<Object, Object> context) {
-				Provider functionProvider = Provider.get(context);
-				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildFunction(GetDeclaredFieldFunction.class, context);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
 

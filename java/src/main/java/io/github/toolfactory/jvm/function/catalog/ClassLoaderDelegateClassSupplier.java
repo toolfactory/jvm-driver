@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.util.Classes;
 import io.github.toolfactory.jvm.function.util.Resources;
@@ -60,11 +60,11 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 					Resources.getAsInputStream(this.getClass().getClassLoader(), Classes.class.getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
 				);
 			) {
-				Provider functionProvider = Provider.get(context);
-				cls = functionProvider.getOrBuildFunction(
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				cls = functionProvider.getOrBuildObject(
 					DefineHookClassFunction.class, context
 				).apply(
-					functionProvider.getOrBuildFunction(BuiltinClassLoaderClassSupplier.class, context).get(), 
+					functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get(), 
 					Streams.toByteArray(inputStream)
 				);
 			}

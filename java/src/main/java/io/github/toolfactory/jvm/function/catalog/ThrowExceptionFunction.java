@@ -29,7 +29,7 @@ package io.github.toolfactory.jvm.function.catalog;
 
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Consumer;
 import io.github.toolfactory.jvm.function.util.Strings;
 
@@ -65,7 +65,7 @@ public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
 		final sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
-			unsafe = Provider.get(context).getOrBuildFunction(UnsafeSupplier.class, context).get();
+			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 		}
 
 		@Override

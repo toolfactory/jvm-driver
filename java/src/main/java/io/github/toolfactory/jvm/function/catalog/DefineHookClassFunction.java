@@ -33,7 +33,7 @@ import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.util.JavaClass;
@@ -45,9 +45,9 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 	ThrowExceptionFunction throwExceptionFunction;
 	
 	public DefineHookClassFunction(Map<Object, Object> context) {
-		Provider functionProvider = Provider.get(context);
+		ObjectProvider functionProvider = ObjectProvider.get(context);
 		throwExceptionFunction =
-			functionProvider.getOrBuildFunction(ThrowExceptionFunction.class, context); 
+			functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
 	}
 	
 	
@@ -56,11 +56,11 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
-			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getOrBuildFunction(UnsafeSupplier.class, context).get();
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			defineHookClassMethodHandle = retrieveConsulter(
-				functionProvider.getOrBuildFunction(ConsulterSupplier.class, context).get(),
-				functionProvider.getOrBuildFunction(PrivateLookupInMethodHandleSupplier.class, context).get()
+				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
+				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get()
 			).findSpecial(
 				unsafe.getClass(),
 				"defineAnonymousClass",
@@ -105,15 +105,15 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 		
 		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
-			Provider functionProvider = Provider.get(context);
-			consulter = functionProvider.getOrBuildFunction(ConsulterSupplier.class, context).get();
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			consulter = functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get();
 			defineHookClassMethodHandle = consulter.findSpecial(
 				MethodHandles.Lookup.class,
 				"defineClass",
 				MethodType.methodType(Class.class, byte[].class),
 				MethodHandles.Lookup.class
 			);
-			privateLookupInMethodHandle = functionProvider.getOrBuildFunction(PrivateLookupInMethodHandleSupplier.class, context).get();
+			privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
 		}
 
 		

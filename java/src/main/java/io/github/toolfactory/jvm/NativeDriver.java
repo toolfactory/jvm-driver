@@ -30,7 +30,6 @@ package io.github.toolfactory.jvm;
 import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
@@ -46,20 +45,20 @@ public class NativeDriver extends HybridDriver {
 	
 	
 	void initExceptionThrower(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		exceptionThrower = functionProvider.getOrBuildFunction(
+		exceptionThrower = functionProvider.getOrBuildObject(
 			ThrowExceptionFunction.Native.class, initializationContext
 		);
 	}
 	
 	
 	void initLoadedPackagesRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedPackagesRetriever = functionProvider.getOrBuildFunction(
+		loadedPackagesRetriever = functionProvider.getOrBuildObject(
 			GetLoadedPackagesFunction.Native.class, initializationContext
 		);
 	}
@@ -67,10 +66,10 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initLoadedClassesRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedClassesRetriever = functionProvider.getOrBuildFunction(
+		loadedClassesRetriever = functionProvider.getOrBuildObject(
 			GetLoadedClassesFunction.Native.class, initializationContext
 		);
 	}
@@ -78,10 +77,10 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initFieldValueSetter(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueSetter = functionProvider.getOrBuildFunction(
+		fieldValueSetter = functionProvider.getOrBuildObject(
 			SetFieldValueFunction.Native.class, initializationContext
 		);
 	}
@@ -89,10 +88,10 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initFieldValueRetriever(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueRetriever = functionProvider.getOrBuildFunction(
+		fieldValueRetriever = functionProvider.getOrBuildObject(
 			GetFieldValueFunction.Native.class, initializationContext
 		);
 	}
@@ -100,10 +99,10 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override		
 	void initAllocateInstanceInvoker(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		allocateInstanceInvoker = functionProvider.getOrBuildFunction(
+		allocateInstanceInvoker = functionProvider.getOrBuildObject(
 			AllocateInstanceFunction.Native.class, initializationContext
 		);
 	}
@@ -111,11 +110,11 @@ public class NativeDriver extends HybridDriver {
 	
 	@Override
 	void initAccessibleSetter(
-		Provider functionProvider,
+		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildFunction(
+		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildObject(
 			SetAccessibleFunction.Native.class, initializationContext
 		);
 	}
