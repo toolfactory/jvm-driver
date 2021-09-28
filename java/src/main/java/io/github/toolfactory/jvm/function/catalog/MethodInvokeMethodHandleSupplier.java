@@ -50,7 +50,7 @@ public abstract class MethodInvokeMethodHandleSupplier implements Supplier<Metho
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuild(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
@@ -63,7 +63,7 @@ public abstract class MethodInvokeMethodHandleSupplier implements Supplier<Metho
 			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuild(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
 			methodHandle = consulter.unreflect(invoker);
 		}

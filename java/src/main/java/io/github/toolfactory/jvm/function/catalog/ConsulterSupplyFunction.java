@@ -47,10 +47,10 @@ public abstract class ConsulterSupplyFunction<F> extends FunctionAdapter<F, Clas
 	public static class ForJava7 extends ConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			final MethodHandles.Lookup consulter = functionProvider.getFunctionAdapter(ConsulterSupplier.class, context).get();
-			final MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get();
+			final MethodHandles.Lookup consulter = functionProvider.getOrBuild(ConsulterSupplier.class, context).get();
+			final MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuild(PrivateLookupInMethodHandleSupplier.class, context).get();
 			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
 			setFunction(
 				new Function<Class<?>, MethodHandles.Lookup>() { 
 					@Override
@@ -81,16 +81,16 @@ public abstract class ConsulterSupplyFunction<F> extends FunctionAdapter<F, Clas
 					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
 				);
 			) {
-				MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get();
-				Class<?> methodHandleWrapperClass = functionProvider.getFunctionAdapter(
+				MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuild(PrivateLookupInMethodHandleSupplier.class, context).get();
+				Class<?> methodHandleWrapperClass = functionProvider.getOrBuild(
 					DefineHookClassFunction.class, context
 				).apply(Class.class, Streams.toByteArray(inputStream));
-				functionProvider.getFunctionAdapter(SetFieldValueFunction.class, context).accept(
+				functionProvider.getOrBuild(SetFieldValueFunction.class, context).accept(
 					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"),
 					privateLookupInMethodHandle
 				);
 				setFunction((java.util.function.Function<Class<?>, MethodHandles.Lookup>)
-					functionProvider.getFunctionAdapter(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
+					functionProvider.getOrBuild(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			}
 		}
 

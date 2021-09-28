@@ -42,7 +42,7 @@ public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<Me
 	public static class ForJava7 extends PrivateLookupInMethodHandleSupplier {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(ConsulterSupplier.class, context).get();
+			MethodHandles.Lookup consulter = Provider.get(context).getOrBuild(ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findSpecial(
 				MethodHandles.Lookup.class, "in",
 				MethodType.methodType(MethodHandles.Lookup.class, Class.class),
@@ -61,7 +61,7 @@ public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<Me
 	public static class ForJava9 extends PrivateLookupInMethodHandleSupplier {
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(ConsulterSupplier.class, context).get();
+			MethodHandles.Lookup consulter = Provider.get(context).getOrBuild(ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findStatic(
 				MethodHandles.class, "privateLookupIn",
 				MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)

@@ -43,7 +43,7 @@ public abstract class SetFieldValueFunction implements TriConsumer<Object, Field
 	public SetFieldValueFunction(Map<Object, Object> context) {
 		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
-			functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
+			functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
 	}
 	
 	public static class ForJava7 extends SetFieldValueFunction {
@@ -51,7 +51,7 @@ public abstract class SetFieldValueFunction implements TriConsumer<Object, Field
 		
 		public ForJava7(Map<Object, Object> context) {
 			super(context);
-			unsafe = Provider.get(context).getFunctionAdapter(UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getOrBuild(UnsafeSupplier.class, context).get();
 		}
 
 		@Override

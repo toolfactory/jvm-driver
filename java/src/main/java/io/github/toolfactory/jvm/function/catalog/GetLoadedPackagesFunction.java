@@ -45,8 +45,8 @@ public abstract class GetLoadedPackagesFunction implements Function<ClassLoader,
 		
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
-			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
+			unsafe = functionProvider.getOrBuild(UnsafeSupplier.class, context).get();
+			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuild(GetDeclaredFieldFunction.class, context);
 			fieldOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
 			);
@@ -67,7 +67,7 @@ public abstract class GetLoadedPackagesFunction implements Function<ClassLoader,
 			
 			public ForJava7(Map<Object, Object> context) {
 				Provider functionProvider = Provider.get(context);
-				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuild(GetDeclaredFieldFunction.class, context);
 				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
 			}
 

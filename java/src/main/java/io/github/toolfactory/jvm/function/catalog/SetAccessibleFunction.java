@@ -48,7 +48,7 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 	public SetAccessibleFunction(Map<Object, Object> context) {
 		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
-			functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
+			functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
 	}
 	
 	public static class ForJava7 extends SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
@@ -57,7 +57,7 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 			Provider functionProvider = Provider.get(context);
-			final MethodHandle accessibleSetterMethodHandle = functionProvider.getFunctionAdapter(
+			final MethodHandle accessibleSetterMethodHandle = functionProvider.getOrBuild(
 				ConsulterSupplier.class, context
 			).get().unreflect(accessibleSetterMethod);
 			setFunction(
@@ -92,15 +92,15 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 				);
 			) {	
 				Provider functionProvider = Provider.get(context);
-				Class<?> methodHandleWrapperClass = functionProvider.getFunctionAdapter(
+				Class<?> methodHandleWrapperClass = functionProvider.getOrBuild(
 					DefineHookClassFunction.class, context
 				).apply(AccessibleObject.class, Streams.toByteArray(inputStream));
-				functionProvider.getFunctionAdapter(SetFieldValueFunction.class, context).accept(
+				functionProvider.getOrBuild(SetFieldValueFunction.class, context).accept(
 					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"),
-					functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
+					functionProvider.getOrBuild(ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
 				);
 				setFunction((java.util.function.BiConsumer<AccessibleObject, Boolean>)
-					functionProvider.getFunctionAdapter(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
+					functionProvider.getOrBuild(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			}
 		}
 		

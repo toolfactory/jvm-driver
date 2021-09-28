@@ -40,7 +40,7 @@ public class HybridDriver extends DefaultDriver {
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		functionProvider.getFunctionAdapter(ConsulterSupplier.Hybrid.class, initializationContext);
+		functionProvider.getOrBuild(ConsulterSupplier.Hybrid.class, initializationContext);
 		super.initHookClassDefiner(functionProvider, initializationContext);
 	}
 

@@ -71,7 +71,7 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 	public static class ForJava17 extends ConsulterSupplier {
 		
 		public ForJava17(Map<Object, Object> context) {
-			sun.misc.Unsafe unsafe = Provider.get(context).getFunctionAdapter(UnsafeSupplier.class, context).get();
+			sun.misc.Unsafe unsafe = Provider.get(context).getOrBuild(UnsafeSupplier.class, context).get();
 			final long allowedModesFieldMemoryOffset = Info.getInstance().is64Bit() ? 12L : 8L;
 			consulter = MethodHandles.lookup();
 			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);

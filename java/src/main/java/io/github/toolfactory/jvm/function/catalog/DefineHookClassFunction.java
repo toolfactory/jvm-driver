@@ -47,7 +47,7 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 	public DefineHookClassFunction(Map<Object, Object> context) {
 		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
-			functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
+			functionProvider.getOrBuild(ThrowExceptionFunction.class, context); 
 	}
 	
 	
@@ -57,10 +57,10 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
+			unsafe = functionProvider.getOrBuild(UnsafeSupplier.class, context).get();
 			defineHookClassMethodHandle = retrieveConsulter(
-				functionProvider.getFunctionAdapter(ConsulterSupplier.class, context).get(),
-				functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get()
+				functionProvider.getOrBuild(ConsulterSupplier.class, context).get(),
+				functionProvider.getOrBuild(PrivateLookupInMethodHandleSupplier.class, context).get()
 			).findSpecial(
 				unsafe.getClass(),
 				"defineAnonymousClass",
@@ -106,14 +106,14 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
 			Provider functionProvider = Provider.get(context);
-			consulter = functionProvider.getFunctionAdapter(ConsulterSupplier.class, context).get();
+			consulter = functionProvider.getOrBuild(ConsulterSupplier.class, context).get();
 			defineHookClassMethodHandle = consulter.findSpecial(
 				MethodHandles.Lookup.class,
 				"defineClass",
 				MethodType.methodType(Class.class, byte[].class),
 				MethodHandles.Lookup.class
 			);
-			privateLookupInMethodHandle = functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get();
+			privateLookupInMethodHandle = functionProvider.getOrBuild(PrivateLookupInMethodHandleSupplier.class, context).get();
 		}
 
 		

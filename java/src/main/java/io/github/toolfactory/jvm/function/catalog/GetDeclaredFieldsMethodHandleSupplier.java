@@ -50,7 +50,7 @@ public abstract class GetDeclaredFieldsMethodHandleSupplier implements Supplier<
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			Provider functionProvider = Provider.get(context);
 			ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+				functionProvider.getOrBuild(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
 			methodHandle = consulter.findSpecial(
 				Class.class,

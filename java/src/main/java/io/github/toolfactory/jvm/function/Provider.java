@@ -33,7 +33,7 @@ public class Provider {
 	}
 
 	
-	public <F> F getFunctionAdapter(Class<? super F> functionClass, Map<Object, Object> context) {
+	public <F> F getOrBuild(Class<? super F> functionClass, Map<Object, Object> context) {
 		String className = functionClass.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
 		F functionAdapter = find(functionClass, context);		
@@ -57,7 +57,7 @@ public class Provider {
 			}
 		}
 		functionClass = functionClass.getSuperclass();
-		return functionClass != null && !functionClass.equals(Object.class)? getFunctionAdapter(functionClass, context) : null;
+		return functionClass != null && !functionClass.equals(Object.class)? getOrBuild(functionClass, context) : null;
 	}
 
 
