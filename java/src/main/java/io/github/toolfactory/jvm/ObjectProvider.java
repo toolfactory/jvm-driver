@@ -60,7 +60,7 @@ public class ObjectProvider {
 		Class<?> superClass = clazz.getSuperclass();
 		if (superClass != null && !superClass.equals(Object.class)) {
 			try {
-				return getOrBuildObject(superClass, context);
+				return (T)getOrBuildObject(superClass, context);
 			} catch (BuildingException exc) {
 				throw new BuildingException(
 					"Unable to build the related object of " + clazz.getName() + ": " + String.join(", ", searchedClasses) + " have been searched without success",
