@@ -27,18 +27,47 @@
 package io.github.toolfactory.jvm;
 
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 
 
-public class HybridDriver extends DefaultDriver {
+interface _GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 	
+	
+	static class ForJava7 implements _GetPackageFunction{
 
-	void initHookClassDefiner(
-		FunctionProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		functionProvider.getFunctionAdapter(_ConsulterSupplier.Hybrid.class, initializationContext);
-		super.initHookClassDefiner(functionProvider, initializationContext);
+		ForJava7(Map<Object, Object> context) {}
+
+		@Override
+		public Package apply(ClassLoader inputOne, String packageName) {
+			return Package.getPackage(packageName);
+		}
+		
 	}
+	
+	static class ForJava9 implements _GetPackageFunction{
+		MethodHandle methodHandle;
+		
+		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			_ConsulterSupplyFunction<?> consulterSupplyFunction = FunctionProvider.get(context).getFunctionAdapter(_ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
+			MethodType methodType = MethodType.methodType(Package.class, String.class);
+			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
 
+		}
+
+		@Override
+		public Package apply(ClassLoader classLoader, String packageName) {
+			try {
+				return (Package)methodHandle.invokeExact(classLoader, packageName);
+			} catch (Throwable exc) {
+				return Throwables.getInstance().throwException(exc);
+			}
+		}
+		
+	}
+	
+	
 }

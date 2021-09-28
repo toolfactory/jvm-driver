@@ -27,20 +27,33 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class FunctionAdapter<F, I, O> {
+import java.util.Map;
+
+
+interface _BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
 	
-	F function;
-	
-	FunctionAdapter() {}
-	
-	FunctionAdapter(F function) {
-		this.function = function;
+	static class ForJava7 implements _BuiltinClassLoaderClassSupplier{
+		
+		ForJava7(Map<Object, Object> context) {}
+		
+		@Override
+		public Class<?> get() {
+			return null;
+		}
+		
 	}
 	
-	FunctionAdapter<F, I, O> setFunction(F function) {
-		this.function = function;
-		return this;
+	static class ForJava9 implements _BuiltinClassLoaderClassSupplier{
+		Class<?> cls;
+		ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
+			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");
+		}
+		
+		@Override
+		public Class<?> get() {
+			return cls;
+		}
+		
 	}
 	
-	abstract O apply(I input);
 }

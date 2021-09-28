@@ -76,6 +76,10 @@ class Throwables {
 		return null;
 	}
 	
+	private <E extends Throwable> void throwException(Throwable exc) throws E {
+		throw (E)exc;
+	}
+	
 	private static class Holder {
 		private static final Throwables INSTANCE = new Throwables();
 
@@ -83,5 +87,5 @@ class Throwables {
 			return INSTANCE;
 		}
 	}
-
+	
 }

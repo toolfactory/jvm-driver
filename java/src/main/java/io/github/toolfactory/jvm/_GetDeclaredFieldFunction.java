@@ -27,20 +27,32 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class FunctionAdapter<F, I, O> {
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Field;
+import java.util.Map;
+
+
+abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
 	
-	F function;
-	
-	FunctionAdapter() {}
-	
-	FunctionAdapter(F function) {
-		this.function = function;
-	}
-	
-	FunctionAdapter<F, I, O> setFunction(F function) {
-		this.function = function;
-		return this;
-	}
-	
-	abstract O apply(I input);
+	static class ForJava7 extends _GetDeclaredFieldFunction {
+		MethodHandle getDeclaredFields;
+		ForJava7(Map<Object, Object> context) {
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			getDeclaredFields = functionProvider.getFunctionAdapter(_GetDeclaredFieldsMethodHandleSupplier.class, context).get();
+		}
+
+		@Override
+		public Field apply(Class<?> cls, String name) {
+			try {
+				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
+					if (field.getName().equals(name)) {
+						return field;
+					}
+				}
+			} catch (Throwable exc) {
+				return Throwables.getInstance().throwException(exc);
+			}
+			return null;
+		}
+	}	
 }

@@ -27,20 +27,47 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class FunctionAdapter<F, I, O> {
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
+
+interface _ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	
-	F function;
-	
-	FunctionAdapter() {}
-	
-	FunctionAdapter(F function) {
-		this.function = function;
+	static class ForJava7 implements _ClassLoaderDelegateClassSupplier{
+		
+		ForJava7(Map<Object, Object> context) {}
+		
+		@Override
+		public Class<?> get() {
+			return null;
+		}
+		
 	}
 	
-	FunctionAdapter<F, I, O> setFunction(F function) {
-		this.function = function;
-		return this;
+	static class ForJava9 implements _ClassLoaderDelegateClassSupplier{
+		Class<?> cls;
+		ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
+			try (
+				InputStream inputStream =
+					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
+				);
+			) {
+				FunctionProvider functionProvider = FunctionProvider.get(context);
+				cls = functionProvider.getFunctionAdapter(
+					_DefineHookClassFunction.class, context
+				).apply(
+					functionProvider.getFunctionAdapter(_BuiltinClassLoaderClassSupplier.class, context).get(), 
+					Streams.toByteArray(inputStream)
+				);
+			}
+		}
+		
+		@Override
+		public Class<?> get() {
+			return cls;
+		}
+		
 	}
 	
-	abstract O apply(I input);
 }

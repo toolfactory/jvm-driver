@@ -1,37 +1,29 @@
 package io.github.toolfactory.jvm;
 
-
-import java.lang.invoke.MethodHandle;
-
 import org.junit.jupiter.api.Test;
 
-import io.github.toolfactory.jvm.DefaultDriver;
-import io.github.toolfactory.jvm.Driver;
-import io.github.toolfactory.jvm.Throwables;
-
-
-@SuppressWarnings("unused")
-public class DefaultDriverTest extends BaseTest {
+public class NativeDriverTest extends BaseTest {
 	private static Driver driver;
 	
 	public static void main(String[] args) {
-		new DefaultDriverTest().getAndSetDirectVolatileTestOne();
+		new NativeDriverTest().getAndSetDirectVolatileTestOne();
 	}
 	
 	Driver getDriver() {
 		if (driver == null) {
 			try {
-				driver = new DefaultDriver();
+				driver = new NativeDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
 				return Throwables.getInstance().throwException(exc);
 			}
 		}
 		return driver;
-	}	
+	}
+	
 	@Test
 	public void getAndSetDirectVolatileTestOne() {
 		super.getAndSetDirectVolatileTestOne();
 	}
-	
+
 }

@@ -31,8 +31,15 @@ abstract class BiConsumerAdapter<F, I, J> {
 	
 	F function;
 	
+	BiConsumerAdapter(){}
+	
 	BiConsumerAdapter(F function) {
 		this.function = function;
+	}
+	
+	BiConsumerAdapter<F, I, J> setFunction(F function) {
+		this.function = function;
+		return this;
 	}
 	
 	abstract void accept(I inputOne, J inputTwo);

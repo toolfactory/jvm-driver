@@ -27,32 +27,33 @@
 package io.github.toolfactory.jvm;
 
 
-import java.io.Closeable;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Driver.InitializationException;
+import sun.misc.Unsafe;
 
-abstract class DriverFunctionSupplier implements Closeable {
 
-	abstract BiFunction<Class<?>, byte[], Class<?>> getDefineHookClassFunction(Lookup mainConsulter, MethodHandle lookupMethod);
+@SuppressWarnings("all")
+interface _UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
 
-	abstract BiFunction<Object, Field, Object> getFieldValueFunction();
-
-	abstract TriConsumer<Object, Field, Object> getSetFieldValueFunction();
-
-	abstract Function<ClassLoader, Collection<Class<?>>> getRetrieveLoadedClassesFunction();
-
-	abstract Function<ClassLoader, Map<String, ?>> getRetrieveLoadedPackagesFunction();
-
-	abstract Function<Class<?>, Object> getAllocateInstanceFunction();
-
-	abstract Supplier<MethodHandles.Lookup> getMethodHandlesLookupSupplyingFunction();
-
-	@Override
-	public abstract void close();
-
+	static class ForJava7 implements _UnsafeSupplier {
+		sun.misc.Unsafe unsafe;
+		
+		ForJava7(Map<Object, Object> context) {
+			try {
+				Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+				theUnsafeField.setAccessible(true);
+				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
+			} catch (Throwable exc) {
+				Throwables.getInstance().throwException(new InitializationException("Exception while retrieving unsafe", exc));
+			}
+		}
+		
+		@Override
+		public sun.misc.Unsafe get() {
+			return unsafe;
+		}
+	
+	}
 }

@@ -27,20 +27,34 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class FunctionAdapter<F, I, O> {
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
+import java.util.Map;
+
+
+abstract class _GetDeclaredMethodsMethodHandleSupplier implements Supplier<MethodHandle> {
+	MethodHandle methodHandle;
 	
-	F function;
-	
-	FunctionAdapter() {}
-	
-	FunctionAdapter(F function) {
-		this.function = function;
+	@Override
+	public MethodHandle get() {
+		return methodHandle;
 	}
 	
-	FunctionAdapter<F, I, O> setFunction(F function) {
-		this.function = function;
-		return this;
-	}
-	
-	abstract O apply(I input);
+	static class ForJava7 extends _GetDeclaredMethodsMethodHandleSupplier {
+		
+		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			_ConsulterSupplyFunction<?> getConsulterFunction =
+				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			methodHandle = consulter.findSpecial(
+				Class.class,
+				"getDeclaredMethods0",
+				MethodType.methodType(Method[].class, boolean.class),
+				Class.class
+			);
+		}
+	}	
 }
