@@ -40,9 +40,9 @@ There are two kinds of driver:
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 All JNI methods used by the native driver and the hybrid driver are supplied by [**narcissus**](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
-    * Windows (x86, x64)
-    * Linux (x86, x64)
-    * MacOs (x64) 
+* Windows (x86, x64)
+* Linux (x86, x64)
+* MacOs (x64) 
 
 <br/>
 
