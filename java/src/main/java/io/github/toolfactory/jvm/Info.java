@@ -30,7 +30,7 @@ package io.github.toolfactory.jvm;
 import java.lang.reflect.Method;
 
 
-public class JVMInfo {
+public class Info {
 
     private final String osArch;
     private boolean is64Bit;
@@ -39,17 +39,17 @@ public class JVMInfo {
     private boolean compressedRefsEnabled;
     private int version;
 
-    public JVMInfo() {
+    public Info() {
     	osArch = System.getProperty("os.arch");
     	init();
     }
 
-    public static JVMInfo getInstance() {
+    public static Info getInstance() {
     	return Holder.getWithinInstance();
     }
 
-    public static JVMInfo create() {
-    	return new JVMInfo();
+    public static Info create() {
+    	return new Info();
     }
 
     private void init() {
@@ -129,9 +129,9 @@ public class JVMInfo {
     }
 
 	private static class Holder {
-		private static final JVMInfo INSTANCE = JVMInfo.create();
+		private static final Info INSTANCE = Info.create();
 
-		private static JVMInfo getWithinInstance() {
+		private static Info getWithinInstance() {
 			return INSTANCE;
 		}
 	}

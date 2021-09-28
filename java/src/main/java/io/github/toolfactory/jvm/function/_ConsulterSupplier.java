@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.JVMInfo;
+import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
@@ -71,7 +71,7 @@ public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Looku
 		
 		public ForJava17(Map<Object, Object> context) {
 			sun.misc.Unsafe unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
-			final long allowedModesFieldMemoryOffset = JVMInfo.getInstance().is64Bit() ? 12L : 8L;
+			final long allowedModesFieldMemoryOffset = Info.getInstance().is64Bit() ? 12L : 8L;
 			consulter = MethodHandles.lookup();
 			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
 		}

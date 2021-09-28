@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
-import io.github.toolfactory.jvm.JVMInfo;
+import io.github.toolfactory.jvm.Info;
 
 
 
@@ -21,7 +21,7 @@ public class Provider {
 	
 	public Provider(String innerClassSuffix, int... versions) {
 		this.innerClassSuffix = innerClassSuffix;
-		int jVMVersion = JVMInfo.getInstance().getVersion();
+		int jVMVersion = Info.getInstance().getVersion();
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int i = 0; i < versions.length; i++) {
 			if (jVMVersion >= versions[i]) {
