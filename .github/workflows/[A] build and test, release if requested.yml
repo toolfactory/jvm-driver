@@ -25,6 +25,7 @@
 #
 name: Build and release if requested
 
+
 on:
   push:
     branches:
@@ -36,6 +37,7 @@ on:
       - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
+
 
 jobs:
 
@@ -70,6 +72,7 @@ jobs:
           git add .
           git commit -am "Generated hook classes" --allow-empty
           git push
+
           
   build-and-test-with-Java-8-and-later-with-7-target:
     name: Build and test with 7 target (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
@@ -100,6 +103,7 @@ jobs:
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
         run: mvn -B clean test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
+
   
   build-and-test-with-Java-8-and-later:
     name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
@@ -133,6 +137,7 @@ jobs:
       - if: endsWith(matrix.java, '18-ea') == true 
         name: Build and test with early access version JDK
         run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml  
+
   
   release:
     needs: [build-and-test-with-Java-8-and-later]
