@@ -39,27 +39,27 @@ import io.github.toolfactory.jvm.function.util.JavaClass;
 
 
 @SuppressWarnings("restriction")
-public abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
+public abstract class DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
 	MethodHandle defineHookClassMethodHandle;
-	_ThrowExceptionFunction throwExceptionFunction;
+	ThrowExceptionFunction throwExceptionFunction;
 	
-	public _DefineHookClassFunction(Map<Object, Object> context) {
+	public DefineHookClassFunction(Map<Object, Object> context) {
 		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
-			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+			functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 	}
 	
 	
-	public static class ForJava7 extends _DefineHookClassFunction {
+	public static class ForJava7 extends DefineHookClassFunction {
 		sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
 			defineHookClassMethodHandle = retrieveConsulter(
-				functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get(),
-				functionProvider.getFunctionAdapter(_PrivateLookupInMethodHandleSupplier.class, context).get()
+				functionProvider.getFunctionAdapter(ConsulterSupplier.class, context).get(),
+				functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get()
 			).findSpecial(
 				unsafe.getClass(),
 				"defineAnonymousClass",
@@ -98,21 +98,21 @@ public abstract class _DefineHookClassFunction implements BiFunction<Class<?>, b
 	}
 	
 	
-	public static class ForJava17 extends _DefineHookClassFunction {
+	public static class ForJava17 extends DefineHookClassFunction {
 		private MethodHandle privateLookupInMethodHandle;
 		private MethodHandles.Lookup consulter;
 		
 		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
 			Provider functionProvider = Provider.get(context);
-			consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();
+			consulter = functionProvider.getFunctionAdapter(ConsulterSupplier.class, context).get();
 			defineHookClassMethodHandle = consulter.findSpecial(
 				MethodHandles.Lookup.class,
 				"defineClass",
 				MethodType.methodType(Class.class, byte[].class),
 				MethodHandles.Lookup.class
 			);
-			privateLookupInMethodHandle = functionProvider.getFunctionAdapter(_PrivateLookupInMethodHandleSupplier.class, context).get();
+			privateLookupInMethodHandle = functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get();
 		}
 
 		

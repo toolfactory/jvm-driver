@@ -39,25 +39,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.Provider;
-import io.github.toolfactory.jvm.function._AllocateInstanceFunction;
-import io.github.toolfactory.jvm.function._BuiltinClassLoaderClassSupplier;
-import io.github.toolfactory.jvm.function._ClassLoaderDelegateClassSupplier;
-import io.github.toolfactory.jvm.function._ConstructorInvokeMethodHandleSupplier;
-import io.github.toolfactory.jvm.function._ConsulterSupplyFunction;
-import io.github.toolfactory.jvm.function._DeepConsulterSupplyFunction;
-import io.github.toolfactory.jvm.function._DefineHookClassFunction;
-import io.github.toolfactory.jvm.function._GetDeclaredConstructorsMethodHandleSupplier;
-import io.github.toolfactory.jvm.function._GetDeclaredFieldFunction;
-import io.github.toolfactory.jvm.function._GetDeclaredFieldsMethodHandleSupplier;
-import io.github.toolfactory.jvm.function._GetDeclaredMethodsMethodHandleSupplier;
-import io.github.toolfactory.jvm.function._GetFieldValueFunction;
-import io.github.toolfactory.jvm.function._GetLoadedClassesFunction;
-import io.github.toolfactory.jvm.function._GetLoadedPackagesFunction;
-import io.github.toolfactory.jvm.function._GetPackageFunction;
-import io.github.toolfactory.jvm.function._MethodInvokeMethodHandleSupplier;
-import io.github.toolfactory.jvm.function._SetAccessibleFunction;
-import io.github.toolfactory.jvm.function._SetFieldValueFunction;
-import io.github.toolfactory.jvm.function._ThrowExceptionFunction;
+import io.github.toolfactory.jvm.function.AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function.BuiltinClassLoaderClassSupplier;
+import io.github.toolfactory.jvm.function.ClassLoaderDelegateClassSupplier;
+import io.github.toolfactory.jvm.function.ConstructorInvokeMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.ConsulterSupplyFunction;
+import io.github.toolfactory.jvm.function.DeepConsulterSupplyFunction;
+import io.github.toolfactory.jvm.function.DefineHookClassFunction;
+import io.github.toolfactory.jvm.function.GetDeclaredConstructorsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.GetDeclaredFieldFunction;
+import io.github.toolfactory.jvm.function.GetDeclaredFieldsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.GetDeclaredMethodsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.GetFieldValueFunction;
+import io.github.toolfactory.jvm.function.GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function.GetLoadedPackagesFunction;
+import io.github.toolfactory.jvm.function.GetPackageFunction;
+import io.github.toolfactory.jvm.function.MethodInvokeMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.SetAccessibleFunction;
+import io.github.toolfactory.jvm.function.SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
@@ -69,7 +69,7 @@ import io.github.toolfactory.jvm.function.util.FunctionAdapter;
 @SuppressWarnings("unchecked")
 public class DefaultDriver implements Driver {	
 	
-	_ThrowExceptionFunction exceptionThrower; 
+	ThrowExceptionFunction exceptionThrower; 
 	Function<Class<?>, Object> allocateInstanceInvoker;	
 	BiFunction<Object, Field, Object> fieldValueRetriever;
 	TriConsumer<Object, Field, Object> fieldValueSetter;
@@ -116,13 +116,13 @@ public class DefaultDriver implements Driver {
 		initLoadedPackagesRetriever(functionProvider, initializationContext);
 	}
 	
-	
+	//Initializers
 	void initExceptionThrower(
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		exceptionThrower = functionProvider.getFunctionAdapter(
-			_ThrowExceptionFunction.class, initializationContext
+			ThrowExceptionFunction.class, initializationContext
 		);
 	}
 	
@@ -132,7 +132,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		loadedPackagesRetriever = functionProvider.getFunctionAdapter(
-			_GetLoadedPackagesFunction.class, initializationContext
+			GetLoadedPackagesFunction.class, initializationContext
 		);
 	}
 
@@ -142,7 +142,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		loadedClassesRetriever = functionProvider.getFunctionAdapter(
-			_GetLoadedClassesFunction.class, initializationContext
+			GetLoadedClassesFunction.class, initializationContext
 		);
 	}
 
@@ -153,7 +153,7 @@ public class DefaultDriver implements Driver {
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
 		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getFunctionAdapter(
-			_DeepConsulterSupplyFunction.class, initializationContext
+			DeepConsulterSupplyFunction.class, initializationContext
 		);
 	}
 
@@ -163,7 +163,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		classLoaderDelegateClass = functionProvider.getFunctionAdapter(
-			_ClassLoaderDelegateClassSupplier.class, initializationContext
+			ClassLoaderDelegateClassSupplier.class, initializationContext
 		).get();
 	}
 
@@ -173,7 +173,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		builtinClassLoaderClass = functionProvider.getFunctionAdapter(
-			_BuiltinClassLoaderClassSupplier.class, initializationContext
+			BuiltinClassLoaderClassSupplier.class, initializationContext
 		).get();
 	}
 
@@ -183,7 +183,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		packageRetriever = functionProvider.getFunctionAdapter(
-			_GetPackageFunction.class, initializationContext
+			GetPackageFunction.class, initializationContext
 		);
 	}
 
@@ -193,7 +193,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueSetter = functionProvider.getFunctionAdapter(
-			_SetFieldValueFunction.class, initializationContext
+			SetFieldValueFunction.class, initializationContext
 		);
 	}
 
@@ -203,7 +203,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueRetriever = functionProvider.getFunctionAdapter(
-			_GetFieldValueFunction.class, initializationContext
+			GetFieldValueFunction.class, initializationContext
 		);
 	}
 
@@ -213,7 +213,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		allocateInstanceInvoker = functionProvider.getFunctionAdapter(
-			_AllocateInstanceFunction.class, initializationContext
+			AllocateInstanceFunction.class, initializationContext
 		);
 	}
 
@@ -223,7 +223,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		methodInvoker = functionProvider.getFunctionAdapter(
-			_MethodInvokeMethodHandleSupplier.class, initializationContext
+			MethodInvokeMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
@@ -233,7 +233,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		constructorInvoker = functionProvider.getFunctionAdapter(
-			_ConstructorInvokeMethodHandleSupplier.class, initializationContext
+			ConstructorInvokeMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
@@ -244,7 +244,7 @@ public class DefaultDriver implements Driver {
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
 		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getFunctionAdapter(
-			_SetAccessibleFunction.class, initializationContext
+			SetAccessibleFunction.class, initializationContext
 		);
 	}
 
@@ -254,7 +254,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredFieldRetriever = functionProvider.getFunctionAdapter(
-			_GetDeclaredFieldFunction.class, initializationContext
+			GetDeclaredFieldFunction.class, initializationContext
 		);
 	}
 
@@ -264,7 +264,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredConstructorsRetriever = functionProvider.getFunctionAdapter(
-			_GetDeclaredConstructorsMethodHandleSupplier.class, initializationContext
+			GetDeclaredConstructorsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
@@ -274,7 +274,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredMethodsRetriever = functionProvider.getFunctionAdapter(
-			_GetDeclaredMethodsMethodHandleSupplier.class, initializationContext
+			GetDeclaredMethodsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
@@ -284,7 +284,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredFieldsRetriever = functionProvider.getFunctionAdapter(
-			_GetDeclaredFieldsMethodHandleSupplier.class, initializationContext
+			GetDeclaredFieldsMethodHandleSupplier.class, initializationContext
 		).get();
 	}
 
@@ -294,7 +294,7 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		hookClassDefiner = functionProvider.getFunctionAdapter(
-			_DefineHookClassFunction.class, initializationContext
+			DefineHookClassFunction.class, initializationContext
 		);
 	}
 
@@ -305,10 +305,17 @@ public class DefaultDriver implements Driver {
 	) {	
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
 		consulterRetriever = (FunctionAdapter<?, Class<?>, MethodHandles.Lookup>)functionProvider.getFunctionAdapter(
-			_ConsulterSupplyFunction.class, initializationContext
+			ConsulterSupplyFunction.class, initializationContext
 		);
 	}
-
+	
+	
+	//Exposed methods
+	@Override
+	public<T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements) {
+		return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+	}
+	
 	
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
@@ -430,10 +437,6 @@ public class DefaultDriver implements Driver {
 		}
 	}
 	
-	@Override
-	public<T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements) {
-		return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
-	}
 	
 	@Override
 	public void close() {

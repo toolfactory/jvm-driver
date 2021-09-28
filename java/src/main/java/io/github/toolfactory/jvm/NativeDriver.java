@@ -31,12 +31,13 @@ import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.Provider;
-import io.github.toolfactory.jvm.function._AllocateInstanceFunction;
-import io.github.toolfactory.jvm.function._GetFieldValueFunction;
-import io.github.toolfactory.jvm.function._GetLoadedClassesFunction;
-import io.github.toolfactory.jvm.function._GetLoadedPackagesFunction;
-import io.github.toolfactory.jvm.function._SetAccessibleFunction;
-import io.github.toolfactory.jvm.function._SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function.GetFieldValueFunction;
+import io.github.toolfactory.jvm.function.GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function.GetLoadedPackagesFunction;
+import io.github.toolfactory.jvm.function.SetAccessibleFunction;
+import io.github.toolfactory.jvm.function.SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
 
 
@@ -44,12 +45,22 @@ import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
 public class NativeDriver extends HybridDriver {
 	
 	
+	void initExceptionThrower(
+		Provider functionProvider,
+		Map<Object, Object> initializationContext
+	) {
+		exceptionThrower = functionProvider.getFunctionAdapter(
+			ThrowExceptionFunction.Native.class, initializationContext
+		);
+	}
+	
+	
 	void initLoadedPackagesRetriever(
 		Provider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		loadedPackagesRetriever = functionProvider.getFunctionAdapter(
-			_GetLoadedPackagesFunction.Native.class, initializationContext
+			GetLoadedPackagesFunction.Native.class, initializationContext
 		);
 	}
 
@@ -60,7 +71,7 @@ public class NativeDriver extends HybridDriver {
 		Map<Object, Object> initializationContext
 	) {
 		loadedClassesRetriever = functionProvider.getFunctionAdapter(
-			_GetLoadedClassesFunction.Native.class, initializationContext
+			GetLoadedClassesFunction.Native.class, initializationContext
 		);
 	}
 
@@ -71,7 +82,7 @@ public class NativeDriver extends HybridDriver {
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueSetter = functionProvider.getFunctionAdapter(
-			_SetFieldValueFunction.Native.class, initializationContext
+			SetFieldValueFunction.Native.class, initializationContext
 		);
 	}
 
@@ -82,7 +93,7 @@ public class NativeDriver extends HybridDriver {
 		Map<Object, Object> initializationContext
 	) {
 		fieldValueRetriever = functionProvider.getFunctionAdapter(
-			_GetFieldValueFunction.Native.class, initializationContext
+			GetFieldValueFunction.Native.class, initializationContext
 		);
 	}
 
@@ -93,7 +104,7 @@ public class NativeDriver extends HybridDriver {
 		Map<Object, Object> initializationContext
 	) {
 		allocateInstanceInvoker = functionProvider.getFunctionAdapter(
-			_AllocateInstanceFunction.Native.class, initializationContext
+			AllocateInstanceFunction.Native.class, initializationContext
 		);
 	}
 	
@@ -105,7 +116,7 @@ public class NativeDriver extends HybridDriver {
 	) {
 		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
 		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getFunctionAdapter(
-			_SetAccessibleFunction.Native.class, initializationContext
+			SetAccessibleFunction.Native.class, initializationContext
 		);
 	}
 

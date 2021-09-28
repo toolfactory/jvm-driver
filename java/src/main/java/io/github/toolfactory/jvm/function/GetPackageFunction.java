@@ -30,33 +30,49 @@ package io.github.toolfactory.jvm.function;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
-public abstract class _GetDeclaredConstructorsMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+public interface GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
+	
+	public static class ForJava7 implements GetPackageFunction{
+
+		public ForJava7(Map<Object, Object> context) {}
+
+		@Override
+		public Package apply(ClassLoader inputOne, String packageName) {
+			return Package.getPackage(packageName);
+		}
+		
 	}
 	
-	public static class ForJava7 extends _GetDeclaredConstructorsMethodHandleSupplier {
+	public static class ForJava9 implements GetPackageFunction{
+		MethodHandle methodHandle;
+		ThrowExceptionFunction throwExceptionFunction;
 		
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			Provider functionProvider = Provider.get(context);
-			_ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
-			methodHandle = consulter.findSpecial(
-				Class.class,
-				"getDeclaredConstructors0",
-				MethodType.methodType(Constructor[].class, boolean.class),
-				Class.class
-			);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
+			MethodType methodType = MethodType.methodType(Package.class, String.class);
+			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 		}
-	}	
+
+		@Override
+		public Package apply(ClassLoader classLoader, String packageName) {
+			try {
+				return (Package)methodHandle.invokeExact(classLoader, packageName);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+		}
+		
+	}
+	
+	
 }

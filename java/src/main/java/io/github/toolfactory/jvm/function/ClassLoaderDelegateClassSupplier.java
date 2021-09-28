@@ -27,51 +27,52 @@
 package io.github.toolfactory.jvm.function;
 
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.util.Classes;
+import io.github.toolfactory.jvm.function.util.Resources;
+import io.github.toolfactory.jvm.function.util.Streams;
 
 
-public abstract class _PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	
-	public static class ForJava7 extends _PrivateLookupInMethodHandleSupplier {
+	public static class ForJava7 implements ClassLoaderDelegateClassSupplier{
 		
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(_ConsulterSupplier.class, context).get();
-			methodHandle = consulter.findSpecial(
-				MethodHandles.Lookup.class, "in",
-				MethodType.methodType(MethodHandles.Lookup.class, Class.class),
-				MethodHandles.Lookup.class
-			);
-		}
+		public ForJava7(Map<Object, Object> context) {}
 		
 		@Override
-		public MethodHandle get() {
-			return methodHandle;
+		public Class<?> get() {
+			return null;
 		}
 		
 	}
 	
-	
-	public static class ForJava9 extends _PrivateLookupInMethodHandleSupplier {
+	public static class ForJava9 implements ClassLoaderDelegateClassSupplier{
+		Class<?> cls;
 		
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(_ConsulterSupplier.class, context).get();
-			methodHandle = consulter.findStatic(
-				MethodHandles.class, "privateLookupIn",
-				MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
-			);
+		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
+			try (
+				InputStream inputStream =
+					Resources.getAsInputStream(this.getClass().getClassLoader(), Classes.class.getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
+				);
+			) {
+				Provider functionProvider = Provider.get(context);
+				cls = functionProvider.getFunctionAdapter(
+					DefineHookClassFunction.class, context
+				).apply(
+					functionProvider.getFunctionAdapter(BuiltinClassLoaderClassSupplier.class, context).get(), 
+					Streams.toByteArray(inputStream)
+				);
+			}
 		}
 		
 		@Override
-		public MethodHandle get() {
-			return methodHandle;
+		public Class<?> get() {
+			return cls;
 		}
-		
 		
 	}
 	

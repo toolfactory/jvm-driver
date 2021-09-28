@@ -27,52 +27,38 @@
 package io.github.toolfactory.jvm.function;
 
 
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaConversionException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.Driver;
+import io.github.toolfactory.jvm.Driver.InitializationException;
+import io.github.toolfactory.jvm.function.template.Supplier;
+import sun.misc.Unsafe;
 
 
 @SuppressWarnings("all")
-public interface _AllocateInstanceFunction extends Function<Class<?>, Object> {
-	
-	public static class ForJava7 implements _AllocateInstanceFunction {
-		final sun.misc.Unsafe unsafe;
-		final _ThrowExceptionFunction throwExceptionFunction;
+public interface UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
+
+	public static class ForJava7 implements UnsafeSupplier {
+		sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
-			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
-			throwExceptionFunction =
-				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context);
-		}
-
-		@Override
-		public Object apply(Class<?> input) {
 			try {
-				return unsafe.allocateInstance(input);
-			} catch (InstantiationException exc) {
-				return throwExceptionFunction.apply(exc);
+				Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+				theUnsafeField.setAccessible(true);
+				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
+			} catch (Throwable exc) {
+				Provider functionProvider = Provider.get(context);
+				ThrowExceptionFunction throwExceptionFunction =
+					functionProvider.getFunctionAdapter(ThrowExceptionFunction.Native.class, context);
+				throwExceptionFunction.apply(new InitializationException("Exception while retrieving unsafe", exc));
 			}
 		}
 		
-	}
-
-	public static interface Native extends _AllocateInstanceFunction {
-		
-		public static class ForJava7 implements Native {
-			
-			public ForJava7(Map<Object, Object> context) {}
-			
-			@Override
-			public Object apply(Class<?> cls) {
-				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
-			}
-			
+		@Override
+		public sun.misc.Unsafe get() {
+			return unsafe;
 		}
-	}
 	
+	}
 }

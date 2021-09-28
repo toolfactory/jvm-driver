@@ -30,34 +30,49 @@ package io.github.toolfactory.jvm.function;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-public abstract class _GetDeclaredFieldsMethodHandleSupplier implements Supplier<MethodHandle> {
+public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
 	MethodHandle methodHandle;
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
-	}
-	
-	public static class ForJava7 extends _GetDeclaredFieldsMethodHandleSupplier {
+	public static class ForJava7 extends PrivateLookupInMethodHandleSupplier {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			Provider functionProvider = Provider.get(context);
-			_ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findSpecial(
-				Class.class,
-				"getDeclaredFields0",
-				MethodType.methodType(Field[].class, boolean.class),
-				Class.class
+				MethodHandles.Lookup.class, "in",
+				MethodType.methodType(MethodHandles.Lookup.class, Class.class),
+				MethodHandles.Lookup.class
 			);
 		}
+		
+		@Override
+		public MethodHandle get() {
+			return methodHandle;
+		}
+		
+	}
+	
+	
+	public static class ForJava9 extends PrivateLookupInMethodHandleSupplier {
+		
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(ConsulterSupplier.class, context).get();
+			methodHandle = consulter.findStatic(
+				MethodHandles.class, "privateLookupIn",
+				MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
+			);
+		}
+		
+		@Override
+		public MethodHandle get() {
+			return methodHandle;
+		}
+		
+		
 	}
 	
 }

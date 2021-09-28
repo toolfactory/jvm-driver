@@ -28,51 +28,37 @@ package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
-public interface _GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
+public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
 	
-	
-	public static class ForJava7 implements _GetPackageFunction{
-
-		public ForJava7(Map<Object, Object> context) {}
-
-		@Override
-		public Package apply(ClassLoader inputOne, String packageName) {
-			return Package.getPackage(packageName);
-		}
+	public static class ForJava7 extends GetDeclaredFieldFunction {
+		MethodHandle getDeclaredFields;
+		ThrowExceptionFunction throwExceptionFunction;
 		
-	}
-	
-	public static class ForJava9 implements _GetPackageFunction{
-		MethodHandle methodHandle;
-		_ThrowExceptionFunction throwExceptionFunction;
-		
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
-			MethodType methodType = MethodType.methodType(Package.class, String.class);
-			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
+			getDeclaredFields = functionProvider.getFunctionAdapter(GetDeclaredFieldsMethodHandleSupplier.class, context).get();
 			throwExceptionFunction =
-				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 		}
 
 		@Override
-		public Package apply(ClassLoader classLoader, String packageName) {
+		public Field apply(Class<?> cls, String name) {
 			try {
-				return (Package)methodHandle.invokeExact(classLoader, packageName);
+				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
+					if (field.getName().equals(name)) {
+						return field;
+					}
+				}
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
+			return null;
 		}
-		
-	}
-	
-	
+	}	
 }

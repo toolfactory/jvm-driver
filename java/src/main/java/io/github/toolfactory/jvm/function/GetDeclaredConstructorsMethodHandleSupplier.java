@@ -29,14 +29,14 @@ package io.github.toolfactory.jvm.function;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-public class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
+public abstract class GetDeclaredConstructorsMethodHandleSupplier implements Supplier<MethodHandle> {
 	MethodHandle methodHandle;
 	
 	@Override
@@ -44,30 +44,19 @@ public class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHa
 		return methodHandle;
 	}
 	
-	public static class ForJava7 extends _ConstructorInvokeMethodHandleSupplier {
+	public static class ForJava7 extends GetDeclaredConstructorsMethodHandleSupplier {
 		
-		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			Provider functionProvider = Provider.get(context);
-			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			_ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
-			methodHandle = consulter.unreflect(method);
+			ConsulterSupplyFunction<?> getConsulterFunction =
+				functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			methodHandle = consulter.findSpecial(
+				Class.class,
+				"getDeclaredConstructors0",
+				MethodType.methodType(Constructor[].class, boolean.class),
+				Class.class
+			);
 		}
-
-	}
-	
-	public static class ForJava9 extends _ConstructorInvokeMethodHandleSupplier {
-		
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
-			Provider functionProvider = Provider.get(context);
-			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			_ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
-			methodHandle = consulter.unreflect(method);
-		}
-		
-	}
-	
+	}	
 }

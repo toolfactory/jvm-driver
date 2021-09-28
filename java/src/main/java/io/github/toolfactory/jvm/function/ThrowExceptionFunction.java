@@ -34,7 +34,7 @@ import io.github.toolfactory.jvm.function.util.Strings;
 
 
 @SuppressWarnings("all")
-public abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
+public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
 	
 	public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
 		Throwable exception = null;
@@ -60,11 +60,11 @@ public abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
 		return null;
 	}
 	
-	public static class ForJava7 extends _ThrowExceptionFunction {
+	public static class ForJava7 extends ThrowExceptionFunction {
 		final sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
-			unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getFunctionAdapter(UnsafeSupplier.class, context).get();
 		}
 
 		@Override
@@ -75,7 +75,7 @@ public abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
 		
 	}
 
-	public static abstract class Native extends _ThrowExceptionFunction {
+	public static abstract class Native extends ThrowExceptionFunction {
 		
 		public static class ForJava7 extends Native {
 			

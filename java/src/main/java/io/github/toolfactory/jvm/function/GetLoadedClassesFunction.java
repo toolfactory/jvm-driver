@@ -28,50 +28,51 @@ package io.github.toolfactory.jvm.function;
 
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function._GetLoadedClassesFunction.Native;
+import io.github.toolfactory.jvm.function.GetFieldValueFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
 
 
 @SuppressWarnings("all")
-public abstract class _GetLoadedPackagesFunction implements Function<ClassLoader, Map<String, ?>> {
+public abstract class GetLoadedClassesFunction implements Function<ClassLoader, Collection<Class<?>>> {
 	
-	public static class ForJava7 extends _GetLoadedPackagesFunction {
+	public static class ForJava7 extends GetLoadedClassesFunction {
 		final sun.misc.Unsafe unsafe;
-		final Long fieldOffset;
+		final Long loadedClassesVectorMemoryOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
-			_GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(_GetDeclaredFieldFunction.class, context);
-			fieldOffset = unsafe.objectFieldOffset(
-				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
+			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
+			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
+			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
+				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
-		}
+		}		
 		
 		@Override
-		public Map<String, ?> apply(ClassLoader classLoader) {
-			return (Map<String, ?>)unsafe.getObject(classLoader, fieldOffset);
-		}		
+		public Collection<Class<?>> apply(ClassLoader classLoader) {
+			return (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
+		}
 		
 	}
 	
-	
-	public static abstract class Native extends _GetLoadedPackagesFunction {
+	public static abstract class Native extends GetLoadedClassesFunction {
 		
 		public static class ForJava7 extends Native {
-			Field packagesField;
-			ForJava7(Map<Object, Object> context) {
+			Field classesField;
+			
+			public ForJava7(Map<Object, Object> context) {
 				Provider functionProvider = Provider.get(context);
-				_GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(_GetDeclaredFieldFunction.class, context);
-				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
+				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
 
 			@Override
-			public Map<String, ?> apply(ClassLoader classLoader) {
-				return (Map<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, packagesField);
+			public Collection<Class<?>> apply(ClassLoader classLoader) {
+				return (Collection<Class<?>>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);
 			}
 		}
 		

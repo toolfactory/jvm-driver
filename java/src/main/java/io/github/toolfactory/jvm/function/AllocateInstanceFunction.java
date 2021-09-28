@@ -27,36 +27,52 @@
 package io.github.toolfactory.jvm.function;
 
 
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.template.Function;
 
 
-public interface _BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
+@SuppressWarnings("all")
+public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
 	
-	public static class ForJava7 implements _BuiltinClassLoaderClassSupplier{
+	public static class ForJava7 implements AllocateInstanceFunction {
+		final sun.misc.Unsafe unsafe;
+		final ThrowExceptionFunction throwExceptionFunction;
 		
-		public ForJava7(Map<Object, Object> context) {}
-		
+		public ForJava7(Map<Object, Object> context) {
+			Provider functionProvider = Provider.get(context);
+			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context);
+		}
+
 		@Override
-		public Class<?> get() {
-			return null;
+		public Object apply(Class<?> input) {
+			try {
+				return unsafe.allocateInstance(input);
+			} catch (InstantiationException exc) {
+				return throwExceptionFunction.apply(exc);
+			}
 		}
 		
 	}
-	
-	public static class ForJava9 implements _BuiltinClassLoaderClassSupplier{
-		Class<?> cls;
+
+	public static interface Native extends AllocateInstanceFunction {
 		
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
-			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");
+		public static class ForJava7 implements Native {
+			
+			public ForJava7(Map<Object, Object> context) {}
+			
+			@Override
+			public Object apply(Class<?> cls) {
+				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
+			}
+			
 		}
-		
-		@Override
-		public Class<?> get() {
-			return cls;
-		}
-		
 	}
 	
 }

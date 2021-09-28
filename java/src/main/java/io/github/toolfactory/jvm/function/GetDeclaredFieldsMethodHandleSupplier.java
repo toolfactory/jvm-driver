@@ -27,53 +27,37 @@
 package io.github.toolfactory.jvm.function;
 
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
-import io.github.toolfactory.jvm.function.util.Classes;
-import io.github.toolfactory.jvm.function.util.Resources;
-import io.github.toolfactory.jvm.function.util.Streams;
 
 
-public interface _ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
+public abstract class GetDeclaredFieldsMethodHandleSupplier implements Supplier<MethodHandle> {
+	MethodHandle methodHandle;
 	
-	public static class ForJava7 implements _ClassLoaderDelegateClassSupplier{
-		
-		public ForJava7(Map<Object, Object> context) {}
-		
-		@Override
-		public Class<?> get() {
-			return null;
-		}
-		
+	@Override
+	public MethodHandle get() {
+		return methodHandle;
 	}
 	
-	public static class ForJava9 implements _ClassLoaderDelegateClassSupplier{
-		Class<?> cls;
+	public static class ForJava7 extends GetDeclaredFieldsMethodHandleSupplier {
 		
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
-			try (
-				InputStream inputStream =
-					Resources.getAsInputStream(this.getClass().getClassLoader(), Classes.class.getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
-				);
-			) {
-				Provider functionProvider = Provider.get(context);
-				cls = functionProvider.getFunctionAdapter(
-					_DefineHookClassFunction.class, context
-				).apply(
-					functionProvider.getFunctionAdapter(_BuiltinClassLoaderClassSupplier.class, context).get(), 
-					Streams.toByteArray(inputStream)
-				);
-			}
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			Provider functionProvider = Provider.get(context);
+			ConsulterSupplyFunction<?> getConsulterFunction =
+				functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			methodHandle = consulter.findSpecial(
+				Class.class,
+				"getDeclaredFields0",
+				MethodType.methodType(Field[].class, boolean.class),
+				Class.class
+			);
 		}
-		
-		@Override
-		public Class<?> get() {
-			return cls;
-		}
-		
 	}
 	
 }

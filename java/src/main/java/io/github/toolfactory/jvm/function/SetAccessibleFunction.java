@@ -41,23 +41,23 @@ import io.github.toolfactory.jvm.function.util.Streams;
 
 
 @SuppressWarnings("unchecked")
-public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
-	_ThrowExceptionFunction throwExceptionFunction;
+public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
+	ThrowExceptionFunction throwExceptionFunction;
 	
-	public _SetAccessibleFunction(Map<Object, Object> context) {
+	public SetAccessibleFunction(Map<Object, Object> context) {
 		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
-			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+			functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 	}
 	
-	public static class ForJava7 extends _SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
+	public static class ForJava7 extends SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
 			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 			Provider functionProvider = Provider.get(context);
 			final MethodHandle accessibleSetterMethodHandle = functionProvider.getFunctionAdapter(
-				_ConsulterSupplier.class, context
+				ConsulterSupplier.class, context
 			).get().unreflect(accessibleSetterMethod);
 			setFunction(
 				new BiConsumer<AccessibleObject, Boolean>() {
@@ -81,7 +81,7 @@ public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acc
 	}
 	
 	
-	public static class ForJava9 extends _SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
+	public static class ForJava9 extends SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {			
 			super(context);
@@ -92,14 +92,14 @@ public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acc
 			) {	
 				Provider functionProvider = Provider.get(context);
 				Class<?> methodHandleWrapperClass = functionProvider.getFunctionAdapter(
-					_DefineHookClassFunction.class, context
+					DefineHookClassFunction.class, context
 				).apply(AccessibleObject.class, Streams.toByteArray(inputStream));
-				functionProvider.getFunctionAdapter(_SetFieldValueFunction.class, context).accept(
+				functionProvider.getFunctionAdapter(SetFieldValueFunction.class, context).accept(
 					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("methodHandleRetriever"),
-					functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
+					functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
 				);
 				setFunction((java.util.function.BiConsumer<AccessibleObject, Boolean>)
-					functionProvider.getFunctionAdapter(_AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
+					functionProvider.getFunctionAdapter(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			} catch (Throwable exc) {
 				throwExceptionFunction.apply(new InitializationException("Could not initialize accessible setter", exc));
 			}
@@ -112,7 +112,7 @@ public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acc
 		
 	}
 	
-	public static abstract class Native<B> extends _SetAccessibleFunction<B>{		
+	public static abstract class Native<B> extends SetAccessibleFunction<B>{		
 		
 		public Native(Map<Object, Object> context) {
 			super(context);

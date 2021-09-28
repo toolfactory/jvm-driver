@@ -55,10 +55,10 @@ public class Provider {
 			} catch (ClassNotFoundException exc) {
 				searchedClasses.add(clsName);
 			} catch (Throwable exc) {
-				_ThrowExceptionFunction throwingFunction = null;
+				ThrowExceptionFunction throwingFunction = null;
 				for (Object function : context.values()) {
-					if (_ThrowExceptionFunction.class.isAssignableFrom(function.getClass())) {
-						throwingFunction = (_ThrowExceptionFunction)function;
+					if (ThrowExceptionFunction.class.isAssignableFrom(function.getClass())) {
+						throwingFunction = (ThrowExceptionFunction)function;
 					}
 				}
 				

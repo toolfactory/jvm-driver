@@ -35,14 +35,14 @@ import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
 @SuppressWarnings("restriction")
-public interface _GetFieldValueFunction extends BiFunction<Object, Field, Object> {
+public interface GetFieldValueFunction extends BiFunction<Object, Field, Object> {
 	
 	
-	public static class ForJava7 implements _GetFieldValueFunction {
+	public static class ForJava7 implements GetFieldValueFunction {
 		final sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
-			unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getFunctionAdapter(UnsafeSupplier.class, context).get();
 		}
 
 		@Override
@@ -106,7 +106,7 @@ public interface _GetFieldValueFunction extends BiFunction<Object, Field, Object
 		}
 	}
 	
-	public static interface Native extends _GetFieldValueFunction {
+	public static interface Native extends GetFieldValueFunction {
 		
 		public static class ForJava7 implements Native {
 			

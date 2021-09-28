@@ -36,21 +36,21 @@ import io.github.toolfactory.jvm.function.util.Classes;
 
 
 @SuppressWarnings({"restriction", "null"})
-public abstract class _SetFieldValueFunction implements TriConsumer<Object, Field, Object> {
-	_ThrowExceptionFunction throwExceptionFunction;
+public abstract class SetFieldValueFunction implements TriConsumer<Object, Field, Object> {
+	ThrowExceptionFunction throwExceptionFunction;
 	
-	public _SetFieldValueFunction(Map<Object, Object> context) {
+	public SetFieldValueFunction(Map<Object, Object> context) {
 		Provider functionProvider = Provider.get(context);
 		throwExceptionFunction =
-			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+			functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 	}
 	
-	public static class ForJava7 extends _SetFieldValueFunction {
+	public static class ForJava7 extends SetFieldValueFunction {
 		final sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
 			super(context);
-			unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			unsafe = Provider.get(context).getFunctionAdapter(UnsafeSupplier.class, context).get();
 		}
 
 		@Override
@@ -119,7 +119,7 @@ public abstract class _SetFieldValueFunction implements TriConsumer<Object, Fiel
 	}
 	
 	
-	public static abstract class Native extends _SetFieldValueFunction{
+	public static abstract class Native extends SetFieldValueFunction{
 		
 		public Native(Map<Object, Object> context) {
 			super(context);

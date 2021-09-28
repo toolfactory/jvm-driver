@@ -27,38 +27,36 @@
 package io.github.toolfactory.jvm.function;
 
 
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-public abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
+public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
 	
-	public static class ForJava7 extends _GetDeclaredFieldFunction {
-		MethodHandle getDeclaredFields;
-		_ThrowExceptionFunction throwExceptionFunction;
+	public static class ForJava7 implements BuiltinClassLoaderClassSupplier{
 		
-		public ForJava7(Map<Object, Object> context) {
-			Provider functionProvider = Provider.get(context);
-			getDeclaredFields = functionProvider.getFunctionAdapter(_GetDeclaredFieldsMethodHandleSupplier.class, context).get();
-			throwExceptionFunction =
-				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
-		}
-
+		public ForJava7(Map<Object, Object> context) {}
+		
 		@Override
-		public Field apply(Class<?> cls, String name) {
-			try {
-				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
-					if (field.getName().equals(name)) {
-						return field;
-					}
-				}
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Class<?> get() {
 			return null;
 		}
-	}	
+		
+	}
+	
+	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
+		Class<?> cls;
+		
+		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
+			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");
+		}
+		
+		@Override
+		public Class<?> get() {
+			return cls;
+		}
+		
+	}
+	
 }

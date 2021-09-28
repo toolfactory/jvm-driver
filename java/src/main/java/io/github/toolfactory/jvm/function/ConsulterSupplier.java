@@ -37,7 +37,7 @@ import io.github.toolfactory.jvm.function.template.Supplier;
 
 
 @SuppressWarnings("restriction")
-public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Lookup> {
+public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup> {
 	MethodHandles.Lookup consulter;
 	
 	@Override
@@ -46,7 +46,7 @@ public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Looku
 	}
 	
 	
-	public static class ForJava7 extends _ConsulterSupplier {
+	public static class ForJava7 extends ConsulterSupplier {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 			Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
@@ -58,7 +58,7 @@ public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Looku
 	}
 	
 	
-	public static class ForJava9 extends _ConsulterSupplier {
+	public static class ForJava9 extends ConsulterSupplier {
 		
 		public ForJava9(Map<Object, Object> context) {
 			consulter = MethodHandles.lookup();
@@ -67,10 +67,10 @@ public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Looku
 	}
 
 	
-	public static class ForJava17 extends _ConsulterSupplier {
+	public static class ForJava17 extends ConsulterSupplier {
 		
 		public ForJava17(Map<Object, Object> context) {
-			sun.misc.Unsafe unsafe = Provider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			sun.misc.Unsafe unsafe = Provider.get(context).getFunctionAdapter(UnsafeSupplier.class, context).get();
 			final long allowedModesFieldMemoryOffset = Info.getInstance().is64Bit() ? 12L : 8L;
 			consulter = MethodHandles.lookup();
 			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
@@ -78,7 +78,7 @@ public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Looku
 		
 	}
 	
-	public static class Hybrid extends	_ConsulterSupplier {
+	public static class Hybrid extends	ConsulterSupplier {
 		
 		public static class ForJava17 extends Hybrid {
 			
@@ -90,7 +90,7 @@ public abstract class _ConsulterSupplier implements Supplier<MethodHandles.Looku
 		}
 	}
 	
-	static class Native extends	_ConsulterSupplier {
+	static class Native extends	ConsulterSupplier {
 		
 		static class ForJava7 extends Native {
 			

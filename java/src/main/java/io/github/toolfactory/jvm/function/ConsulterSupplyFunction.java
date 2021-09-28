@@ -40,16 +40,16 @@ import io.github.toolfactory.jvm.function.util.Streams;
 
 
 @SuppressWarnings("unchecked")
-public abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
+public abstract class ConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
 
 	
-	public static class ForJava7 extends _ConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
+	public static class ForJava7 extends ConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			final MethodHandles.Lookup consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();
-			final MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(_PrivateLookupInMethodHandleSupplier.class, context).get();
-			final _ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+			final MethodHandles.Lookup consulter = functionProvider.getFunctionAdapter(ConsulterSupplier.class, context).get();
+			final MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get();
+			final ThrowExceptionFunction throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 			setFunction(
 				new Function<Class<?>, MethodHandles.Lookup>() { 
 					@Override
@@ -71,27 +71,27 @@ public abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Cla
 		
 	}
 	
-	public static class ForJava9 extends _ConsulterSupplyFunction<java.util.function.Function<Class<?>, MethodHandles.Lookup>> {
+	public static class ForJava9 extends ConsulterSupplyFunction<java.util.function.Function<Class<?>, MethodHandles.Lookup>> {
 		
 		public ForJava9(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
-			final _ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+			final ThrowExceptionFunction throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 			try (
 				InputStream inputStream =
 					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
 				);
 			) {
-				MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(_PrivateLookupInMethodHandleSupplier.class, context).get();
+				MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(PrivateLookupInMethodHandleSupplier.class, context).get();
 				Class<?> methodHandleWrapperClass = functionProvider.getFunctionAdapter(
-					_DefineHookClassFunction.class, context
+					DefineHookClassFunction.class, context
 				).apply(Class.class, Streams.toByteArray(inputStream));
-				functionProvider.getFunctionAdapter(_SetFieldValueFunction.class, context).accept(
+				functionProvider.getFunctionAdapter(SetFieldValueFunction.class, context).accept(
 					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"),
 					privateLookupInMethodHandle
 				);
 				setFunction((java.util.function.Function<Class<?>, MethodHandles.Lookup>)
-					functionProvider.getFunctionAdapter(_AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
+					functionProvider.getFunctionAdapter(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			} catch (Throwable exc) {
 				throwExceptionFunction.apply(new InitializationException("Could not initialize consulter retriever", exc));
 			}
