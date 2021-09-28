@@ -30,8 +30,6 @@ package io.github.toolfactory.jvm.function;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Driver;
-import io.github.toolfactory.jvm.Driver.InitializationException;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import sun.misc.Unsafe;
 
@@ -42,17 +40,10 @@ public interface UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
 	public static class ForJava7 implements UnsafeSupplier {
 		sun.misc.Unsafe unsafe;
 		
-		public ForJava7(Map<Object, Object> context) {
-			try {
-				Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-				theUnsafeField.setAccessible(true);
-				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
-			} catch (Throwable exc) {
-				Provider functionProvider = Provider.get(context);
-				ThrowExceptionFunction throwExceptionFunction =
-					functionProvider.getFunctionAdapter(ThrowExceptionFunction.Native.class, context);
-				throwExceptionFunction.apply(new InitializationException("Exception while retrieving unsafe", exc));
-			}
+		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+			theUnsafeField.setAccessible(true);
+			this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
 		}
 		
 		@Override

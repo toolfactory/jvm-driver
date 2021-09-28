@@ -27,13 +27,13 @@
 package io.github.toolfactory.jvm.function;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Driver.InitializationException;
 import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.function.util.Resources;
@@ -83,7 +83,7 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 	
 	public static class ForJava9 extends SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
 		
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {			
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, IOException, NoSuchFieldException {			
 			super(context);
 			try (
 				InputStream inputStream =
@@ -100,8 +100,6 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 				);
 				setFunction((java.util.function.BiConsumer<AccessibleObject, Boolean>)
 					functionProvider.getFunctionAdapter(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
-			} catch (Throwable exc) {
-				throwExceptionFunction.apply(new InitializationException("Could not initialize accessible setter", exc));
 			}
 		}
 		

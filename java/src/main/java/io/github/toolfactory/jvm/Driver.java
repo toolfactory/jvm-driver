@@ -39,49 +39,50 @@ import java.util.Map;
 
 public interface Driver extends Closeable {
 
-	public void setFieldValue(Object target, Field field, Object value);
-
-	public <T> T getFieldValue(Object target, Field field);
-
-	public Method[] getDeclaredMethods(Class<?> cls);
-
-	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
-
-	public Field[] getDeclaredFields(Class<?> cls);
-
-	public Field getDeclaredField(Class<?> cls, String name);
-
-	public <T> T newInstance(Constructor<T> ctor, Object[] params);
-
-	public <T> T invoke(Method method, Object target, Object[] params);
-
-	public MethodHandles.Lookup getConsulter(Class<?> cls);
-
-	public Class<?> getClassLoaderDelegateClass();
-
-	public Class<?> getBuiltinClassLoaderClass();
-
-	public boolean isClassLoaderDelegate(ClassLoader classLoader);
-
-	public boolean isBuiltinClassLoader(ClassLoader classLoader);
-
-	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
-
-	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
-
-	public Package getPackage(ClassLoader classLoader, String packageName);
-
-	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
-
-	public void setAccessible(AccessibleObject object, boolean flag);
-
 	public <T> T allocateInstance(Class<?> cls);
-	
-	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
-	
+
 	@Override
 	public void close();
 
+	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
+
+	public Class<?> getBuiltinClassLoaderClass();
+
+	public Class<?> getClassLoaderDelegateClass();
+
+	public MethodHandles.Lookup getConsulter(Class<?> cls);
+
+	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
+
+	public Field getDeclaredField(Class<?> cls, String name);
+
+	public Field[] getDeclaredFields(Class<?> cls);
+
+	public Method[] getDeclaredMethods(Class<?> cls);
+
+	public <T> T getFieldValue(Object target, Field field);
+
+	public Package getPackage(ClassLoader classLoader, String packageName);
+
+	public <T> T invoke(Method method, Object target, Object[] params);
+
+	public boolean isBuiltinClassLoader(ClassLoader classLoader);
+
+	public boolean isClassLoaderDelegate(ClassLoader classLoader);
+
+	public <T> T newInstance(Constructor<T> ctor, Object[] params);
+
+	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
+
+	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
+	
+	public void setAccessible(AccessibleObject object, boolean flag);
+	
+	public void setFieldValue(Object target, Field field, Object value);
+
+	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
+	
+	
 	public static class InitializationException extends Exception {
 
 		private static final long serialVersionUID = -3348641464676904231L;
@@ -91,5 +92,4 @@ public interface Driver extends Closeable {
 	    }
 
 	}
-
 }

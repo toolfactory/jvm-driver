@@ -27,12 +27,12 @@
 package io.github.toolfactory.jvm.function;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Driver.InitializationException;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.util.FunctionAdapter;
 import io.github.toolfactory.jvm.function.util.Resources;
@@ -73,10 +73,8 @@ public abstract class ConsulterSupplyFunction<F> extends FunctionAdapter<F, Clas
 	
 	public static class ForJava9 extends ConsulterSupplyFunction<java.util.function.Function<Class<?>, MethodHandles.Lookup>> {
 		
-		public ForJava9(Map<Object, Object> context) {
+		public ForJava9(Map<Object, Object> context) throws IOException, NoSuchFieldException, SecurityException {
 			Provider functionProvider = Provider.get(context);
-			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 			try (
 				InputStream inputStream =
 					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
@@ -92,8 +90,6 @@ public abstract class ConsulterSupplyFunction<F> extends FunctionAdapter<F, Clas
 				);
 				setFunction((java.util.function.Function<Class<?>, MethodHandles.Lookup>)
 					functionProvider.getFunctionAdapter(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
-			} catch (Throwable exc) {
-				throwExceptionFunction.apply(new InitializationException("Could not initialize consulter retriever", exc));
 			}
 		}
 

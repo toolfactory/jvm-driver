@@ -90,30 +90,39 @@ public class DefaultDriver implements Driver {
 
 
 	public DefaultDriver() {
-		Provider functionProvider =
-			new Provider(
-				"ForJava", 7, 9, 14, 17
-			);
+		Provider functionProvider = new Provider(
+			"ForJava", 7, 9, 14, 17
+		);
+		
 		Map<Object, Object> initializationContext = new HashMap<>();
+		
 		initExceptionThrower(functionProvider, initializationContext);	
-		initAllocateInstanceInvoker(functionProvider, initializationContext);	
-		initFieldValueRetriever(functionProvider, initializationContext);
-		initFieldValueSetter(functionProvider, initializationContext);
-		initHookClassDefiner(functionProvider, initializationContext);
-		initConsulterRetriever(functionProvider, initializationContext);
-		initDeclaredFieldsRetriever(functionProvider, initializationContext);
-		initDeclaredMethodsRetriever(functionProvider, initializationContext);
-		initDeclaredConstructorsRetriever(functionProvider, initializationContext);
-		initDeclaredFieldRetriever(functionProvider, initializationContext);
-		initAccessibleSetter(functionProvider, initializationContext);
-		initConstructorInvoker(functionProvider, initializationContext);
-		initMethodInvoker(functionProvider, initializationContext);
-		initPackageRetriever(functionProvider, initializationContext);		
-		initBuiltinClassLoaderClass(functionProvider, initializationContext);	
-		initClassLoaderDelegateClass(functionProvider, initializationContext);
-		replaceConsulterWithDeepConsulter(functionProvider, initializationContext);
-		initLoadedClassesRetriever(functionProvider, initializationContext);
-		initLoadedPackagesRetriever(functionProvider, initializationContext);
+		try {
+			initAllocateInstanceInvoker(functionProvider, initializationContext);	
+			initFieldValueRetriever(functionProvider, initializationContext);
+			initFieldValueSetter(functionProvider, initializationContext);
+			initHookClassDefiner(functionProvider, initializationContext);
+			initConsulterRetriever(functionProvider, initializationContext);
+			initDeclaredFieldsRetriever(functionProvider, initializationContext);
+			initDeclaredMethodsRetriever(functionProvider, initializationContext);
+			initDeclaredConstructorsRetriever(functionProvider, initializationContext);
+			initDeclaredFieldRetriever(functionProvider, initializationContext);
+			initAccessibleSetter(functionProvider, initializationContext);
+			initConstructorInvoker(functionProvider, initializationContext);
+			initMethodInvoker(functionProvider, initializationContext);
+			initPackageRetriever(functionProvider, initializationContext);		
+			initBuiltinClassLoaderClass(functionProvider, initializationContext);	
+			initClassLoaderDelegateClass(functionProvider, initializationContext);
+			replaceConsulterWithDeepConsulter(functionProvider, initializationContext);
+			initLoadedClassesRetriever(functionProvider, initializationContext);
+			initLoadedPackagesRetriever(functionProvider, initializationContext);
+		} catch (Throwable exc) {
+			throwException(
+				new InitializationException(
+					"Could not initiliazed " + this.getClass().getSimpleName(), exc
+				)
+			);
+		}
 	}
 	
 	//Initializers
