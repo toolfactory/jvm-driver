@@ -64,7 +64,8 @@ public abstract class GetLoadedPackagesFunction implements Function<ClassLoader,
 		
 		public static class ForJava7 extends Native {
 			Field packagesField;
-			ForJava7(Map<Object, Object> context) {
+			
+			public ForJava7(Map<Object, Object> context) {
 				Provider functionProvider = Provider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
 				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
