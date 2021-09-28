@@ -36,7 +36,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 There are two kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **hybrid driver** that extends the default driver and uses some JNI functions only when run on on JDK 17 and later
+* the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 All JNI methods used by the native driver and the hybrid driver are supplied by [narcissus](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
