@@ -62,8 +62,12 @@ public class Provider {
 						throwingFunction = (ThrowExceptionFunction)function;
 					}
 				}
+				if (throwingFunction != null) {
+					throwingFunction.apply(exc);
+				} else {
+					throw new RuntimeException(exc);
+				}
 				
-				return throwingFunction.apply(exc);
 			}
 		}
 		cls = cls.getSuperclass();

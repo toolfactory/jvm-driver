@@ -83,7 +83,7 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		
 		public static class ForJava17 extends Hybrid {
 			
-			ForJava17(Map<Object, Object> context) {
+			public ForJava17(Map<Object, Object> context) {
 				consulter = MethodHandles.lookup();
 				io.github.toolfactory.narcissus.Narcissus.setAllowedModes(consulter, -1);
 			}

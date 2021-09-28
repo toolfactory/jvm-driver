@@ -119,7 +119,7 @@ public class DefaultDriver implements Driver {
 		} catch (Throwable exc) {
 			throwException(
 				new InitializationException(
-					"Could not initiliazed " + this.getClass().getSimpleName(), exc
+					"Could not initiliaze " + this.getClass().getSimpleName(), exc
 				)
 			);
 		}
