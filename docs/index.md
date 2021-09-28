@@ -46,8 +46,6 @@ All JNI methods used by the native and the hybrid driver are supplied by [**narc
 
 <br/>
 
-<br/>
-
 ## Using
 
 To create a default driver instance you should use this code:
@@ -66,6 +64,8 @@ To create a native driver instance you should use this code:
 
 io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.NativeDriver();
 ```
+
+<br/>
 
 <br/>
 
