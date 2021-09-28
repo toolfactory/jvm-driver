@@ -46,6 +46,8 @@ All JNI methods used by the native and the hybrid driver are supplied by [**narc
 
 <br/>
 
+<br/>
+
 ## Using
 
 To create a default driver instance you should use this code:
