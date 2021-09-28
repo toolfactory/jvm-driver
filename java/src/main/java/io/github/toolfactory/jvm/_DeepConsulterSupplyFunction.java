@@ -63,6 +63,8 @@ abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<
 			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 			);
+			final _ThrowExceptionFunction throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 			setFunction(
 				new Function<Class<?>, MethodHandles.Lookup>() {
 					@Override
@@ -70,7 +72,7 @@ abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<
 						try {
 							return (MethodHandles.Lookup)methodHandle.invoke(cls, -1);
 						} catch (Throwable exc) {
-							return Throwables.getInstance().throwException(exc);
+							return throwExceptionFunction.apply(exc);
 						}
 					}
 				}
@@ -94,6 +96,8 @@ abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<
 			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 			);
+			final _ThrowExceptionFunction throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 			setFunction(
 				new Function<Class<?>, MethodHandles.Lookup>() {
 					@Override
@@ -101,7 +105,7 @@ abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<
 						try {
 							return (MethodHandles.Lookup)mthHandle.invoke(cls, null, -1);
 						} catch (Throwable exc) {
-							return Throwables.getInstance().throwException(exc);
+							return throwExceptionFunction.apply(exc);
 						}
 					}
 				}

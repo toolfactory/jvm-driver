@@ -36,9 +36,13 @@ abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String,
 	
 	static class ForJava7 extends _GetDeclaredFieldFunction {
 		MethodHandle getDeclaredFields;
+		_ThrowExceptionFunction throwExceptionFunction;
+		
 		ForJava7(Map<Object, Object> context) {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			getDeclaredFields = functionProvider.getFunctionAdapter(_GetDeclaredFieldsMethodHandleSupplier.class, context).get();
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 		}
 
 		@Override
@@ -50,7 +54,7 @@ abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String,
 					}
 				}
 			} catch (Throwable exc) {
-				return Throwables.getInstance().throwException(exc);
+				return throwExceptionFunction.apply(exc);
 			}
 			return null;
 		}

@@ -76,7 +76,9 @@ public interface Driver extends Closeable {
 	public void setAccessible(AccessibleObject object, boolean flag);
 
 	public <T> T allocateInstance(Class<?> cls);
-
+	
+	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
+	
 	@Override
 	public void close();
 

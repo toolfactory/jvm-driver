@@ -46,7 +46,10 @@ interface _UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
 				theUnsafeField.setAccessible(true);
 				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
 			} catch (Throwable exc) {
-				Throwables.getInstance().throwException(new InitializationException("Exception while retrieving unsafe", exc));
+				FunctionProvider functionProvider = FunctionProvider.get(context);
+				_ThrowExceptionFunction throwExceptionFunction =
+					functionProvider.getFunctionAdapter(_ThrowExceptionFunction.Native.class, context);
+				throwExceptionFunction.apply(new InitializationException("Exception while retrieving unsafe", exc));
 			}
 		}
 		

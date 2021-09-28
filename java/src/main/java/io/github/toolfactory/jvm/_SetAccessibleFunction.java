@@ -38,10 +38,18 @@ import io.github.toolfactory.jvm.Driver.InitializationException;
 
 @SuppressWarnings("unchecked")
 abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
-
+	_ThrowExceptionFunction throwExceptionFunction;
+	
+	_SetAccessibleFunction(Map<Object, Object> context) {
+		FunctionProvider functionProvider = FunctionProvider.get(context);
+		throwExceptionFunction =
+			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+	}
+	
 	static class ForJava7 extends _SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
 		
 		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
+			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			final MethodHandle accessibleSetterMethodHandle = functionProvider.getFunctionAdapter(
@@ -54,7 +62,7 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 						try {
 							accessibleSetterMethodHandle.invoke(accessibleObject, flag);
 						} catch (Throwable exc) {
-							Throwables.getInstance().throwException(exc);
+							throwExceptionFunction.apply(exc);
 						}
 					}
 				}
@@ -72,6 +80,7 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 	static class ForJava9 extends _SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
 		
 		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {			
+			super(context);
 			try (
 				InputStream inputStream =
 					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
@@ -88,7 +97,7 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 				setFunction((java.util.function.BiConsumer<AccessibleObject, Boolean>)
 					functionProvider.getFunctionAdapter(_AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			} catch (Throwable exc) {
-				Throwables.getInstance().throwException(new InitializationException("Could not initialize accessible setter", exc));
+				throwExceptionFunction.apply(new InitializationException("Could not initialize accessible setter", exc));
 			}
 		}
 		
@@ -99,11 +108,16 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 		
 	}
 	
-	static abstract class Native<B> extends _SetAccessibleFunction<B>{
+	static abstract class Native<B> extends _SetAccessibleFunction<B>{		
 		
+		Native(Map<Object, Object> context) {
+			super(context);
+		}
+
 		static class ForJava7 extends Native<BiConsumer<AccessibleObject, Boolean>> {
 			
 			ForJava7(Map<Object, Object> context) {
+				super(context);
 				setFunction(new BiConsumer<AccessibleObject, Boolean>() {
 					@Override
 					public void accept(AccessibleObject accessibleObject, Boolean flag) {

@@ -39,9 +39,13 @@ interface _AllocateInstanceFunction extends Function<Class<?>, Object> {
 	
 	static class ForJava7 implements _AllocateInstanceFunction {
 		final sun.misc.Unsafe unsafe;
+		final _ThrowExceptionFunction throwExceptionFunction;
 		
 		ForJava7(Map<Object, Object> context) {
-			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context);
 		}
 
 		@Override
@@ -49,7 +53,7 @@ interface _AllocateInstanceFunction extends Function<Class<?>, Object> {
 			try {
 				return unsafe.allocateInstance(input);
 			} catch (InstantiationException exc) {
-				return Throwables.getInstance().throwException(exc);
+				return throwExceptionFunction.apply(exc);
 			}
 		}
 		

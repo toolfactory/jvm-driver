@@ -35,12 +35,10 @@ import java.io.OutputStream;
 
 class Streams {
 
-	static byte[] toByteArray(InputStream inputStream) {
+	static byte[] toByteArray(InputStream inputStream) throws IOException {
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			copy(inputStream, outputStream);
 			return outputStream.toByteArray();
-		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
 		}
 	}
 

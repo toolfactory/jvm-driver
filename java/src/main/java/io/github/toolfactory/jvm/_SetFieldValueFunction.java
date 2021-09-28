@@ -33,20 +33,27 @@ import java.util.Map;
 
 
 @SuppressWarnings({"restriction", "null"})
-interface _SetFieldValueFunction extends TriConsumer<Object, Field, Object> {
+abstract class _SetFieldValueFunction implements TriConsumer<Object, Field, Object> {
+	_ThrowExceptionFunction throwExceptionFunction;
 	
+	_SetFieldValueFunction(Map<Object, Object> context) {
+		FunctionProvider functionProvider = FunctionProvider.get(context);
+		throwExceptionFunction =
+			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+	}
 	
-	static class ForJava7 implements _SetFieldValueFunction {
+	static class ForJava7 extends _SetFieldValueFunction {
 		final sun.misc.Unsafe unsafe;
 		
 		ForJava7(Map<Object, Object> context) {
+			super(context);
 			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
 		}
 
 		@Override
 		public void accept(Object origTarget, Field field, Object value) {
 			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-				Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
+				throwExceptionFunction.apply("Value {} is not assignable to {}", value , field.getName());
 			}
 			Object target = Modifier.isStatic(field.getModifiers())?
 				field.getDeclaringClass() :
@@ -109,16 +116,22 @@ interface _SetFieldValueFunction extends TriConsumer<Object, Field, Object> {
 	}
 	
 	
-	static interface Native extends _SetFieldValueFunction{
+	static abstract class Native extends _SetFieldValueFunction{
 		
-		static class ForJava7 implements Native {
+		Native(Map<Object, Object> context) {
+			super(context);
+		}
+
+		static class ForJava7 extends Native {
 			
-			ForJava7(Map<Object, Object> context) {}
+			ForJava7(Map<Object, Object> context) {
+				super(context);
+			}
 
 			@Override
 			public void accept(Object target, Field field, Object value) {
 				if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-					Throwables.getInstance().throwException("Value {} is not assignable to {}", value , field.getName());
+					throwExceptionFunction.apply("Value {} is not assignable to {}", value , field.getName());
 				}
 				if (Modifier.isStatic(field.getModifiers())) {
 					io.github.toolfactory.narcissus.Narcissus.setStaticField(field, value);

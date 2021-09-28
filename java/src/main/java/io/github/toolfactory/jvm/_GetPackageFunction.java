@@ -49,13 +49,16 @@ interface _GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 	
 	static class ForJava9 implements _GetPackageFunction{
 		MethodHandle methodHandle;
+		_ThrowExceptionFunction throwExceptionFunction;
 		
 		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			_ConsulterSupplyFunction<?> consulterSupplyFunction = FunctionProvider.get(context).getFunctionAdapter(_ConsulterSupplyFunction.class, context);
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
 			MethodType methodType = MethodType.methodType(Package.class, String.class);
 			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
-
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 		}
 
 		@Override
@@ -63,7 +66,7 @@ interface _GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 			try {
 				return (Package)methodHandle.invokeExact(classLoader, packageName);
 			} catch (Throwable exc) {
-				return Throwables.getInstance().throwException(exc);
+				return throwExceptionFunction.apply(exc);
 			}
 		}
 		

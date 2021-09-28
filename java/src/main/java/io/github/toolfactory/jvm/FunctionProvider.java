@@ -7,7 +7,7 @@ import java.util.TreeSet;
 
 
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("all")
 class FunctionProvider {
 	private final String innerClassSuffix;
 	private final static String CLASS_NAME;
@@ -33,32 +33,35 @@ class FunctionProvider {
 	<F> F getFunctionAdapter(Class<? super F> cls, Map<Object, Object> context) {
 		String className = cls.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		try {
-			F functionAdapter = (F) context.get(className);
-			if (functionAdapter != null) {
+		F functionAdapter = (F) context.get(className);
+		if (functionAdapter != null) {
+			return functionAdapter;
+		} else {
+			for (Object function : context.values()) {
+				if (cls.isAssignableFrom(function.getClass())) {
+					return (F)function;
+				}
+			}
+		}
+		context.put(CLASS_NAME, this);
+		for (int version : registeredVersions) {
+			String clsName = className + "$" +  innerClassSuffix + version;
+			try {
+				functionAdapter = (F) Class.forName(clsName).getDeclaredConstructor(Map.class).newInstance(context);
+				context.put(className, functionAdapter);
 				return functionAdapter;
-			} else {
+			} catch (ClassNotFoundException exc) {
+				searchedClasses.add(clsName);
+			} catch (Throwable exc) {
+				_ThrowExceptionFunction throwingFunction = null;
 				for (Object function : context.values()) {
-					if (cls.isAssignableFrom(function.getClass())) {
-						return (F)function;
+					if (_ThrowExceptionFunction.class.isAssignableFrom(function.getClass())) {
+						throwingFunction = (_ThrowExceptionFunction)function;
 					}
 				}
+				
+				return throwingFunction.apply(exc);
 			}
-			context.put(CLASS_NAME, this);
-			for (int version : registeredVersions) {
-				String clsName = className + "$" +  innerClassSuffix + version;
-				try {
-					functionAdapter = (F) Class.forName(clsName).getDeclaredConstructor(Map.class).newInstance(context);
-					context.put(className, functionAdapter);
-					return functionAdapter;
-				} catch (ClassNotFoundException exc) {
-					searchedClasses.add(clsName);
-				} catch (Throwable exc) {
-					return Throwables.getInstance().throwException(exc);
-				}
-			}
-		} finally {
-			context.remove(CLASS_NAME);
 		}
 		cls = cls.getSuperclass();
 		return cls != null && !cls.equals(Object.class)? getFunctionAdapter(cls, context) : null;

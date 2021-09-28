@@ -7,9 +7,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.toolfactory.jvm.Driver;
-import io.github.toolfactory.jvm.Throwables;
-
 
 @SuppressWarnings("unused")
 abstract class BaseTest {
@@ -103,7 +100,7 @@ abstract class BaseTest {
 			assertTrue(charValue == 'a');
 		} catch (Throwable exc) {
 			exc.printStackTrace();
-			Throwables.getInstance().throwException(exc);
+			getDriver().throwException(exc);
 		}
 	}
 	

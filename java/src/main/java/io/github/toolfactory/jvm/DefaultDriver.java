@@ -43,6 +43,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public class DefaultDriver implements Driver {	
 	
+	_ThrowExceptionFunction exceptionThrower; 
 	Function<Class<?>, Object> allocateInstanceInvoker;	
 	BiFunction<Object, Field, Object> fieldValueRetriever;
 	TriConsumer<Object, Field, Object> fieldValueSetter;
@@ -68,7 +69,7 @@ public class DefaultDriver implements Driver {
 				"ForJava", 7, 9, 14, 17
 			);
 		Map<Object, Object> initializationContext = new HashMap<>();
-
+		initExceptionThrower(functionProvider, initializationContext);	
 		initAllocateInstanceInvoker(functionProvider, initializationContext);	
 		initFieldValueRetriever(functionProvider, initializationContext);
 		initFieldValueSetter(functionProvider, initializationContext);
@@ -88,7 +89,18 @@ public class DefaultDriver implements Driver {
 		initLoadedClassesRetriever(functionProvider, initializationContext);
 		initLoadedPackagesRetriever(functionProvider, initializationContext);
 	}
-
+	
+	
+	void initExceptionThrower(
+		FunctionProvider functionProvider,
+		Map<Object, Object> initializationContext
+	) {
+		exceptionThrower = functionProvider.getFunctionAdapter(
+			_ThrowExceptionFunction.class, initializationContext
+		);
+	}
+	
+	
 	void initLoadedPackagesRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -98,6 +110,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initLoadedClassesRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -107,6 +120,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void replaceConsulterWithDeepConsulter(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -117,6 +131,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initClassLoaderDelegateClass(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -126,6 +141,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initBuiltinClassLoaderClass(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -135,6 +151,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initPackageRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -144,6 +161,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initFieldValueSetter(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -153,6 +171,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initFieldValueRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -162,6 +181,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initAllocateInstanceInvoker(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -171,6 +191,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initMethodInvoker(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -180,6 +201,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initConstructorInvoker(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -189,6 +211,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initAccessibleSetter(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -199,6 +222,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initDeclaredFieldRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -208,6 +232,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initDeclaredConstructorsRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -217,6 +242,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initDeclaredMethodsRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -226,6 +252,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initDeclaredFieldsRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -235,6 +262,7 @@ public class DefaultDriver implements Driver {
 		).get();
 	}
 
+	
 	void initHookClassDefiner(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -244,6 +272,7 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	void initConsulterRetriever(
 		FunctionProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -254,26 +283,31 @@ public class DefaultDriver implements Driver {
 		);
 	}
 
+	
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
 		accessibleSetter.accept(object, flag);
 	}
 
+	
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
 		return hookClassDefiner.apply(clientClass, byteCode);
 	}
 
+	
 	@Override
 	public Package getPackage(ClassLoader classLoader, String packageName) {
 		return packageRetriever.apply(classLoader, packageName);
 	}
 
+	
 	@Override
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
 		return loadedClassesRetriever.apply(classLoader);
 	}
 
+	
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
 		return loadedPackagesRetriever.apply(classLoader);
@@ -325,7 +359,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (T)methodInvoker.invoke(method, target, params);
 		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
+			return throwException(exc);
 		}
 	}
 
@@ -334,7 +368,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (T)constructorInvoker.invoke(ctor, params);
 		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
+			return throwException(exc);
 		}
 	}
 
@@ -348,7 +382,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (Field[])declaredFieldsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
+			return throwException(exc);
 		}
 	}
 
@@ -357,7 +391,7 @@ public class DefaultDriver implements Driver {
 		try {
 			return (Constructor<T>[])declaredConstructorsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
+			return throwException(exc);
 		}
 	}
 
@@ -366,12 +400,18 @@ public class DefaultDriver implements Driver {
 		try {
 			return (Method[])declaredMethodsRetriever.invoke(cls, false);
 		} catch (Throwable exc) {
-			return Throwables.getInstance().throwException(exc);
+			return throwException(exc);
 		}
 	}
-
+	
+	@Override
+	public<T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements) {
+		return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+	}
+	
 	@Override
 	public void close() {
+		exceptionThrower = null;
 		allocateInstanceInvoker = null;	
 		fieldValueRetriever = null;
 		fieldValueSetter = null;

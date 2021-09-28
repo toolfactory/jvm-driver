@@ -1,13 +1,7 @@
 package io.github.toolfactory.jvm;
 
 
-import java.lang.invoke.MethodHandle;
-
 import org.junit.jupiter.api.Test;
-
-import io.github.toolfactory.jvm.DefaultDriver;
-import io.github.toolfactory.jvm.Driver;
-import io.github.toolfactory.jvm.Throwables;
 
 
 @SuppressWarnings("unused")
@@ -24,7 +18,7 @@ public class DefaultDriverTest extends BaseTest {
 				driver = new DefaultDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
-				return Throwables.getInstance().throwException(exc);
+				return getDriver().throwException(exc);
 			}
 		}
 		return driver;

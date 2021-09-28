@@ -26,66 +26,65 @@
  */
 package io.github.toolfactory.jvm;
 
-import java.lang.reflect.Field;
 
-import sun.misc.Unsafe;
+import java.util.Map;
+
 
 @SuppressWarnings("all")
-class Throwables {
-	private static Unsafe unsafe;
+abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
 	
-	private Throwables() {
-		
-	}
-	
-	public static Throwables getInstance() {
-		return Holder.getWithinInstance();
-	}
-	
-	static {
-		try {
-			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-			theUnsafeField.setAccessible(true);
-			unsafe = (Unsafe)theUnsafeField.get(null);
-		} catch (Throwable exc) {
-			throw new RuntimeException("");
-		}
-	}
-
-	<T> T throwException(Object obj, Object... arguments) {
+	public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
 		Throwable exception = null;
 		StackTraceElement[] stackTraceOfException = null;
-		if (obj instanceof String) {
-			if (arguments == null || arguments.length == 0) {
-				exception = new Exception((String)obj);
+		if (exceptionOrMessage instanceof String) {
+			if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
+				exception = new Exception((String)exceptionOrMessage);
 			} else {
-				exception = new Exception(Strings.compile((String)obj, arguments));
+				exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
 			}
 			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
 			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
 		} else {
-			exception = (Throwable)obj;
+			exception = (Throwable)exceptionOrMessage;
 			StackTraceElement[] stackTrace = exception.getStackTrace();
 			stackTraceOfException = new StackTraceElement[stackTrace.length + 1];
 			stackTraceOfException[0] = Thread.currentThread().getStackTrace()[2];
 			System.arraycopy(stackTrace, 0, stackTraceOfException, 1, stackTrace.length);
 		}
 		exception.setStackTrace(stackTraceOfException);
-		unsafe.throwException(exception);
+		accept(exception);
 		return null;
 	}
 	
-	private <E extends Throwable> void throwException(Throwable exc) throws E {
-		throw (E)exc;
-	}
-	
-	private static class Holder {
-		private static final Throwables INSTANCE = new Throwables();
+	static class ForJava7 extends _ThrowExceptionFunction {
+		final sun.misc.Unsafe unsafe;
+		
+		ForJava7(Map<Object, Object> context) {
+			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
+		}
 
-		private static Throwables getWithinInstance() {
-			return INSTANCE;
+		@Override
+		public void accept(Throwable exception) {
+			unsafe.throwException(exception);			
+		}
+
+		
+	}
+
+	static abstract class Native extends _ThrowExceptionFunction {
+		
+		static class ForJava7 extends Native {
+			
+			ForJava7(Map<Object, Object> context) {}
+			
+			@Override
+			public void accept(Throwable exception) {
+				io.github.toolfactory.narcissus.Narcissus.sneakyThrow(exception);			
+			}
+			
 		}
 	}
+	
 	
 }

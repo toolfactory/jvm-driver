@@ -37,12 +37,20 @@ import java.util.Map;
 @SuppressWarnings("restriction")
 abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
 	MethodHandle defineHookClassMethodHandle;
-
+	_ThrowExceptionFunction throwExceptionFunction;
+	
+	_DefineHookClassFunction(Map<Object, Object> context) {
+		FunctionProvider functionProvider = FunctionProvider.get(context);
+		throwExceptionFunction =
+			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+	}
+	
 	
 	static class ForJava7 extends _DefineHookClassFunction {
 		sun.misc.Unsafe unsafe;
 		
 		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
+			super(context);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
 			defineHookClassMethodHandle = retrieveConsulter(
@@ -65,11 +73,12 @@ abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], 
 			try {
 				return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
 			} catch (Throwable exc) {
-				return Throwables.getInstance().throwException(exc);
+				return throwExceptionFunction.apply(exc);
 			}
 		}
 		
 	}
+	
 	
 	static class ForJava9 extends ForJava7 {
 		
@@ -84,11 +93,13 @@ abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], 
 		
 	}
 	
+	
 	static class ForJava17 extends _DefineHookClassFunction {
 		private MethodHandle privateLookupInMethodHandle;
 		private MethodHandles.Lookup consulter;
 		
 		ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			super(context);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();
 			defineHookClassMethodHandle = consulter.findSpecial(
@@ -113,13 +124,13 @@ abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], 
 							try {
 								return Class.forName(javaClass.getName());
 							} catch (Throwable inExc) {
-								return Throwables.getInstance().throwException(inExc);
+								return throwExceptionFunction.apply(inExc);
 							}
 						};
 					});
 				}
 			} catch (Throwable exc) {
-				return Throwables.getInstance().throwException(exc);
+				return throwExceptionFunction.apply(exc);
 			}
 		}
 		

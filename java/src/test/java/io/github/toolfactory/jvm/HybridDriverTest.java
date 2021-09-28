@@ -17,7 +17,7 @@ public class HybridDriverTest extends BaseTest {
 				driver = new HybridDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
-				return Throwables.getInstance().throwException(exc);
+				return getDriver().throwException(exc);
 			}
 		}
 		return driver;
