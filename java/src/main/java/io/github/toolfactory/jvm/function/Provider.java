@@ -12,7 +12,7 @@ import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 @SuppressWarnings("all")
 public class Provider {
-	private final String innerClassSuffix;
+	private final String classSuffix;
 	private final static String CLASS_NAME;
 	final Integer[] registeredVersions;
 	
@@ -20,8 +20,8 @@ public class Provider {
 		CLASS_NAME = Provider.class.getName();
 	}
 	
-	public Provider(String innerClassSuffix, int... versions) {
-		this.innerClassSuffix = innerClassSuffix;
+	public Provider(String classSuffix, int... versions) {
+		this.classSuffix = classSuffix;
 		int jVMVersion = Info.getInstance().getVersion();
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int i = 0; i < versions.length; i++) {
@@ -36,35 +36,43 @@ public class Provider {
 	public <F> F getOrBuildFunction(Class<? super F> functionClass, Map<Object, Object> context) {
 		String className = functionClass.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		F functionAdapter = getFunction(functionClass, context);		
+		F function = getFunction(functionClass, context);		
 		context.put(CLASS_NAME, this);
 		for (int version : registeredVersions) {
-			String clsName = className + "$" +  innerClassSuffix + version;
+			String clsName = className + "$" +  classSuffix + version;
 			try {
-				functionAdapter = (F) Class.forName(clsName).getDeclaredConstructor(Map.class).newInstance(context);
-				context.put(className, functionAdapter);
-				return functionAdapter;
+				Class<?> functionEffectiveClass = null;
+				try {
+					functionEffectiveClass = Class.forName(clsName);
+				} catch (ClassNotFoundException exc) {
+					searchedClasses.add(clsName);
+					clsName = className + classSuffix + version;
+					functionEffectiveClass = Class.forName(clsName);
+				}
+				function = (F) functionEffectiveClass.getDeclaredConstructor(Map.class).newInstance(context);
+				context.put(className, function);
+				return function;
 			} catch (ClassNotFoundException exc) {
 				searchedClasses.add(clsName);
 			} catch (Throwable exc) {
-				ThrowExceptionFunction throwingFunction = getFunction(ThrowExceptionFunction.class, context);
-				if (throwingFunction != null) {
-					throwingFunction.apply(exc);
-				} else {
-					throw new RuntimeException(exc);
-				}
-				
+				throw new FunctionBuildingException("Unable to build the related function of " + functionClass.getName(), exc);
 			}
 		}
 		functionClass = functionClass.getSuperclass();
-		return functionClass != null && !functionClass.equals(Object.class)? getOrBuildFunction(functionClass, context) : null;
+		if (functionClass != null && !functionClass.equals(Object.class)) {
+			return getOrBuildFunction(functionClass, context);
+		} else {
+			throw new FunctionBuildingException(
+				"Unable to build the related function of " + functionClass.getName() + ": " + String.join(", ", searchedClasses) + " have been searched without success"
+			);
+		}
 	}
 
 
 	public static <F> F getFunction(Class<? super F> functionClass, Map<Object, Object> context) {
-		F functionAdapter = (F) context.get(functionClass.getName());
-		if (functionAdapter != null) {
-			return functionAdapter;
+		F functionFound = (F) context.get(functionClass.getName());
+		if (functionFound != null) {
+			return functionFound;
 		} else {
 			for (Object function : context.values()) {
 				if (functionClass.isAssignableFrom(function.getClass())) {
@@ -79,4 +87,16 @@ public class Provider {
 		return (Provider)context.get(CLASS_NAME);
 	}
 	
+	
+	public static class FunctionBuildingException extends RuntimeException {
+
+	    public FunctionBuildingException(String message, Throwable cause) {
+	        super(message, cause);
+	    }
+	    
+	    public FunctionBuildingException(String message) {
+	        super(message);
+	    }
+
+	}
 }

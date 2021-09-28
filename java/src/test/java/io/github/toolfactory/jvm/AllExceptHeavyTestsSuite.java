@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 @SelectClasses({
     DefaultDriverTest.class,
     HybridDriverTest.class,
-    NativeDriver.class
+    NativeDriverTest.class
 })
 @ExcludeTags("Heavy")
 public class AllExceptHeavyTestsSuite {
