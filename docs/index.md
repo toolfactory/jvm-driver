@@ -65,6 +65,8 @@ To create a native driver instance you should use this code:
 io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.NativeDriver();
 ```
 
+<br/>
+
 The methods exposed by the Driver interface are the following:
 ```java                                                                                                     
 public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
