@@ -24,14 +24,18 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Consumer;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Strings;
+
 
 @SuppressWarnings("all")
-abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
+public abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
 	
 	public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
 		Throwable exception = null;
@@ -57,10 +61,10 @@ abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
 		return null;
 	}
 	
-	static class ForJava7 extends _ThrowExceptionFunction {
+	public static class ForJava7 extends _ThrowExceptionFunction {
 		final sun.misc.Unsafe unsafe;
 		
-		ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) {
 			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
 		}
 
@@ -72,11 +76,11 @@ abstract class _ThrowExceptionFunction implements Consumer<Throwable> {
 		
 	}
 
-	static abstract class Native extends _ThrowExceptionFunction {
+	public static abstract class Native extends _ThrowExceptionFunction {
 		
-		static class ForJava7 extends Native {
+		public static class ForJava7 extends Native {
 			
-			ForJava7(Map<Object, Object> context) {}
+			public ForJava7(Map<Object, Object> context) {}
 			
 			@Override
 			public void accept(Throwable exception) {

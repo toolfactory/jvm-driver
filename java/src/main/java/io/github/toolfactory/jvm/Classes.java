@@ -29,9 +29,9 @@ package io.github.toolfactory.jvm;
 import java.nio.ByteBuffer;
 
 
-class Classes {
+public class Classes {
 
-	static class Symbol{
+	private static class Symbol{
 		static class Tag {
 			static final byte UTF8 = 1;
 			static final byte INTEGER = 3;
@@ -54,11 +54,11 @@ class Classes {
 	    }
 	}
 
-	static boolean isAssignableFrom(Class<?> cls_01, Class<?> cls_02) {
+	public static boolean isAssignableFrom(Class<?> cls_01, Class<?> cls_02) {
 		return getClassOrWrapper(cls_01).isAssignableFrom(getClassOrWrapper(cls_02));
 	}
 
-	static Class<?> getClassOrWrapper(Class<?> cls) {
+	public static Class<?> getClassOrWrapper(Class<?> cls) {
 		if (cls.isPrimitive()) {
 			if (cls == int.class) {
 				return Integer.class;
@@ -80,7 +80,7 @@ class Classes {
 	}
 
 
-	static String retrieveName(
+	public static String retrieveName(
 		final byte[] classFileBuffer
 	) {
 		return retrieveName(new Function<Integer, Byte>() {
@@ -90,7 +90,7 @@ class Classes {
 		});
 	}
 
-	static String retrieveName(
+	public static String retrieveName(
 		final ByteBuffer classFileBuffer
 	) {
 		return retrieveName(new Function<Integer, Byte>() {

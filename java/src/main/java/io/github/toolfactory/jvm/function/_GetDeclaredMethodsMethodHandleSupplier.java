@@ -24,39 +24,40 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Driver.InitializationException;
-import sun.misc.Unsafe;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Supplier;
 
 
-@SuppressWarnings("all")
-interface _UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
-
-	static class ForJava7 implements _UnsafeSupplier {
-		sun.misc.Unsafe unsafe;
-		
-		ForJava7(Map<Object, Object> context) {
-			try {
-				Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-				theUnsafeField.setAccessible(true);
-				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
-			} catch (Throwable exc) {
-				FunctionProvider functionProvider = FunctionProvider.get(context);
-				_ThrowExceptionFunction throwExceptionFunction =
-					functionProvider.getFunctionAdapter(_ThrowExceptionFunction.Native.class, context);
-				throwExceptionFunction.apply(new InitializationException("Exception while retrieving unsafe", exc));
-			}
-		}
-		
-		@Override
-		public sun.misc.Unsafe get() {
-			return unsafe;
-		}
+public abstract class _GetDeclaredMethodsMethodHandleSupplier implements Supplier<MethodHandle> {
+	MethodHandle methodHandle;
 	
+	@Override
+	public MethodHandle get() {
+		return methodHandle;
 	}
+	
+	public static class ForJava7 extends _GetDeclaredMethodsMethodHandleSupplier {
+		
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			_ConsulterSupplyFunction<?> getConsulterFunction =
+				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			methodHandle = consulter.findSpecial(
+				Class.class,
+				"getDeclaredMethods0",
+				MethodType.methodType(Method[].class, boolean.class),
+				Class.class
+			);
+		}
+	}	
 }

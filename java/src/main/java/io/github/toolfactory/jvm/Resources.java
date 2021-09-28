@@ -30,9 +30,9 @@ package io.github.toolfactory.jvm;
 import java.io.InputStream;
 
 
-class Resources {
+public class Resources {
 
-	static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
+	public static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
 		if (resourceClassLoader == null) {
 			resourceClassLoader = ClassLoader.getSystemClassLoader();
 		}

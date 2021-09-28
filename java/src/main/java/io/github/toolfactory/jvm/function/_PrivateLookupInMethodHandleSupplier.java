@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
@@ -32,13 +32,16 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Supplier;
 
-abstract class _PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
+
+public abstract class _PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
 	MethodHandle methodHandle;
 	
-	static class ForJava7 extends _PrivateLookupInMethodHandleSupplier {
+	public static class ForJava7 extends _PrivateLookupInMethodHandleSupplier {
 		
-		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			MethodHandles.Lookup consulter = FunctionProvider.get(context).getFunctionAdapter(_ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findSpecial(
 				MethodHandles.Lookup.class, "in",
@@ -55,9 +58,9 @@ abstract class _PrivateLookupInMethodHandleSupplier implements Supplier<MethodHa
 	}
 	
 	
-	static class ForJava9 extends _PrivateLookupInMethodHandleSupplier {
+	public static class ForJava9 extends _PrivateLookupInMethodHandleSupplier {
 		
-		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			MethodHandles.Lookup consulter = FunctionProvider.get(context).getFunctionAdapter(_ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findStatic(
 				MethodHandles.class, "privateLookupIn",

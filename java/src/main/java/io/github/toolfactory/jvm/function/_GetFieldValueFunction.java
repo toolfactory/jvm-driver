@@ -24,22 +24,25 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.BiFunction;
+import io.github.toolfactory.jvm.FunctionProvider;
+
 
 @SuppressWarnings("restriction")
-interface _GetFieldValueFunction extends BiFunction<Object, Field, Object> {
+public interface _GetFieldValueFunction extends BiFunction<Object, Field, Object> {
 	
 	
-	static class ForJava7 implements _GetFieldValueFunction {
+	public static class ForJava7 implements _GetFieldValueFunction {
 		final sun.misc.Unsafe unsafe;
 		
-		ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) {
 			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
 		}
 
@@ -104,11 +107,11 @@ interface _GetFieldValueFunction extends BiFunction<Object, Field, Object> {
 		}
 	}
 	
-	static interface Native extends _GetFieldValueFunction {
+	public static interface Native extends _GetFieldValueFunction {
 		
-		static class ForJava7 implements Native {
+		public static class ForJava7 implements Native {
 			
-			ForJava7(Map<Object, Object> context) {}
+			public ForJava7(Map<Object, Object> context) {}
 
 			@Override
 			public Object apply(Object target, Field field) {

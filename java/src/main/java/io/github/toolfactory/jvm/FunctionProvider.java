@@ -5,10 +5,12 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
+import io.github.toolfactory.jvm.function._ThrowExceptionFunction;
+
 
 
 @SuppressWarnings("all")
-class FunctionProvider {
+public class FunctionProvider {
 	private final String innerClassSuffix;
 	private final static String CLASS_NAME;
 	final Integer[] registeredVersions;
@@ -17,7 +19,7 @@ class FunctionProvider {
 		CLASS_NAME = FunctionProvider.class.getName();
 	}
 	
-	FunctionProvider(String innerClassSuffix, int... versions) {
+	public FunctionProvider(String innerClassSuffix, int... versions) {
 		this.innerClassSuffix = innerClassSuffix;
 		int jVMVersion = JVMInfo.getInstance().getVersion();
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
@@ -30,7 +32,7 @@ class FunctionProvider {
 	}
 
 	
-	<F> F getFunctionAdapter(Class<? super F> cls, Map<Object, Object> context) {
+	public <F> F getFunctionAdapter(Class<? super F> cls, Map<Object, Object> context) {
 		String className = cls.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
 		F functionAdapter = (F) context.get(className);
@@ -67,7 +69,7 @@ class FunctionProvider {
 		return cls != null && !cls.equals(Object.class)? getFunctionAdapter(cls, context) : null;
 	}
 	
-	static FunctionProvider get(Map<Object, Object> context) {
+	public static FunctionProvider get(Map<Object, Object> context) {
 		return (FunctionProvider)context.get(CLASS_NAME);
 	}
 	

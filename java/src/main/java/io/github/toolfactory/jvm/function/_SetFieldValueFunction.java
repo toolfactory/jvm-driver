@@ -24,28 +24,32 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Classes;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.TriConsumer;
+
 
 @SuppressWarnings({"restriction", "null"})
-abstract class _SetFieldValueFunction implements TriConsumer<Object, Field, Object> {
+public abstract class _SetFieldValueFunction implements TriConsumer<Object, Field, Object> {
 	_ThrowExceptionFunction throwExceptionFunction;
 	
-	_SetFieldValueFunction(Map<Object, Object> context) {
+	public _SetFieldValueFunction(Map<Object, Object> context) {
 		FunctionProvider functionProvider = FunctionProvider.get(context);
 		throwExceptionFunction =
 			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 	}
 	
-	static class ForJava7 extends _SetFieldValueFunction {
+	public static class ForJava7 extends _SetFieldValueFunction {
 		final sun.misc.Unsafe unsafe;
 		
-		ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) {
 			super(context);
 			unsafe = FunctionProvider.get(context).getFunctionAdapter(_UnsafeSupplier.class, context).get();
 		}
@@ -116,15 +120,15 @@ abstract class _SetFieldValueFunction implements TriConsumer<Object, Field, Obje
 	}
 	
 	
-	static abstract class Native extends _SetFieldValueFunction{
+	public static abstract class Native extends _SetFieldValueFunction{
 		
-		Native(Map<Object, Object> context) {
+		public Native(Map<Object, Object> context) {
 			super(context);
 		}
 
-		static class ForJava7 extends Native {
+		public static class ForJava7 extends Native {
 			
-			ForJava7(Map<Object, Object> context) {
+			public ForJava7(Map<Object, Object> context) {
 				super(context);
 			}
 

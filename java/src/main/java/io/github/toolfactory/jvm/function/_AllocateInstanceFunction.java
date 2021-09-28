@@ -24,56 +24,56 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
-import java.lang.reflect.Field;
-import java.util.Collection;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm._GetLoadedClassesFunction.Native;
+import io.github.toolfactory.jvm.Function;
+import io.github.toolfactory.jvm.FunctionProvider;
 
 
 @SuppressWarnings("all")
-abstract class _GetLoadedPackagesFunction implements Function<ClassLoader, Map<String, ?>> {
+public interface _AllocateInstanceFunction extends Function<Class<?>, Object> {
 	
-	static class ForJava7 extends _GetLoadedPackagesFunction {
+	public static class ForJava7 implements _AllocateInstanceFunction {
 		final sun.misc.Unsafe unsafe;
-		final Long fieldOffset;
+		final _ThrowExceptionFunction throwExceptionFunction;
 		
-		ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
-			_GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(_GetDeclaredFieldFunction.class, context);
-			fieldOffset = unsafe.objectFieldOffset(
-				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
-			);
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context);
 		}
-		
+
 		@Override
-		public Map<String, ?> apply(ClassLoader classLoader) {
-			return (Map<String, ?>)unsafe.getObject(classLoader, fieldOffset);
-		}		
+		public Object apply(Class<?> input) {
+			try {
+				return unsafe.allocateInstance(input);
+			} catch (InstantiationException exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+		}
 		
 	}
-	
-	
-	static abstract class Native extends _GetLoadedPackagesFunction {
-		
-		static class ForJava7 extends Native {
-			Field packagesField;
-			ForJava7(Map<Object, Object> context) {
-				FunctionProvider functionProvider = FunctionProvider.get(context);
-				_GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(_GetDeclaredFieldFunction.class, context);
-				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
-			}
 
-			@Override
-			public Map<String, ?> apply(ClassLoader classLoader) {
-				return (Map<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, packagesField);
-			}
-		}
+	public static interface Native extends _AllocateInstanceFunction {
 		
+		public static class ForJava7 implements Native {
+			
+			public ForJava7(Map<Object, Object> context) {}
+			
+			@Override
+			public Object apply(Class<?> cls) {
+				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
+			}
+			
+		}
 	}
 	
 }

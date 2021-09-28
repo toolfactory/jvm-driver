@@ -24,50 +24,41 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Supplier;
 
-interface _ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
+
+public abstract class _GetDeclaredFieldsMethodHandleSupplier implements Supplier<MethodHandle> {
+	MethodHandle methodHandle;
 	
-	static class ForJava7 implements _ClassLoaderDelegateClassSupplier{
-		
-		ForJava7(Map<Object, Object> context) {}
-		
-		@Override
-		public Class<?> get() {
-			return null;
-		}
-		
+	@Override
+	public MethodHandle get() {
+		return methodHandle;
 	}
 	
-	static class ForJava9 implements _ClassLoaderDelegateClassSupplier{
-		Class<?> cls;
-		ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
-			try (
-				InputStream inputStream =
-					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
-				);
-			) {
-				FunctionProvider functionProvider = FunctionProvider.get(context);
-				cls = functionProvider.getFunctionAdapter(
-					_DefineHookClassFunction.class, context
-				).apply(
-					functionProvider.getFunctionAdapter(_BuiltinClassLoaderClassSupplier.class, context).get(), 
-					Streams.toByteArray(inputStream)
-				);
-			}
-		}
+	public static class ForJava7 extends _GetDeclaredFieldsMethodHandleSupplier {
 		
-		@Override
-		public Class<?> get() {
-			return cls;
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			_ConsulterSupplyFunction<?> getConsulterFunction =
+				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			methodHandle = consulter.findSpecial(
+				Class.class,
+				"getDeclaredFields0",
+				MethodType.methodType(Field[].class, boolean.class),
+				Class.class
+			);
 		}
-		
 	}
 	
 }

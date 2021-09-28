@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
@@ -33,23 +33,28 @@ import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.BiFunction;
+import io.github.toolfactory.jvm.Function;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.JavaClass;
+
 
 @SuppressWarnings("restriction")
-abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
+public abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
 	MethodHandle defineHookClassMethodHandle;
 	_ThrowExceptionFunction throwExceptionFunction;
 	
-	_DefineHookClassFunction(Map<Object, Object> context) {
+	public _DefineHookClassFunction(Map<Object, Object> context) {
 		FunctionProvider functionProvider = FunctionProvider.get(context);
 		throwExceptionFunction =
 			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 	}
 	
 	
-	static class ForJava7 extends _DefineHookClassFunction {
+	public static class ForJava7 extends _DefineHookClassFunction {
 		sun.misc.Unsafe unsafe;
 		
-		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			unsafe = functionProvider.getFunctionAdapter(_UnsafeSupplier.class, context).get();
@@ -64,7 +69,7 @@ abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], 
 			);
 		}
 		
-		MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
+		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
 			return (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
 		}
 		
@@ -80,25 +85,25 @@ abstract class _DefineHookClassFunction implements BiFunction<Class<?>, byte[], 
 	}
 	
 	
-	static class ForJava9 extends ForJava7 {
+	public static class ForJava9 extends ForJava7 {
 		
-		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 		}
 		
 		@Override
-		MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
+		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
 			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
 		}
 		
 	}
 	
 	
-	static class ForJava17 extends _DefineHookClassFunction {
+	public static class ForJava17 extends _DefineHookClassFunction {
 		private MethodHandle privateLookupInMethodHandle;
 		private MethodHandles.Lookup consulter;
 		
-		ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();

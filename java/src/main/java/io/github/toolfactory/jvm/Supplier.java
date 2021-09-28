@@ -27,7 +27,7 @@
 package io.github.toolfactory.jvm;
 
 
-interface Supplier<T> {
+public interface Supplier<T> {
 
-    T get();
+	public T get();
 }

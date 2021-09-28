@@ -24,37 +24,42 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.BiFunction;
+import io.github.toolfactory.jvm.FunctionProvider;
 
-abstract class _GetDeclaredConstructorsMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+
+public abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
-	}
-	
-	static class ForJava7 extends _GetDeclaredConstructorsMethodHandleSupplier {
+	public static class ForJava7 extends _GetDeclaredFieldFunction {
+		MethodHandle getDeclaredFields;
+		_ThrowExceptionFunction throwExceptionFunction;
 		
-		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
-			_ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
-			methodHandle = consulter.findSpecial(
-				Class.class,
-				"getDeclaredConstructors0",
-				MethodType.methodType(Constructor[].class, boolean.class),
-				Class.class
-			);
+			getDeclaredFields = functionProvider.getFunctionAdapter(_GetDeclaredFieldsMethodHandleSupplier.class, context).get();
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+		}
+
+		@Override
+		public Field apply(Class<?> cls, String name) {
+			try {
+				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
+					if (field.getName().equals(name)) {
+						return field;
+					}
+				}
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+			return null;
 		}
 	}	
 }

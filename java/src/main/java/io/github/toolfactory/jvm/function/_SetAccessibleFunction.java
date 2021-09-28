@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.io.InputStream;
@@ -33,22 +33,27 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.BiConsumer;
+import io.github.toolfactory.jvm.BiConsumerAdapter;
 import io.github.toolfactory.jvm.Driver.InitializationException;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Resources;
+import io.github.toolfactory.jvm.Streams;
 
 
 @SuppressWarnings("unchecked")
-abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
+public abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
 	_ThrowExceptionFunction throwExceptionFunction;
 	
-	_SetAccessibleFunction(Map<Object, Object> context) {
+	public _SetAccessibleFunction(Map<Object, Object> context) {
 		FunctionProvider functionProvider = FunctionProvider.get(context);
 		throwExceptionFunction =
 			functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
 	}
 	
-	static class ForJava7 extends _SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
+	public static class ForJava7 extends _SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
 		
-		ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
 			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
@@ -70,16 +75,16 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 		}
 		
 		@Override
-		void accept(AccessibleObject accessibleObject, Boolean flag) {
+		public void accept(AccessibleObject accessibleObject, Boolean flag) {
 			function.accept(accessibleObject, flag);
 		}
 		
 	}
 	
 	
-	static class ForJava9 extends _SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
+	public static class ForJava9 extends _SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
 		
-		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {			
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {			
 			super(context);
 			try (
 				InputStream inputStream =
@@ -102,21 +107,21 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 		}
 		
 		@Override
-		void accept(AccessibleObject accessibleObject, Boolean flag) {
+		public void accept(AccessibleObject accessibleObject, Boolean flag) {
 			function.accept(accessibleObject, flag);
 		}
 		
 	}
 	
-	static abstract class Native<B> extends _SetAccessibleFunction<B>{		
+	public static abstract class Native<B> extends _SetAccessibleFunction<B>{		
 		
-		Native(Map<Object, Object> context) {
+		public Native(Map<Object, Object> context) {
 			super(context);
 		}
 
-		static class ForJava7 extends Native<BiConsumer<AccessibleObject, Boolean>> {
+		public static class ForJava7 extends Native<BiConsumer<AccessibleObject, Boolean>> {
 			
-			ForJava7(Map<Object, Object> context) {
+			public ForJava7(Map<Object, Object> context) {
 				super(context);
 				setFunction(new BiConsumer<AccessibleObject, Boolean>() {
 					@Override
@@ -127,7 +132,7 @@ abstract class _SetAccessibleFunction<B> extends BiConsumerAdapter<B, Accessible
 			}
 			
 			@Override
-			void accept(AccessibleObject accessibleObject, Boolean flag) {
+			public void accept(AccessibleObject accessibleObject, Boolean flag) {
 				function.accept(accessibleObject, flag);
 			}
 		}

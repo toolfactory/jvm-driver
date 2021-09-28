@@ -27,9 +27,9 @@
 package io.github.toolfactory.jvm;
 
 
-class Strings {
+public class Strings {
 
-	static String compile(String message, Object... arguments) {
+	public static String compile(String message, Object... arguments) {
 		for (Object obj : arguments) {
 			message = message.replaceFirst("\\{\\}", obj == null ? "null" : clear(obj.toString()));
 		}

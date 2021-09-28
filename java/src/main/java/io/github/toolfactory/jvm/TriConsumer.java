@@ -27,8 +27,8 @@
 package io.github.toolfactory.jvm;
 
 
-interface TriConsumer<I, J, K> {
+public interface TriConsumer<I, J, K> {
 
-    void accept(I inputOne, J inputTwo, K inputThree);
+	public void accept(I inputOne, J inputTwo, K inputThree);
 
 }

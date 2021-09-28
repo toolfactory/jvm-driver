@@ -27,21 +27,21 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class BiConsumerAdapter<F, I, J> {
+public abstract class BiConsumerAdapter<F, I, J> {
 	
-	F function;
+	protected F function;
 	
-	BiConsumerAdapter(){}
+	public BiConsumerAdapter(){}
 	
-	BiConsumerAdapter(F function) {
+	public BiConsumerAdapter(F function) {
 		this.function = function;
 	}
 	
-	BiConsumerAdapter<F, I, J> setFunction(F function) {
+	public BiConsumerAdapter<F, I, J> setFunction(F function) {
 		this.function = function;
 		return this;
 	}
 	
-	abstract void accept(I inputOne, J inputTwo);
+	public abstract void accept(I inputOne, J inputTwo);
 	
 }

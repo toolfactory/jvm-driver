@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
@@ -35,28 +35,33 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Function;
+import io.github.toolfactory.jvm.FunctionAdapter;
+import io.github.toolfactory.jvm.FunctionProvider;
+
 
 @SuppressWarnings("unchecked")
-abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
+public abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
 
 	
-	static class ForJava7 extends _DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
-		ForJava7(Map<Object, Object> context) {
+	public static class ForJava7 extends _DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
+		public ForJava7(Map<Object, Object> context) {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			setFunction(
-				(Function<Class<?>, MethodHandles.Lookup>)functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context).function
+				(Function<Class<?>, MethodHandles.Lookup>)functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context).getFunction()
 			);
 		}
 		
 		@Override
-		MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
 		
 	}
 	
-	static class ForJava9 extends _DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
-		ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
+	public static class ForJava9 extends _DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
+		
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 			Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			functionProvider.getFunctionAdapter(_SetAccessibleFunction.class, context).accept (lookupCtor, true);
@@ -82,13 +87,13 @@ abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<
 
 		
 		@Override
-		MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
 		
 	}
 	
-	static class ForJava14 extends _DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
+	public static class ForJava14 extends _DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
 		ForJava14(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 			Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
 			FunctionProvider functionProvider = FunctionProvider.get(context);
@@ -115,7 +120,7 @@ abstract class _DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<
 
 		
 		@Override
-		MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
 		

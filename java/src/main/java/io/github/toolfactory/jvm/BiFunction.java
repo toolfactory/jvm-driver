@@ -27,8 +27,8 @@
 package io.github.toolfactory.jvm;
 
 
-interface BiFunction<I, J, R> {
+public interface BiFunction<I, J, R> {
 
-	R apply(I inputOne, J inputTwo);
+	public R apply(I inputOne, J inputTwo);
 
 }

@@ -10,7 +10,8 @@ import org.junit.runner.RunWith;
 //@SelectPackages("org.toolfactory.core")
 @SelectClasses({
     DefaultDriverTest.class,
-    HybridDriverTest.class
+    HybridDriverTest.class,
+    NativeDriver.class
 })
 @ExcludeTags("Heavy")
 public class AllExceptHeavyTestsSuite {

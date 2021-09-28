@@ -38,6 +38,26 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function._AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function._BuiltinClassLoaderClassSupplier;
+import io.github.toolfactory.jvm.function._ClassLoaderDelegateClassSupplier;
+import io.github.toolfactory.jvm.function._ConstructorInvokeMethodHandleSupplier;
+import io.github.toolfactory.jvm.function._ConsulterSupplyFunction;
+import io.github.toolfactory.jvm.function._DeepConsulterSupplyFunction;
+import io.github.toolfactory.jvm.function._DefineHookClassFunction;
+import io.github.toolfactory.jvm.function._GetDeclaredConstructorsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function._GetDeclaredFieldFunction;
+import io.github.toolfactory.jvm.function._GetDeclaredFieldsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function._GetDeclaredMethodsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function._GetFieldValueFunction;
+import io.github.toolfactory.jvm.function._GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function._GetLoadedPackagesFunction;
+import io.github.toolfactory.jvm.function._GetPackageFunction;
+import io.github.toolfactory.jvm.function._MethodInvokeMethodHandleSupplier;
+import io.github.toolfactory.jvm.function._SetAccessibleFunction;
+import io.github.toolfactory.jvm.function._SetFieldValueFunction;
+import io.github.toolfactory.jvm.function._ThrowExceptionFunction;
+
 
 
 @SuppressWarnings("unchecked")

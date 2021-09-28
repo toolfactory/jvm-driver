@@ -27,20 +27,24 @@
 package io.github.toolfactory.jvm;
 
 
-abstract class FunctionAdapter<F, I, O> {
+public abstract class FunctionAdapter<F, I, O> {
 	
-	F function;
+	protected F function;
 	
-	FunctionAdapter() {}
+	public FunctionAdapter() {}
 	
-	FunctionAdapter(F function) {
+	public FunctionAdapter(F function) {
 		this.function = function;
 	}
 	
-	FunctionAdapter<F, I, O> setFunction(F function) {
+	public FunctionAdapter<F, I, O> setFunction(F function) {
 		this.function = function;
 		return this;
 	}
 	
-	abstract O apply(I input);
+	public F getFunction() {
+		return this.function;
+	}
+	
+	public abstract O apply(I input);
 }

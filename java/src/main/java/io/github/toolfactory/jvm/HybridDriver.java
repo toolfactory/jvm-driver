@@ -29,6 +29,8 @@ package io.github.toolfactory.jvm;
 
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function._ConsulterSupplier;
+
 
 public class HybridDriver extends DefaultDriver {
 	

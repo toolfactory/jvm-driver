@@ -30,6 +30,13 @@ package io.github.toolfactory.jvm;
 import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function._AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function._GetFieldValueFunction;
+import io.github.toolfactory.jvm.function._GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function._GetLoadedPackagesFunction;
+import io.github.toolfactory.jvm.function._SetAccessibleFunction;
+import io.github.toolfactory.jvm.function._SetFieldValueFunction;
+
 
 @SuppressWarnings("unchecked")
 public class NativeDriver extends HybridDriver {

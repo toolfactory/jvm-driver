@@ -30,7 +30,7 @@ package io.github.toolfactory.jvm;
 import java.nio.ByteBuffer;
 
 
-class JavaClass {
+public class JavaClass {
 	private String classNameSlashed;
 	private String className;
 
@@ -42,15 +42,15 @@ class JavaClass {
 		this(Classes.retrieveName(byteCode), BufferHandler.shareContent(byteCode));
 	}
 
-	static JavaClass create(ByteBuffer byteCode) {
+	public static JavaClass create(ByteBuffer byteCode) {
 		return new JavaClass(byteCode);
 	}
 
-	static void use(ByteBuffer byteCode, Consumer<JavaClass> javaClassConsumer) {
+	public static void use(ByteBuffer byteCode, Consumer<JavaClass> javaClassConsumer) {
 		javaClassConsumer.accept(JavaClass.create(byteCode));
 	}
 
-	static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
+	public static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
 		return javaClassConsumer.apply(JavaClass.create(byteCode));
 	}
 
@@ -66,7 +66,7 @@ class JavaClass {
 			classNameSlashed;
 	}
 
-	String getPackageName() {
+	public String getPackageName() {
 		String pckgName = _getPackageName();
 		if (pckgName != null) {
 			pckgName = pckgName.replace("/", ".");
@@ -74,12 +74,12 @@ class JavaClass {
 		return pckgName;
 	}
 
-	String getSimpleName() {
+	public String getSimpleName() {
 		return _getSimpleName();
 	}
 
 
-	String getName() {
+	public String getName() {
 		if (className == null) {
 			String packageName = getPackageName();
 			String classSimpleName = getSimpleName();

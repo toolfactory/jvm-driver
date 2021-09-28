@@ -27,8 +27,8 @@
 package io.github.toolfactory.jvm;
 
 
-interface BiConsumer<T, U> {
+public interface BiConsumer<T, U> {
 
-    void accept(T t, U u);
+	public void accept(T t, U u);
 
 }

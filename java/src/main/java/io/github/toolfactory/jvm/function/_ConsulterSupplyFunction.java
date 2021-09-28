@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.io.InputStream;
@@ -33,14 +33,19 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Driver.InitializationException;
+import io.github.toolfactory.jvm.Function;
+import io.github.toolfactory.jvm.FunctionAdapter;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Resources;
+import io.github.toolfactory.jvm.Streams;
 
 
 @SuppressWarnings("unchecked")
-abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
+public abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
 
 	
-	static class ForJava7 extends _ConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
-		ForJava7(Map<Object, Object> context) {
+	public static class ForJava7 extends _ConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
+		public ForJava7(Map<Object, Object> context) {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getFunctionAdapter(_ConsulterSupplier.class, context).get();
 			final MethodHandle privateLookupInMethodHandle = functionProvider.getFunctionAdapter(_PrivateLookupInMethodHandleSupplier.class, context).get();
@@ -61,14 +66,15 @@ abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, 
 		}
 		
 		@Override
-		MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
 		
 	}
 	
-	static class ForJava9 extends _ConsulterSupplyFunction<java.util.function.Function<Class<?>, MethodHandles.Lookup>> {
-		ForJava9(Map<Object, Object> context) {
+	public static class ForJava9 extends _ConsulterSupplyFunction<java.util.function.Function<Class<?>, MethodHandles.Lookup>> {
+		
+		public ForJava9(Map<Object, Object> context) {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			final _ThrowExceptionFunction throwExceptionFunction =
 				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
@@ -94,7 +100,7 @@ abstract class _ConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, 
 
 		
 		@Override
-		MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
 		

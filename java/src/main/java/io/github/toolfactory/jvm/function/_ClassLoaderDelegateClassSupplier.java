@@ -24,39 +24,56 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Field;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Resources;
+import io.github.toolfactory.jvm.Streams;
+import io.github.toolfactory.jvm.Supplier;
 
-abstract class _GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
+
+public interface _ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	
-	static class ForJava7 extends _GetDeclaredFieldFunction {
-		MethodHandle getDeclaredFields;
-		_ThrowExceptionFunction throwExceptionFunction;
+	public static class ForJava7 implements _ClassLoaderDelegateClassSupplier{
 		
-		ForJava7(Map<Object, Object> context) {
-			FunctionProvider functionProvider = FunctionProvider.get(context);
-			getDeclaredFields = functionProvider.getFunctionAdapter(_GetDeclaredFieldsMethodHandleSupplier.class, context).get();
-			throwExceptionFunction =
-				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
-		}
-
+		public ForJava7(Map<Object, Object> context) {}
+		
 		@Override
-		public Field apply(Class<?> cls, String name) {
-			try {
-				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
-					if (field.getName().equals(name)) {
-						return field;
-					}
-				}
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Class<?> get() {
 			return null;
 		}
-	}	
+		
+	}
+	
+	public static class ForJava9 implements _ClassLoaderDelegateClassSupplier{
+		Class<?> cls;
+		
+		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
+			try (
+				InputStream inputStream =
+					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
+				);
+			) {
+				FunctionProvider functionProvider = FunctionProvider.get(context);
+				cls = functionProvider.getFunctionAdapter(
+					_DefineHookClassFunction.class, context
+				).apply(
+					functionProvider.getFunctionAdapter(_BuiltinClassLoaderClassSupplier.class, context).get(), 
+					Streams.toByteArray(inputStream)
+				);
+			}
+		}
+		
+		@Override
+		public Class<?> get() {
+			return cls;
+		}
+		
+	}
+	
 }

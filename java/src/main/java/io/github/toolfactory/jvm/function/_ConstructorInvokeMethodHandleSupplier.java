@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
@@ -33,8 +33,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Supplier;
 
-class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
+
+public class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
 	MethodHandle methodHandle;
 	
 	@Override
@@ -42,9 +45,9 @@ class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
 		return methodHandle;
 	}
 	
-	static class ForJava7 extends _ConstructorInvokeMethodHandleSupplier {
+	public static class ForJava7 extends _ConstructorInvokeMethodHandleSupplier {
 		
-		ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
@@ -55,9 +58,9 @@ class _ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
 
 	}
 	
-	static class ForJava9 extends _ConstructorInvokeMethodHandleSupplier {
+	public static class ForJava9 extends _ConstructorInvokeMethodHandleSupplier {
 		
-		ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			FunctionProvider functionProvider = FunctionProvider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);

@@ -33,16 +33,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 
-class Streams {
+public class Streams {
 
-	static byte[] toByteArray(InputStream inputStream) throws IOException {
+	public static byte[] toByteArray(InputStream inputStream) throws IOException {
 		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			copy(inputStream, outputStream);
 			return outputStream.toByteArray();
 		}
 	}
 
-	static void copy(InputStream input, OutputStream output) throws IOException {
+	public static void copy(InputStream input, OutputStream output) throws IOException {
 		byte[] buffer = new byte[1024];
 		int bytesRead = 0;
 		while (-1 != (bytesRead = input.read(buffer))) {

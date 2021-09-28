@@ -24,36 +24,42 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Driver;
+import io.github.toolfactory.jvm.FunctionProvider;
+import io.github.toolfactory.jvm.Supplier;
+import io.github.toolfactory.jvm.Driver.InitializationException;
+import sun.misc.Unsafe;
 
-interface _BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
-	
-	static class ForJava7 implements _BuiltinClassLoaderClassSupplier{
+
+@SuppressWarnings("all")
+public interface _UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
+
+	public static class ForJava7 implements _UnsafeSupplier {
+		sun.misc.Unsafe unsafe;
 		
-		ForJava7(Map<Object, Object> context) {}
+		public ForJava7(Map<Object, Object> context) {
+			try {
+				Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+				theUnsafeField.setAccessible(true);
+				this.unsafe = (sun.misc.Unsafe)theUnsafeField.get(null);
+			} catch (Throwable exc) {
+				FunctionProvider functionProvider = FunctionProvider.get(context);
+				_ThrowExceptionFunction throwExceptionFunction =
+					functionProvider.getFunctionAdapter(_ThrowExceptionFunction.Native.class, context);
+				throwExceptionFunction.apply(new InitializationException("Exception while retrieving unsafe", exc));
+			}
+		}
 		
 		@Override
-		public Class<?> get() {
-			return null;
+		public sun.misc.Unsafe get() {
+			return unsafe;
 		}
-		
-	}
 	
-	static class ForJava9 implements _BuiltinClassLoaderClassSupplier{
-		Class<?> cls;
-		ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
-			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");
-		}
-		
-		@Override
-		public Class<?> get() {
-			return cls;
-		}
-		
 	}
-	
 }

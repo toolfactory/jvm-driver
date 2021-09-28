@@ -24,47 +24,56 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function;
 
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.BiFunction;
+import io.github.toolfactory.jvm.FunctionProvider;
 
-abstract class _MethodInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
-	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
-	}
-	
-	static class ForJava7 extends _MethodInvokeMethodHandleSupplier {
-		
-		ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
-			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
-			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
-			methodHandle = consulter.unreflect(method);
-		}
 
-	}
+public interface _GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 	
-	static class ForJava9 extends _MethodInvokeMethodHandleSupplier {
-		
-		ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
-			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
-			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
-			FunctionProvider functionProvider = FunctionProvider.get(context);
-			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
-			methodHandle = consulter.unreflect(invoker);
+	
+	public static class ForJava7 implements _GetPackageFunction{
+
+		public ForJava7(Map<Object, Object> context) {}
+
+		@Override
+		public Package apply(ClassLoader inputOne, String packageName) {
+			return Package.getPackage(packageName);
 		}
 		
 	}
+	
+	public static class ForJava9 implements _GetPackageFunction{
+		MethodHandle methodHandle;
+		_ThrowExceptionFunction throwExceptionFunction;
+		
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			FunctionProvider functionProvider = FunctionProvider.get(context);
+			_ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(_ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
+			MethodType methodType = MethodType.methodType(Package.class, String.class);
+			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(_ThrowExceptionFunction.class, context); 
+		}
+
+		@Override
+		public Package apply(ClassLoader classLoader, String packageName) {
+			try {
+				return (Package)methodHandle.invokeExact(classLoader, packageName);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+		}
+		
+	}
+	
 	
 }
