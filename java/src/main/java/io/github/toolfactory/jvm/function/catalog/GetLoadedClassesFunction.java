@@ -24,55 +24,59 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaConversionException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
 
 
 @SuppressWarnings("all")
-public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
+public abstract class GetLoadedClassesFunction implements Function<ClassLoader, Collection<Class<?>>> {
 	
-	public static class ForJava7 implements AllocateInstanceFunction {
+	public static class ForJava7 extends GetLoadedClassesFunction {
 		final sun.misc.Unsafe unsafe;
-		final ThrowExceptionFunction throwExceptionFunction;
+		final Long loadedClassesVectorMemoryOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
 			Provider functionProvider = Provider.get(context);
 			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
-			throwExceptionFunction =
-				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context);
-		}
-
+			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
+			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
+				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
+			);
+		}		
+		
 		@Override
-		public Object apply(Class<?> input) {
-			try {
-				return unsafe.allocateInstance(input);
-			} catch (InstantiationException exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Collection<Class<?>> apply(ClassLoader classLoader) {
+			return (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
 		}
 		
 	}
-
-	public static interface Native extends AllocateInstanceFunction {
+	
+	public static abstract class Native extends GetLoadedClassesFunction {
 		
-		public static class ForJava7 implements Native {
+		public static class ForJava7 extends Native {
+			Field classesField;
 			
-			public ForJava7(Map<Object, Object> context) {}
-			
-			@Override
-			public Object apply(Class<?> cls) {
-				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
+			public ForJava7(Map<Object, Object> context) {
+				Provider functionProvider = Provider.get(context);
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getFunctionAdapter(GetDeclaredFieldFunction.class, context);
+				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
-			
+
+			@Override
+			public Collection<Class<?>> apply(ClassLoader classLoader) {
+				return (Collection<Class<?>>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);
+			}
 		}
+		
 	}
 	
 }

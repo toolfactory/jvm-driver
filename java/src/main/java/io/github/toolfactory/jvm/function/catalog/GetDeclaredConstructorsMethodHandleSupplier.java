@@ -24,41 +24,40 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
+public abstract class GetDeclaredConstructorsMethodHandleSupplier implements Supplier<MethodHandle> {
+	MethodHandle methodHandle;
 	
-	public static class ForJava7 extends GetDeclaredFieldFunction {
-		MethodHandle getDeclaredFields;
-		ThrowExceptionFunction throwExceptionFunction;
+	@Override
+	public MethodHandle get() {
+		return methodHandle;
+	}
+	
+	public static class ForJava7 extends GetDeclaredConstructorsMethodHandleSupplier {
 		
-		public ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			Provider functionProvider = Provider.get(context);
-			getDeclaredFields = functionProvider.getFunctionAdapter(GetDeclaredFieldsMethodHandleSupplier.class, context).get();
-			throwExceptionFunction =
-				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
-		}
-
-		@Override
-		public Field apply(Class<?> cls, String name) {
-			try {
-				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
-					if (field.getName().equals(name)) {
-						return field;
-					}
-				}
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
-			return null;
+			ConsulterSupplyFunction<?> getConsulterFunction =
+				functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+			methodHandle = consulter.findSpecial(
+				Class.class,
+				"getDeclaredConstructors0",
+				MethodType.methodType(Constructor[].class, boolean.class),
+				Class.class
+			);
 		}
 	}	
 }

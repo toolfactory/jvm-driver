@@ -24,39 +24,39 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-public abstract class GetDeclaredMethodsMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
+	public static class ForJava7 implements BuiltinClassLoaderClassSupplier{
+		
+		public ForJava7(Map<Object, Object> context) {}
+		
+		@Override
+		public Class<?> get() {
+			return null;
+		}
+		
 	}
 	
-	public static class ForJava7 extends GetDeclaredMethodsMethodHandleSupplier {
+	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
+		Class<?> cls;
 		
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
-			methodHandle = consulter.findSpecial(
-				Class.class,
-				"getDeclaredMethods0",
-				MethodType.methodType(Method[].class, boolean.class),
-				Class.class
-			);
+		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
+			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");
 		}
-	}	
+		
+		@Override
+		public Class<?> get() {
+			return cls;
+		}
+		
+	}
+	
 }

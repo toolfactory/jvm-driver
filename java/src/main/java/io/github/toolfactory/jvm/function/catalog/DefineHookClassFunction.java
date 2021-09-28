@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.invoke.MethodHandle;
@@ -33,6 +33,7 @@ import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.util.JavaClass;

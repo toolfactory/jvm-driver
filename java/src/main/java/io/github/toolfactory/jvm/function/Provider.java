@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.toolfactory.jvm.Info;
+import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 
 

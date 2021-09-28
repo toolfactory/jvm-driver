@@ -24,7 +24,7 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.invoke.MethodHandle;
@@ -32,47 +32,48 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
-public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+public interface GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 	
-	public static class ForJava7 extends PrivateLookupInMethodHandleSupplier {
-		
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(ConsulterSupplier.class, context).get();
-			methodHandle = consulter.findSpecial(
-				MethodHandles.Lookup.class, "in",
-				MethodType.methodType(MethodHandles.Lookup.class, Class.class),
-				MethodHandles.Lookup.class
-			);
-		}
-		
+	
+	public static class ForJava7 implements GetPackageFunction{
+
+		public ForJava7(Map<Object, Object> context) {}
+
 		@Override
-		public MethodHandle get() {
-			return methodHandle;
+		public Package apply(ClassLoader inputOne, String packageName) {
+			return Package.getPackage(packageName);
 		}
 		
 	}
 	
-	
-	public static class ForJava9 extends PrivateLookupInMethodHandleSupplier {
+	public static class ForJava9 implements GetPackageFunction{
+		MethodHandle methodHandle;
+		ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			MethodHandles.Lookup consulter = Provider.get(context).getFunctionAdapter(ConsulterSupplier.class, context).get();
-			methodHandle = consulter.findStatic(
-				MethodHandles.class, "privateLookupIn",
-				MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
-			);
+			Provider functionProvider = Provider.get(context);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
+			MethodType methodType = MethodType.methodType(Package.class, String.class);
+			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
 		}
-		
+
 		@Override
-		public MethodHandle get() {
-			return methodHandle;
+		public Package apply(ClassLoader classLoader, String packageName) {
+			try {
+				return (Package)methodHandle.invokeExact(classLoader, packageName);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
 		}
-		
 		
 	}
+	
 	
 }

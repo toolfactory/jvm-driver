@@ -24,17 +24,23 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.Provider;
 import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.util.Classes;
+import io.github.toolfactory.jvm.function.util.Resources;
+import io.github.toolfactory.jvm.function.util.Streams;
 
 
-public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
+public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	
-	public static class ForJava7 implements BuiltinClassLoaderClassSupplier{
+	public static class ForJava7 implements ClassLoaderDelegateClassSupplier{
 		
 		public ForJava7(Map<Object, Object> context) {}
 		
@@ -45,11 +51,23 @@ public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
 		
 	}
 	
-	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
+	public static class ForJava9 implements ClassLoaderDelegateClassSupplier{
 		Class<?> cls;
 		
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
-			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");
+		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
+			try (
+				InputStream inputStream =
+					Resources.getAsInputStream(this.getClass().getClassLoader(), Classes.class.getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
+				);
+			) {
+				Provider functionProvider = Provider.get(context);
+				cls = functionProvider.getFunctionAdapter(
+					DefineHookClassFunction.class, context
+				).apply(
+					functionProvider.getFunctionAdapter(BuiltinClassLoaderClassSupplier.class, context).get(), 
+					Streams.toByteArray(inputStream)
+				);
+			}
 		}
 		
 		@Override

@@ -31,13 +31,13 @@ import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.Provider;
-import io.github.toolfactory.jvm.function.AllocateInstanceFunction;
-import io.github.toolfactory.jvm.function.GetFieldValueFunction;
-import io.github.toolfactory.jvm.function.GetLoadedClassesFunction;
-import io.github.toolfactory.jvm.function.GetLoadedPackagesFunction;
-import io.github.toolfactory.jvm.function.SetAccessibleFunction;
-import io.github.toolfactory.jvm.function.SetFieldValueFunction;
-import io.github.toolfactory.jvm.function.ThrowExceptionFunction;
+import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
+import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
+import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
+import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
 
 

@@ -24,39 +24,56 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function;
+package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.lang.invoke.MethodHandle;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaConversionException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.Provider;
+import io.github.toolfactory.jvm.function.template.Function;
 
 
-public abstract class GetDeclaredConstructorsMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+@SuppressWarnings("all")
+public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
+	public static class ForJava7 implements AllocateInstanceFunction {
+		final sun.misc.Unsafe unsafe;
+		final ThrowExceptionFunction throwExceptionFunction;
+		
+		public ForJava7(Map<Object, Object> context) {
+			Provider functionProvider = Provider.get(context);
+			unsafe = functionProvider.getFunctionAdapter(UnsafeSupplier.class, context).get();
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context);
+		}
+
+		@Override
+		public Object apply(Class<?> input) {
+			try {
+				return unsafe.allocateInstance(input);
+			} catch (InstantiationException exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+		}
+		
+	}
+
+	public static interface Native extends AllocateInstanceFunction {
+		
+		public static class ForJava7 implements Native {
+			
+			public ForJava7(Map<Object, Object> context) {}
+			
+			@Override
+			public Object apply(Class<?> cls) {
+				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
+			}
+			
+		}
 	}
 	
-	public static class ForJava7 extends GetDeclaredConstructorsMethodHandleSupplier {
-		
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			Provider functionProvider = Provider.get(context);
-			ConsulterSupplyFunction<?> getConsulterFunction =
-				functionProvider.getFunctionAdapter(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
-			methodHandle = consulter.findSpecial(
-				Class.class,
-				"getDeclaredConstructors0",
-				MethodType.methodType(Constructor[].class, boolean.class),
-				Class.class
-			);
-		}
-	}	
 }

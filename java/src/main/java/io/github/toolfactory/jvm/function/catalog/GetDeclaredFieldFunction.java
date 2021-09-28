@@ -24,24 +24,42 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.function.catalog;
 
 
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.Provider;
-import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.function.template.BiFunction;
 
 
-public class HybridDriver extends DefaultDriver {
+public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
 	
+	public static class ForJava7 extends GetDeclaredFieldFunction {
+		MethodHandle getDeclaredFields;
+		ThrowExceptionFunction throwExceptionFunction;
+		
+		public ForJava7(Map<Object, Object> context) {
+			Provider functionProvider = Provider.get(context);
+			getDeclaredFields = functionProvider.getFunctionAdapter(GetDeclaredFieldsMethodHandleSupplier.class, context).get();
+			throwExceptionFunction =
+				functionProvider.getFunctionAdapter(ThrowExceptionFunction.class, context); 
+		}
 
-	void initHookClassDefiner(
-		Provider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		functionProvider.getFunctionAdapter(ConsulterSupplier.Hybrid.class, initializationContext);
-		super.initHookClassDefiner(functionProvider, initializationContext);
-	}
-
+		@Override
+		public Field apply(Class<?> cls, String name) {
+			try {
+				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
+					if (field.getName().equals(name)) {
+						return field;
+					}
+				}
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+			return null;
+		}
+	}	
 }
