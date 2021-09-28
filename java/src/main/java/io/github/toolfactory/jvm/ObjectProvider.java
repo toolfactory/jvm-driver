@@ -32,7 +32,7 @@ public class ObjectProvider {
 	}
 
 	
-	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
+	public <T> T getOrBuildObject(Class<T> clazz, Map<Object, Object> context) {
 		String className = clazz.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
 		T object = getObject(clazz, context);		
