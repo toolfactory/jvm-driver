@@ -32,10 +32,10 @@ public class ObjectProvider {
 	}
 
 	
-	public <F> F getOrBuildObject(Class<? super F> clazz, Map<Object, Object> context) {
+	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
 		String className = clazz.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		F function = getObject(clazz, context);		
+		T object = getObject(clazz, context);		
 		context.put(CLASS_NAME, this);
 		for (int version : registeredVersions) {
 			String clsName = className + "$" +  classSuffix + version;
@@ -48,9 +48,9 @@ public class ObjectProvider {
 					clsName = className + classSuffix + version;
 					effectiveClass = Class.forName(clsName);
 				}
-				function = (F) effectiveClass.getDeclaredConstructor(Map.class).newInstance(context);
-				context.put(className, function);
-				return function;
+				object = (T) effectiveClass.getDeclaredConstructor(Map.class).newInstance(context);
+				context.put(className, object);
+				return object;
 			} catch (ClassNotFoundException exc) {
 				searchedClasses.add(clsName);
 			} catch (Throwable exc) {
@@ -80,9 +80,9 @@ public class ObjectProvider {
 		if (objectFound != null) {
 			return objectFound;
 		} else {
-			for (Object function : context.values()) {
-				if (clazz.isAssignableFrom(function.getClass())) {
-					return (F)function;
+			for (Object object : context.values()) {
+				if (clazz.isAssignableFrom(object.getClass())) {
+					return (F)object;
 				}
 			}
 		}
