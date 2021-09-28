@@ -7,9 +7,9 @@
 [![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/3)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
 [![GitHub](https://img.shields.io/github/license/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/blob/main/LICENSE)
 
-[![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1274750957)
+[![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1283779993)
 
-[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209+%20(17)-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/1274750957)
+[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209+%20(17)-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/1283779993)
 
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>3.0.3</version>
+    <version>4.0.0</version>
 </dependency>	
 ```
 
@@ -36,10 +36,13 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 There are two kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **hybrid driver** that extends the default driver and uses some custom JNI methods through [narcissus](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
+* the **hybrid driver** that extends the default driver and uses some JNI functions only when run on on JDK 17 and later
+* the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
+
+All JNI methods used by the native driver and the hybrid driver are supplied by [narcissus](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
     * Windows (x86, x64)
     * Linux (x86, x64)
-    * MacOs (x64)
+    * MacOs (x64) 
 
 <br/>
 
@@ -56,46 +59,51 @@ To create a hybrid driver instance you should use this code:
 
 io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.HybridDriver();
 ```
+To create a native driver instance you should use this code:
+```java
+
+io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.NativeDriver();
+```
 
 The methods exposed by the Driver interface are the following:
 ```java                                                                                                     
-public void setFieldValue(Object target, Field field, Object value);                                    
-                                                                                                        
-public <T> T getFieldValue(Object target, Field field);                                                 
-                                                                                                        
-public Method[] getDeclaredMethods(Class<?> cls);                                                       
-                                                                                                        
-public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);                                      
-                                                                                                        
-public Field[] getDeclaredFields(Class<?> cls);                                                         
-                                                                                                        
-public Field getDeclaredField(Class<?> cls, String name);                                               
-                                                                                                        
-public <T> T newInstance(Constructor<T> ctor, Object[] params);                                         
-                                                                                                        
-public Object invoke(Method method, Object target, Object[] params);                                    
-                                                                                                        
-public MethodHandles.Lookup getConsulter(Class<?> cls);                                                               
-                                                                                                        
-public Class<?> getClassLoaderDelegateClass();                                                          
-                                                                                                        
-public Class<?> getBuiltinClassLoaderClass();                                                           
-                                                                                                        
-public boolean isClassLoaderDelegate(ClassLoader classLoader);                                          
-                                                                                                        
-public boolean isBuiltinClassLoader(ClassLoader classLoader);                                           
-                                                                                                        
-public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);                                  
-                                                                                                        
-public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);                             
-                                                                                                        
+public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
+
+public Class<?> getBuiltinClassLoaderClass();
+
+public Class<?> getClassLoaderDelegateClass();
+
+public MethodHandles.Lookup getConsulter(Class<?> cls);
+
+public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
+
+public Field getDeclaredField(Class<?> cls, String name);
+
+public Field[] getDeclaredFields(Class<?> cls);
+
+public Method[] getDeclaredMethods(Class<?> cls);
+
+public <T> T getFieldValue(Object target, Field field);
+
 public Package getPackage(ClassLoader classLoader, String packageName);
-                                                                                                        
-public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);                                 
-                                                                                                        
-public void setAccessible(AccessibleObject object, boolean flag);                                       
-                                                                                                        
-public <T> T allocateInstance(Class<?> cls);                                                            
+
+public <T> T invoke(Method method, Object target, Object[] params);
+
+public boolean isBuiltinClassLoader(ClassLoader classLoader);
+
+public boolean isClassLoaderDelegate(ClassLoader classLoader);
+
+public <T> T newInstance(Constructor<T> ctor, Object[] params);
+
+public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
+
+public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
+
+public void setAccessible(AccessibleObject object, boolean flag);
+
+public void setFieldValue(Object target, Field field, Object value);
+
+public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                           
 ```
 
 <br/>
