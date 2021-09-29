@@ -87,10 +87,10 @@ public interface Driver extends Closeable {
 		try {
 			try {
 				return getNewDefault();
-			} catch (InitializationException exc) {
+			} catch (InitializeException exc) {
 				return getNewHybrid(); 
 			}
-		} catch (InitializationException exc) {
+		} catch (InitializeException exc) {
 			return getNewNative();
 		}
 	}
@@ -107,11 +107,11 @@ public interface Driver extends Closeable {
 		return new NativeDriver();
 	}
 	
-	public static class InitializationException extends RuntimeException {
+	public static class InitializeException extends RuntimeException {
 
 		private static final long serialVersionUID = -3348641464676904231L;
 
-	    public InitializationException(String message, Throwable cause) {
+	    public InitializeException(String message, Throwable cause) {
 	        super(message, cause);
 	    }
 

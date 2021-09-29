@@ -117,7 +117,7 @@ public class DefaultDriver implements Driver {
 			initLoadedPackagesRetriever(functionProvider, initializationContext);
 		} catch (Throwable exc) {
 			throwException(
-				new InitializationException(
+				new InitializeException(
 					"Could not initiliaze " + this.getClass().getSimpleName(), exc
 				)
 			);
