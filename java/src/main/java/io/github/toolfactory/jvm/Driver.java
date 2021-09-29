@@ -83,28 +83,31 @@ public interface Driver extends Closeable {
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
 	
 	
-	public static Driver getNew() {
-		try {
+	public static class Provider {
+		
+		public static Driver getNew() {
 			try {
-				return getNewDefault();
+				try {
+					return getNewDefault();
+				} catch (InitializeException exc) {
+					return getNewHybrid(); 
+				}
 			} catch (InitializeException exc) {
-				return getNewHybrid(); 
+				return getNewNative();
 			}
-		} catch (InitializeException exc) {
-			return getNewNative();
 		}
-	}
-	
-	public static Driver getNewDefault() {
-		return new DefaultDriver();
-	}
-	
-	public static Driver getNewHybrid() {
-		return new HybridDriver();
-	}
-	
-	public static Driver getNewNative() {
-		return new NativeDriver();
+		
+		public static Driver getNewDefault() {
+			return new DefaultDriver();
+		}
+		
+		public static Driver getNewHybrid() {
+			return new HybridDriver();
+		}
+		
+		public static Driver getNewNative() {
+			return new NativeDriver();
+		}
 	}
 	
 	public static class InitializeException extends RuntimeException {
