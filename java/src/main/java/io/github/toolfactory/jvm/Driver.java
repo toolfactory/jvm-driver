@@ -83,7 +83,31 @@ public interface Driver extends Closeable {
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
 	
 	
-	public static class InitializationException extends Exception {
+	public static Driver getNew() {
+		try {
+			try {
+				return getNewDefault();
+			} catch (InitializationException exc) {
+				return getNewHybrid(); 
+			}
+		} catch (InitializationException exc) {
+			return getNewNative();
+		}
+	}
+	
+	public static Driver getNewDefault() {
+		return new DefaultDriver();
+	}
+	
+	public static Driver getNewHybrid() {
+		return new HybridDriver();
+	}
+	
+	public static Driver getNewNative() {
+		return new NativeDriver();
+	}
+	
+	public static class InitializationException extends RuntimeException {
 
 		private static final long serialVersionUID = -3348641464676904231L;
 
