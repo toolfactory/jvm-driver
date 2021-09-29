@@ -33,7 +33,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 
 ## Overview
 
-There are two kinds of driver:
+There are three kinds of driver:
 
 * the **default driver** completely based on Java api
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
