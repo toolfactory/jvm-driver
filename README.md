@@ -53,7 +53,7 @@ To create a driver a driver instance you should use this code:
 io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.getNew();
 ```
 
-The driver type returned by `io.github.toolfactory.jvm.Driver.Factory.getNew ()` is ** the first driver that can be initialized among the default, hybrid and native drivers respectively**.
+The driver type returned by `io.github.toolfactory.jvm.Driver.Factory.getNew ()` is **the first driver that can be initialized among the default, hybrid and native drivers respectively**.
 
 If you need to create a specific driver type you should use:
 
