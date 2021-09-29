@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>4.0.0</version>
+    <version>5.0.0</version>
 </dependency>	
 ```
 
@@ -48,21 +48,31 @@ All JNI methods used by the native and the hybrid driver are supplied by [**narc
 
 ## Usage
 
-To create a default driver instance you should use this code:
+To create a driver a driver instance you should use this code:
 ```java
-
-io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.DefaultDriver();
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.getNew();
 ```
 
-To create a hybrid driver instance you should use this code:
-```java
+The driver type returned by `io.github.toolfactory.jvm.Driver.Factory.getNew ()` is ** the first driver that can be initialized among the default, hybrid and native drivers respectively**.
 
-io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.HybridDriver();
+If you need to create a specific driver type you should use:
+
+* this code to create a default driver instance:
+
+```java
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewDefault();
 ```
-To create a native driver instance you should use this code:
-```java
 
-io.github.toolfactory.jvm.Driver driver = new io.github.toolfactory.jvm.NativeDriver();
+* this code to create an hybrid driver instance:
+
+```java
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewHybrid();
+```
+
+* this code to create a native driver instance:
+
+```java
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewNative();
 ```
 
 <br/>
