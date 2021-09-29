@@ -83,7 +83,7 @@ public interface Driver extends Closeable {
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
 	
 	
-	public static class Provider {
+	public static class Factory {
 		
 		public static Driver getNew() {
 			try {
