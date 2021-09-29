@@ -24,45 +24,30 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function.util;
+package io.github.toolfactory.jvm.util;
 
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
-@SuppressWarnings("unchecked")
-public class BufferHandler {
+public class Streams {
 
-	public static ByteBuffer shareContent(ByteBuffer byteBuffer) {
-		ByteBuffer duplicated = duplicate(byteBuffer);
-		if (position(byteBuffer) > 0) {
-			flip(duplicated);
+	public static byte[] toByteArray(InputStream inputStream) throws IOException {
+		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+			copy(inputStream, outputStream);
+			return outputStream.toByteArray();
 		}
-		return duplicated;
 	}
 
-	public static <T extends Buffer> T flip(T buffer) {
-		return (T)((Buffer)buffer).flip();
-	}
-
-	public static <T extends Buffer> int position(T buffer) {
-		return ((Buffer)buffer).position();
-	}
-
-	public static ByteBuffer duplicate(ByteBuffer buffer) {
-		return buffer.duplicate();
-	}
-
-	public static <T extends Buffer> int limit(T buffer) {
-		return ((Buffer)buffer).limit();
-	}
-
-	public static byte[] toByteArray(ByteBuffer byteBuffer) {
-    	byteBuffer = shareContent(byteBuffer);
-    	byte[] result = new byte[limit(byteBuffer)];
-    	byteBuffer.get(result, 0, result.length);
-        return result;
+	public static void copy(InputStream input, OutputStream output) throws IOException {
+		byte[] buffer = new byte[1024];
+		int bytesRead = 0;
+		while (-1 != (bytesRead = input.read(buffer))) {
+			output.write(buffer, 0, bytesRead);
+		}
 	}
 
 }

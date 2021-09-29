@@ -37,7 +37,7 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Function;
-import io.github.toolfactory.jvm.function.util.FunctionAdapter;
+import io.github.toolfactory.jvm.util.FunctionAdapter;
 
 
 @SuppressWarnings("unchecked")

@@ -33,9 +33,9 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
-import io.github.toolfactory.jvm.function.util.Classes;
-import io.github.toolfactory.jvm.function.util.Resources;
-import io.github.toolfactory.jvm.function.util.Streams;
+import io.github.toolfactory.jvm.util.Classes;
+import io.github.toolfactory.jvm.util.Resources;
+import io.github.toolfactory.jvm.util.Streams;
 
 
 public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {

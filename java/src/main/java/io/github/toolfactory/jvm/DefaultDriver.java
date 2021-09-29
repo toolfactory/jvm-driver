@@ -60,8 +60,8 @@ import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
-import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
-import io.github.toolfactory.jvm.function.util.FunctionAdapter;
+import io.github.toolfactory.jvm.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.util.FunctionAdapter;
 
 
 

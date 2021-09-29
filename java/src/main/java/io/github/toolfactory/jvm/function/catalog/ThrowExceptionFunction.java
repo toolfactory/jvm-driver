@@ -31,7 +31,7 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Consumer;
-import io.github.toolfactory.jvm.function.util.Strings;
+import io.github.toolfactory.jvm.util.Strings;
 
 
 @SuppressWarnings("all")

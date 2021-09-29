@@ -24,24 +24,27 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function.util;
+package io.github.toolfactory.jvm.util;
 
 
-public abstract class BiConsumerAdapter<F, I, J> {
+public abstract class FunctionAdapter<F, I, O> {
 	
 	protected F function;
 	
-	public BiConsumerAdapter(){}
+	public FunctionAdapter() {}
 	
-	public BiConsumerAdapter(F function) {
+	public FunctionAdapter(F function) {
 		this.function = function;
 	}
 	
-	public BiConsumerAdapter<F, I, J> setFunction(F function) {
+	public FunctionAdapter<F, I, O> setFunction(F function) {
 		this.function = function;
 		return this;
 	}
 	
-	public abstract void accept(I inputOne, J inputTwo);
+	public F getFunction() {
+		return this.function;
+	}
 	
+	public abstract O apply(I input);
 }

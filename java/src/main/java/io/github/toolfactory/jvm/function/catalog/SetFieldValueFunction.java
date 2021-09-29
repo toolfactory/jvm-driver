@@ -33,7 +33,7 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
-import io.github.toolfactory.jvm.function.util.Classes;
+import io.github.toolfactory.jvm.util.Classes;
 
 
 @SuppressWarnings({"restriction", "null"})

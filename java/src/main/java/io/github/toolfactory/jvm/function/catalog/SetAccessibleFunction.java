@@ -36,9 +36,9 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiConsumer;
-import io.github.toolfactory.jvm.function.util.BiConsumerAdapter;
-import io.github.toolfactory.jvm.function.util.Resources;
-import io.github.toolfactory.jvm.function.util.Streams;
+import io.github.toolfactory.jvm.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.util.Resources;
+import io.github.toolfactory.jvm.util.Streams;
 
 
 @SuppressWarnings("unchecked")
