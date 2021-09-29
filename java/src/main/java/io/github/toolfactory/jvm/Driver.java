@@ -54,8 +54,6 @@ public interface Driver extends Closeable {
 
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
 
-	public Field getDeclaredField(Class<?> cls, String name);
-
 	public Field[] getDeclaredFields(Class<?> cls);
 
 	public Method[] getDeclaredMethods(Class<?> cls);

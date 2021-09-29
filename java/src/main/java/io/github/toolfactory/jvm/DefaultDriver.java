@@ -46,7 +46,6 @@ import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DeepConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredConstructorsMethodHandleSupplier;
-import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldsMethodHandleSupplier;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredMethodsMethodHandleSupplier;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
@@ -78,7 +77,6 @@ public class DefaultDriver implements Driver {
 	MethodHandle declaredFieldsRetriever;
 	MethodHandle declaredMethodsRetriever;
 	MethodHandle declaredConstructorsRetriever;
-	BiFunction<Class<?>, String, Field> declaredFieldRetriever;
 	BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
 	MethodHandle constructorInvoker;
 	BiFunction<ClassLoader, String, Package> packageRetriever;
@@ -106,7 +104,6 @@ public class DefaultDriver implements Driver {
 			initDeclaredFieldsRetriever(functionProvider, initializationContext);
 			initDeclaredMethodsRetriever(functionProvider, initializationContext);
 			initDeclaredConstructorsRetriever(functionProvider, initializationContext);
-			initDeclaredFieldRetriever(functionProvider, initializationContext);
 			initAccessibleSetter(functionProvider, initializationContext);
 			initConstructorInvoker(functionProvider, initializationContext);
 			initMethodInvoker(functionProvider, initializationContext);
@@ -258,16 +255,6 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initDeclaredFieldRetriever(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		declaredFieldRetriever = functionProvider.getOrBuildObject(
-			GetDeclaredFieldFunction.class, initializationContext
-		);
-	}
-
-	
 	void initDeclaredConstructorsRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -414,11 +401,7 @@ public class DefaultDriver implements Driver {
 		}
 	}
 
-	@Override
-	public Field getDeclaredField(Class<?> cls, String name) {
-		return declaredFieldRetriever.apply(cls, name);
-	}
-
+	
 	@Override
 	public Field[] getDeclaredFields(Class<?> cls)  {
 		try {
@@ -458,7 +441,6 @@ public class DefaultDriver implements Driver {
 		declaredFieldsRetriever = null;
 		declaredMethodsRetriever = null;
 		declaredConstructorsRetriever = null;
-		declaredFieldRetriever = null;
 		accessibleSetter = null;
 		constructorInvoker = null;
 		packageRetriever = null;
