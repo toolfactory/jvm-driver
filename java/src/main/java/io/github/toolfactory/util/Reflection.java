@@ -148,8 +148,7 @@ public class Reflection {
 			collection.add(member);
 		}
 		for (Class<?> interf : cls.getInterfaces()) {
-			if (!visitedInterfaces.contains(interf)) {
-				visitedInterfaces.add(interf);
+			if (visitedInterfaces.add(interf)) {
 				getAll(interf, memberSupplier, visitedInterfaces, collection);
 			}
 		}
