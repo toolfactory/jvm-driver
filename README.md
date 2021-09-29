@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>5.1.0</version>
+    <version>5.1.1</version>
 </dependency>	
 ```
 
@@ -119,6 +119,46 @@ public <T> T throwException(Object exceptionOrMessage, Object... placeHolderRepl
 ```
 
 <br/>
+
+
+The JVM Driver library also provides a little utility class named `io.github.toolfactory.util.Reflection` that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
+
+```java
+public static Reflection getNew();
+
+public static Reflection getNewWithDefaultDriver();
+
+public static Reflection getNewWithHybridDriver();
+
+public static Reflection getNewWithNativeDriver();
+
+public static Reflection getNewWith(Driver driver);
+```
+
+The methods exposed by the `io.github.toolfactory.util.Reflection` component are the following:
+```java
+public Driver getDriver();
+
+public Collection<Method> getDeclaredMethods(Class<?> cls);
+
+public Collection<Method> getAllMethods(Class<?> cls);
+
+public <T> T getFieldValue(Object target, Field field);
+
+public void setFieldValue(Object target, Field field, Object value);
+
+public Field getDeclaredField(Class<?> cls, String name);
+
+public Collection<Field> getDeclaredFields(Class<?> cls);
+
+public Collection<Field> getAllFields(Class<?> cls);
+
+public Collection<Constructor<?>> getDeclaredConstructors(Class<?> cls);
+
+public Collection<Constructor<?>> getAllConstructors(Class<?> cls);
+
+```
+
 
 ## Compilation requirements
 
