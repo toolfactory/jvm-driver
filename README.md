@@ -4,7 +4,7 @@
 <img src="https://raw.githubusercontent.com/toolfactory/jvm-driver/master/docs/logo.png" alt="logo.png" height="180px" align="right"/>
 </a>
 
-[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/4)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
+[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/5)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
 [![GitHub](https://img.shields.io/github/license/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/blob/main/LICENSE)
 
 [![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1283896812)
@@ -33,7 +33,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 
 ## Overview
 
-There are two kinds of driver:
+There are three kinds of driver:
 
 * the **default driver** completely based on Java api
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
@@ -53,7 +53,7 @@ To create a driver a driver instance you should use this code:
 io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.getNew();
 ```
 
-The driver type returned by `io.github.toolfactory.jvm.Driver.Factory.getNew ()` is ** the first driver that can be initialized among the default, hybrid and native drivers respectively**.
+The driver type returned by the method `io.github.toolfactory.jvm.Driver.Factory.getNew()` is **the first driver that can be initialized among the default, hybrid and native drivers respectively**.
 
 If you need to create a specific driver type you should use:
 
