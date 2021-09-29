@@ -159,6 +159,7 @@ public Collection<Constructor<?>> getAllConstructors(Class<?> cls);
 
 ```
 
+<br />
 
 ## Compilation requirements
 
