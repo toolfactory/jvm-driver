@@ -33,8 +33,8 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public abstract class GetDeclaredMethodsMethodHandleSupplier implements Supplier<MethodHandle> {

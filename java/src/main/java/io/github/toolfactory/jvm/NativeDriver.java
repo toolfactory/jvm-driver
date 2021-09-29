@@ -38,6 +38,7 @@ import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("unchecked")

@@ -62,6 +62,7 @@ import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.util.FunctionAdapter;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 

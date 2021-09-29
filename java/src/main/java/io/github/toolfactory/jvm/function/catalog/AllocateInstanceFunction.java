@@ -33,8 +33,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")

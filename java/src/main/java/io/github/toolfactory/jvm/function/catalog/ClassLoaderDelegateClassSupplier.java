@@ -31,9 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.Classes;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Resources;
 import io.github.toolfactory.jvm.util.Streams;
 

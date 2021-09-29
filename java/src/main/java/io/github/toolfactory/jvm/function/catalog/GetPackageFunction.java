@@ -32,8 +32,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public interface GetPackageFunction extends BiFunction<ClassLoader, String, Package> {

@@ -31,8 +31,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {

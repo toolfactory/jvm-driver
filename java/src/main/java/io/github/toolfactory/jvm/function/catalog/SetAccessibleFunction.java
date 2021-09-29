@@ -34,9 +34,9 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Resources;
 import io.github.toolfactory.jvm.util.Streams;
 

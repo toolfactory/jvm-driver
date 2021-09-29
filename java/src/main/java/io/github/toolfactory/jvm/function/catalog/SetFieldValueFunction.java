@@ -31,9 +31,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.util.Classes;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings({"restriction", "null"})

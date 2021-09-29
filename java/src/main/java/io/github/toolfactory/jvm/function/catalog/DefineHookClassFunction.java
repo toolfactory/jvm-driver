@@ -33,10 +33,10 @@ import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.JavaClass;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("restriction")

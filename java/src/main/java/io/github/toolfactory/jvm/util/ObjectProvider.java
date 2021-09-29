@@ -1,4 +1,4 @@
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.util;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;

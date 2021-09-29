@@ -31,9 +31,9 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")

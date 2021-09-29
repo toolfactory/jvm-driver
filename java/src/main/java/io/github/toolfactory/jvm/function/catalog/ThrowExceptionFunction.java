@@ -29,8 +29,8 @@ package io.github.toolfactory.jvm.function.catalog;
 
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Consumer;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 
 

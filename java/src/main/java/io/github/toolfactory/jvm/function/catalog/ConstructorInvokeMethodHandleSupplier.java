@@ -33,8 +33,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public class ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {

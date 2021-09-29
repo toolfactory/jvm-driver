@@ -35,9 +35,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.ObjectProvider;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.FunctionAdapter;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("unchecked")

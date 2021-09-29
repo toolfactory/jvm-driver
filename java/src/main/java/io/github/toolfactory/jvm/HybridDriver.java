@@ -30,6 +30,7 @@ package io.github.toolfactory.jvm;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public class HybridDriver extends DefaultDriver {
