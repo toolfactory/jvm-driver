@@ -91,8 +91,6 @@ public MethodHandles.Lookup getConsulter(Class<?> cls);
 
 public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
 
-public Field getDeclaredField(Class<?> cls, String name);
-
 public Field[] getDeclaredFields(Class<?> cls);
 
 public Method[] getDeclaredMethods(Class<?> cls);
@@ -117,7 +115,7 @@ public void setAccessible(AccessibleObject object, boolean flag);
 
 public void setFieldValue(Object target, Field field, Object value);
 
-public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                           
+public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                          
 ```
 
 <br/>
