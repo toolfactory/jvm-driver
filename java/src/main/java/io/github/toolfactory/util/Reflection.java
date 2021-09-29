@@ -158,19 +158,23 @@ public class Reflection {
 	public static class Factory {
 		
 		public static Reflection getNew() {
-			return new Reflection(Driver.Factory.getNew());
+			return getNewWith(Driver.Factory.getNew());
+		}
+		
+		public static Reflection getNewWith(Driver driver) {
+			return new Reflection(driver);
 		}
 		
 		public static Reflection getNewWithDefaultDriver() {
-			return new Reflection(Driver.Factory.getNewDefault());
+			return getNewWith(Driver.Factory.getNewDefault());
 		}
 		
 		public static Reflection getNewWithHybridDriver() {
-			return new Reflection(Driver.Factory.getNewHybrid());
+			return getNewWith(Driver.Factory.getNewHybrid());
 		}
 		
 		public static Reflection getNewWithNativeDriver() {
-			return new Reflection(Driver.Factory.getNewNative());
+			return getNewWith(Driver.Factory.getNewNative());
 		}
 	}
 }
