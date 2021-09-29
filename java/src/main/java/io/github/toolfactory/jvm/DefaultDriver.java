@@ -401,7 +401,6 @@ public class DefaultDriver implements Driver {
 		}
 	}
 
-	
 	@Override
 	public Field[] getDeclaredFields(Class<?> cls)  {
 		try {

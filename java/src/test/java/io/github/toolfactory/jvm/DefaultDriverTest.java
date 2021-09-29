@@ -3,26 +3,29 @@ package io.github.toolfactory.jvm;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.toolfactory.util.Reflection;
+
 
 @SuppressWarnings("unused")
 public class DefaultDriverTest extends BaseTest {
-	private static Driver driver;
 	
 	public static void main(String[] args) {
 		new DefaultDriverTest().getAndSetDirectVolatileTestOne();
 	}
 	
-	Driver getDriver() {
-		if (driver == null) {
+	Reflection getReflection() {
+		if (reflection == null) {
 			try {
-				driver = new DefaultDriver();
+				reflection = Reflection.Factory.getNewWithDefaultDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
 				throw new RuntimeException(exc);
 			}
 		}
-		return driver;
-	}	
+		return reflection;
+	}
+	
+	
 	@Test
 	public void getAndSetDirectVolatileTestOne() {
 		super.getAndSetDirectVolatileTestOne();

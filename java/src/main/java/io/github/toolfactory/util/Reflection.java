@@ -45,6 +45,9 @@ public class Reflection {
 		this.driver = driver;
 	}
 	
+	public Driver getDriver() {
+		return this.driver;
+	}
 	
 	public Collection<Method> getDeclaredMethods(Class<?> cls) {
 		Set<Method> declaredMembers = new LinkedHashSet<>();
@@ -68,8 +71,12 @@ public class Reflection {
 		);		
 	}
 	
-	public Field getFieldValue(Object target, Field field) {
+	public <T> T getFieldValue(Object target, Field field) {
 		return driver.getFieldValue(target, field);
+	}
+	
+	public void setFieldValue(Object target, Field field, Object value) {
+		driver.setFieldValue(target, field, value);
 	}
 	
 

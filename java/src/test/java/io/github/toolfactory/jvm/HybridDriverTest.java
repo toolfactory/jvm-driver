@@ -3,24 +3,25 @@ package io.github.toolfactory.jvm;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.toolfactory.util.Reflection;
+
 
 public class HybridDriverTest extends BaseTest {
-	private static Driver driver;
 	
 	public static void main(String[] args) {
 		new HybridDriverTest().getAndSetDirectVolatileTestOne();
 	}
 	
-	Driver getDriver() {
-		if (driver == null) {
+	Reflection getReflection() {
+		if (reflection == null) {
 			try {
-				driver = new HybridDriver();
+				reflection = Reflection.Factory.getNewWithHybridDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
 				throw new RuntimeException(exc);
 			}
 		}
-		return driver;
+		return reflection;
 	}
 	
 	@Test
