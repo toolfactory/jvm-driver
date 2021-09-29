@@ -32,8 +32,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.template.Supplier;
-import io.github.toolfactory.jvm.util.Info;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
