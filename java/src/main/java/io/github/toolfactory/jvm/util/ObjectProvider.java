@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.toolfactory.jvm.Info;
-import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 
 @SuppressWarnings("all")
@@ -90,13 +89,13 @@ public class ObjectProvider {
 				return (T)getOrBuildObject((Class<? super T>)superClass, context);
 			} catch (BuildingException exc) {
 				throw new BuildingException(
-					"Unable to build the related object of " + clazz.getName() + ": " + String.join(", ", searchedClasses) + " have been searched without success",
+					"Unable to build the related object of " + clazz.getName() + ": " + Strings.join(", ", searchedClasses) + " have been searched without success",
 					exc
 				);
 			}
 		} else {
 			throw new BuildingException(
-				"Unable to build the related object of " + clazz.getName() + ": " + String.join(", ", searchedClasses) + " have been searched without success"
+				"Unable to build the related object of " + clazz.getName() + ": " + Strings.join(", ", searchedClasses) + " have been searched without success"
 			);
 		}
 	}

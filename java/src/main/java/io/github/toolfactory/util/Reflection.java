@@ -61,11 +61,15 @@ public class Reflection {
 			new Function<Class<?>, Method[]>() {
 				@Override
 				public Method[] apply(Class<?> input) {
-					return driver.getDeclaredMethods(cls);
+					return driver.getDeclaredMethods(input);
 				}
 			},
-			new LinkedHashSet<>()
+			new LinkedHashSet<Method>()
 		);		
+	}
+	
+	public Field getFieldValue(Object target, Field field) {
+		return driver.getFieldValue(target, field);
 	}
 	
 
@@ -93,10 +97,10 @@ public class Reflection {
 			new Function<Class<?>, Field[]>() {
 				@Override
 				public Field[] apply(Class<?> input) {
-					return driver.getDeclaredFields(cls);
+					return driver.getDeclaredFields(input);
 				}
 			},
-			new LinkedHashSet<>()
+			new LinkedHashSet<Field>()
 		);		
 	}
 	
@@ -116,10 +120,10 @@ public class Reflection {
 			new Function<Class<?>, Constructor<?>[]>() {
 				@Override
 				public Constructor<?>[] apply(Class<?> input) {
-					return driver.getDeclaredConstructors(cls);
+					return driver.getDeclaredConstructors(input);
 				}
 			},
-			new LinkedHashSet<>()
+			new LinkedHashSet<Constructor<?>>()
 		);		
 	}
 	

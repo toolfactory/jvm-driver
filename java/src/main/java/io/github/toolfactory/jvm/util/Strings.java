@@ -26,6 +26,8 @@
  */
 package io.github.toolfactory.jvm.util;
 
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Strings {
 
@@ -45,6 +47,18 @@ public class Strings {
 		.replace(")", "\\)")
 		.replace(".", "\\.")
 		.replace("$", "\\$");
+	}
+
+	public static String join(String delimiter, Collection<?> objs) {
+		String joinedString = "";
+		Iterator<?> objsItr = objs.iterator();
+		while (objsItr.hasNext()) {
+			joinedString += objsItr.next().toString();
+			if (objsItr.hasNext()) {
+				joinedString += delimiter;
+			}
+		}
+		return joinedString;
 	}
 
 }
