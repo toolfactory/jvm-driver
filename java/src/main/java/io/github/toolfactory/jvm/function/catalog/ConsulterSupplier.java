@@ -91,16 +91,4 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		}
 	}
 	
-	static class Native extends	ConsulterSupplier {
-		
-		static class ForJava7 extends Native {
-			
-			ForJava7(Map<Object, Object> context) {
-				consulter = MethodHandles.lookup();
-				io.github.toolfactory.narcissus.Narcissus.setAllowedModes(consulter, -1);
-			}
-			
-		}
-	}
-	
 }
