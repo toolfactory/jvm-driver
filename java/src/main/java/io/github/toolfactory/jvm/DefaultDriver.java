@@ -68,23 +68,23 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 @SuppressWarnings("unchecked")
 public class DefaultDriver implements Driver {	
 	
-	ThrowExceptionFunction exceptionThrower; 
-	Function<Class<?>, Object> allocateInstanceInvoker;	
-	BiFunction<Object, Field, Object> fieldValueRetriever;
-	TriConsumer<Object, Field, Object> fieldValueSetter;
-	BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
-	FunctionAdapter<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
-	MethodHandle declaredFieldsRetriever;
-	MethodHandle declaredMethodsRetriever;
-	MethodHandle declaredConstructorsRetriever;
-	BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
-	MethodHandle constructorInvoker;
-	BiFunction<ClassLoader, String, Package> packageRetriever;
-	MethodHandle methodInvoker;
-	Class<?> builtinClassLoaderClass;
-	Class<?> classLoaderDelegateClass;
-	Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
-	Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;	
+	protected ThrowExceptionFunction exceptionThrower; 
+	protected Function<Class<?>, Object> allocateInstanceInvoker;	
+	protected BiFunction<Object, Field, Object> fieldValueRetriever;
+	protected TriConsumer<Object, Field, Object> fieldValueSetter;
+	protected BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
+	protected FunctionAdapter<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
+	protected MethodHandle declaredFieldsRetriever;
+	protected MethodHandle declaredMethodsRetriever;
+	protected MethodHandle declaredConstructorsRetriever;
+	protected BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
+	protected MethodHandle constructorInvoker;
+	protected BiFunction<ClassLoader, String, Package> packageRetriever;
+	protected MethodHandle methodInvoker;
+	protected Class<?> builtinClassLoaderClass;
+	protected Class<?> classLoaderDelegateClass;
+	protected Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
+	protected Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;	
 
 
 	public DefaultDriver() {
