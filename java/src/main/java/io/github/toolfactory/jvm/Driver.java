@@ -171,27 +171,27 @@ public interface Driver extends Closeable {
 			setDriverClass("nativeDriverClass", className);
 		}
 		
-		public static Driver getNewDefault() {
+		public static <D extends Driver> D getNewDefault() {
 			try {
-				return driverConstructors.get("defaultDriverClass").newInstance();
+				return (D)driverConstructors.get("defaultDriverClass").newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
 			}
 		}
 		
-		public static Driver getNewHybrid() {
+		public static <D extends Driver> D getNewHybrid() {
 			try {
-				return driverConstructors.get("hybridDriverClass").newInstance();
+				return (D)driverConstructors.get("hybridDriverClass").newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
 			}
 		}
 		
-		public static Driver getNewNative() {
+		public static <D extends Driver> D getNewNative() {
 			try {
-				return driverConstructors.get("nativeDriverClass").newInstance();
+				return (D)driverConstructors.get("nativeDriverClass").newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
