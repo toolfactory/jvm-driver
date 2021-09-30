@@ -103,7 +103,7 @@
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven-scm-provider-gitexe.version>1.9.5</maven-scm-provider-gitexe.version>
 		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
-		<narcissus.version>1.0.1</narcissus.version>
+		<narcissus.version>1.0.2</narcissus.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 	</properties>
 
