@@ -47,7 +47,7 @@ public class ObjectProvider {
 	
 	public ObjectProvider(String classSuffix, int... versions) {
 		this.classSuffix = classSuffix;
-		int jVMVersion = Info.Provider.getInstance().getVersion();
+		int jVMVersion = Info.Provider.getInfoInstance().getVersion();
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int i = 0; i < versions.length; i++) {
 			if (jVMVersion >= versions[i]) {

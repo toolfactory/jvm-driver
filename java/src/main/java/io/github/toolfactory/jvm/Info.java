@@ -47,7 +47,7 @@ public interface Info {
 	
 	public static class Provider {
 		
-		public static Info getInstance() {
+		public static Info getInfoInstance() {
 			return InfoImpl.getInstance();
 		}
 		
