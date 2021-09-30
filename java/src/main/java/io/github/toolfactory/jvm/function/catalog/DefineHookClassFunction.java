@@ -41,8 +41,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("restriction")
 public abstract class DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
-	MethodHandle defineHookClassMethodHandle;
-	ThrowExceptionFunction throwExceptionFunction;
+	protected MethodHandle defineHookClassMethodHandle;
+	protected ThrowExceptionFunction throwExceptionFunction;
 	
 	public DefineHookClassFunction(Map<Object, Object> context) {
 		ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -52,7 +52,7 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 	
 	
 	public static class ForJava7 extends DefineHookClassFunction {
-		sun.misc.Unsafe unsafe;
+		protected sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
@@ -100,8 +100,8 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 	
 	
 	public static class ForJava17 extends DefineHookClassFunction {
-		private MethodHandle privateLookupInMethodHandle;
-		private MethodHandles.Lookup consulter;
+		protected MethodHandle privateLookupInMethodHandle;
+		protected MethodHandles.Lookup consulter;
 		
 		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);

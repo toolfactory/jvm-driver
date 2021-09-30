@@ -43,7 +43,7 @@ import io.github.toolfactory.jvm.util.Streams;
 
 @SuppressWarnings("unchecked")
 public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
-	ThrowExceptionFunction throwExceptionFunction;
+	protected ThrowExceptionFunction throwExceptionFunction;
 	
 	public SetAccessibleFunction(Map<Object, Object> context) {
 		ObjectProvider functionProvider = ObjectProvider.get(context);

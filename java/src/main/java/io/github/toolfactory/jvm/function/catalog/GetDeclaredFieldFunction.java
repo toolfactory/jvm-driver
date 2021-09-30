@@ -38,8 +38,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
 	
 	public static class ForJava7 extends GetDeclaredFieldFunction {
-		MethodHandle getDeclaredFields;
-		ThrowExceptionFunction throwExceptionFunction;
+		protected MethodHandle getDeclaredFields;
+		protected ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);

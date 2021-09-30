@@ -37,7 +37,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+	protected MethodHandle methodHandle;
 	
 	public static class ForJava7 extends PrivateLookupInMethodHandleSupplier {
 		

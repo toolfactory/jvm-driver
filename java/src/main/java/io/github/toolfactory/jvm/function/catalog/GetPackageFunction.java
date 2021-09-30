@@ -51,8 +51,8 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 	}
 	
 	public static class ForJava9 implements GetPackageFunction{
-		MethodHandle methodHandle;
-		ThrowExceptionFunction throwExceptionFunction;
+		protected MethodHandle methodHandle;
+		protected ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);

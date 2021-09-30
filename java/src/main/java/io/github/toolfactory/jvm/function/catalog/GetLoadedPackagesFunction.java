@@ -40,8 +40,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public abstract class GetLoadedPackagesFunction implements Function<ClassLoader, Map<String, ?>> {
 	
 	public static class ForJava7 extends GetLoadedPackagesFunction {
-		final sun.misc.Unsafe unsafe;
-		final Long fieldOffset;
+		protected sun.misc.Unsafe unsafe;
+		protected Long fieldOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);

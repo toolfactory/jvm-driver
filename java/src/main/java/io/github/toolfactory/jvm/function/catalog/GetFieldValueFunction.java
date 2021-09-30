@@ -40,7 +40,7 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 	
 	
 	public static class ForJava7 implements GetFieldValueFunction {
-		final sun.misc.Unsafe unsafe;
+		protected sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
 			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();

@@ -52,7 +52,7 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	}
 	
 	public static class ForJava9 implements ClassLoaderDelegateClassSupplier{
-		Class<?> cls;
+		protected Class<?> cls;
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
 			try (

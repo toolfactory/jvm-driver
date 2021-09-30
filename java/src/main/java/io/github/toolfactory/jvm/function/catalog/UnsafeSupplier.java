@@ -38,7 +38,7 @@ import sun.misc.Unsafe;
 public interface UnsafeSupplier extends Supplier<sun.misc.Unsafe> {
 
 	public static class ForJava7 implements UnsafeSupplier {
-		sun.misc.Unsafe unsafe;
+		protected sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 			Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");

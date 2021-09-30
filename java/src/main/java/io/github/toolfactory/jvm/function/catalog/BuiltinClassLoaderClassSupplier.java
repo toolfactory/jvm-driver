@@ -46,7 +46,7 @@ public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
 	}
 	
 	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
-		Class<?> cls;
+		protected Class<?> cls;
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
 			cls = Class.forName("jdk.internal.loader.BuiltinClassLoader");

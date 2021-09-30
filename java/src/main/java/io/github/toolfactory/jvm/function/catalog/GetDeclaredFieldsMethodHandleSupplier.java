@@ -38,7 +38,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public abstract class GetDeclaredFieldsMethodHandleSupplier implements Supplier<MethodHandle> {
-	MethodHandle methodHandle;
+	protected MethodHandle methodHandle;
 	
 	@Override
 	public MethodHandle get() {

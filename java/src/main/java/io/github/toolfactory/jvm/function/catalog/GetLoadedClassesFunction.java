@@ -41,8 +41,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public abstract class GetLoadedClassesFunction implements Function<ClassLoader, Collection<Class<?>>> {
 	
 	public static class ForJava7 extends GetLoadedClassesFunction {
-		final sun.misc.Unsafe unsafe;
-		final Long loadedClassesVectorMemoryOffset;
+		protected sun.misc.Unsafe unsafe;
+		protected Long loadedClassesVectorMemoryOffset;
 		
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);

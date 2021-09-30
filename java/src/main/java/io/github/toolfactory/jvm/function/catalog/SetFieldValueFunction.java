@@ -38,7 +38,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings({"restriction", "null"})
 public abstract class SetFieldValueFunction implements TriConsumer<Object, Field, Object> {
-	ThrowExceptionFunction throwExceptionFunction;
+	protected ThrowExceptionFunction throwExceptionFunction;
 	
 	public SetFieldValueFunction(Map<Object, Object> context) {
 		ObjectProvider functionProvider = ObjectProvider.get(context);
