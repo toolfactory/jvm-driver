@@ -36,7 +36,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public class HybridDriver extends DefaultDriver {
 	
 
-	void initHookClassDefiner(
+	protected void initHookClassDefiner(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {

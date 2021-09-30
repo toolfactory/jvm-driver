@@ -45,7 +45,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public class NativeDriver extends HybridDriver {
 	
 	
-	void initExceptionThrower(
+	protected void initExceptionThrower(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -55,7 +55,7 @@ public class NativeDriver extends HybridDriver {
 	}
 	
 	
-	void initLoadedPackagesRetriever(
+	protected void initLoadedPackagesRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -66,7 +66,7 @@ public class NativeDriver extends HybridDriver {
 
 	
 	@Override
-	void initLoadedClassesRetriever(
+	protected void initLoadedClassesRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -77,7 +77,7 @@ public class NativeDriver extends HybridDriver {
 
 	
 	@Override
-	void initFieldValueSetter(
+	protected void initFieldValueSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -88,7 +88,7 @@ public class NativeDriver extends HybridDriver {
 
 	
 	@Override
-	void initFieldValueRetriever(
+	protected void initFieldValueRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -99,7 +99,7 @@ public class NativeDriver extends HybridDriver {
 
 	
 	@Override		
-	void initAllocateInstanceInvoker(
+	protected void initAllocateInstanceInvoker(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -110,7 +110,7 @@ public class NativeDriver extends HybridDriver {
 	
 	
 	@Override
-	void initAccessibleSetter(
+	protected void initAccessibleSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {

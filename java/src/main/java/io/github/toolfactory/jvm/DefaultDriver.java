@@ -123,7 +123,7 @@ public class DefaultDriver implements Driver {
 	}
 	
 	//Initializers
-	void initExceptionThrower(
+	protected void initExceptionThrower(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -133,7 +133,7 @@ public class DefaultDriver implements Driver {
 	}
 	
 	
-	void initLoadedPackagesRetriever(
+	protected void initLoadedPackagesRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -143,7 +143,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initLoadedClassesRetriever(
+	protected void initLoadedClassesRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -153,7 +153,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void replaceConsulterWithDeepConsulter(
+	protected void replaceConsulterWithDeepConsulter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
@@ -164,7 +164,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initClassLoaderDelegateClass(
+	protected void initClassLoaderDelegateClass(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -174,7 +174,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initBuiltinClassLoaderClass(
+	protected void initBuiltinClassLoaderClass(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -184,7 +184,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initPackageRetriever(
+	protected void initPackageRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -194,7 +194,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initFieldValueSetter(
+	protected void initFieldValueSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -204,7 +204,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initFieldValueRetriever(
+	protected void initFieldValueRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -214,7 +214,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initAllocateInstanceInvoker(
+	protected void initAllocateInstanceInvoker(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -224,7 +224,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initMethodInvoker(
+	protected void initMethodInvoker(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -234,7 +234,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initConstructorInvoker(
+	protected void initConstructorInvoker(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -244,7 +244,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initAccessibleSetter(
+	protected void initAccessibleSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -255,7 +255,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initDeclaredConstructorsRetriever(
+	protected void initDeclaredConstructorsRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -265,7 +265,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initDeclaredMethodsRetriever(
+	protected void initDeclaredMethodsRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -275,7 +275,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initDeclaredFieldsRetriever(
+	protected void initDeclaredFieldsRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -285,7 +285,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initHookClassDefiner(
+	protected void initHookClassDefiner(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -295,7 +295,7 @@ public class DefaultDriver implements Driver {
 	}
 
 	
-	void initConsulterRetriever(
+	protected void initConsulterRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
