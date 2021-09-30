@@ -1,7 +1,11 @@
 /*
- * This file is part of ToolFactory JVM driver.
+ * This file is derived from ToolFactory JVM driver.
  *
  * Hosted at: https://github.com/toolfactory/jvm-driver
+ * 
+ * Modified by: Roberto Gentili
+ *
+ * Modifications hosted at: https://github.com/burningwave/jvm-driver
  *
  * --
  *
@@ -26,113 +30,20 @@
  */
 package io.github.toolfactory.jvm;
 
-
-import java.lang.reflect.Method;
-
-
-public class Info {
-
-    private final String osArch;
-    private boolean is64Bit;
-    private boolean is64BitHotspot;
-    private boolean is32Bit;
-    private boolean compressedRefsEnabled;
-    private int version;
-
-    public Info() {
-    	osArch = System.getProperty("os.arch");
-    	init();
-    }
-
-    public static Info getInstance() {
-    	return Holder.getWithinInstance();
-    }
-
-    public static Info create() {
-    	return new Info();
-    }
-
-    private void init() {
-    	String version = System.getProperty("java.version");
-        if(version.startsWith("1.")) {
-        	version = version.substring(2, 3);
-        } else {
-        	int separatorIdx = version.indexOf(".");
-        	if(separatorIdx != -1) {
-        		version = version.substring(0, separatorIdx);
-        	} else {
-        		separatorIdx = version.indexOf("-");
-        		if(separatorIdx != -1) {
-            		version = version.substring(0, separatorIdx);
-            	}
-        	}        }
-        this.version = Integer.parseInt(version);
-        boolean is64Bit = false;
-        boolean is32Bit = false;
-        final String x = System.getProperty("sun.arch.data.model");
-        if (x != null) {
-            is64Bit = x.contains("64");
-            is32Bit = x.contains("32");
-        } else {
-            if (osArch != null && osArch.contains("64")) {
-                is64Bit = true;
-            } else {
-                is64Bit = false;
-            }
-        }
-        boolean compressedOops = false;
-        boolean is64BitHotspot = false;
-
-        if (is64Bit) {
-            try {
-                final Class<?> beanClazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
-                final Object hotSpotBean = Class.forName("java.lang.management.ManagementFactory").getMethod("getPlatformMXBean", Class.class)
-                        .invoke(null, beanClazz);
-                if (hotSpotBean != null) {
-                    is64BitHotspot = true;
-                    final Method getVMOptionMethod = beanClazz.getMethod("getVMOption", String.class);
-                    try {
-                        final Object vmOption = getVMOptionMethod.invoke(hotSpotBean, "UseCompressedOops");
-                        compressedOops = Boolean.parseBoolean(vmOption.getClass().getMethod("getValue").invoke(vmOption).toString());
-                    } catch (ReflectiveOperationException | RuntimeException e) {
-                        is64BitHotspot = false;
-                    }
-                }
-            } catch (ReflectiveOperationException | RuntimeException e) {
-                is64BitHotspot = false;
-            }
-        }
-        this.is64Bit = is64Bit;
-        this.is64BitHotspot = is64BitHotspot;
-        this.is32Bit = is32Bit;
-        this.compressedRefsEnabled = compressedOops;
-    }
-
-    public boolean isCompressedOopsOffOn64BitHotspot() {
-        return is64BitHotspot && !compressedRefsEnabled;
-    }
-
-    public boolean isCompressedOopsOffOn64Bit() {
-        return is64Bit && !compressedRefsEnabled;
-    }
-
-    public boolean is32Bit() {
-    	return is32Bit;
-    }
-
-    public boolean is64Bit() {
-    	return is64Bit;
-    }
-
-    public int getVersion() {
-    	return version;
-    }
-
-	private static class Holder {
-		private static final Info INSTANCE = Info.create();
-
-		private static Info getWithinInstance() {
-			return INSTANCE;
-		}
+public interface Info {
+	
+	public static Info getInstance() {
+		return InfoImpl.getInstance();
 	}
+	
+	boolean isCompressedOopsOffOn64BitHotspot();
+
+	boolean isCompressedOopsOffOn64Bit();
+
+	boolean is32Bit();
+
+	boolean is64Bit();
+
+	int getVersion();
+	
 }
