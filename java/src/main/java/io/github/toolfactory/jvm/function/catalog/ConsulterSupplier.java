@@ -39,7 +39,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("restriction")
 public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup> {
-	MethodHandles.Lookup consulter;
+	protected MethodHandles.Lookup consulter;
 	
 	@Override
 	public MethodHandles.Lookup get() {
