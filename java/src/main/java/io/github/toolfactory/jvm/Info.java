@@ -32,9 +32,7 @@ package io.github.toolfactory.jvm;
 
 public interface Info {
 	
-	public static Info getInstance() {
-		return InfoImpl.getInstance();
-	}
+
 	
 	boolean isCompressedOopsOffOn64BitHotspot();
 
@@ -46,4 +44,12 @@ public interface Info {
 
 	int getVersion();
 	
+	
+	public static class Provider {
+		
+		public static Info getInstance() {
+			return InfoImpl.getInstance();
+		}
+		
+	}
 }

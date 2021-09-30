@@ -95,6 +95,10 @@ public interface Driver extends Closeable {
 			}
 		}
 		
+		public static Driver getNew(String className) throws Throwable{
+			return (Driver)Class.forName(className).getDeclaredConstructor().newInstance();
+		}
+		
 		public static Driver getNewDefault() {
 			return new DefaultDriver();
 		}
