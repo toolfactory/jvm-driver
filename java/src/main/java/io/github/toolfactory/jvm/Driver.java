@@ -88,7 +88,6 @@ public interface Driver extends Closeable {
 	
 	@SuppressWarnings("unchecked")
 	public static class Factory {
-		private static java.util.Properties configuration;
 		private static Map<String, Constructor<? extends Driver>> driverConstructors;
 
 		
@@ -97,7 +96,7 @@ public interface Driver extends Closeable {
 				Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
 				classLoaders.add(Factory.class.getClassLoader());
 				classLoaders.add(Thread.currentThread().getContextClassLoader());
-				configuration = Properties.loadFromResourcesAndMerge(
+				java.util.Properties configuration = Properties.loadFromResourcesAndMerge(
 					"jvm-driver.properties",
 					"priority-of-this-configuration-file",
 					classLoaders.toArray(new ClassLoader[classLoaders.size()])
