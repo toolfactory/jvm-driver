@@ -34,7 +34,7 @@
     </parent>
 	
 	<artifactId>jvm-driver</artifactId>
-	<version>6.0.1-SNAPSHOT</version>
+	<version>6.1.0-SNAPSHOT</version>
 	
 	<packaging>jar</packaging>
 
@@ -105,6 +105,12 @@
 					<include>**LICENSE</include>
 				</includes>
 				<targetPath>META-INF</targetPath>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<includes>
+					<include>**</include>
+				</includes>
 			</resource>
 			<resource>
 				<directory>${project.basedir}/../java-hook/src/main/java</directory>
