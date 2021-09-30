@@ -64,14 +64,14 @@ public class ObjectProvider {
 		T object = getObject(clazz, context);		
 		context.put(CLASS_NAME, this);
 		for (int version : registeredVersions) {
-			String clsName = className + "$" +  classSuffix + version;
+			String clsName = className + classSuffix + version;
 			try {
 				Class<?> effectiveClass = null;
 				try {
 					effectiveClass = Class.forName(clsName);
 				} catch (ClassNotFoundException exc) {
 					searchedClasses.add(clsName);
-					clsName = className + classSuffix + version;
+					clsName = className + "$" +  classSuffix + version;
 					effectiveClass = Class.forName(clsName);
 				}
 				object = (T) effectiveClass.getDeclaredConstructor(Map.class).newInstance(context);

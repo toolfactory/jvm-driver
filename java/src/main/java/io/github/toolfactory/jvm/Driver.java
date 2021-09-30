@@ -32,9 +32,15 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import io.github.toolfactory.jvm.util.Properties;
 
 
 public interface Driver extends Closeable {
@@ -81,7 +87,31 @@ public interface Driver extends Closeable {
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
 	
 	
+	@SuppressWarnings("unchecked")
 	public static class Factory {
+		private static java.util.Properties configuration;
+		private static Map<String, Constructor<? extends Driver>> driverConstructors;
+
+		
+		static {
+			try {
+				Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
+				classLoaders.add(Factory.class.getClassLoader());
+				classLoaders.add(Thread.currentThread().getContextClassLoader());
+				configuration = Properties.loadFromResourcesAndMerge(
+					"jvm-driver.properties",
+					"priority-of-this-configuration-file",
+					classLoaders.toArray(new ClassLoader[classLoaders.size()])
+				);
+				driverConstructors = new ConcurrentHashMap<String, Constructor<? extends Driver>>();
+				setDriverClass("defaultDriverClass", configuration.getProperty("default-driver.class"));
+				setDriverClass("hybridDriverClass", configuration.getProperty("hybrid-driver.class"));
+				setDriverClass("nativeDriverClass", configuration.getProperty("native-driver.class"));
+			} catch (Throwable exc) {
+				throw new FactoryException(exc);
+			}
+		}
+		
 		
 		public static Driver getNew() {
 			try {
@@ -95,30 +125,109 @@ public interface Driver extends Closeable {
 			}
 		}
 		
-		public static Driver getNew(String className) throws Throwable{
+		public static Driver getNew(String className) throws Throwable {
 			return (Driver)Class.forName(className).getDeclaredConstructor().newInstance();
 		}
 		
+		private static void setDriverClass(String name, String className) {
+			try {
+				setDriverClass(name, Class.forName(className));
+			} catch (ClassNotFoundException exc) {
+				throw new FactoryException(exc);
+			}
+		}
+		
+		private static void setDriverClass(String name, Class<?> cls) {
+			try {
+				driverConstructors.put(
+					name, 
+					(Constructor<? extends Driver>)cls.getDeclaredConstructor()
+				);
+			} catch (NoSuchMethodException | SecurityException exc) {
+				throw new FactoryException(exc);
+			}
+		}
+		
+		public static void setDefaultDriverClass(Class<? extends Driver> cls) {
+			setDriverClass("defaultDriverClass", cls);
+		}
+		
+		public static void setDefaultDriverClass(String className) {
+			setDriverClass("defaultDriverClass", className);
+		}
+		
+		public static void setHybridDriverClass(Class<? extends Driver> cls) {
+			setDriverClass("hybridDriverClass", cls);
+		}
+		
+		public static void setHybridDriverClass(String className) {
+			setDriverClass("hybridDriverClass", className);
+		}
+		
+		public static void setNativeDriverClass(Class<? extends Driver> cls) {
+			setDriverClass("nativeDriverClass", cls);
+		}
+		
+		public static void setNativeDriverClass(String className) {
+			setDriverClass("nativeDriverClass", className);
+		}
+		
 		public static Driver getNewDefault() {
-			return new DefaultDriver();
+			try {
+				return driverConstructors.get("defaultDriverClass").newInstance();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException exc) {
+				throw new InstantiateException(exc);
+			}
 		}
 		
 		public static Driver getNewHybrid() {
-			return new HybridDriver();
+			try {
+				return driverConstructors.get("hybridDriverClass").newInstance();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException exc) {
+				throw new InstantiateException(exc);
+			}
 		}
 		
 		public static Driver getNewNative() {
-			return new NativeDriver();
+			try {
+				return driverConstructors.get("nativeDriverClass").newInstance();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException exc) {
+				throw new InstantiateException(exc);
+			}
+		}
+		
+		public static class	FactoryException extends RuntimeException {
+
+			private static final long serialVersionUID = 6332920978175279534L;
+			
+			public FactoryException(Throwable cause) {
+		        super(cause);
+		    }
+
 		}
 	}
 	
 	public static class InitializeException extends RuntimeException {
 
-		private static final long serialVersionUID = -3348641464676904231L;
+		private static final long serialVersionUID = -1351844562568567842L;
 
-	    public InitializeException(String message, Throwable cause) {
+		public InitializeException(String message, Throwable cause) {
 	        super(message, cause);
 	    }
 
 	}
+	
+	public static class	InstantiateException extends RuntimeException {
+
+		private static final long serialVersionUID = 558903509767014098L;
+
+		public InstantiateException(Throwable cause) {
+	        super(cause);
+	    }
+
+	}
+	
 }

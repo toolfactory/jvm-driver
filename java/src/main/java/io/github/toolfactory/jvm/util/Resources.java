@@ -27,7 +27,12 @@
 package io.github.toolfactory.jvm.util;
 
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Resources {
@@ -37,6 +42,23 @@ public class Resources {
 			resourceClassLoader = ClassLoader.getSystemClassLoader();
 		}
 		return resourceClassLoader.getResourceAsStream(resourceRelativePath);
+	}
+	
+	public static Map<URL, InputStream> getAsInputStreams(ClassLoader resourceClassLoader, String resourceRelativePath) throws IOException {
+		if (resourceClassLoader == null) {
+			resourceClassLoader = ClassLoader.getSystemClassLoader();
+		}
+		Map<URL, InputStream> streams = new HashMap<>();
+		Enumeration<URL> resources = resourceClassLoader.getResources(resourceRelativePath);
+		while (resources.hasMoreElements()) {
+			URL resourceURL = resources.nextElement();
+			streams.put(
+				resourceURL,
+				resourceURL.openStream()
+			);
+		}
+		
+		return streams;
 	}
 
 }

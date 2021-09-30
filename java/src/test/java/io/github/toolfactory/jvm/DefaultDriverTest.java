@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import io.github.toolfactory.util.Reflection;
 
 
-@SuppressWarnings("unused")
 public class DefaultDriverTest extends BaseTest {
 	
 	public static void main(String[] args) {
