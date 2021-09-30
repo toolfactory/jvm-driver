@@ -4,7 +4,7 @@
 <img src="https://raw.githubusercontent.com/toolfactory/jvm-driver/master/docs/logo.png" alt="logo.png" height="180px" align="right"/>
 </a>
 
-[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/5)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
+[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/6)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
 [![GitHub](https://img.shields.io/github/license/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/blob/main/LICENSE)
 
 [![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1283896812)
@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>5.1.3</version>
+    <version>6.0.0</version>
 </dependency>	
 ```
 
@@ -121,7 +121,7 @@ public <T> T throwException(Object exceptionOrMessage, Object... placeHolderRepl
 <br/>
 
 
-The JVM Driver library also provides a little utility class named `io.github.toolfactory.util.Reflection` that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
+In the [test folder](https://github.com/toolfactory/jvm-driver/tree/main/java/src/test/java/io/github/toolfactory/util) is also present a little utility class named [`io.github.toolfactory.util.Reflection`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/test/java/io/github/toolfactory/util/Reflection.java) that can be copied into your project and that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
 
 ```java
 public static Reflection getNew();
