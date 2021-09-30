@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>5.1.3</version>
+    <version>6.0.0</version>
 </dependency>	
 ```
 
@@ -121,7 +121,7 @@ public <T> T throwException(Object exceptionOrMessage, Object... placeHolderRepl
 <br/>
 
 
-The JVM Driver library also provides a little utility class named `io.github.toolfactory.util.Reflection` that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
+In the [test folder](https://github.com/toolfactory/jvm-driver/tree/main/java/src/test/java/io/github/toolfactory/util) is also present a little utility class named [`io.github.toolfactory.util.Reflection`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/test/java/io/github/toolfactory/util/Reflection.java) that can be copied into your project and that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
 
 ```java
 public static Reflection getNew();
