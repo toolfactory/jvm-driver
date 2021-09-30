@@ -39,24 +39,20 @@ public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
 	
 	public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
 		Throwable exception = null;
-		StackTraceElement[] stackTraceOfException = null;
 		if (exceptionOrMessage instanceof String) {
+			StackTraceElement[] stackTraceOfException = null;
 			if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
 				exception = new Exception((String)exceptionOrMessage);
 			} else {
 				exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
 			}
 			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
-			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
+			stackTraceOfException = new StackTraceElement[stackTrace.length - 3];
+			System.arraycopy(stackTrace, 3, stackTraceOfException, 0, stackTraceOfException.length);
+			exception.setStackTrace(stackTraceOfException);
 		} else {
 			exception = (Throwable)exceptionOrMessage;
-			StackTraceElement[] stackTrace = exception.getStackTrace();
-			stackTraceOfException = new StackTraceElement[stackTrace.length + 1];
-			stackTraceOfException[0] = Thread.currentThread().getStackTrace()[2];
-			System.arraycopy(stackTrace, 0, stackTraceOfException, 1, stackTrace.length);
 		}
-		exception.setStackTrace(stackTraceOfException);
 		accept(exception);
 		return null;
 	}
