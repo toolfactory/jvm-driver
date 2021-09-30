@@ -89,7 +89,7 @@ public class DefaultDriver implements Driver {
 
 	public DefaultDriver() {
 		ObjectProvider functionProvider = new ObjectProvider(
-			"ForJava", 7, 9, 14, 17
+			"ForJava", Info.CRITICAL_VERSIONS
 		);
 		
 		Map<Object, Object> initializationContext = new HashMap<>();

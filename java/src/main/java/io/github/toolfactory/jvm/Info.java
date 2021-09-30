@@ -31,7 +31,7 @@
 package io.github.toolfactory.jvm;
 
 public interface Info {
-	
+	public final static int[] CRITICAL_VERSIONS = new int[]{7, 9, 14, 17};
 
 	
 	boolean isCompressedOopsOffOn64BitHotspot();

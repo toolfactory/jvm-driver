@@ -44,11 +44,8 @@ import io.github.toolfactory.jvm.util.Properties;
 
 
 public interface Driver extends Closeable {
-
+	
 	public <T> T allocateInstance(Class<?> cls);
-
-	@Override
-	public void close();
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 
@@ -85,7 +82,9 @@ public interface Driver extends Closeable {
 	public void setFieldValue(Object target, Field field, Object value);
 
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
-	
+
+	@Override
+	public void close();
 	
 	@SuppressWarnings("unchecked")
 	public static class Factory {
