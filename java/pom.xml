@@ -158,7 +158,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <jar
                                     update="true"
                                     destfile="${project.build.directory}/${project.build.finalName}.jar">
@@ -167,7 +167,7 @@
                                         dir="${project.basedir}/src/module-info/io.github.toolfactory.jvm"
                                         includes="module-info.class" />
                                 </jar>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
 				</executions>
