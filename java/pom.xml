@@ -212,6 +212,7 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifestEntries>
 							<built-by>ToolFactory</built-by>
+                            <Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
 				</configuration>
