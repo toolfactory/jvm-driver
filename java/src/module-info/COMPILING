@@ -1,0 +1,3 @@
+# This is compiled separately from Narcissus, so that Narcissus can be built for JDK 7
+
+javac --release 9 io.github.toolfactory.jvm/module-info.java io.github.toolfactory.jvm/io/github/toolfactory/jvm/Placeholder.java
