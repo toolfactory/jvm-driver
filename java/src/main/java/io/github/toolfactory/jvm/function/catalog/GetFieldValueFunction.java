@@ -35,7 +35,7 @@ import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("restriction")
+@SuppressWarnings("all")
 public interface GetFieldValueFunction extends BiFunction<Object, Field, Object> {
 	
 	

@@ -36,6 +36,7 @@ import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
+@SuppressWarnings("all")
 public interface GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
 	
 	
@@ -43,6 +44,7 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 
 		public ForJava7(Map<Object, Object> context) {}
 
+	
 		@Override
 		public Package apply(ClassLoader inputOne, String packageName) {
 			return Package.getPackage(packageName);

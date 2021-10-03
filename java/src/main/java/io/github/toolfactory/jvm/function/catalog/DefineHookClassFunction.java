@@ -39,7 +39,7 @@ import io.github.toolfactory.jvm.util.JavaClass;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("restriction")
+@SuppressWarnings("all")
 public abstract class DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
 	protected MethodHandle defineHookClassMethodHandle;
 	protected ThrowExceptionFunction throwExceptionFunction;
