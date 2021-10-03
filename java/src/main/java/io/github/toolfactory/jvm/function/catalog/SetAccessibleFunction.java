@@ -37,7 +37,6 @@ import java.util.Map;
 import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Resources;
 import io.github.toolfactory.jvm.util.Streams;
 
 
@@ -87,8 +86,8 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, IOException, NoSuchFieldException {			
 			super(context);
 			try (
-				InputStream inputStream =
-					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/AccessibleSetterInvokerForJDK9.bwc"
+				InputStream inputStream = this.getClass().getResourceAsStream(
+					"AccessibleSetterInvokerForJDK9.bwc"
 				);
 			) {	
 				ObjectProvider functionProvider = ObjectProvider.get(context);

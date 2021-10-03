@@ -36,7 +36,6 @@ import java.util.Map;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.FunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Resources;
 import io.github.toolfactory.jvm.util.Streams;
 
 
@@ -78,7 +77,7 @@ public abstract class ConsulterSupplyFunction<F> extends FunctionAdapter<F, Clas
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			try (
 				InputStream inputStream =
-					Resources.getAsInputStream(this.getClass().getClassLoader(), this.getClass().getPackage().getName().replace(".", "/") + "/ConsulterRetrieverForJDK9.bwc"
+					this.getClass().getResourceAsStream("ConsulterRetrieverForJDK9.bwc"
 				);
 			) {
 				MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();

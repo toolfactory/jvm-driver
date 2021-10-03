@@ -34,7 +34,6 @@ import java.util.Map;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.Classes;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Resources;
 import io.github.toolfactory.jvm.util.Streams;
 
 
@@ -56,8 +55,8 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
 			try (
-				InputStream inputStream =
-					Resources.getAsInputStream(this.getClass().getClassLoader(), Classes.class.getPackage().getName().replace(".", "/") + "/ClassLoaderDelegateForJDK9.bwc"
+				InputStream inputStream = Classes.class.getResourceAsStream(
+					"ClassLoaderDelegateForJDK9.bwc"
 				);
 			) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);

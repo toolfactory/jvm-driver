@@ -36,13 +36,6 @@ import java.util.Map;
 
 
 public class Resources {
-
-	public static InputStream getAsInputStream(ClassLoader resourceClassLoader, String resourceRelativePath) {
-		if (resourceClassLoader == null) {
-			resourceClassLoader = ClassLoader.getSystemClassLoader();
-		}
-		return resourceClassLoader.getResourceAsStream(resourceRelativePath);
-	}
 	
 	public static Map<URL, InputStream> getAsInputStreams(ClassLoader resourceClassLoader, String resourceRelativePath) throws IOException {
 		if (resourceClassLoader == null) {
