@@ -31,8 +31,8 @@
 module io.github.toolfactory.jvm {
     exports io.github.toolfactory.jvm;
     
-    requires io.github.toolfactory.narcissus;
+    requires static io.github.toolfactory.narcissus;
     
     // For access to Unsafe
-    requires jdk.unsupported;
+    requires static jdk.unsupported;
 }
