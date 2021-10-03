@@ -37,6 +37,3 @@ hs_err_pid*
 /native/.settings
 /native/.classpath
 /native/target/
-*.bwc
-
-!module-info.class

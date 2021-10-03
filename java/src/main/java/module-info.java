@@ -1,7 +1,5 @@
 /*
- * This file is part of JVM-Driver.
- *
- * Author: Luke Hutchison
+ * This file is part of ToolFactory JVM driver.
  *
  * Hosted at: https://github.com/toolfactory/jvm-driver
  *
@@ -9,7 +7,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2021 Luke Hutchison, Roberto Gentili
+ * Copyright (c) 2019-2021 Luke Hutchison, Roberto Gentili
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without
@@ -25,14 +23,14 @@
  * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-// Compile this in JDK 9 compatibility mode
+ */	
 module io.github.toolfactory.jvm {
-    exports io.github.toolfactory.jvm;
-    
-    requires static io.github.toolfactory.narcissus;
-    
-    // For access to Unsafe
+	
     requires static jdk.unsupported;
+    requires static io.github.toolfactory.narcissus;
+	
+    exports io.github.toolfactory.jvm;
+    exports io.github.toolfactory.jvm.function.catalog;
+    exports io.github.toolfactory.jvm.function.template;
+    exports io.github.toolfactory.jvm.util;
 }

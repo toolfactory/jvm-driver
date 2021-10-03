@@ -34,7 +34,7 @@
     </parent>
 	
 	<artifactId>jvm-driver</artifactId>
-	<version>6.2.4-SNAPSHOT</version>
+	<version>6.2.5-SNAPSHOT</version>
 	
 	<packaging>jar</packaging>
 
@@ -93,7 +93,6 @@
 			<groupId>io.github.toolfactory</groupId>
 			<artifactId>narcissus</artifactId>
 			<version>${narcissus.version}</version>
-            <optional>true</optional>
 		</dependency>
 
 	</dependencies>
@@ -151,33 +150,46 @@
 							</target>
 						</configuration>
 					</execution>
-                    <execution>
-                        <!-- Put module-info.class in META-INF/versions/9 to maximize backwards compatibility. -->
-                        <id>add-module-info-to-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <jar
-                                    update="true"
-                                    destfile="${project.build.directory}/${project.build.finalName}.jar">
-                                    <zipfileset
-                                        prefix="META-INF/versions/9"
-                                        dir="${project.basedir}/src/module-info/io.github.toolfactory.jvm"
-                                        includes="module-info.class" />
-                                </jar>
-                            </target>
-                        </configuration>
-                    </execution>
 				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<configuration>
+							<!-- compile everything to ensure module-info contains right entries -->
+							<release>9</release>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-testCompile</id>
+						<configuration>
+							<release>9</release>
+						</configuration>
+					</execution>
+					<execution>
+						<id>base-compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<!-- recompile everything for target VM except the module-info.java -->
+						<configuration>
+							<excludes>
+								<exclude>module-info.java</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+				<!-- defaults for compile and testCompile -->
 				<configuration>
+					<!-- Only required when JAVA_HOME isn't at least Java 9 and when haven't 
+						configured the maven-toolchains-plugin -->
+					<jdkToolchain>
+						<version>9</version>
+					</jdkToolchain>
 					<source>${project_jdk_version}</source>
 					<target>${project_jdk_version}</target>
 					<verbose>true</verbose>
@@ -213,7 +225,6 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifestEntries>
 							<built-by>ToolFactory</built-by>
-                            <Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
 				</configuration>
