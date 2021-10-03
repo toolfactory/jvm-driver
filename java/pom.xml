@@ -221,6 +221,21 @@
 							</target>
 						</configuration>
 					</execution>
+                    <execution>
+                        <!-- Put module-info.class in META-INF/versions/9 to maximize backwards compatibility. -->
+                        <id>add-module-info-to-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
+                                    <zipfileset prefix="META-INF/versions/9" dir="${project.basedir}/src/module-info/io.github.toolfactory.jvm" includes="module-info.class" />
+                                </jar>
+                            </target>
+                        </configuration>
+                    </execution>
 				</executions>
 			</plugin>
 			<plugin>
