@@ -93,7 +93,6 @@
 			<groupId>io.github.toolfactory</groupId>
 			<artifactId>narcissus</artifactId>
 			<version>${narcissus.version}</version>
-            <optional>true</optional>
 		</dependency>
 
 	</dependencies>
