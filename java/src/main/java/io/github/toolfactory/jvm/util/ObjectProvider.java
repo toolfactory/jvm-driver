@@ -172,15 +172,6 @@ public class ObjectProvider {
 		return classNames;
 	}
 	
-//	private  <T> Class<? super T> retrieveClass(String className, Collection<String> notFoundClasses) {
-//		try {
-//			return (Class<? super T>)Class.forName(className);
-//		} catch (ClassNotFoundException exc) {
-//			notFoundClasses.add(className);
-//		}
-//		return null;
-//	}
-	
 	public static <F> F getObject(Class<? super F> clazz, Map<Object, Object> context) {
 		F objectFound = (F) context.get(clazz.getName());
 		if (objectFound != null) {
