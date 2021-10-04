@@ -31,6 +31,7 @@ import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
@@ -42,8 +43,15 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("unchecked")
-public class NativeDriver extends HybridDriver {
+public class NativeDriver extends DefaultDriver {
 	
+	protected void initHookClassDefiner(
+		ObjectProvider functionProvider,
+		Map<Object, Object> initializationContext
+	) {
+		functionProvider.getOrBuildObject(ConsulterSupplier.Native.class, initializationContext);
+		super.initHookClassDefiner(functionProvider, initializationContext);
+	}
 	
 	protected void initExceptionThrower(
 		ObjectProvider functionProvider,

@@ -50,7 +50,6 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			Thread.currentThread().getContextClassLoader();
 			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
@@ -72,7 +71,6 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-				Thread.currentThread().getContextClassLoader();
 				classNameBasedLockHashTable = unsafe.objectFieldOffset(
 					getDeclaredFieldFunction.apply(ClassLoader.class, "classNameBasedLock")
 				);
@@ -83,11 +81,11 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 				if (classLoader == null) {
 					throw new NullPointerException("Input classLoader parameter can't be null");
 				}
-				Hashtable<String, ?> loadedClassesHS = new Hashtable<String, Object>((Hashtable<String, ?>)unsafe.getObject(classLoader, classNameBasedLockHashTable));
+				Hashtable<String, ?> loadedClassesHS = (Hashtable<String, ?>)unsafe.getObject(classLoader, classNameBasedLockHashTable);
 				Set<Class<?>> loadedClasses = new HashSet<Class<?>>();
 				for (Entry<String, ?> classEntry : loadedClassesHS.entrySet()) {
 					try {
-						loadedClasses.add(classLoader.loadClass(classEntry.getKey()));
+						loadedClasses.add(Class.forName(classEntry.getKey()));
 					} catch (ClassNotFoundException exc) {
 
 					}
@@ -100,9 +98,9 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 	}
 	
 	public static abstract class Native extends GetLoadedClassesFunction {
+		Field classesField;
 		
 		public static class ForJava7 extends Native {
-			Field classesField;
 			
 			public ForJava7(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -116,6 +114,33 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 					throw new NullPointerException("Input classLoader parameter can't be null");
 				}
 				return (Collection<Class<?>>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);
+			}
+			
+			public static class ForSemeru extends Native {
+				
+				public ForSemeru(Map<Object, Object> context) {
+					ObjectProvider functionProvider = ObjectProvider.get(context);
+					GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
+					classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classNameBasedLock");
+				}
+				
+				@Override
+				public Collection<Class<?>> apply(ClassLoader classLoader) {
+					if (classLoader == null) {
+						throw new NullPointerException("Input classLoader parameter can't be null");
+					}
+					Hashtable<String, ?> loadedClassesHS = (Hashtable<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);;
+					Set<Class<?>> loadedClasses = new HashSet<Class<?>>();
+					for (Entry<String, ?> classEntry : loadedClassesHS.entrySet()) {
+						try {
+							loadedClasses.add(Class.forName(classEntry.getKey()));
+						} catch (ClassNotFoundException exc) {
+
+						}
+					}				
+					return loadedClasses;
+				}
+				
 			}
 		}
 		

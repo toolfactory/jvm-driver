@@ -35,6 +35,7 @@ import java.util.Map;
 import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -57,14 +58,10 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		}
 		
 		public static class ForSemeru extends ConsulterSupplier {
-			public static final int PUBLIC = Modifier.PUBLIC;
-			public static final int PRIVATE = Modifier.PRIVATE;
-			public static final int PROTECTED = Modifier.PROTECTED;
-			public static final int PACKAGE = 0x8;
-
-			static final int INTERNAL_PRIVILEGED = 0x80;
-
-			private static final int FULL_ACCESS_MASK = PUBLIC | PRIVATE | PROTECTED | PACKAGE;
+			protected static final int PACKAGE = 0x8;
+			protected static final int INTERNAL_PRIVILEGED = 0x80;
+			private static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
+			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				modes.setAccessible(true);
@@ -81,6 +78,21 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		
 		public ForJava9(Map<Object, Object> context) {
 			consulter = MethodHandles.lookup();
+		}
+		
+		public static class ForSemeru extends ConsulterSupplier {
+			protected static final int MODULE = 0x10;
+			private static final int FULL_ACCESS_MASK = 
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
+			
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
+				consulter = MethodHandles.lookup();
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE);
+			}
+			
 		}
 		
 	}
@@ -103,9 +115,32 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			
 			public ForJava17(Map<Object, Object> context) {
 				consulter = MethodHandles.lookup();
-				io.github.toolfactory.narcissus.Narcissus.setAllowedModes(consulter, -1);
+				for (Field field : Narcissus.getDeclaredFields(consulter.getClass())) {
+					if (field.getName().equals("allowedModes")) {
+						io.github.toolfactory.narcissus.Narcissus.setField(consulter, field, -1);
+						break;
+					}
+				}
+				
 			}
+		}
+	}
+	
+	
+	public static abstract class Native extends	ConsulterSupplier {
+		
+		public static class ForJava7 extends Native {
 			
+			public ForJava7(Map<Object, Object> context) {
+				consulter = MethodHandles.lookup();
+				for (Field field : Narcissus.getDeclaredFields(consulter.getClass())) {
+					if (field.getName().equals("allowedModes")) {
+						io.github.toolfactory.narcissus.Narcissus.setField(consulter, field, -1);
+						break;
+					}
+				}
+				
+			}
 		}
 	}
 	
