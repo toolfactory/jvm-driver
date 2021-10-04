@@ -109,7 +109,7 @@ jobs:
   
   build-and-test-with-Java-9-and-later:
     name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
-    needs: [build-and-test-with-Java-8-and-later-with-7-target]
+    needs: [build-and-test-with-Java-9-and-later-with-7-target]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -142,7 +142,7 @@ jobs:
 
   
   release:
-    needs: [build-and-test-with-Java-8-and-later]
+    needs: [build-and-test-with-Java-9-and-later]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
