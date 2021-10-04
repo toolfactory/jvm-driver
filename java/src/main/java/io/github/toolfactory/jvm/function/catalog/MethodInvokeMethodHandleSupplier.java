@@ -36,6 +36,7 @@ import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
+@SuppressWarnings("unchecked")
 public abstract class MethodInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
 	protected MethodHandle methodHandle;
 	
@@ -48,11 +49,12 @@ public abstract class MethodInvokeMethodHandleSupplier implements Supplier<Metho
 		
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
+			Method invoker = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
-			methodHandle = consulter.unreflect(method);
+			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
+			methodHandle = consulter.unreflect(invoker);
 		}
 
 	}
@@ -65,6 +67,7 @@ public abstract class MethodInvokeMethodHandleSupplier implements Supplier<Metho
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
+			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
 			methodHandle = consulter.unreflect(invoker);
 		}
 		

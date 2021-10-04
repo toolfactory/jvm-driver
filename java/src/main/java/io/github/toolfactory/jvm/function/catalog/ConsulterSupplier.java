@@ -28,8 +28,8 @@ package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.invoke.MethodHandles;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Info;
@@ -54,6 +54,25 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			consulter = MethodHandles.lookup();
 			modes.setAccessible(true);
 			modes.setInt(consulter, -1);
+		}
+		
+		public static class ForSemeru extends ConsulterSupplier {
+			public static final int PUBLIC = Modifier.PUBLIC;
+			public static final int PRIVATE = Modifier.PRIVATE;
+			public static final int PROTECTED = Modifier.PROTECTED;
+			public static final int PACKAGE = 0x8;
+
+			static final int INTERNAL_PRIVILEGED = 0x80;
+
+			private static final int FULL_ACCESS_MASK = PUBLIC | PRIVATE | PROTECTED | PACKAGE;
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				consulter = MethodHandles.lookup();
+				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
+				
+				modes.setAccessible(true);
+				modes.setInt(consulter, INTERNAL_PRIVILEGED);
+			}
+			
 		}
 		
 	}

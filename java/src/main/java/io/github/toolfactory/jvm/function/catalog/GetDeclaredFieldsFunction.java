@@ -33,21 +33,23 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public abstract class GetDeclaredFieldsMethodHandleSupplier implements Supplier<MethodHandle> {
+public abstract class GetDeclaredFieldsFunction implements Function<Class<?>, Field[]> {
 	protected MethodHandle methodHandle;
+	protected ThrowExceptionFunction throwExceptionFunction;
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
-	}
+	protected GetDeclaredFieldsFunction(Map<Object, Object> context) {
+		ObjectProvider functionProvider = ObjectProvider.get(context);
+		throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+	}	
 	
-	public static class ForJava7 extends GetDeclaredFieldsMethodHandleSupplier {
+	public static class ForJava7 extends GetDeclaredFieldsFunction {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction<?> getConsulterFunction =
 				functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
@@ -58,6 +60,41 @@ public abstract class GetDeclaredFieldsMethodHandleSupplier implements Supplier<
 				MethodType.methodType(Field[].class, boolean.class),
 				Class.class
 			);
+		}
+		
+		@Override
+		public Field[] apply(Class<?> cls) {
+			try {
+				return (Field[])methodHandle.invoke(cls, false);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+		}
+		
+		public static class ForSemeru extends GetDeclaredFieldsFunction {
+			
+			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+				super(context);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				ConsulterSupplyFunction<?> getConsulterFunction =
+					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+				MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+				methodHandle = consulter.findSpecial(
+					Class.class,
+					"getDeclaredFieldsImpl",
+					MethodType.methodType(Field[].class),
+					Class.class
+				);
+			}
+			
+			@Override
+			public Field[] apply(Class<?> cls) {
+				try {
+					return (Field[])methodHandle.invoke(cls);
+				} catch (Throwable exc) {
+					return throwExceptionFunction.apply(exc);
+				}
+			}
 		}
 	}
 	

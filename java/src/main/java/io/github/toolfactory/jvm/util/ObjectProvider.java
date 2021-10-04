@@ -27,9 +27,15 @@
 package io.github.toolfactory.jvm.util;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import io.github.toolfactory.jvm.Info;
@@ -37,16 +43,21 @@ import io.github.toolfactory.jvm.Info;
 
 @SuppressWarnings("all")
 public class ObjectProvider {
-	private final String classSuffix;
+	private final List<String> classNameItems;
+	private final List<String> classNameOptionalItems;
 	private final static String CLASS_NAME;
-	final Integer[] registeredVersions;
 	
 	static {
 		CLASS_NAME = ObjectProvider.class.getName();
 	}
 	
-	public ObjectProvider(String classSuffix, int... versions) {
-		this.classSuffix = classSuffix;
+	public ObjectProvider(int... versions) {
+		this.classNameItems = new ArrayList();
+		this.classNameOptionalItems = new ArrayList();
+		String vendor = System.getProperty("java.vendor");
+		if (vendor.equals("International Business Machines Corporation")) {
+			classNameOptionalItems.add("ForSemeru");
+		}
 		int jVMVersion = Info.Provider.getInfoInstance().getVersion();
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int i = 0; i < versions.length; i++) {
@@ -54,7 +65,9 @@ public class ObjectProvider {
 				registeredVersions.add(versions[i]);
 			}
 		}
-		this.registeredVersions = registeredVersions.descendingSet().toArray(new Integer[registeredVersions.size()]);
+		for (Integer version : registeredVersions.descendingSet().toArray(new Integer[registeredVersions.size()])) {
+			classNameItems.add("ForJava" + version);
+		}
 	}
 
 	
@@ -63,22 +76,32 @@ public class ObjectProvider {
 		Collection<String> searchedClasses = new LinkedHashSet<>();
 		T object = getObject(clazz, context);		
 		context.put(CLASS_NAME, this);
-		for (int version : registeredVersions) {
-			String clsName = className + classSuffix + version;
-			try {
-				Class<?> effectiveClass = null;
+		List<String> classNameOptionalItems = new ArrayList<String>(this.classNameOptionalItems);
+		List<String> classNameItems = Arrays.asList(new String[classNameOptionalItems.size() + 2]);
+		classNameItems.set(0, className);
+		for (int i = 0; i < classNameOptionalItems.size(); i++) {
+			classNameItems.set(i + 2, classNameOptionalItems.get(i));
+		}
+		classNameItems = new ArrayList<String>(classNameItems);
+		while (classNameItems.size() > 1) {
+			for (String classNameItem : this.classNameItems) {
 				try {
-					effectiveClass = Class.forName(clsName);
+					classNameItems.set(1, classNameItem);
+					object = (T)retrieveClass(classNameItems, searchedClasses, "$").getDeclaredConstructor(Map.class).newInstance(context);
+					context.put(className, object);
+					return object;
 				} catch (ClassNotFoundException exc) {
-					searchedClasses.add(clsName);
-					clsName = className + "$" +  classSuffix + version;
-					effectiveClass = Class.forName(clsName);
+					continue;
+				} catch (Throwable exc) {
+					throw new BuildingException("Unable to build the related object of " + clazz.getName(), exc);
 				}
-				object = (T) effectiveClass.getDeclaredConstructor(Map.class).newInstance(context);
-				context.put(className, object);
-				return object;
-			} catch (ClassNotFoundException exc) {
-				searchedClasses.add(clsName);
+			}			
+			classNameItems.remove(classNameItems.size() -1);
+		}
+		
+		if (!Modifier.isAbstract(clazz.getModifiers()) && !clazz.isInterface()) {
+			try {
+				return (T) clazz.getDeclaredConstructor(Map.class).newInstance(context);
 			} catch (Throwable exc) {
 				throw new BuildingException("Unable to build the related object of " + clazz.getName(), exc);
 			}
@@ -100,7 +123,64 @@ public class ObjectProvider {
 		}
 	}
 
+	
+	private <T> Class<? super T> retrieveClass(
+		List<String> classNameItems,
+		Collection<String> notFoundClasses,
+		String separator
+	) throws ClassNotFoundException {
+		Collection<String> allClassNameCombinations = retrieveAllClassNameCombinations(classNameItems, separator);
+		for (String className : allClassNameCombinations) {
+			try {
+				return (Class<? super T>)Class.forName(className);
+			} catch (ClassNotFoundException exc) {
+				notFoundClasses.add(className);
+			}
+		}
+		throw new ClassNotFoundException();
+	}
 
+
+	Collection<String> retrieveAllClassNameCombinations(List<String> classNameItems, String separator) {
+		List<String> finalStringColl = new ArrayList<String>();
+		Set<String> classNames = new LinkedHashSet<String>();
+		Collection<List<String>> combinationsToBeReprocessed = new ArrayList<>(); 
+		for (int i = classNameItems.size(); i > 0; i--) {
+			List<String> firstPartList = classNameItems.subList(0, i);
+			String firstPart = Strings.join("", firstPartList);
+			if (!firstPartList.isEmpty()) {
+				finalStringColl.add(firstPart);
+			}
+			List<String> secondPartList = classNameItems.subList(i, classNameItems.size());
+			String secondPart = Strings.join("", secondPartList);
+			if (!secondPartList.isEmpty()) {
+				finalStringColl.add(secondPart);
+			}
+			classNames.add(Strings.join(separator, finalStringColl));
+			if (secondPartList.size() > 1) {
+				List<String> toBeReprocessed = new ArrayList<String>();
+				String firstPartOfSecondPart = secondPartList.get(0);
+				toBeReprocessed.add(firstPart + separator + firstPartOfSecondPart);
+				toBeReprocessed.addAll(secondPartList.subList(1, secondPartList.size()));
+				combinationsToBeReprocessed.add(toBeReprocessed);
+			}
+			finalStringColl.clear();
+		}
+		for (List<String> toBeReprocessed : combinationsToBeReprocessed) {
+			classNames.addAll(retrieveAllClassNameCombinations(toBeReprocessed, separator));
+		}
+		return classNames;
+	}
+	
+//	private  <T> Class<? super T> retrieveClass(String className, Collection<String> notFoundClasses) {
+//		try {
+//			return (Class<? super T>)Class.forName(className);
+//		} catch (ClassNotFoundException exc) {
+//			notFoundClasses.add(className);
+//		}
+//		return null;
+//	}
+	
 	public static <F> F getObject(Class<? super F> clazz, Map<Object, Object> context) {
 		F objectFound = (F) context.get(clazz.getName());
 		if (objectFound != null) {

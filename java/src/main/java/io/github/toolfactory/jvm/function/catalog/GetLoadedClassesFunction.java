@@ -28,11 +28,13 @@ package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
@@ -48,6 +50,7 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
+			Thread.currentThread().getContextClassLoader();
 			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
@@ -55,7 +58,43 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 		
 		@Override
 		public Collection<Class<?>> apply(ClassLoader classLoader) {
+			if (classLoader == null) {
+				throw new NullPointerException("Input classLoader parameter can't be null");
+			}
 			return (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
+		}
+		
+		public static class ForSemeru extends GetLoadedClassesFunction {
+			protected sun.misc.Unsafe unsafe;
+			protected Long classNameBasedLockHashTable;
+			
+			public ForSemeru(Map<Object, Object> context) {
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
+				Thread.currentThread().getContextClassLoader();
+				classNameBasedLockHashTable = unsafe.objectFieldOffset(
+					getDeclaredFieldFunction.apply(ClassLoader.class, "classNameBasedLock")
+				);
+			}	
+			
+			@Override
+			public Collection<Class<?>> apply(ClassLoader classLoader) {
+				if (classLoader == null) {
+					throw new NullPointerException("Input classLoader parameter can't be null");
+				}
+				Hashtable<String, ?> loadedClassesHS = (Hashtable<String, ?>)unsafe.getObject(classLoader, classNameBasedLockHashTable);
+				Set<Class<?>> loadedClasses = new HashSet<Class<?>>();
+				for (Entry<String, ?> classEntry : loadedClassesHS.entrySet()) {
+					try {
+						loadedClasses.add(Class.forName(classEntry.getKey()));
+					} catch (ClassNotFoundException exc) {
+
+					}
+				}				
+				return loadedClasses;
+			}
+			
 		}
 		
 	}
@@ -73,6 +112,9 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 
 			@Override
 			public Collection<Class<?>> apply(ClassLoader classLoader) {
+				if (classLoader == null) {
+					throw new NullPointerException("Input classLoader parameter can't be null");
+				}
 				return (Collection<Class<?>>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);
 			}
 		}

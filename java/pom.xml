@@ -161,7 +161,10 @@
 						<id>default-compile</id>
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
-							<release>9</release>
+							<release>8</release>
+							<excludes>
+								<exclude>module-info.java</exclude>
+							</excludes>
 						</configuration>
 					</execution>
 					<execution>

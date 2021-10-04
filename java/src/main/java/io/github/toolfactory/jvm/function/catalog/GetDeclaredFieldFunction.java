@@ -27,7 +27,6 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -38,12 +37,12 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
 	
 	public static class ForJava7 extends GetDeclaredFieldFunction {
-		protected MethodHandle getDeclaredFields;
+		protected GetDeclaredFieldsFunction getDeclaredFields;
 		protected ThrowExceptionFunction throwExceptionFunction;
 		
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			getDeclaredFields = functionProvider.getOrBuildObject(GetDeclaredFieldsMethodHandleSupplier.class, context).get();
+			getDeclaredFields = functionProvider.getOrBuildObject(GetDeclaredFieldsFunction.class, context);
 			throwExceptionFunction =
 				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
 		}
@@ -51,7 +50,7 @@ public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, S
 		@Override
 		public Field apply(Class<?> cls, String name) {
 			try {
-				for (Field field : (Field[])getDeclaredFields.invoke(cls, false)) {
+				for (Field field : (Field[])getDeclaredFields.apply(cls)) {
 					if (field.getName().equals(name)) {
 						return field;
 					}

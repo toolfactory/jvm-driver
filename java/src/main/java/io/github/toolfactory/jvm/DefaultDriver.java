@@ -45,9 +45,9 @@ import io.github.toolfactory.jvm.function.catalog.ConstructorInvokeMethodHandleS
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DeepConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
-import io.github.toolfactory.jvm.function.catalog.GetDeclaredConstructorsMethodHandleSupplier;
-import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldsMethodHandleSupplier;
-import io.github.toolfactory.jvm.function.catalog.GetDeclaredMethodsMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.catalog.GetDeclaredConstructorsFunction;
+import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldsFunction;
+import io.github.toolfactory.jvm.function.catalog.GetDeclaredMethodsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
@@ -74,9 +74,9 @@ public class DefaultDriver implements Driver {
 	protected TriConsumer<Object, Field, Object> fieldValueSetter;
 	protected BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
 	protected FunctionAdapter<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
-	protected MethodHandle declaredFieldsRetriever;
-	protected MethodHandle declaredMethodsRetriever;
-	protected MethodHandle declaredConstructorsRetriever;
+	protected Function<Class<?>, Field[]> declaredFieldsRetriever;
+	protected Function<Class<?>, Method[]> declaredMethodsRetriever;
+	protected Function<Class<?>, Constructor<?>[]> declaredConstructorsRetriever;
 	protected BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
 	protected MethodHandle constructorInvoker;
 	protected BiFunction<ClassLoader, String, Package> packageRetriever;
@@ -89,7 +89,7 @@ public class DefaultDriver implements Driver {
 
 	public DefaultDriver() {
 		ObjectProvider functionProvider = new ObjectProvider(
-			"ForJava", Info.CRITICAL_VERSIONS
+			Info.CRITICAL_VERSIONS
 		);
 		
 		Map<Object, Object> initializationContext = new HashMap<>();
@@ -260,8 +260,8 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredConstructorsRetriever = functionProvider.getOrBuildObject(
-			GetDeclaredConstructorsMethodHandleSupplier.class, initializationContext
-		).get();
+			GetDeclaredConstructorsFunction.class, initializationContext
+		);
 	}
 
 	
@@ -270,8 +270,8 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredMethodsRetriever = functionProvider.getOrBuildObject(
-			GetDeclaredMethodsMethodHandleSupplier.class, initializationContext
-		).get();
+			GetDeclaredMethodsFunction.class, initializationContext
+		);
 	}
 
 	
@@ -280,8 +280,8 @@ public class DefaultDriver implements Driver {
 		Map<Object, Object> initializationContext
 	) {
 		declaredFieldsRetriever = functionProvider.getOrBuildObject(
-			GetDeclaredFieldsMethodHandleSupplier.class, initializationContext
-		).get();
+			GetDeclaredFieldsFunction.class, initializationContext
+		);
 	}
 
 	
@@ -404,7 +404,7 @@ public class DefaultDriver implements Driver {
 	@Override
 	public Field[] getDeclaredFields(Class<?> cls)  {
 		try {
-			return (Field[])declaredFieldsRetriever.invoke(cls, false);
+			return (Field[])declaredFieldsRetriever.apply(cls);
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
@@ -413,7 +413,7 @@ public class DefaultDriver implements Driver {
 	@Override
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
 		try {
-			return (Constructor<T>[])declaredConstructorsRetriever.invoke(cls, false);
+			return (Constructor<T>[])declaredConstructorsRetriever.apply(cls);
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
@@ -422,7 +422,7 @@ public class DefaultDriver implements Driver {
 	@Override
 	public Method[] getDeclaredMethods(Class<?> cls) {
 		try {
-			return (Method[])declaredMethodsRetriever.invoke(cls, false);
+			return (Method[])declaredMethodsRetriever.apply(cls);
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}

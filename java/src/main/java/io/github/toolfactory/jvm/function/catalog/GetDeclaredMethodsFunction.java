@@ -30,34 +30,72 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public abstract class GetDeclaredConstructorsMethodHandleSupplier implements Supplier<MethodHandle> {
+public abstract class GetDeclaredMethodsFunction implements Function<Class<?>, Method[]> {
 	protected MethodHandle methodHandle;
+	protected ThrowExceptionFunction throwExceptionFunction;
 	
-	@Override
-	public MethodHandle get() {
-		return methodHandle;
+	protected GetDeclaredMethodsFunction(Map<Object, Object> context) {
+		ObjectProvider functionProvider = ObjectProvider.get(context);
+		throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
 	}
 	
-	public static class ForJava7 extends GetDeclaredConstructorsMethodHandleSupplier {
+	public static class ForJava7 extends GetDeclaredMethodsFunction {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction<?> getConsulterFunction =
 				functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
 			methodHandle = consulter.findSpecial(
 				Class.class,
-				"getDeclaredConstructors0",
-				MethodType.methodType(Constructor[].class, boolean.class),
+				"getDeclaredMethods0",
+				MethodType.methodType(Method[].class, boolean.class),
 				Class.class
 			);
 		}
+
+		@Override
+		public Method[] apply(Class<?> input) {
+			try {
+				return (Method[]) methodHandle.invoke(input, false);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
+		}
+		
+		public static class ForSemeru extends GetDeclaredMethodsFunction {
+			
+			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+				super(context);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				ConsulterSupplyFunction<?> getConsulterFunction =
+					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+				MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
+				methodHandle = consulter.findSpecial(
+					Class.class,
+					"getDeclaredMethodsImpl",
+					MethodType.methodType(Method[].class),
+					Class.class
+				);
+			}
+			
+			@Override
+			public Method[] apply(Class<?> cls) {
+				try {
+					return (Method[])methodHandle.invoke(cls);
+				} catch (Throwable exc) {
+					return throwExceptionFunction.apply(exc);
+				}
+			}
+		}
+		
 	}	
 }

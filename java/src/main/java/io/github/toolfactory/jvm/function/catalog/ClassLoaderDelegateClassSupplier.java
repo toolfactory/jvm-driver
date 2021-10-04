@@ -39,7 +39,7 @@ import io.github.toolfactory.jvm.util.Streams;
 
 public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	
-	public static class ForJava7 implements ClassLoaderDelegateClassSupplier{
+	public static class ForJava7 implements ClassLoaderDelegateClassSupplier {
 		
 		public ForJava7(Map<Object, Object> context) {}
 		

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import io.github.toolfactory.util.Reflection;
@@ -99,6 +100,10 @@ abstract class BaseTest {
 			reflection.setFieldValue(obj, field, 'a');
 			charValue = reflection.getFieldValue(obj, field);
 			assertTrue(charValue == 'a');
+			Collection<Class<?>> loadedClasses = reflection.getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader());
+			for (Class<?> cls : loadedClasses) {
+				System.out.println(cls.getName());
+			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);

@@ -53,6 +53,7 @@ public class ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHan
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
+			method.setAccessible(true);
 			methodHandle = consulter.unreflect(method);
 		}
 
