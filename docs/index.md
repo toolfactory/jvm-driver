@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>6.2.2</version>
+    <version>6.3.0</version>
 </dependency>	
 ```
 
