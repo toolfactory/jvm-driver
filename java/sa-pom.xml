@@ -238,9 +238,9 @@
 					<execution>
 						<id>default-testCompile</id>
 						<configuration>
-							<jdkToolchain>
-								<version>9</version>
-							</jdkToolchain>
+							<testExcludes>
+								<testExclude>module-info.java</testExclude>
+							</testExcludes>
 							<release>${project_jdk_version}</release>
 							<verbose>true</verbose>
 						</configuration>
@@ -255,20 +255,11 @@
 							<excludes>
 								<exclude>module-info.java</exclude>
 							</excludes>
+							<source>${project_jdk_version}</source>
+							<target>${project_jdk_version}</target>
 						</configuration>
 					</execution>
 				</executions>
-				<!-- defaults for compile and testCompile -->
-				<configuration>
-					<!-- Only required when JAVA_HOME isn't at least Java 9 and when haven't 
-						configured the maven-toolchains-plugin -->
-					<jdkToolchain>
-						<version>9</version>
-					</jdkToolchain>
-					<source>${project_jdk_version}</source>
-					<target>${project_jdk_version}</target>
-					<verbose>true</verbose>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
