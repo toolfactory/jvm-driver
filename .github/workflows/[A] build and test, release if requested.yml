@@ -74,7 +74,7 @@ jobs:
           git push
 
           
-  build-and-test-with-Java-9-and-later-with-7-target:
+  build-and-test-with-Java-9-and-later:
     name: Build and test with 7 target (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
     needs: [elaborate-java-hook-module]
     strategy:
@@ -103,43 +103,8 @@ jobs:
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
         run: |
-           mvn -B clean test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
-           mvn -B test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
-
-  
-  build-and-test-with-Java-9-and-later:
-    name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
-    needs: [build-and-test-with-Java-9-and-later-with-7-target]
-    strategy:
-      fail-fast: false
-      max-parallel: 15
-      matrix:
-        architecture: [x86, x64]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
-        exclude:
-          - os: macOS-latest
-            architecture: x86
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-          architecture: ${{ matrix.architecture }}
-      - name: Update repositories
-        run: |
-          git config user.name "${{ github.event.head_commit.committer.name }}"
-          git config user.email "${{ github.event.head_commit.committer.email }}"
-          git pull origin ${{github.ref}}  
-      - if: endsWith(matrix.java, '-ea') != true 
-        name: Build and test with final version JDK
-        run: mvn -B clean test -Dproject_jdk_version=${{ matrix.java }} -DskipTests=false --file ./java/pom.xml
-      - if: endsWith(matrix.java, '18-ea') == true 
-        name: Build and test with early access version JDK
-        run: mvn -B clean test -Dproject_jdk_version=18 -DskipTests=false --file ./java/pom.xml  
-
+           mvn -B clean test -DskipTests=false --file ./java/pom.xml   
+           mvn -B test -DskipTests=false --file ./java/pom.xml   
   
   release:
     needs: [build-and-test-with-Java-9-and-later]
