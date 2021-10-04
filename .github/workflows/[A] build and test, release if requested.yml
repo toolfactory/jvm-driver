@@ -74,7 +74,7 @@ jobs:
           git push
 
           
-  build-and-test-with-Java-8-and-later-with-7-target:
+  build-and-test-with-Java-9-and-later-with-7-target:
     name: Build and test with 7 target (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
     needs: [elaborate-java-hook-module]
     strategy:
@@ -83,7 +83,7 @@ jobs:
       matrix:
         architecture: [x86, x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
@@ -102,10 +102,12 @@ jobs:
           git pull origin ${{github.ref}}  
       - if: endsWith(matrix.java, '-ea') != true 
         name: Build and test with final version JDK
-        run: mvn -B clean test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
+        run: |
+           mvn -B clean test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
+           mvn -B test -Dproject_jdk_version=7 -DskipTests=false --file ./java/pom.xml   
 
   
-  build-and-test-with-Java-8-and-later:
+  build-and-test-with-Java-9-and-later:
     name: Build and test (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
     needs: [build-and-test-with-Java-8-and-later-with-7-target]
     strategy:
@@ -114,7 +116,7 @@ jobs:
       matrix:
         architecture: [x86, x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
