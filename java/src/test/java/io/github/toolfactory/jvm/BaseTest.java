@@ -19,9 +19,7 @@ abstract class BaseTest {
 
 	void getAndSetDirectVolatileTestOne() {
 		try {
-		
 			Object obj = new Object() {
-				
 				volatile List<Object> objectValue;
 				volatile int intValue;
 				volatile long longValue;
