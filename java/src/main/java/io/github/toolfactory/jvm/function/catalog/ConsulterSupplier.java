@@ -66,10 +66,9 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 
 			private static final int FULL_ACCESS_MASK = PUBLIC | PRIVATE | PROTECTED | PACKAGE;
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-				consulter = MethodHandles.lookup();
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
-				
 				modes.setAccessible(true);
+				consulter = MethodHandles.lookup();
 				modes.setInt(consulter, INTERNAL_PRIVILEGED);
 			}
 			
@@ -98,7 +97,7 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		
 	}
 	
-	public static class Hybrid extends	ConsulterSupplier {
+	public static abstract class Hybrid extends	ConsulterSupplier {
 		
 		public static class ForJava17 extends Hybrid {
 			
