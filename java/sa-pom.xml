@@ -90,7 +90,7 @@
 
 		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
-		<junit-jupiter.version>5.7.0</junit-jupiter.version>
+		<junit-jupiter.version>5.8.1</junit-jupiter.version>
 		<junit.version>1.7.0</junit.version>
 		<maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -131,7 +131,13 @@
 	</scm>
 
 	<dependencies>
-
+				
+		<dependency>
+			<groupId>io.github.toolfactory</groupId>
+			<artifactId>narcissus</artifactId>
+			<version>${narcissus.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
@@ -158,12 +164,6 @@
 			<artifactId>junit-platform-runner</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>io.github.toolfactory</groupId>
-			<artifactId>narcissus</artifactId>
-			<version>${narcissus.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -238,7 +238,11 @@
 					<execution>
 						<id>default-testCompile</id>
 						<configuration>
-							<release>9</release>
+							<jdkToolchain>
+								<version>9</version>
+							</jdkToolchain>
+							<release>${project_jdk_version}</release>
+							<verbose>true</verbose>
 						</configuration>
 					</execution>
 					<execution>
