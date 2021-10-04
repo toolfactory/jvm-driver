@@ -48,22 +48,28 @@
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
 
-		<junit-jupiter.version>5.7.0</junit-jupiter.version>
+		<junit-jupiter.version>4.13.2</junit-jupiter.version>
 		<junit.version>1.7.0</junit.version>
 		<maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M1</maven-surefire-plugin.version>
 		<narcissus.version>1.0.4</narcissus.version>
 	</properties>
 
 	<dependencies>
-
+				
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
+			<groupId>io.github.toolfactory</groupId>
+			<artifactId>narcissus</artifactId>
+			<version>${narcissus.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
 			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -87,12 +93,6 @@
 			<artifactId>junit-platform-runner</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>io.github.toolfactory</groupId>
-			<artifactId>narcissus</artifactId>
-			<version>${narcissus.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -167,7 +167,11 @@
 					<execution>
 						<id>default-testCompile</id>
 						<configuration>
-							<release>9</release>
+							<jdkToolchain>
+								<version>9</version>
+							</jdkToolchain>
+							<release>${project_jdk_version}</release>
+							<verbose>true</verbose>
 						</configuration>
 					</execution>
 					<execution>
