@@ -83,7 +83,7 @@
 		<project_jdk_version>7</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
-		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
+		<project.test.testSuite>AllTestsSuite</project.test.testSuite>
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
 		<repository.url>https://toolfactory@github.com/toolfactory/jvm-driver.git</repository.url>
@@ -103,7 +103,7 @@
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven-scm-provider-gitexe.version>1.9.5</maven-scm-provider-gitexe.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-		<narcissus.version>1.0.4</narcissus.version>
+		<narcissus.version>1.0.6</narcissus.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 	</properties>
 
