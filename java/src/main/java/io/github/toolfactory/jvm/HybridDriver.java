@@ -30,13 +30,15 @@ package io.github.toolfactory.jvm;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public class HybridDriver extends DefaultDriver {
 	
-
-	protected void initHookClassDefiner(
+	
+	@Override
+	protected DefineHookClassFunction initHookClassDefiner(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -44,7 +46,7 @@ public class HybridDriver extends DefaultDriver {
             throw new InitializeException("Could not load Narcissus native library");
         }
 		functionProvider.getOrBuildObject(ConsulterSupplier.Hybrid.class, initializationContext);
-		super.initHookClassDefiner(functionProvider, initializationContext);
+		return super.initHookClassDefiner(functionProvider, initializationContext);
 	}
 
 }

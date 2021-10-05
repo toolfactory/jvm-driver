@@ -27,106 +27,109 @@
 package io.github.toolfactory.jvm;
 
 
-import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
-import io.github.toolfactory.jvm.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("unchecked")
+//@SuppressWarnings("unchecked")
 public class NativeDriver extends DefaultDriver {
 	
-	protected void initHookClassDefiner(
+	
+	@Override
+	protected DefineHookClassFunction initHookClassDefiner(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
 		functionProvider.getOrBuildObject(ConsulterSupplier.Native.class, initializationContext);
-		super.initHookClassDefiner(functionProvider, initializationContext);
+		return super.initHookClassDefiner(functionProvider, initializationContext);
 	}
 	
-	protected void initExceptionThrower(
+	
+	@Override
+	protected ThrowExceptionFunction initExceptionThrower(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		exceptionThrower = functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			ThrowExceptionFunction.Native.class, initializationContext
 		);
 	}
 	
 	
-	protected void initLoadedPackagesRetriever(
+	@Override
+	protected GetLoadedPackagesFunction initLoadedPackagesRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedPackagesRetriever = functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			GetLoadedPackagesFunction.Native.class, initializationContext
 		);
 	}
 
 	
 	@Override
-	protected void initLoadedClassesRetriever(
+	protected GetLoadedClassesFunction initLoadedClassesRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		loadedClassesRetriever = functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			GetLoadedClassesFunction.Native.class, initializationContext
 		);
 	}
 
 	
 	@Override
-	protected void initFieldValueSetter(
+	protected SetFieldValueFunction initFieldValueSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
         if (!io.github.toolfactory.narcissus.Narcissus.libraryLoaded) {
             throw new InitializeException("Could not load Narcissus native library");
         }
-		fieldValueSetter = functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			SetFieldValueFunction.Native.class, initializationContext
 		);
 	}
 
 	
 	@Override
-	protected void initFieldValueRetriever(
+	protected GetFieldValueFunction initFieldValueRetriever(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		fieldValueRetriever = functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			GetFieldValueFunction.Native.class, initializationContext
 		);
 	}
 
 	
 	@Override		
-	protected void initAllocateInstanceInvoker(
+	protected AllocateInstanceFunction initAllocateInstanceInvoker(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		allocateInstanceInvoker = functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			AllocateInstanceFunction.Native.class, initializationContext
 		);
 	}
 	
 	
 	@Override
-	protected void initAccessibleSetter(
+	protected SetAccessibleFunction<?> initAccessibleSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		//this cast is necessary to avoid the incompatible types error (no unique maximal instance exists for type variable)
-		accessibleSetter = (BiConsumerAdapter<?, AccessibleObject, Boolean>)functionProvider.getOrBuildObject(
+		return functionProvider.getOrBuildObject(
 			SetAccessibleFunction.Native.class, initializationContext
 		);
 	}
