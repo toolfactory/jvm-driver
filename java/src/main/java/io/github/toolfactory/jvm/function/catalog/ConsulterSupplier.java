@@ -113,15 +113,29 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		
 		public static class ForJava17 extends Hybrid {
 			
-			public ForJava17(Map<Object, Object> context) {
+			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
 				consulter = MethodHandles.lookup();
-				for (Field field : Narcissus.getDeclaredFields(consulter.getClass())) {
-					if (field.getName().equals("allowedModes")) {
-						io.github.toolfactory.narcissus.Narcissus.setField(consulter, field, -1);
-						break;
-					}
-				}
+				Narcissus.findField(getClass(), "allowedModes");
+				io.github.toolfactory.narcissus.Narcissus.setField(
+					consulter,
+					Narcissus.findField(consulter.getClass(), "allowedModes"), 
+					-1
+				);
 				
+			}
+			
+			public static class ForSemeru extends Hybrid {
+				
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
+					consulter = MethodHandles.lookup();
+					Narcissus.findField(consulter.getClass(), "accessMode");
+					io.github.toolfactory.narcissus.Narcissus.setField(
+						consulter,
+						Narcissus.findField(consulter.getClass(), "accessMode"), 
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+					);
+				
+				}
 			}
 		}
 	}
@@ -131,17 +145,53 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		
 		public static class ForJava7 extends Native {
 			
-			public ForJava7(Map<Object, Object> context) {
+			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException {
 				consulter = MethodHandles.lookup();
-				for (Field field : Narcissus.getDeclaredFields(consulter.getClass())) {
-					if (field.getName().equals("allowedModes")) {
-						io.github.toolfactory.narcissus.Narcissus.setField(consulter, field, -1);
-						break;
-					}
-				}
+				io.github.toolfactory.narcissus.Narcissus.setField(
+					consulter,
+					Narcissus.findField(consulter.getClass(), "allowedModes"), 
+					-1
+				);
+			
+			}
+			
+			public static class ForSemeru extends Native {
 				
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
+					consulter = MethodHandles.lookup();
+					Narcissus.findField(consulter.getClass(), "accessMode");
+					io.github.toolfactory.narcissus.Narcissus.setField(
+						consulter,
+						Narcissus.findField(consulter.getClass(), "accessMode"), 
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+					);
+				
+				}
 			}
 		}
+		
+		public static class ForJava9 extends ConsulterSupplier {
+			
+			public ForJava9(Map<Object, Object> context) {
+				consulter = MethodHandles.lookup();
+			}
+			
+			public static class ForSemeru extends Native {
+				
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+					consulter = MethodHandles.lookup();
+					Narcissus.findField(consulter.getClass(), "accessMode");
+					io.github.toolfactory.narcissus.Narcissus.setField(
+						consulter,
+						Narcissus.findField(consulter.getClass(), "accessMode"), 
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | 
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+					);
+				}
+				
+			}		
+		}
+		
 	}
 	
 }

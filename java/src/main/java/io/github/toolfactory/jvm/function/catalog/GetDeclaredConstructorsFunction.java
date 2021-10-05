@@ -65,7 +65,7 @@ public abstract class GetDeclaredConstructorsFunction implements Function<Class<
 		@Override
 		public Constructor<?>[] apply(Class<?> input) {
 			try {
-				return (Constructor<?>[]) methodHandle.invoke(null);
+				return (Constructor<?>[]) methodHandle.invoke(input, false);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}

@@ -26,5 +26,9 @@ public class NativeDriverTest extends BaseTest {
 	public void getAndSetDirectVolatileTestOne() {
 		super.getAndSetDirectVolatileTestOne();
 	}
-
+	
+	@Test
+	public void retrieveLoadedClasses() {
+		super.retrieveLoadedClasses();
+	}	
 }

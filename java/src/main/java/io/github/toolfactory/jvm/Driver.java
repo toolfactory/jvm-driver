@@ -215,6 +215,10 @@ public interface Driver extends Closeable {
 		public InitializeException(String message, Throwable cause) {
 	        super(message, cause);
 	    }
+		
+		public InitializeException(String message) {
+	        super(message);
+	    }
 
 	}
 	

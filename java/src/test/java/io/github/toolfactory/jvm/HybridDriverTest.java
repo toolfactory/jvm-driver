@@ -29,4 +29,9 @@ public class HybridDriverTest extends BaseTest {
 		super.getAndSetDirectVolatileTestOne();
 	}
 	
+	@Test
+	public void retrieveLoadedClasses() {
+		super.retrieveLoadedClasses();
+	}
+	
 }

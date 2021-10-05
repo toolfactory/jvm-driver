@@ -88,7 +88,10 @@ public class NativeDriver extends DefaultDriver {
 	protected void initFieldValueSetter(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
-	) {
+	) {	
+        if (!io.github.toolfactory.narcissus.Narcissus.libraryLoaded) {
+            throw new InitializeException("Could not load Narcissus native library");
+        }
 		fieldValueSetter = functionProvider.getOrBuildObject(
 			SetFieldValueFunction.Native.class, initializationContext
 		);

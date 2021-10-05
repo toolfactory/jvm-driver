@@ -118,14 +118,54 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 
 		public static class ForJava7 extends Native<BiConsumer<AccessibleObject, Boolean>> {
 			
-			public ForJava7(Map<Object, Object> context) {
+			public ForJava7(Map<Object, Object> context) throws IllegalAccessException {
 				super(context);
-				setFunction(new BiConsumer<AccessibleObject, Boolean>() {
-					@Override
-					public void accept(AccessibleObject accessibleObject, Boolean flag) {
-						io.github.toolfactory.narcissus.Narcissus.setAccessible(accessibleObject, flag);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				final GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
+						
+				Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{AccessibleObject.class, boolean.class});
+				final MethodHandle accessibleSetterMethodHandle = functionProvider.getOrBuildObject(
+					ConsulterSupplier.class, context
+				).get().unreflect(accessibleSetterMethod);
+				setFunction(
+					new BiConsumer<AccessibleObject, Boolean>() {
+						@Override
+						public void accept(AccessibleObject accessibleObject, Boolean flag) {
+							try {
+								accessibleSetterMethodHandle.invoke(accessibleObject, flag);
+							} catch (Throwable exc) {
+								throwExceptionFunction.apply(exc);
+							}
+						}
 					}
-				});
+				);
+			}
+			
+			@Override
+			public void accept(AccessibleObject accessibleObject, Boolean flag) {
+				function.accept(accessibleObject, flag);
+			}
+		}
+		
+		public static class ForJava9 extends Native<BiConsumer<AccessibleObject, Boolean>> {
+			
+			public ForJava9(Map<Object, Object> context) throws IllegalAccessException {
+				super(context);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);		
+				final Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{boolean.class});
+				setFunction(
+					new BiConsumer<AccessibleObject, Boolean>() {
+						@Override
+						public void accept(AccessibleObject target, Boolean flag) {
+							try {
+								io.github.toolfactory.narcissus.Narcissus.invokeMethod(target, accessibleSetterMethod, flag);
+							} catch (Throwable exc) {
+								throwExceptionFunction.apply(exc);
+							}
+						}
+					}
+				);
 			}
 			
 			@Override

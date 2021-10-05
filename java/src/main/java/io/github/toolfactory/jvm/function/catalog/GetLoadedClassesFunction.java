@@ -81,7 +81,7 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 				if (classLoader == null) {
 					throw new NullPointerException("Input classLoader parameter can't be null");
 				}
-				Hashtable<String, ?> loadedClassesHS = (Hashtable<String, ?>)unsafe.getObject(classLoader, classNameBasedLockHashTable);
+				Hashtable<String, ?> loadedClassesHS = new Hashtable<String, Object>((Hashtable<String, ?>)unsafe.getObject(classLoader, classNameBasedLockHashTable));
 				Set<Class<?>> loadedClasses = new HashSet<Class<?>>();
 				for (Entry<String, ?> classEntry : loadedClassesHS.entrySet()) {
 					try {

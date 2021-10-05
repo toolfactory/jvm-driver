@@ -100,7 +100,15 @@ abstract class BaseTest {
 			reflection.setFieldValue(obj, field, 'a');
 			charValue = reflection.getFieldValue(obj, field);
 			assertTrue(charValue == 'a');
-			Collection<Class<?>> loadedClasses = reflection.getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader());
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	void retrieveLoadedClasses() {
+		try {
+			Collection<Class<?>> loadedClasses = getReflection().getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader());
 			for (Class<?> cls : loadedClasses) {
 				System.out.println(cls.getName());
 			}
@@ -109,6 +117,7 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
+	
 	
 	private static class ClassForTest {
 		

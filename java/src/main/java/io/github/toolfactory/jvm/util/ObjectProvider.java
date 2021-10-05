@@ -27,16 +27,17 @@
 package io.github.toolfactory.jvm.util;
 
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.github.toolfactory.jvm.Info;
 
@@ -44,21 +45,18 @@ import io.github.toolfactory.jvm.Info;
 @SuppressWarnings("all")
 public class ObjectProvider {
 	private final List<String> classNameItems;
-	private final List<String> classNameOptionalItems;
 	private final static String CLASS_NAME;
+	private int jVMVersion;
+	private String vendor;
 	
 	static {
 		CLASS_NAME = ObjectProvider.class.getName();
 	}
 	
 	public ObjectProvider(int... versions) {
-		this.classNameItems = new ArrayList();
-		this.classNameOptionalItems = new ArrayList();
-		String vendor = System.getProperty("java.vendor");
-		if (vendor.equals("International Business Machines Corporation")) {
-			classNameOptionalItems.add("ForSemeru");
-		}
-		int jVMVersion = Info.Provider.getInfoInstance().getVersion();
+		this.classNameItems = new CopyOnWriteArrayList<String>();
+		jVMVersion = Info.Provider.getInfoInstance().getVersion();
+		vendor = System.getProperty("java.vendor");
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int i = 0; i < versions.length; i++) {
 			if (jVMVersion >= versions[i]) {
@@ -69,14 +67,62 @@ public class ObjectProvider {
 			classNameItems.add("ForJava" + version);
 		}
 	}
-
+	
 	
 	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
+		Map<String, Throwable> exceptions = new HashMap<String, Throwable>();
+		context.putIfAbsent("classNameOptionalItems", new ArrayList<String>());
+		try {
+			try {
+				return getOrBuildObjectInternal(clazz, context);
+			} catch (BuildingException exc) {
+				if (putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru")) {
+					exceptions.put("default", exc);
+				} else {
+					exceptions.put("International Business Machines Corporation", exc);
+				}				
+			}
+			return getOrBuildObjectInternal(clazz, context);
+		} catch (BuildingException exc) {
+
+		}
+		throw new BuildingException(
+			Strings.compile(
+				"Exception occurred (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
+				Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
+				jVMVersion, vendor
+			),
+			(BuildingException)exceptions.getOrDefault(
+				vendor,
+				exceptions.get("default")
+			)
+		);
+	}
+
+
+	boolean putClassNameOptionalItem(List<String> classNameOptionalItems, String value) {
+		if (!classNameOptionalItems.contains(value)) {
+			synchronized (classNameOptionalItems) {
+				if (!classNameOptionalItems.contains(value)) {
+					classNameOptionalItems.clear();
+					classNameOptionalItems.add(value);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	private <T> T getOrBuildObjectInternal(Class<? super T> clazz, Map<Object, Object> context) {
 		String className = clazz.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		T object = getObject(clazz, context);		
+		T object = getObject(clazz, context);	
+		if (object != null) {
+			return object;
+		}
 		context.put(CLASS_NAME, this);
-		List<String> classNameOptionalItems = new ArrayList<String>(this.classNameOptionalItems);
+		List<String> classNameOptionalItems = (List<String>)context.get("classNameOptionalItems");
 		List<String> classNameItems = Arrays.asList(new String[classNameOptionalItems.size() + 2]);
 		classNameItems.set(0, className);
 		for (int i = 0; i < classNameOptionalItems.size(); i++) {
@@ -132,6 +178,11 @@ public class ObjectProvider {
 		Collection<String> allClassNameCombinations = retrieveAllClassNameCombinations(classNameItems, separator);
 		for (String className : allClassNameCombinations) {
 			try {
+				Class<? super T> cls = (Class<? super T>)Class.forName(className);
+				if (Modifier.isAbstract(cls.getModifiers()) || cls.isInterface()) {
+					notFoundClasses.add(className);
+					continue;
+				}
 				return (Class<? super T>)Class.forName(className);
 			} catch (ClassNotFoundException exc) {
 				notFoundClasses.add(className);
