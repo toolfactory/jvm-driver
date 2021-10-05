@@ -41,102 +41,62 @@ import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
+@SuppressWarnings("rawtypes")
 public class NativeDriver extends DefaultDriver {
 	
 	
 	@Override
-	<D extends Driver> D init() {
+	protected DefineHookClassFunction getOrBuildHookClassDefiner(
+		ObjectProvider functionProvider,
+		Map<Object, Object> initializationContext
+	) {
         if (!io.github.toolfactory.narcissus.Narcissus.libraryLoaded) {
             throw new InitializeException("Could not load Narcissus native library");
         }
-		return super.init();
-	}
-	
-	
-	@Override
-	protected DefineHookClassFunction initHookClassDefiner(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
 		functionProvider.getOrBuildObject(ConsulterSupplier.Native.class, initializationContext);
-		return super.initHookClassDefiner(functionProvider, initializationContext);
+		return super.getOrBuildHookClassDefiner(functionProvider, initializationContext);
 	}
 	
 	
 	@Override
-	protected ThrowExceptionFunction initExceptionThrower(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		return functionProvider.getOrBuildObject(
-			ThrowExceptionFunction.Native.class, initializationContext
-		);
+	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {
+		return ThrowExceptionFunction.Native.class;
 	}
 	
 	
 	@Override
-	protected GetLoadedPackagesFunction initLoadedPackagesRetriever(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		return functionProvider.getOrBuildObject(
-			GetLoadedPackagesFunction.Native.class, initializationContext
-		);
+	protected Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass() {
+		return GetLoadedPackagesFunction.Native.class;
+	}
+	
+	
+	@Override
+	protected Class<? extends GetLoadedClassesFunction> getGetLoadedClassesFunctionClass() {
+		return GetLoadedClassesFunction.Native.class;
 	}
 
 	
 	@Override
-	protected GetLoadedClassesFunction initLoadedClassesRetriever(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		return functionProvider.getOrBuildObject(
-			GetLoadedClassesFunction.Native.class, initializationContext
-		);
-	}
-
-	
-	@Override
-	protected SetFieldValueFunction initFieldValueSetter(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {	
-		return functionProvider.getOrBuildObject(
-			SetFieldValueFunction.Native.class, initializationContext
-		);
-	}
-
-	
-	@Override
-	protected GetFieldValueFunction initFieldValueRetriever(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		return functionProvider.getOrBuildObject(
-			GetFieldValueFunction.Native.class, initializationContext
-		);
-	}
-
-	
-	@Override		
-	protected AllocateInstanceFunction initAllocateInstanceInvoker(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		return functionProvider.getOrBuildObject(
-			AllocateInstanceFunction.Native.class, initializationContext
-		);
+	protected Class<? extends SetFieldValueFunction> getSetFieldValueFunctionClass() {
+		return SetFieldValueFunction.Native.class;
 	}
 	
 	
 	@Override
-	protected SetAccessibleFunction<?> initAccessibleSetter(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-		return (SetAccessibleFunction<?>)functionProvider.getOrBuildObject(
-			SetAccessibleFunction.Native.class, initializationContext
-		);
+	protected Class<? extends GetFieldValueFunction> getGetFieldValueFunctionClass() {
+		return GetFieldValueFunction.Native.class;
+	}
+	
+	
+	@Override
+	protected Class<? extends AllocateInstanceFunction> getAllocateInstanceFunctionClass() {
+		return AllocateInstanceFunction.Native.class;
+	}
+	
+
+	@Override
+	protected Class<? extends SetAccessibleFunction> getSetAccessibleFunctionClass() {
+		return SetAccessibleFunction.Native.class;
 	}
 
 }

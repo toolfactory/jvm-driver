@@ -29,45 +29,54 @@ package io.github.toolfactory.jvm.function.catalog;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.template.TriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public class ConstructorInvokeMethodHandleSupplier implements Supplier<MethodHandle> {
+@SuppressWarnings("unchecked")
+public abstract class MethodInvokeFunction implements TriFunction<Method, Object, Object[], Object> {
 	protected MethodHandle methodHandle;
+	protected ThrowExceptionFunction throwExceptionFunction;
+
 	
 	@Override
-	public MethodHandle get() {
-		return methodHandle;
+	public Object apply(Method method, Object target, Object[] params) {
+		try {
+			return methodHandle.invoke(method, target, params);
+		} catch (Throwable exc) {
+			return throwExceptionFunction.apply(exc);
+		}
 	}
 	
-	public static class ForJava7 extends ConstructorInvokeMethodHandleSupplier {
+	public static class ForJava7 extends MethodInvokeFunction {
 		
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
+			Method invoker = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
-			method.setAccessible(true);
-			methodHandle = consulter.unreflect(method);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
+			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
+			methodHandle = consulter.unreflect(invoker);
+			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 	}
 	
-	public static class ForJava9 extends ConstructorInvokeMethodHandleSupplier {
+	public static class ForJava9 extends MethodInvokeFunction {
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
+			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
-			methodHandle = consulter.unreflect(method);
+			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
+			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
+			methodHandle = consulter.unreflect(invoker);
+			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 		
 	}

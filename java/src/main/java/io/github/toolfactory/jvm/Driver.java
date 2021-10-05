@@ -127,7 +127,7 @@ public interface Driver extends Closeable {
 		public static <D extends Driver> D getNew(String className) throws Throwable {
 			D driver = (D)Class.forName(className).getDeclaredConstructor().newInstance();
 			if (driver instanceof DriverAbst) {
-				((DriverAbst)driver).init();
+				//((DriverAbst)driver).init();
 			}
 			return driver;
 		}
@@ -179,7 +179,7 @@ public interface Driver extends Closeable {
 			try {
 				D driver = ((D)driverConstructors.get("defaultDriverClass").newInstance());
 				if (driver instanceof DriverAbst) {
-					((DriverAbst)driver).init();
+					//((DriverAbst)driver).init();
 				}
 				return driver;
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -192,7 +192,7 @@ public interface Driver extends Closeable {
 			try {
 				D driver = ((D)driverConstructors.get("hybridDriverClass").newInstance());
 				if (driver instanceof DriverAbst) {
-					((DriverAbst)driver).init();
+					//((DriverAbst)driver).init();
 				}
 				return driver;
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -205,7 +205,7 @@ public interface Driver extends Closeable {
 			try {
 				D driver = ((D)driverConstructors.get("nativeDriverClass").newInstance());
 				if (driver instanceof DriverAbst) {
-					((DriverAbst)driver).init();
+					//((DriverAbst)driver).init();
 				}
 				return driver;
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException

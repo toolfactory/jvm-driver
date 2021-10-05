@@ -27,13 +27,10 @@
 package io.github.toolfactory.jvm;
 
 
-import java.lang.invoke.MethodHandle;
-import java.util.Map;
-
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.BuiltinClassLoaderClassSupplier;
 import io.github.toolfactory.jvm.function.catalog.ClassLoaderDelegateClassSupplier;
-import io.github.toolfactory.jvm.function.catalog.ConstructorInvokeMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.catalog.ConstructorInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DeepConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
@@ -44,121 +41,119 @@ import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetPackageFunction;
-import io.github.toolfactory.jvm.function.catalog.MethodInvokeMethodHandleSupplier;
+import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
-import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
+@SuppressWarnings({"rawtypes"})
 public class DefaultDriver extends DriverAbst {	
 	
-	protected ThrowExceptionFunction initExceptionThrower(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			ThrowExceptionFunction.class, initializationContext
-		);
-	}
-
-	protected AllocateInstanceFunction initAllocateInstanceInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			AllocateInstanceFunction.class, initializationContext
-		);
-	}
-
-	protected GetFieldValueFunction initFieldValueRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetFieldValueFunction.class, initializationContext
-		);
-	}
-
-	protected SetFieldValueFunction initFieldValueSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			SetFieldValueFunction.class, initializationContext
-		);
-	}
-
-	protected DefineHookClassFunction initHookClassDefiner(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			DefineHookClassFunction.class, initializationContext
-		);
-	}
-
-	protected ConsulterSupplyFunction<?> initConsulterRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {	
-		return functionProvider.getOrBuildObject(
-			ConsulterSupplyFunction.class, initializationContext
-		);
-	}
-
-	protected GetDeclaredFieldsFunction initDeclaredFieldsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetDeclaredFieldsFunction.class, initializationContext
-		);
-	}
-
-	protected GetDeclaredMethodsFunction initDeclaredMethodsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetDeclaredMethodsFunction.class, initializationContext
-		);
-	}
-
-	protected GetDeclaredConstructorsFunction initDeclaredConstructorsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetDeclaredConstructorsFunction.class, initializationContext
-		);
-	}
-
-	protected SetAccessibleFunction<?> initAccessibleSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			SetAccessibleFunction.class, initializationContext
-		);
-	}
-
-	protected MethodHandle initConstructorInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			ConstructorInvokeMethodHandleSupplier.class, initializationContext
-		).get();
-	}
-
-	protected MethodHandle initMethodInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			MethodInvokeMethodHandleSupplier.class, initializationContext
-		).get();
-	}
-
-	protected GetPackageFunction initPackageRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetPackageFunction.class, initializationContext
-		);
-	}
-
-	protected Class<?> initBuiltinClassLoaderClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			BuiltinClassLoaderClassSupplier.class, initializationContext
-		).get();
-	}
-
-	protected Class<?> initClassLoaderDelegateClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			ClassLoaderDelegateClassSupplier.class, initializationContext
-		).get();
-	}
-
-	protected DeepConsulterSupplyFunction<?> replaceConsulterWithDeepConsulter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {	
-		return functionProvider.getOrBuildObject(
-			DeepConsulterSupplyFunction.class, initializationContext
-		);
-	}
-
-	protected GetLoadedClassesFunction initLoadedClassesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetLoadedClassesFunction.class, initializationContext
-		);
-	}
-
-	protected GetLoadedPackagesFunction initLoadedPackagesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
-			GetLoadedPackagesFunction.class, initializationContext
-		);
+	@Override
+	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {
+		return ThrowExceptionFunction.class;
 	}
 	
+	
+	@Override
+	protected Class<? extends AllocateInstanceFunction> getAllocateInstanceFunctionClass() {
+		return AllocateInstanceFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetFieldValueFunction> getGetFieldValueFunctionClass() {
+		return GetFieldValueFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends SetFieldValueFunction> getSetFieldValueFunctionClass() {
+		return SetFieldValueFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends DefineHookClassFunction> getDefineHookClassFunctionClass() {
+		return DefineHookClassFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends ConsulterSupplyFunction> getConsulterSupplyFunctionClass() {
+		return (Class<? extends ConsulterSupplyFunction>)ConsulterSupplyFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetDeclaredFieldsFunction> getGetDeclaredFieldsFunctionClass() {
+		return GetDeclaredFieldsFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetDeclaredMethodsFunction> getGetDeclaredMethodsFunctionClass() {
+		return GetDeclaredMethodsFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetDeclaredConstructorsFunction> getGetDeclaredConstructorsFunctionClass() {
+		return GetDeclaredConstructorsFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends SetAccessibleFunction> getSetAccessibleFunctionClass() {
+		return SetAccessibleFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends ConstructorInvokeFunction> getConstructorInvokeFunctionClass() {
+		return ConstructorInvokeFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends MethodInvokeFunction> getMethodInvokeFunctionClass() {
+		return MethodInvokeFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetPackageFunction> getGetPackageFunctionClass() {
+		return GetPackageFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends BuiltinClassLoaderClassSupplier> getBuiltinClassLoaderClassSupplierClass() {
+		return BuiltinClassLoaderClassSupplier.class;
+	}
+
+
+	@Override
+	protected Class<? extends ClassLoaderDelegateClassSupplier> getClassLoaderDelegateClassSupplierClass() {
+		return ClassLoaderDelegateClassSupplier.class;
+	}
+
+
+	@Override
+	protected Class<? extends DeepConsulterSupplyFunction> getDeepConsulterSupplyFunctionClass() {
+		return DeepConsulterSupplyFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetLoadedClassesFunction> getGetLoadedClassesFunctionClass() {
+		return GetLoadedClassesFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass() {
+		return GetLoadedPackagesFunction.class;
+	}
 }

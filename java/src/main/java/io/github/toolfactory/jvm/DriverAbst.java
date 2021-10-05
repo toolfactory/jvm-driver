@@ -27,7 +27,6 @@
 package io.github.toolfactory.jvm;
 
 
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
@@ -39,6 +38,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
+import io.github.toolfactory.jvm.function.catalog.BuiltinClassLoaderClassSupplier;
+import io.github.toolfactory.jvm.function.catalog.ClassLoaderDelegateClassSupplier;
+import io.github.toolfactory.jvm.function.catalog.ConstructorInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DeepConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
@@ -49,6 +51,7 @@ import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetPackageFunction;
+import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
@@ -60,7 +63,7 @@ import io.github.toolfactory.jvm.util.FunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class DriverAbst implements Driver {
 
 	private ThrowExceptionFunction exceptionThrower;
@@ -73,9 +76,9 @@ public abstract class DriverAbst implements Driver {
 	private Function<Class<?>, Method[]> declaredMethodsRetriever;
 	private Function<Class<?>, Constructor<?>[]> declaredConstructorsRetriever;
 	private BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
-	private MethodHandle constructorInvoker;
+	private ConstructorInvokeFunction constructorInvoker;
 	private BiFunction<ClassLoader, String, Package> packageRetriever;
-	private MethodHandle methodInvoker;
+	private MethodInvokeFunction methodInvoker;
 	private Class<?> builtinClassLoaderClass;
 	private Class<?> classLoaderDelegateClass;
 	private Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
@@ -84,33 +87,60 @@ public abstract class DriverAbst implements Driver {
 	public DriverAbst() {}
 
 	
-	<D extends Driver> D init() {
-		ObjectProvider functionProvider = new ObjectProvider(
-			Info.CRITICAL_VERSIONS
-		);
-		
-		Map<Object, Object> initializationContext = new HashMap<>();
-		
-		initExceptionThrower(functionProvider, initializationContext);	
+//	<D extends Driver> D init() {
+//		ObjectProvider functionProvider = getNewObjectProvider();
+//		
+//		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
+//		
+//		getOrBuildExceptionThrower(functionProvider, initializationContext);	
+//		try {
+//			exceptionThrower = getOrBuildExceptionThrower(functionProvider, initializationContext);
+//			allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(functionProvider, initializationContext);	
+//			fieldValueRetriever = getOrBuildFieldValueRetriever(functionProvider, initializationContext);
+//			fieldValueSetter = getOrBuildFieldValueSetter(functionProvider, initializationContext);
+//			hookClassDefiner = getOrBuildHookClassDefiner(functionProvider, initializationContext);
+//			declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(functionProvider, initializationContext);
+//			declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(functionProvider, initializationContext);
+//			declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(functionProvider, initializationContext);
+//			accessibleSetter = getOrBuildAccessibleSetter(functionProvider, initializationContext);
+//			constructorInvoker = getOrBuildConstructorInvoker(functionProvider, initializationContext);
+//			methodInvoker = getOrBuildMethodInvoker(functionProvider, initializationContext);
+//			packageRetriever = getOrBuildPackageRetriever(functionProvider, initializationContext);		
+//			builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(functionProvider, initializationContext);	
+//			classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(functionProvider, initializationContext);
+//			consulterRetriever = getOrBuildDeepConsulterRetriever(functionProvider, initializationContext);
+//			loadedClassesRetriever = getOrBuildLoadedClassesRetriever(functionProvider, initializationContext);
+//			loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(functionProvider, initializationContext);
+//		} catch (Throwable exc) {
+//			throwException(
+//				new InitializeException(
+//					"Could not initiliaze " + this.getClass().getSimpleName(), exc
+//				)
+//			);
+//		}
+//		return (D)this;
+//	}
+	
+	
+	<D extends Driver> D refresh(Map<Object, Object> initializationContext) {
 		try {
-			exceptionThrower = initExceptionThrower(functionProvider, initializationContext);
-			allocateInstanceInvoker = initAllocateInstanceInvoker(functionProvider, initializationContext);	
-			fieldValueRetriever = initFieldValueRetriever(functionProvider, initializationContext);
-			fieldValueSetter = initFieldValueSetter(functionProvider, initializationContext);
-			hookClassDefiner = initHookClassDefiner(functionProvider, initializationContext);
-			consulterRetriever = initConsulterRetriever(functionProvider, initializationContext);
-			declaredFieldsRetriever = initDeclaredFieldsRetriever(functionProvider, initializationContext);
-			declaredMethodsRetriever = initDeclaredMethodsRetriever(functionProvider, initializationContext);
-			declaredConstructorsRetriever = initDeclaredConstructorsRetriever(functionProvider, initializationContext);
-			accessibleSetter = initAccessibleSetter(functionProvider, initializationContext);
-			constructorInvoker = initConstructorInvoker(functionProvider, initializationContext);
-			methodInvoker = initMethodInvoker(functionProvider, initializationContext);
-			packageRetriever = initPackageRetriever(functionProvider, initializationContext);		
-			builtinClassLoaderClass = initBuiltinClassLoaderClass(functionProvider, initializationContext);	
-			classLoaderDelegateClass = initClassLoaderDelegateClass(functionProvider, initializationContext);
-			consulterRetriever = replaceConsulterWithDeepConsulter(functionProvider, initializationContext);
-			loadedClassesRetriever = initLoadedClassesRetriever(functionProvider, initializationContext);
-			loadedPackagesRetriever = initLoadedPackagesRetriever(functionProvider, initializationContext);
+			exceptionThrower = getExceptionThrower(initializationContext);
+			allocateInstanceInvoker = getAllocateInstanceInvoker(initializationContext);	
+			fieldValueRetriever = getFieldValueRetriever(initializationContext);
+			fieldValueSetter = getFieldValueSetter(initializationContext);
+			hookClassDefiner = getHookClassDefiner(initializationContext);
+			declaredFieldsRetriever = getDeclaredFieldsRetriever(initializationContext);
+			declaredMethodsRetriever = getDeclaredMethodsRetriever(initializationContext);
+			declaredConstructorsRetriever = getDeclaredConstructorsRetriever(initializationContext);
+			accessibleSetter = getAccessibleSetter(initializationContext);
+			constructorInvoker = getConstructorInvoker(initializationContext);
+			methodInvoker = getMethodInvoker(initializationContext);
+			packageRetriever = getPackageRetriever(initializationContext);		
+			builtinClassLoaderClass = getBuiltinClassLoaderClass(initializationContext);	
+			classLoaderDelegateClass = getClassLoaderDelegateClass(initializationContext);
+			consulterRetriever = getDeepConsulterRetriever(initializationContext);
+			loadedClassesRetriever = getLoadedClassesRetriever(initializationContext);
+			loadedPackagesRetriever = getLoadedPackagesRetriever(initializationContext);
 		} catch (Throwable exc) {
 			throwException(
 				new InitializeException(
@@ -121,117 +151,564 @@ public abstract class DriverAbst implements Driver {
 		return (D)this;
 	}
 
-	protected abstract ThrowExceptionFunction initExceptionThrower(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
 
-	protected abstract AllocateInstanceFunction initAllocateInstanceInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract GetFieldValueFunction initFieldValueRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract SetFieldValueFunction initFieldValueSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract DefineHookClassFunction initHookClassDefiner(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract ConsulterSupplyFunction<?> initConsulterRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract GetDeclaredFieldsFunction initDeclaredFieldsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract GetDeclaredMethodsFunction initDeclaredMethodsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract GetDeclaredConstructorsFunction initDeclaredConstructorsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract SetAccessibleFunction<?> initAccessibleSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract MethodHandle initConstructorInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract MethodHandle initMethodInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract GetPackageFunction initPackageRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract Class<?> initBuiltinClassLoaderClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract Class<?> initClassLoaderDelegateClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract DeepConsulterSupplyFunction<?> replaceConsulterWithDeepConsulter(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
-
-	protected abstract GetLoadedClassesFunction initLoadedClassesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
+	ObjectProvider getNewObjectProvider() {
+		ObjectProvider functionProvider = new ObjectProvider(
+			Info.CRITICAL_VERSIONS
+		);
+		return functionProvider;
+	}
 	
-	protected abstract GetLoadedPackagesFunction initLoadedPackagesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext);
+	protected abstract Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass();
+	
+	protected abstract Class<? extends AllocateInstanceFunction> getAllocateInstanceFunctionClass();
+	
+	protected abstract Class<? extends GetFieldValueFunction> getGetFieldValueFunctionClass();
+	
+	protected abstract Class<? extends SetFieldValueFunction> getSetFieldValueFunctionClass();
+	
+	protected abstract Class<? extends DefineHookClassFunction> getDefineHookClassFunctionClass();
+	
+	protected abstract Class<? extends ConsulterSupplyFunction> getConsulterSupplyFunctionClass();
+	
+	protected abstract Class<? extends GetDeclaredFieldsFunction> getGetDeclaredFieldsFunctionClass();
+	
+	protected abstract Class<? extends GetDeclaredMethodsFunction> getGetDeclaredMethodsFunctionClass();
+	
+	protected abstract Class<? extends GetDeclaredConstructorsFunction> getGetDeclaredConstructorsFunctionClass();
+	
+	protected abstract Class<? extends SetAccessibleFunction> getSetAccessibleFunctionClass();
+	
+	protected abstract Class<? extends ConstructorInvokeFunction> getConstructorInvokeFunctionClass();
+	
+	protected abstract Class<? extends MethodInvokeFunction> getMethodInvokeFunctionClass();
+	
+	protected abstract Class<? extends GetPackageFunction> getGetPackageFunctionClass();
+	
+	protected abstract Class<? extends BuiltinClassLoaderClassSupplier> getBuiltinClassLoaderClassSupplierClass();
+	
+	protected abstract Class<? extends ClassLoaderDelegateClassSupplier> getClassLoaderDelegateClassSupplierClass();
+	
+	protected abstract Class<? extends DeepConsulterSupplyFunction> getDeepConsulterSupplyFunctionClass();
+	
+	protected abstract Class<? extends GetLoadedClassesFunction> getGetLoadedClassesFunctionClass();
+	
+	protected abstract Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass();
+	
+	
+	protected ThrowExceptionFunction getOrBuildExceptionThrower(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getThrowExceptionFunctionClass(), initializationContext
+		);
+	}
 
+	protected AllocateInstanceFunction getOrBuildAllocateInstanceInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getAllocateInstanceFunctionClass(), initializationContext
+		);
+	}	
+
+	protected GetFieldValueFunction getOrBuildFieldValueRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetFieldValueFunctionClass(), initializationContext
+		);
+	}
+
+	protected SetFieldValueFunction getOrBuildFieldValueSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getSetFieldValueFunctionClass(), initializationContext
+		);
+	}
+
+	protected DefineHookClassFunction getOrBuildHookClassDefiner(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getDefineHookClassFunctionClass(), initializationContext
+		);
+	}
+
+	protected ConsulterSupplyFunction getOrBuildConsulterRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {	
+		return functionProvider.getOrBuildObject(
+			getConsulterSupplyFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetDeclaredFieldsFunction getOrBuildDeclaredFieldsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetDeclaredFieldsFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetDeclaredMethodsFunction getOrBuildDeclaredMethodsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetDeclaredMethodsFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetDeclaredConstructorsFunction getOrBuildDeclaredConstructorsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetDeclaredConstructorsFunctionClass(), initializationContext
+		);
+	}
+
+	protected SetAccessibleFunction getOrBuildAccessibleSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getSetAccessibleFunctionClass(), initializationContext
+		);
+	}
+
+	protected ConstructorInvokeFunction getOrBuildConstructorInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getConstructorInvokeFunctionClass(), initializationContext
+		);
+	}
+
+	protected MethodInvokeFunction getOrBuildMethodInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getMethodInvokeFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetPackageFunction getOrBuildPackageRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetPackageFunctionClass(), initializationContext
+		);
+	}
+
+	protected Class<?> getOrBuildBuiltinClassLoaderClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getBuiltinClassLoaderClassSupplierClass(), initializationContext
+		).get();
+	}
+
+	protected Class<?> getOrBuildClassLoaderDelegateClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getClassLoaderDelegateClassSupplierClass(), initializationContext
+		).get();
+	}
+
+	protected DeepConsulterSupplyFunction getOrBuildDeepConsulterRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {	
+		return functionProvider.getOrBuildObject(
+			getDeepConsulterSupplyFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetLoadedClassesFunction getOrBuildLoadedClassesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetLoadedClassesFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetLoadedPackagesFunction getOrBuildLoadedPackagesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
+		return functionProvider.getOrBuildObject(
+			getGetLoadedPackagesFunctionClass(), initializationContext
+		);
+	}
+	
+	
+	//
+	protected ThrowExceptionFunction getExceptionThrower(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getThrowExceptionFunctionClass(), initializationContext
+		);
+	}
+
+	protected AllocateInstanceFunction getAllocateInstanceInvoker(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getAllocateInstanceFunctionClass(), initializationContext
+		);
+	}	
+
+	protected GetFieldValueFunction getFieldValueRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetFieldValueFunctionClass(), initializationContext
+		);
+	}
+
+	protected SetFieldValueFunction getFieldValueSetter(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getSetFieldValueFunctionClass(), initializationContext
+		);
+	}
+
+	protected DefineHookClassFunction getHookClassDefiner(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getDefineHookClassFunctionClass(), initializationContext
+		);
+	}
+
+	protected ConsulterSupplyFunction getConsulterRetriever(Map<Object, Object> initializationContext) {	
+		return ObjectProvider.getObject(
+			getConsulterSupplyFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetDeclaredFieldsFunction getDeclaredFieldsRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetDeclaredFieldsFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetDeclaredMethodsFunction getDeclaredMethodsRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetDeclaredMethodsFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetDeclaredConstructorsFunction getDeclaredConstructorsRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetDeclaredConstructorsFunctionClass(), initializationContext
+		);
+	}
+
+	protected SetAccessibleFunction getAccessibleSetter(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getSetAccessibleFunctionClass(), initializationContext
+		);
+	}
+
+	protected ConstructorInvokeFunction getConstructorInvoker(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getConstructorInvokeFunctionClass(), initializationContext
+		);
+	}
+
+	protected MethodInvokeFunction getMethodInvoker(Map<Object, Object> initializationContext) {
+		return  ObjectProvider.getObject(
+			getMethodInvokeFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetPackageFunction getPackageRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetPackageFunctionClass(), initializationContext
+		);
+	}
+
+	protected Class<?> getBuiltinClassLoaderClass(Map<Object, Object> initializationContext) {
+		BuiltinClassLoaderClassSupplier supplier = ObjectProvider.getObject(
+			getBuiltinClassLoaderClassSupplierClass(), initializationContext
+		);
+		return supplier != null ? supplier.get() : null;
+	}
+
+	protected Class<?> getClassLoaderDelegateClass(Map<Object, Object> initializationContext) {
+		ClassLoaderDelegateClassSupplier supplier = ObjectProvider.getObject(
+			getClassLoaderDelegateClassSupplierClass(), initializationContext
+		);
+		return supplier != null ? supplier.get() : null;
+	}
+
+	protected DeepConsulterSupplyFunction getDeepConsulterRetriever(Map<Object, Object> initializationContext) {	
+		return ObjectProvider.getObject(
+			getDeepConsulterSupplyFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetLoadedClassesFunction getLoadedClassesRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetLoadedClassesFunctionClass(), initializationContext
+		);
+	}
+
+	protected GetLoadedPackagesFunction getLoadedPackagesRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getGetLoadedPackagesFunctionClass(), initializationContext
+		);
+	}
+	
+	
+	protected Map<Object, Object> functionsToMap() {
+		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
+		putIfNotNull(initializationContext, getThrowExceptionFunctionClass(), exceptionThrower);                      
+		putIfNotNull(initializationContext, getAllocateInstanceFunctionClass(), allocateInstanceInvoker);             
+		putIfNotNull(initializationContext, getGetFieldValueFunctionClass(), fieldValueRetriever);                    
+		putIfNotNull(initializationContext, getSetFieldValueFunctionClass(), fieldValueSetter);                       
+		putIfNotNull(initializationContext, getDefineHookClassFunctionClass(), hookClassDefiner);                     
+		putIfNotNull(initializationContext, getGetDeclaredFieldsFunctionClass(), declaredFieldsRetriever);            
+		putIfNotNull(initializationContext, getGetDeclaredMethodsFunctionClass(), declaredMethodsRetriever);          
+		putIfNotNull(initializationContext, getGetDeclaredConstructorsFunctionClass(), declaredConstructorsRetriever);
+		putIfNotNull(initializationContext, getSetAccessibleFunctionClass(), accessibleSetter);                       
+		putIfNotNull(initializationContext, getConstructorInvokeFunctionClass(), constructorInvoker);     
+		putIfNotNull(initializationContext, getMethodInvokeFunctionClass(), methodInvoker);               
+		putIfNotNull(initializationContext, getGetPackageFunctionClass(), packageRetriever);                          
+		putIfNotNull(initializationContext, getBuiltinClassLoaderClassSupplierClass(), builtinClassLoaderClass);      
+		putIfNotNull(initializationContext, getClassLoaderDelegateClassSupplierClass(), classLoaderDelegateClass);    
+		putIfNotNull(initializationContext, getDeepConsulterSupplyFunctionClass(),  consulterRetriever);              
+		putIfNotNull(initializationContext, getGetLoadedClassesFunctionClass(), loadedClassesRetriever);             
+		putIfNotNull(initializationContext, getGetLoadedPackagesFunctionClass(), loadedPackagesRetriever);
+		return initializationContext;
+	}
+	
+	
+	private void putIfNotNull(Map<Object, Object> map, Class<?> cls, Object object) {
+		if (object != null) {
+			map.put(cls.getName(), object);
+		}		
+	}
+	
 	
 	@Override
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements) {
-		return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+		try {
+			return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+		} catch (NullPointerException exc) {
+			if (exceptionThrower == null) {
+				synchronized (this) {
+					if (exceptionThrower == null) {
+						exceptionThrower = getOrBuildExceptionThrower(getNewObjectProvider(), functionsToMap());
+					}
+				}
+			}
+			return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+		}
 	}
 
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
-		accessibleSetter.accept(object, flag);
+		try {
+			accessibleSetter.accept(object, flag);
+		} catch (NullPointerException exc) {
+			if (accessibleSetter == null) {
+				synchronized (this) {
+					if (accessibleSetter == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						accessibleSetter = getOrBuildAccessibleSetter(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			accessibleSetter.accept(object, flag);
+		}
+		
 	}
 
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
-		return hookClassDefiner.apply(clientClass, byteCode);
+		try {
+			return hookClassDefiner.apply(clientClass, byteCode);
+		} catch (NullPointerException exc) {
+			if (hookClassDefiner == null) {
+				synchronized (this) {
+					if (hookClassDefiner == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						hookClassDefiner = getOrBuildHookClassDefiner(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return hookClassDefiner.apply(clientClass, byteCode);
+		}
 	}
 
 	@Override
 	public Package getPackage(ClassLoader classLoader, String packageName) {
-		return packageRetriever.apply(classLoader, packageName);
+		try {
+			return packageRetriever.apply(classLoader, packageName);
+		} catch (NullPointerException exc) {
+			if (packageRetriever == null) {
+				synchronized (this) {
+					if (packageRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						packageRetriever = getOrBuildPackageRetriever(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return packageRetriever.apply(classLoader, packageName);
+		}
 	}
 
 	@Override
 	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
-		return loadedClassesRetriever.apply(classLoader);
+		try {
+			return loadedClassesRetriever.apply(classLoader);
+		} catch (NullPointerException exc) {
+			if (loadedClassesRetriever == null) {
+				synchronized (this) {
+					if (loadedClassesRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						loadedClassesRetriever = getOrBuildLoadedClassesRetriever(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return loadedClassesRetriever.apply(classLoader);
+		}
 	}
 
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
-		return loadedPackagesRetriever.apply(classLoader);
+		try {
+			return loadedPackagesRetriever.apply(classLoader);
+		} catch (NullPointerException exc) {
+			if (loadedPackagesRetriever == null) {
+				synchronized (this) {
+					if (loadedPackagesRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return loadedPackagesRetriever.apply(classLoader);
+		}
 	}
 
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
-		return (T)fieldValueRetriever.apply(target, field);
+		try {
+			return (T)fieldValueRetriever.apply(target, field);
+		} catch (NullPointerException exc) {
+			if (fieldValueRetriever == null) {
+				synchronized (this) {
+					if (fieldValueRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						fieldValueRetriever = getOrBuildFieldValueRetriever(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return (T)fieldValueRetriever.apply(target, field);
+		}
 	}
 
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
-		fieldValueSetter.accept(target, field, value);
+		try {
+			fieldValueSetter.accept(target, field, value);
+		} catch (NullPointerException exc) {
+			if (fieldValueSetter == null) {
+				synchronized (this) {
+					if (fieldValueSetter == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						fieldValueSetter = getOrBuildFieldValueSetter(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			fieldValueSetter.accept(target, field, value);
+		}
 	}
 
 	@Override
 	public <T> T allocateInstance(Class<?> cls) {
-		return (T)allocateInstanceInvoker.apply(cls);
+		try {
+			return (T)allocateInstanceInvoker.apply(cls);
+		} catch (NullPointerException exc) {
+			if (allocateInstanceInvoker == null) {
+				synchronized (this) {
+					if (allocateInstanceInvoker == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return (T)allocateInstanceInvoker.apply(cls);
+		}
 	}
 
 	@Override
 	public boolean isBuiltinClassLoader(ClassLoader classLoader) {
+		Class<?> builtinClassLoaderClass = getBuiltinClassLoaderClass();
 		return builtinClassLoaderClass != null && builtinClassLoaderClass.isAssignableFrom(classLoader.getClass());
 	}
 
 	@Override
 	public boolean isClassLoaderDelegate(ClassLoader classLoader) {
+		Class<?> classLoaderDelegateClass = getClassLoaderDelegateClass();
 		return classLoaderDelegateClass != null && classLoaderDelegateClass.isAssignableFrom(classLoader.getClass());
 	}
 
 	@Override
 	public Class<?> getBuiltinClassLoaderClass() {
-		return builtinClassLoaderClass;
+		if (builtinClassLoaderClass == Empty.class) {
+			return null;
+		} else if (builtinClassLoaderClass != null) {
+			return builtinClassLoaderClass;
+		} else {
+			synchronized(this) {
+				if (builtinClassLoaderClass == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					ObjectProvider objectProvider = getNewObjectProvider();
+					builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(objectProvider, initContext);
+					refresh(initContext);
+				}
+				if (builtinClassLoaderClass == null) {
+					builtinClassLoaderClass = Empty.class;
+				}
+			}
+			return getBuiltinClassLoaderClass();
+		}
 	}
 
 	@Override
 	public Class<?> getClassLoaderDelegateClass() {
-		return classLoaderDelegateClass;
+		if (classLoaderDelegateClass == Empty.class) {
+			return null;
+		} else if (classLoaderDelegateClass != null) {
+			return classLoaderDelegateClass;
+		} else {
+			synchronized(this) {
+				if (classLoaderDelegateClass == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					ObjectProvider objectProvider = getNewObjectProvider();
+					classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(objectProvider, initContext);
+					refresh(initContext);
+				}
+				if (classLoaderDelegateClass == null) {
+					classLoaderDelegateClass = Empty.class;
+				}
+			}
+			return getClassLoaderDelegateClass();
+		}
 	}
 
 	@Override
 	public Lookup getConsulter(Class<?> cls) {
-		return consulterRetriever.apply(cls);
+		try {
+			return consulterRetriever.apply(cls);
+		} catch (NullPointerException exc) {
+			if (consulterRetriever == null) {
+				synchronized (this) {
+					if (consulterRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						ObjectProvider objectProvider = getNewObjectProvider();
+						consulterRetriever = getOrBuildDeepConsulterRetriever(objectProvider, initContext);
+						refresh(initContext);
+					}
+				}
+			}
+			return consulterRetriever.apply(cls);
+		}
 	}
 
 	@Override
 	public <T> T invoke(Method method, Object target, Object[] params) {
 		try {
-			return (T)methodInvoker.invoke(method, target, params);
+			try {
+				return (T)methodInvoker.apply(method, target, params);
+			} catch (NullPointerException exc) {
+				if (methodInvoker == null) {
+					synchronized (this) {
+						if (methodInvoker == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							ObjectProvider objectProvider = getNewObjectProvider();
+							methodInvoker = getOrBuildMethodInvoker(objectProvider, initContext);
+							refresh(initContext);
+						}
+					}
+				}
+				return (T)methodInvoker.apply(method, target, params);
+			}
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
@@ -240,7 +717,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> T newInstance(Constructor<T> ctor, Object[] params) {
 		try {
-			return (T)constructorInvoker.invoke(ctor, params);
+			try {
+				return (T)constructorInvoker.apply(ctor, params);
+			} catch (NullPointerException exc) {
+				if (constructorInvoker == null) {
+					synchronized (this) {
+						if (constructorInvoker == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							ObjectProvider objectProvider = getNewObjectProvider();
+							constructorInvoker = getOrBuildConstructorInvoker(objectProvider, initContext);
+							refresh(initContext);
+						}
+					}
+				}
+				return (T)constructorInvoker.apply(ctor, params);
+			}
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
@@ -249,7 +740,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Field[] getDeclaredFields(Class<?> cls) {
 		try {
-			return (Field[])declaredFieldsRetriever.apply(cls);
+			try {
+				return (Field[])declaredFieldsRetriever.apply(cls);
+			} catch (NullPointerException exc) {
+				if (declaredFieldsRetriever == null) {
+					synchronized (this) {
+						if (declaredFieldsRetriever == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							ObjectProvider objectProvider = getNewObjectProvider();
+							declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(objectProvider, initContext);
+							refresh(initContext);
+						}
+					}
+				}
+				return (Field[])declaredFieldsRetriever.apply(cls);
+			}
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
@@ -258,7 +763,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
 		try {
-			return (Constructor<T>[])declaredConstructorsRetriever.apply(cls);
+			try {
+				return (Constructor<T>[])declaredConstructorsRetriever.apply(cls);
+			} catch (NullPointerException exc) {
+				if (declaredConstructorsRetriever == null) {
+					synchronized (this) {
+						if (declaredConstructorsRetriever == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							ObjectProvider objectProvider = getNewObjectProvider();
+							declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(objectProvider, initContext);
+							refresh(initContext);
+						}
+					}
+				}
+				return (Constructor<T>[])declaredConstructorsRetriever.apply(cls);
+			}
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
@@ -267,10 +786,28 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Method[] getDeclaredMethods(Class<?> cls) {
 		try {
-			return (Method[])declaredMethodsRetriever.apply(cls);
+			try {
+				return (Method[])declaredMethodsRetriever.apply(cls);
+			} catch (NullPointerException exc) {
+				if (declaredMethodsRetriever == null) {
+					synchronized (this) {
+						if (declaredMethodsRetriever == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							ObjectProvider objectProvider = getNewObjectProvider();
+							declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(objectProvider, initContext);
+							refresh(initContext);
+						}
+					}
+				}
+				return (Method[])declaredMethodsRetriever.apply(cls);
+			}
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
+	}
+	
+	private static class Empty {
+		
 	}
 
 	@Override

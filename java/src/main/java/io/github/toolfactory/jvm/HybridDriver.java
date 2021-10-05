@@ -38,7 +38,7 @@ public class HybridDriver extends DefaultDriver {
 	
 	
 	@Override
-	protected DefineHookClassFunction initHookClassDefiner(
+	protected DefineHookClassFunction getOrBuildHookClassDefiner(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
@@ -46,7 +46,8 @@ public class HybridDriver extends DefaultDriver {
             throw new InitializeException("Could not load Narcissus native library");
         }
 		functionProvider.getOrBuildObject(ConsulterSupplier.Hybrid.class, initializationContext);
-		return super.initHookClassDefiner(functionProvider, initializationContext);
+		return super.getOrBuildHookClassDefiner(functionProvider, initializationContext);
 	}
 
+	
 }
