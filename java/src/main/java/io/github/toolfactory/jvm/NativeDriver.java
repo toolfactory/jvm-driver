@@ -45,6 +45,15 @@ public class NativeDriver extends DefaultDriver {
 	
 	
 	@Override
+	<D extends Driver> D init() {
+        if (!io.github.toolfactory.narcissus.Narcissus.libraryLoaded) {
+            throw new InitializeException("Could not load Narcissus native library");
+        }
+		return super.init();
+	}
+	
+	
+	@Override
 	protected DefineHookClassFunction initHookClassDefiner(
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
@@ -92,9 +101,6 @@ public class NativeDriver extends DefaultDriver {
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {	
-        if (!io.github.toolfactory.narcissus.Narcissus.libraryLoaded) {
-            throw new InitializeException("Could not load Narcissus native library");
-        }
 		return functionProvider.getOrBuildObject(
 			SetFieldValueFunction.Native.class, initializationContext
 		);
