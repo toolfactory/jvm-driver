@@ -129,7 +129,7 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 					if (classLoader == null) {
 						throw new NullPointerException("Input classLoader parameter can't be null");
 					}
-					Hashtable<String, ?> loadedClassesHS = (Hashtable<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);;
+					Hashtable<String, ?> loadedClassesHS = (Hashtable<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);
 					Set<Class<?>> loadedClasses = new HashSet<Class<?>>();
 					for (Entry<String, ?> classEntry : loadedClassesHS.entrySet()) {
 						try {
