@@ -71,7 +71,13 @@ public class ObjectProvider {
 	
 	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
 		Map<String, Throwable> exceptions = new HashMap<String, Throwable>();
-		context.putIfAbsent("classNameOptionalItems", new ArrayList<String>());
+		if (context.get("classNameOptionalItems") == null) {
+			synchronized (context) {
+				if (context.get("classNameOptionalItems") == null) {
+					context.put("classNameOptionalItems", new ArrayList<String>());
+				}
+			}
+		}		
 		try {
 			try {
 				return getOrBuildObjectInternal(clazz, context);
