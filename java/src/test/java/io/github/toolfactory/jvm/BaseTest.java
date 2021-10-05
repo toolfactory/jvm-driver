@@ -17,7 +17,7 @@ import io.github.toolfactory.util.Reflection;
 
 @SuppressWarnings("unused")
 abstract class BaseTest {
-	protected static Reflection reflection;
+	protected Reflection reflection;
 	
 	abstract Reflection getReflection();
 	
