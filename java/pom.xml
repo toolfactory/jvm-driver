@@ -44,7 +44,7 @@
 		<project_jdk_version>7</project_jdk_version>
 		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
 		<skipTests>true</skipTests>
-		<project.test.testSuite>AllExceptHeavyTestsSuite</project.test.testSuite>
+		<project.test.testSuite>AllTestsSuite</project.test.testSuite>
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
 
@@ -56,7 +56,7 @@
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-		<narcissus.version>1.0.4</narcissus.version>
+		<narcissus.version>1.0.6</narcissus.version>
 	</properties>
 
 	<dependencies>
@@ -168,9 +168,9 @@
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
 							<release>9</release>
-						<!--<excludes>
+						<!-- <excludes>
 								<exclude>module-info.java</exclude>
-							</excludes>-->
+							</excludes> -->
 						</configuration>
 					</execution>
 					<execution>
