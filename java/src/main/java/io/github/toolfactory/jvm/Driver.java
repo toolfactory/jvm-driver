@@ -85,6 +85,7 @@ public interface Driver extends Closeable {
 
 	@Override
 	public void close();
+
 	
 	@SuppressWarnings("unchecked")
 	public static class Factory {
@@ -123,8 +124,12 @@ public interface Driver extends Closeable {
 			}
 		}
 		
-		public static Driver getNew(String className) throws Throwable {
-			return (Driver)Class.forName(className).getDeclaredConstructor().newInstance();
+		public static <D extends Driver> D getNew(String className) throws Throwable {
+			D driver = (D)Class.forName(className).getDeclaredConstructor().newInstance();
+			if (driver instanceof DriverAbst) {
+				((DriverAbst)driver).init();
+			}
+			return driver;
 		}
 		
 		private static void setDriverClass(String name, String className) {
@@ -172,7 +177,11 @@ public interface Driver extends Closeable {
 		
 		public static <D extends Driver> D getNewDefault() {
 			try {
-				return (D)driverConstructors.get("defaultDriverClass").newInstance();
+				D driver = ((D)driverConstructors.get("defaultDriverClass").newInstance());
+				if (driver instanceof DriverAbst) {
+					((DriverAbst)driver).init();
+				}
+				return driver;
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
@@ -181,7 +190,11 @@ public interface Driver extends Closeable {
 		
 		public static <D extends Driver> D getNewHybrid() {
 			try {
-				return (D)driverConstructors.get("hybridDriverClass").newInstance();
+				D driver = ((D)driverConstructors.get("hybridDriverClass").newInstance());
+				if (driver instanceof DriverAbst) {
+					((DriverAbst)driver).init();
+				}
+				return driver;
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
@@ -190,7 +203,11 @@ public interface Driver extends Closeable {
 		
 		public static <D extends Driver> D getNewNative() {
 			try {
-				return (D)driverConstructors.get("nativeDriverClass").newInstance();
+				D driver = ((D)driverConstructors.get("nativeDriverClass").newInstance());
+				if (driver instanceof DriverAbst) {
+					((DriverAbst)driver).init();
+				}
+				return driver;
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
