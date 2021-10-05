@@ -47,8 +47,8 @@ public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
 				exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
 			}
 			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-			stackTraceOfException = new StackTraceElement[stackTrace.length - 3];
-			System.arraycopy(stackTrace, 3, stackTraceOfException, 0, stackTraceOfException.length);
+			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
+			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
 			exception.setStackTrace(stackTraceOfException);
 		} else {
 			exception = (Throwable)exceptionOrMessage;

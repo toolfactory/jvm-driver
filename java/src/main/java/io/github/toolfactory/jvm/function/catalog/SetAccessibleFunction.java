@@ -121,8 +121,7 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 			public ForJava7(Map<Object, Object> context) throws IllegalAccessException {
 				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
-				final GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
-						
+				final GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);		
 				Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{AccessibleObject.class, boolean.class});
 				final MethodHandle accessibleSetterMethodHandle = functionProvider.getOrBuildObject(
 					ConsulterSupplier.class, context

@@ -57,6 +57,7 @@ import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.util.FunctionAdapter;
@@ -85,42 +86,40 @@ public abstract class DriverAbst implements Driver {
 	private Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 
 	public DriverAbst() {}
-
 	
-//	<D extends Driver> D init() {
-//		ObjectProvider functionProvider = getNewObjectProvider();
-//		
-//		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
-//		
-//		getOrBuildExceptionThrower(functionProvider, initializationContext);	
-//		try {
-//			exceptionThrower = getOrBuildExceptionThrower(functionProvider, initializationContext);
-//			allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(functionProvider, initializationContext);	
-//			fieldValueRetriever = getOrBuildFieldValueRetriever(functionProvider, initializationContext);
-//			fieldValueSetter = getOrBuildFieldValueSetter(functionProvider, initializationContext);
-//			hookClassDefiner = getOrBuildHookClassDefiner(functionProvider, initializationContext);
-//			declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(functionProvider, initializationContext);
-//			declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(functionProvider, initializationContext);
-//			declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(functionProvider, initializationContext);
-//			accessibleSetter = getOrBuildAccessibleSetter(functionProvider, initializationContext);
-//			constructorInvoker = getOrBuildConstructorInvoker(functionProvider, initializationContext);
-//			methodInvoker = getOrBuildMethodInvoker(functionProvider, initializationContext);
-//			packageRetriever = getOrBuildPackageRetriever(functionProvider, initializationContext);		
-//			builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(functionProvider, initializationContext);	
-//			classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(functionProvider, initializationContext);
-//			consulterRetriever = getOrBuildDeepConsulterRetriever(functionProvider, initializationContext);
-//			loadedClassesRetriever = getOrBuildLoadedClassesRetriever(functionProvider, initializationContext);
-//			loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(functionProvider, initializationContext);
-//		} catch (Throwable exc) {
-//			throwException(
-//				new InitializeException(
-//					"Could not initiliaze " + this.getClass().getSimpleName(), exc
-//				)
-//			);
-//		}
-//		return (D)this;
-//	}
-	
+//	Replaced by the deferred initialization
+/*	<D extends Driver> D init() {
+		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
+		putNewObjectProviderIfAbsent(initializationContext);
+		getOrBuildExceptionThrower(initializationContext);	
+		try {
+			exceptionThrower = getOrBuildExceptionThrower(initializationContext);
+			allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initializationContext);	
+			fieldValueRetriever = getOrBuildFieldValueRetriever(initializationContext);
+			fieldValueSetter = getOrBuildFieldValueSetter(initializationContext);
+			hookClassDefiner = getOrBuildHookClassDefiner(initializationContext);
+			declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initializationContext);
+			declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(initializationContext);
+			declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(initializationContext);
+			accessibleSetter = getOrBuildAccessibleSetter(initializationContext);
+			constructorInvoker = getOrBuildConstructorInvoker(initializationContext);
+			methodInvoker = getOrBuildMethodInvoker(initializationContext);
+			packageRetriever = getOrBuildPackageRetriever(initializationContext);		
+			builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(initializationContext);	
+			classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(initializationContext);
+			consulterRetriever = getOrBuildDeepConsulterRetriever(initializationContext);
+			loadedClassesRetriever = getOrBuildLoadedClassesRetriever(initializationContext);
+			loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initializationContext);
+		} catch (Throwable exc) {
+			throwException(
+				new InitializeException(
+					"Could not initiliaze " + this.getClass().getSimpleName(), exc
+				)
+			);
+		}
+		return (D)this;
+	}
+*/	
 	
 	<D extends Driver> D refresh(Map<Object, Object> initializationContext) {
 		try {
@@ -141,6 +140,7 @@ public abstract class DriverAbst implements Driver {
 			consulterRetriever = getDeepConsulterRetriever(initializationContext);
 			loadedClassesRetriever = getLoadedClassesRetriever(initializationContext);
 			loadedPackagesRetriever = getLoadedPackagesRetriever(initializationContext);
+			putNewObjectProviderIfAbsent(initializationContext);
 		} catch (Throwable exc) {
 			throwException(
 				new InitializeException(
@@ -150,13 +150,42 @@ public abstract class DriverAbst implements Driver {
 		}
 		return (D)this;
 	}
+	
+	
+	protected Map<Object, Object> functionsToMap() {
+		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
+		putIfNotNull(initializationContext, getThrowExceptionFunctionClass(), exceptionThrower);                      
+		putIfNotNull(initializationContext, getAllocateInstanceFunctionClass(), allocateInstanceInvoker);             
+		putIfNotNull(initializationContext, getGetFieldValueFunctionClass(), fieldValueRetriever);                    
+		putIfNotNull(initializationContext, getSetFieldValueFunctionClass(), fieldValueSetter);                       
+		putIfNotNull(initializationContext, getDefineHookClassFunctionClass(), hookClassDefiner);                     
+		putIfNotNull(initializationContext, getGetDeclaredFieldsFunctionClass(), declaredFieldsRetriever);            
+		putIfNotNull(initializationContext, getGetDeclaredMethodsFunctionClass(), declaredMethodsRetriever);          
+		putIfNotNull(initializationContext, getGetDeclaredConstructorsFunctionClass(), declaredConstructorsRetriever);
+		putIfNotNull(initializationContext, getSetAccessibleFunctionClass(), accessibleSetter);                       
+		putIfNotNull(initializationContext, getConstructorInvokeFunctionClass(), constructorInvoker);     
+		putIfNotNull(initializationContext, getMethodInvokeFunctionClass(), methodInvoker);               
+		putIfNotNull(initializationContext, getGetPackageFunctionClass(), packageRetriever);                          
+		putIfNotNull(initializationContext, getBuiltinClassLoaderClassSupplierClass(), builtinClassLoaderClass);      
+		putIfNotNull(initializationContext, getClassLoaderDelegateClassSupplierClass(), classLoaderDelegateClass);    
+		putIfNotNull(initializationContext, getDeepConsulterSupplyFunctionClass(),  consulterRetriever);              
+		putIfNotNull(initializationContext, getGetLoadedClassesFunctionClass(), loadedClassesRetriever);             
+		putIfNotNull(initializationContext, getGetLoadedPackagesFunctionClass(), loadedPackagesRetriever);
+		putNewObjectProviderIfAbsent(initializationContext);
+		return initializationContext;
+	}
 
 
-	ObjectProvider getNewObjectProvider() {
-		ObjectProvider functionProvider = new ObjectProvider(
-			Info.CRITICAL_VERSIONS
-		);
-		return functionProvider;
+	ObjectProvider putNewObjectProviderIfAbsent(Map<Object, Object> context) {
+		ObjectProvider.putIfAbsent(context, new Supplier<ObjectProvider>() {
+			@Override
+			public ObjectProvider get() {
+				return new ObjectProvider(
+					Info.CRITICAL_VERSIONS
+				);
+			}			
+		});
+		return ObjectProvider.get(context);
 	}
 	
 	protected abstract Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass();
@@ -196,110 +225,110 @@ public abstract class DriverAbst implements Driver {
 	protected abstract Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass();
 	
 	
-	protected ThrowExceptionFunction getOrBuildExceptionThrower(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected ThrowExceptionFunction getOrBuildExceptionThrower(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getThrowExceptionFunctionClass(), initializationContext
 		);
 	}
 
-	protected AllocateInstanceFunction getOrBuildAllocateInstanceInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected AllocateInstanceFunction getOrBuildAllocateInstanceInvoker(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getAllocateInstanceFunctionClass(), initializationContext
 		);
 	}	
 
-	protected GetFieldValueFunction getOrBuildFieldValueRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetFieldValueFunction getOrBuildFieldValueRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetFieldValueFunctionClass(), initializationContext
 		);
 	}
 
-	protected SetFieldValueFunction getOrBuildFieldValueSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected SetFieldValueFunction getOrBuildFieldValueSetter(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getSetFieldValueFunctionClass(), initializationContext
 		);
 	}
 
-	protected DefineHookClassFunction getOrBuildHookClassDefiner(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected DefineHookClassFunction getOrBuildHookClassDefiner(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getDefineHookClassFunctionClass(), initializationContext
 		);
 	}
 
-	protected ConsulterSupplyFunction getOrBuildConsulterRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {	
-		return functionProvider.getOrBuildObject(
+	protected ConsulterSupplyFunction getOrBuildConsulterRetriever(Map<Object, Object> initializationContext) {	
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getConsulterSupplyFunctionClass(), initializationContext
 		);
 	}
 
-	protected GetDeclaredFieldsFunction getOrBuildDeclaredFieldsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetDeclaredFieldsFunction getOrBuildDeclaredFieldsRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetDeclaredFieldsFunctionClass(), initializationContext
 		);
 	}
 
-	protected GetDeclaredMethodsFunction getOrBuildDeclaredMethodsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetDeclaredMethodsFunction getOrBuildDeclaredMethodsRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetDeclaredMethodsFunctionClass(), initializationContext
 		);
 	}
 
-	protected GetDeclaredConstructorsFunction getOrBuildDeclaredConstructorsRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetDeclaredConstructorsFunction getOrBuildDeclaredConstructorsRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetDeclaredConstructorsFunctionClass(), initializationContext
 		);
 	}
 
-	protected SetAccessibleFunction getOrBuildAccessibleSetter(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected SetAccessibleFunction getOrBuildAccessibleSetter(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getSetAccessibleFunctionClass(), initializationContext
 		);
 	}
 
-	protected ConstructorInvokeFunction getOrBuildConstructorInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected ConstructorInvokeFunction getOrBuildConstructorInvoker(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getConstructorInvokeFunctionClass(), initializationContext
 		);
 	}
 
-	protected MethodInvokeFunction getOrBuildMethodInvoker(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected MethodInvokeFunction getOrBuildMethodInvoker(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getMethodInvokeFunctionClass(), initializationContext
 		);
 	}
 
-	protected GetPackageFunction getOrBuildPackageRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetPackageFunction getOrBuildPackageRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetPackageFunctionClass(), initializationContext
 		);
 	}
 
-	protected Class<?> getOrBuildBuiltinClassLoaderClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected Class<?> getOrBuildBuiltinClassLoaderClass(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getBuiltinClassLoaderClassSupplierClass(), initializationContext
 		).get();
 	}
 
-	protected Class<?> getOrBuildClassLoaderDelegateClass(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected Class<?> getOrBuildClassLoaderDelegateClass(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getClassLoaderDelegateClassSupplierClass(), initializationContext
 		).get();
 	}
 
-	protected DeepConsulterSupplyFunction getOrBuildDeepConsulterRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {	
-		return functionProvider.getOrBuildObject(
+	protected DeepConsulterSupplyFunction getOrBuildDeepConsulterRetriever(Map<Object, Object> initializationContext) {	
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getDeepConsulterSupplyFunctionClass(), initializationContext
 		);
 	}
 
-	protected GetLoadedClassesFunction getOrBuildLoadedClassesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetLoadedClassesFunction getOrBuildLoadedClassesRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetLoadedClassesFunctionClass(), initializationContext
 		);
 	}
 
-	protected GetLoadedPackagesFunction getOrBuildLoadedPackagesRetriever(ObjectProvider functionProvider, Map<Object, Object> initializationContext) {
-		return functionProvider.getOrBuildObject(
+	protected GetLoadedPackagesFunction getOrBuildLoadedPackagesRetriever(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getGetLoadedPackagesFunctionClass(), initializationContext
 		);
 	}
@@ -417,29 +446,6 @@ public abstract class DriverAbst implements Driver {
 	}
 	
 	
-	protected Map<Object, Object> functionsToMap() {
-		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
-		putIfNotNull(initializationContext, getThrowExceptionFunctionClass(), exceptionThrower);                      
-		putIfNotNull(initializationContext, getAllocateInstanceFunctionClass(), allocateInstanceInvoker);             
-		putIfNotNull(initializationContext, getGetFieldValueFunctionClass(), fieldValueRetriever);                    
-		putIfNotNull(initializationContext, getSetFieldValueFunctionClass(), fieldValueSetter);                       
-		putIfNotNull(initializationContext, getDefineHookClassFunctionClass(), hookClassDefiner);                     
-		putIfNotNull(initializationContext, getGetDeclaredFieldsFunctionClass(), declaredFieldsRetriever);            
-		putIfNotNull(initializationContext, getGetDeclaredMethodsFunctionClass(), declaredMethodsRetriever);          
-		putIfNotNull(initializationContext, getGetDeclaredConstructorsFunctionClass(), declaredConstructorsRetriever);
-		putIfNotNull(initializationContext, getSetAccessibleFunctionClass(), accessibleSetter);                       
-		putIfNotNull(initializationContext, getConstructorInvokeFunctionClass(), constructorInvoker);     
-		putIfNotNull(initializationContext, getMethodInvokeFunctionClass(), methodInvoker);               
-		putIfNotNull(initializationContext, getGetPackageFunctionClass(), packageRetriever);                          
-		putIfNotNull(initializationContext, getBuiltinClassLoaderClassSupplierClass(), builtinClassLoaderClass);      
-		putIfNotNull(initializationContext, getClassLoaderDelegateClassSupplierClass(), classLoaderDelegateClass);    
-		putIfNotNull(initializationContext, getDeepConsulterSupplyFunctionClass(),  consulterRetriever);              
-		putIfNotNull(initializationContext, getGetLoadedClassesFunctionClass(), loadedClassesRetriever);             
-		putIfNotNull(initializationContext, getGetLoadedPackagesFunctionClass(), loadedPackagesRetriever);
-		return initializationContext;
-	}
-	
-	
 	private void putIfNotNull(Map<Object, Object> map, Class<?> cls, Object object) {
 		if (object != null) {
 			map.put(cls.getName(), object);
@@ -455,7 +461,9 @@ public abstract class DriverAbst implements Driver {
 			if (exceptionThrower == null) {
 				synchronized (this) {
 					if (exceptionThrower == null) {
-						exceptionThrower = getOrBuildExceptionThrower(getNewObjectProvider(), functionsToMap());
+						Map<Object, Object> initContext = functionsToMap();
+						exceptionThrower = getOrBuildExceptionThrower(functionsToMap());
+						refresh(initContext);
 					}
 				}
 			}
@@ -472,8 +480,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (accessibleSetter == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						accessibleSetter = getOrBuildAccessibleSetter(objectProvider, initContext);
+						accessibleSetter = getOrBuildAccessibleSetter(initContext);
 						refresh(initContext);
 					}
 				}
@@ -492,8 +499,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (hookClassDefiner == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						hookClassDefiner = getOrBuildHookClassDefiner(objectProvider, initContext);
+						hookClassDefiner = getOrBuildHookClassDefiner(initContext);
 						refresh(initContext);
 					}
 				}
@@ -511,8 +517,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (packageRetriever == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						packageRetriever = getOrBuildPackageRetriever(objectProvider, initContext);
+						packageRetriever = getOrBuildPackageRetriever(initContext);
 						refresh(initContext);
 					}
 				}
@@ -530,8 +535,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (loadedClassesRetriever == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						loadedClassesRetriever = getOrBuildLoadedClassesRetriever(objectProvider, initContext);
+						loadedClassesRetriever = getOrBuildLoadedClassesRetriever(initContext);
 						refresh(initContext);
 					}
 				}
@@ -549,8 +553,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (loadedPackagesRetriever == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(objectProvider, initContext);
+						loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initContext);
 						refresh(initContext);
 					}
 				}
@@ -568,8 +571,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (fieldValueRetriever == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						fieldValueRetriever = getOrBuildFieldValueRetriever(objectProvider, initContext);
+						fieldValueRetriever = getOrBuildFieldValueRetriever(initContext);
 						refresh(initContext);
 					}
 				}
@@ -587,8 +589,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (fieldValueSetter == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						fieldValueSetter = getOrBuildFieldValueSetter(objectProvider, initContext);
+						fieldValueSetter = getOrBuildFieldValueSetter(initContext);
 						refresh(initContext);
 					}
 				}
@@ -606,8 +607,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (allocateInstanceInvoker == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(objectProvider, initContext);
+						allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initContext);
 						refresh(initContext);
 					}
 				}
@@ -638,8 +638,7 @@ public abstract class DriverAbst implements Driver {
 			synchronized(this) {
 				if (builtinClassLoaderClass == null) {
 					Map<Object, Object> initContext = functionsToMap();
-					ObjectProvider objectProvider = getNewObjectProvider();
-					builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(objectProvider, initContext);
+					builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(initContext);
 					refresh(initContext);
 				}
 				if (builtinClassLoaderClass == null) {
@@ -660,8 +659,7 @@ public abstract class DriverAbst implements Driver {
 			synchronized(this) {
 				if (classLoaderDelegateClass == null) {
 					Map<Object, Object> initContext = functionsToMap();
-					ObjectProvider objectProvider = getNewObjectProvider();
-					classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(objectProvider, initContext);
+					classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(initContext);
 					refresh(initContext);
 				}
 				if (classLoaderDelegateClass == null) {
@@ -681,8 +679,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (consulterRetriever == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						ObjectProvider objectProvider = getNewObjectProvider();
-						consulterRetriever = getOrBuildDeepConsulterRetriever(objectProvider, initContext);
+						consulterRetriever = getOrBuildDeepConsulterRetriever(initContext);
 						refresh(initContext);
 					}
 				}
@@ -701,8 +698,7 @@ public abstract class DriverAbst implements Driver {
 					synchronized (this) {
 						if (methodInvoker == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							ObjectProvider objectProvider = getNewObjectProvider();
-							methodInvoker = getOrBuildMethodInvoker(objectProvider, initContext);
+							methodInvoker = getOrBuildMethodInvoker(initContext);
 							refresh(initContext);
 						}
 					}
@@ -724,8 +720,7 @@ public abstract class DriverAbst implements Driver {
 					synchronized (this) {
 						if (constructorInvoker == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							ObjectProvider objectProvider = getNewObjectProvider();
-							constructorInvoker = getOrBuildConstructorInvoker(objectProvider, initContext);
+							constructorInvoker = getOrBuildConstructorInvoker(initContext);
 							refresh(initContext);
 						}
 					}
@@ -747,8 +742,7 @@ public abstract class DriverAbst implements Driver {
 					synchronized (this) {
 						if (declaredFieldsRetriever == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							ObjectProvider objectProvider = getNewObjectProvider();
-							declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(objectProvider, initContext);
+							declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initContext);
 							refresh(initContext);
 						}
 					}
@@ -770,8 +764,7 @@ public abstract class DriverAbst implements Driver {
 					synchronized (this) {
 						if (declaredConstructorsRetriever == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							ObjectProvider objectProvider = getNewObjectProvider();
-							declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(objectProvider, initContext);
+							declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(initContext);
 							refresh(initContext);
 						}
 					}
@@ -793,8 +786,7 @@ public abstract class DriverAbst implements Driver {
 					synchronized (this) {
 						if (declaredMethodsRetriever == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							ObjectProvider objectProvider = getNewObjectProvider();
-							declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(objectProvider, initContext);
+							declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(initContext);
 							refresh(initContext);
 						}
 					}

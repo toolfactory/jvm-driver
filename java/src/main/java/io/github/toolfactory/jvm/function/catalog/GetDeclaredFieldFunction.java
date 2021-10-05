@@ -32,6 +32,7 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.Strings;
 
 
 public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
@@ -58,7 +59,9 @@ public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, S
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
-			return null;
+			return throwExceptionFunction.apply(
+				Strings.compile("Field named {} not found in the class {}", name, cls.getName())
+			);
 		}
 	}	
 }

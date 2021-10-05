@@ -7,8 +7,8 @@ import org.junit.runner.RunWith;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    DefaultDriverTest.class,
-    HybridDriverTest.class,
+//    DefaultDriverTest.class,
+//    HybridDriverTest.class,
     NativeDriverTest.class
 })
 public class AllTestsSuite {

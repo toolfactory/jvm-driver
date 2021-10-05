@@ -115,7 +115,6 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			
 			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
 				consulter = MethodHandles.lookup();
-				Narcissus.findField(consulter.getClass(), "allowedModes");
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
 					Narcissus.findField(consulter.getClass(), "allowedModes"), 
@@ -128,7 +127,6 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 				
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
 					consulter = MethodHandles.lookup();
-					Narcissus.findField(consulter.getClass(), "accessMode");
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						Narcissus.findField(consulter.getClass(), "accessMode"), 
@@ -159,7 +157,6 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 				
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
 					consulter = MethodHandles.lookup();
-					Narcissus.findField(consulter.getClass(), "accessMode");
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						Narcissus.findField(consulter.getClass(), "accessMode"), 
@@ -180,7 +177,6 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 				
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 					consulter = MethodHandles.lookup();
-					Narcissus.findField(consulter.getClass(), "accessMode");
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						Narcissus.findField(consulter.getClass(), "accessMode"), 

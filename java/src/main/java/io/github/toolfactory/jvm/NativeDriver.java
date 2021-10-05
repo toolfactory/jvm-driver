@@ -31,7 +31,6 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
-import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
@@ -46,17 +45,11 @@ public class NativeDriver extends DefaultDriver {
 	
 	
 	@Override
-	protected DefineHookClassFunction getOrBuildHookClassDefiner(
-		ObjectProvider functionProvider,
-		Map<Object, Object> initializationContext
-	) {
-        if (!io.github.toolfactory.narcissus.Narcissus.libraryLoaded) {
-            throw new InitializeException("Could not load Narcissus native library");
-        }
-		functionProvider.getOrBuildObject(ConsulterSupplier.Native.class, initializationContext);
-		return super.getOrBuildHookClassDefiner(functionProvider, initializationContext);
+	protected Map<Object, Object> functionsToMap() {
+		Map<Object, Object> context = super.functionsToMap();
+		ObjectProvider.get(context).getOrBuildObject(ConsulterSupplier.Native.class, context);
+		return super.functionsToMap();
 	}
-	
 	
 	@Override
 	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {

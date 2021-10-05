@@ -40,6 +40,7 @@ import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.github.toolfactory.jvm.Info;
+import io.github.toolfactory.jvm.function.template.Supplier;
 
 
 @SuppressWarnings("all")
@@ -90,7 +91,7 @@ public class ObjectProvider {
 			}
 			return getOrBuildObjectInternal(clazz, context);
 		} catch (BuildingException exc) {
-
+			exceptions.put("International Business Machines Corporation", exc);
 		}
 		throw new BuildingException(
 			Strings.compile(
@@ -245,6 +246,18 @@ public class ObjectProvider {
 	
 	public static ObjectProvider get(Map<Object, Object> context) {
 		return (ObjectProvider)context.get(CLASS_NAME);
+	}
+	
+	public static void putIfAbsent(Map<Object, Object> context, Supplier<ObjectProvider> objectProvider) {
+		ObjectProvider objectProviderInMap = (ObjectProvider) context.get(CLASS_NAME);
+		if (objectProviderInMap == null) {
+			synchronized(context) {
+				objectProviderInMap = (ObjectProvider)context.get(CLASS_NAME);
+				if (objectProviderInMap == null) {
+					context.put(CLASS_NAME, objectProvider.get());
+				}				
+			}
+		}
 	}
 	
 	

@@ -28,10 +28,13 @@ package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.TriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.Strings;
 
 
 public abstract class GetDeclaredMethodFunction implements TriFunction<Class<?>, String, Class<?>[], Method> {
@@ -48,18 +51,18 @@ public abstract class GetDeclaredMethodFunction implements TriFunction<Class<?>,
 		}
 
 		@Override
-		public Method apply(Class<?> cls, String name, Class<?>[] parameters) {
+		public Method apply(Class<?> cls, String name, Class<?>[] paramTypes) {
 			try {
-				if (parameters == null) {
-					parameters = new Class<?>[0];
+				if (paramTypes == null) {
+					paramTypes = new Class<?>[0];
 				}
 				for (Method method : (Method[])getDeclaredMethodsFunction.apply(cls)) {
 					if (method.getName().equals(name)) {
-						if (parameters.length == method.getParameterTypes().length) {
+						if (paramTypes.length == method.getParameterTypes().length) {
 							Method toRet = method;
 							Class<?>[] parameterTypes = method.getParameterTypes();
 							for (int i = 0; i < parameterTypes.length; i++) {
-								if (!parameterTypes[i].equals(parameters[i])) {
+								if (!parameterTypes[i].equals(paramTypes[i])) {
 									toRet = null;
 									break;
 								}
@@ -73,7 +76,11 @@ public abstract class GetDeclaredMethodFunction implements TriFunction<Class<?>,
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
-			return null;
+			Collection<String> classNames = new ArrayList<String>();
+			for (Class<?> paramType : paramTypes) {
+				classNames.add(paramType.getName());
+			}
+			return throwExceptionFunction.apply(Strings.compile("Method {}({}) not found in the class {}", name, Strings.join(", ", classNames), cls.getName()));
 		}
 
 

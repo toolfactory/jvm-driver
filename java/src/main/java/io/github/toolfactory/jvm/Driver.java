@@ -125,11 +125,7 @@ public interface Driver extends Closeable {
 		}
 		
 		public static <D extends Driver> D getNew(String className) throws Throwable {
-			D driver = (D)Class.forName(className).getDeclaredConstructor().newInstance();
-			if (driver instanceof DriverAbst) {
-				//((DriverAbst)driver).init();
-			}
-			return driver;
+			return (D)Class.forName(className).getDeclaredConstructor().newInstance();
 		}
 		
 		private static void setDriverClass(String name, String className) {
@@ -177,11 +173,7 @@ public interface Driver extends Closeable {
 		
 		public static <D extends Driver> D getNewDefault() {
 			try {
-				D driver = ((D)driverConstructors.get("defaultDriverClass").newInstance());
-				if (driver instanceof DriverAbst) {
-					//((DriverAbst)driver).init();
-				}
-				return driver;
+				return ((D)driverConstructors.get("defaultDriverClass").newInstance());
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
@@ -190,11 +182,7 @@ public interface Driver extends Closeable {
 		
 		public static <D extends Driver> D getNewHybrid() {
 			try {
-				D driver = ((D)driverConstructors.get("hybridDriverClass").newInstance());
-				if (driver instanceof DriverAbst) {
-					//((DriverAbst)driver).init();
-				}
-				return driver;
+				return ((D)driverConstructors.get("hybridDriverClass").newInstance());
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
@@ -203,11 +191,7 @@ public interface Driver extends Closeable {
 		
 		public static <D extends Driver> D getNewNative() {
 			try {
-				D driver = ((D)driverConstructors.get("nativeDriverClass").newInstance());
-				if (driver instanceof DriverAbst) {
-					//((DriverAbst)driver).init();
-				}
-				return driver;
+				return ((D)driverConstructors.get("nativeDriverClass").newInstance());
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
