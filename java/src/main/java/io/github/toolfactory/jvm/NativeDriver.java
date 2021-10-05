@@ -129,7 +129,7 @@ public class NativeDriver extends DefaultDriver {
 		ObjectProvider functionProvider,
 		Map<Object, Object> initializationContext
 	) {
-		return functionProvider.getOrBuildObject(
+		return (SetAccessibleFunction<?>)functionProvider.getOrBuildObject(
 			SetAccessibleFunction.Native.class, initializationContext
 		);
 	}
