@@ -29,7 +29,7 @@
 	
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>6.4.0-SNAPSHOT</version>
+	<version>6.4.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -215,15 +215,9 @@
 							</phase>
 						<configuration>
 							<target>
-								<copy
-									file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ConsulterRetrieverForJDK9.bwc" />
-								<copy
-									file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/AccessibleSetterInvokerForJDK9.bwc" />
-								<copy
-									file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ConsulterRetrieverForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/AccessibleSetterInvokerForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
 							</target>
 						</configuration>
 					</execution>
