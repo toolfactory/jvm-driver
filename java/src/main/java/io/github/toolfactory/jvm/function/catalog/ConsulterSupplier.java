@@ -115,7 +115,7 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			
 			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
 				consulter = MethodHandles.lookup();
-				Narcissus.findField(getClass(), "allowedModes");
+				Narcissus.findField(consulter.getClass(), "allowedModes");
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
 					Narcissus.findField(consulter.getClass(), "allowedModes"), 

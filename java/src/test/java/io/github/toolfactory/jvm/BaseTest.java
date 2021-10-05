@@ -179,13 +179,31 @@ abstract class BaseTest {
 	
 	void setInvokeTestOne() {
 		try {
+			int newValue = 10;
 			getReflection().getDriver().invoke(
 				ClassForTest.class.getDeclaredMethod("setIntValue", int.class),
-				reflection,
-				new Object[] {10}
+				null,
+				new Object[] {newValue}
 			);
 			assertTrue(
-				(Integer)getReflection().getDriver().getFieldValue(null, ClassForTest.class.getDeclaredField("intValue")) == 10
+				(Integer)getReflection().getDriver().getFieldValue(null, ClassForTest.class.getDeclaredField("intValue")) == newValue
+			);
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	
+	void newInstanceTestOne() {
+		try {
+			int newValue = 20;
+			getReflection().getDriver().newInstance(
+				ClassForTest.class.getDeclaredConstructor(int.class),
+				new Object[] {newValue}
+			);
+			assertTrue(
+				(Integer)getReflection().getDriver().getFieldValue(null, ClassForTest.class.getDeclaredField("intValue")) == newValue
 			);
 		} catch (Throwable exc) {
 			exc.printStackTrace();
@@ -231,6 +249,11 @@ abstract class BaseTest {
 		private static volatile byte byteValue;
 		private static volatile char charValue;
 		
+		private ClassForTest() {}
+		
+		private ClassForTest(int value) {
+			setIntValue(value);
+		}
 		
 		private static void setIntValue(int value) {
 			intValue = value;

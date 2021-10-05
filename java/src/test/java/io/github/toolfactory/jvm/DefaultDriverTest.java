@@ -74,6 +74,12 @@ public class DefaultDriverTest extends BaseTest {
 	
 	
 	@Test
+	public void newInstanceTestOne() {
+		super.newInstanceTestOne();
+	}
+	
+	
+	@Test
 	public void retrieveLoadedClassesTestOne() {
 		super.retrieveLoadedClassesTestOne();
 	}
