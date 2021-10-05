@@ -41,7 +41,6 @@ import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-//@SuppressWarnings("unchecked")
 public class NativeDriver extends DefaultDriver {
 	
 	
