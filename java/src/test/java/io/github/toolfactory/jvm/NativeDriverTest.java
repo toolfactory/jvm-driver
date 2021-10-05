@@ -24,13 +24,65 @@ public class NativeDriverTest extends BaseTest {
 		return reflection;
 	}
 	
+
+	@Test
+	public void getConsulterTestOne() {
+		super.getConsulterTestOne();
+	}
+	
+	
 	@Test
 	public void getAndSetDirectVolatileTestOne() {
 		super.getAndSetDirectVolatileTestOne();
 	}
 	
+	
 	@Test
-	public void retrieveLoadedClasses() {
-		super.retrieveLoadedClasses();
-	}	
+	public void getDeclaredFieldsTestOne() {
+		super.getDeclaredFieldsTestOne();
+	}
+	
+	
+	@Test
+	public void getDeclaredMethodsTestOne() {
+		super.getDeclaredMethodsTestOne();
+	}
+	
+	
+	@Test
+	public void getDeclaredConstructorsTestOne() {
+		super.getDeclaredConstructorsTestOne();
+	}
+	
+	
+	@Test
+	public void allocateInstanceTestOne() {
+		super.allocateInstanceTestOne();
+	}
+	
+	
+	@Test
+	public void setAccessibleTestOne() {
+		super.setAccessibleTestOne();
+	}
+	
+	
+	@Test
+	public void setInvokeTestOne() {
+		super.setInvokeTestOne();
+	}
+	
+	
+	@Test
+	public void retrieveLoadedClassesTestOne() {
+		super.retrieveLoadedClassesTestOne();
+	}
+	
+	
+	@Test
+	public void retrieveLoadedPackagesTestOne() {
+		super.retrieveLoadedPackagesTestOne();
+	}
+	
+	
 }

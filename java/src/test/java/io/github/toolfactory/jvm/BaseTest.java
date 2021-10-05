@@ -4,9 +4,13 @@ package io.github.toolfactory.jvm;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import io.github.toolfactory.util.Reflection;
 
@@ -106,7 +110,91 @@ abstract class BaseTest {
 		}
 	}
 	
-	void retrieveLoadedClasses() {
+	
+	void getConsulterTestOne() {
+		try {
+			getReflection().getDriver().getConsulter(Class.class);
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	void getDeclaredFieldsTestOne() {
+		try {
+			for (Member member : getReflection().getDriver().getDeclaredFields(Class.class)) {
+				System.out.println(member);
+			}
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	void getDeclaredMethodsTestOne() {
+		try {
+			for (Member member : getReflection().getDriver().getDeclaredMethods(Class.class)) {
+				System.out.println(member);
+			}
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	void getDeclaredConstructorsTestOne() {
+		try {
+			for (Member member : getReflection().getDriver().getDeclaredConstructors(Class.class)) {
+				System.out.println(member);
+			}
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	
+	void allocateInstanceTestOne() {
+		try {
+			System.out.println(getReflection().getDriver().allocateInstance(ClassForTest.class).toString());
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	
+	void setAccessibleTestOne() {
+		try {
+			ClassForTest object = new ClassForTest();
+			Field field = ClassForTest.class.getDeclaredField("intValue");
+			getReflection().getDriver().setAccessible(field, true);
+			System.out.println(field.get(object));			
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	
+	void setInvokeTestOne() {
+		try {
+			getReflection().getDriver().invoke(
+				ClassForTest.class.getDeclaredMethod("setIntValue", int.class),
+				reflection,
+				new Object[] {10}
+			);
+			assertTrue(
+				(Integer)getReflection().getDriver().getFieldValue(null, ClassForTest.class.getDeclaredField("intValue")) == 10
+			);
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	
+	void retrieveLoadedClassesTestOne() {
 		try {
 			Collection<Class<?>> loadedClasses = getReflection().getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader());
 			for (Class<?> cls : loadedClasses) {
@@ -119,16 +207,34 @@ abstract class BaseTest {
 	}
 	
 	
+	void retrieveLoadedPackagesTestOne() {
+		try {
+			Map<String, ?> loadedClasses = getReflection().getDriver().retrieveLoadedPackages(Thread.currentThread().getContextClassLoader());
+			for (Entry<String, ?> cls : loadedClasses.entrySet()) {
+				System.out.println(cls.getValue().toString());
+			}
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	
 	private static class ClassForTest {
 		
-		static volatile List<Object> objectValue;
-		static volatile int intValue;
-		static volatile long longValue;
-		static volatile float floatValue;
-		static volatile double doubleValue;
-		static volatile boolean booleanValue;
-		static volatile byte byteValue;
-		static volatile char charValue;
+		private static volatile List<Object> objectValue;
+		private static volatile int intValue;
+		private static volatile long longValue;
+		private static volatile float floatValue;
+		private static volatile double doubleValue;
+		private static volatile boolean booleanValue;
+		private static volatile byte byteValue;
+		private static volatile char charValue;
+		
+		
+		private static void setIntValue(int value) {
+			intValue = value;
+		}
 	};
 	
 }
