@@ -1,7 +1,7 @@
 package io.github.toolfactory.jvm;
 
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import io.github.toolfactory.util.Reflection;
 
