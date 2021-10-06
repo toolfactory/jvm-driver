@@ -98,7 +98,8 @@ public class ObjectProvider {
 		}
 		throw new BuildingException(
 			Strings.compile(
-				"Exception occurred (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
+				"Exception occurred while retrieving {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
+				clazz.getName(),
 				Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
 				jVMVersion, vendor
 			),
