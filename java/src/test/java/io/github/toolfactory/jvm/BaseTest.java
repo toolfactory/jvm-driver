@@ -181,8 +181,8 @@ abstract class BaseTest {
 		try {
 			int newValue = 10;
 			getReflection().getDriver().invoke(
-				ClassForTest.class.getDeclaredMethod("setIntValue", int.class),
 				null,
+				ClassForTest.class.getDeclaredMethod("setIntValue", int.class),
 				new Object[] {newValue}
 			);
 			assertTrue(

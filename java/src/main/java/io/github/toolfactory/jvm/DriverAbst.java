@@ -682,7 +682,7 @@ public abstract class DriverAbst implements Driver {
 	}
 
 	@Override
-	public <T> T invoke(Method method, Object target, Object[] params) {
+	public <T> T invoke(Object target, Method method, Object[] params) {
 		try {
 			try {
 				return (T)methodInvoker.apply(method, target, params);

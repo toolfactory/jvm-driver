@@ -66,7 +66,7 @@ public interface Driver extends Closeable {
 
 	public Package getPackage(ClassLoader classLoader, String packageName);
 
-	public <T> T invoke(Method method, Object target, Object[] params);
+	public <T> T invoke(Object target, Method method, Object[] params);
 
 	public boolean isBuiltinClassLoader(ClassLoader classLoader);
 
