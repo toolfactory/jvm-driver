@@ -35,29 +35,35 @@ import io.github.toolfactory.jvm.util.Strings;
 
 
 @SuppressWarnings("all")
-public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
+public interface ThrowExceptionFunction extends Consumer<Throwable> {
 	
-	public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
-		Throwable exception = null;
-		if (exceptionOrMessage instanceof String) {
-			StackTraceElement[] stackTraceOfException = null;
-			if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
-				exception = new Exception((String)exceptionOrMessage);
+	public <T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements);
+	
+	public static abstract class Abst implements ThrowExceptionFunction {
+		
+		public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
+			Throwable exception = null;
+			if (exceptionOrMessage instanceof String) {
+				StackTraceElement[] stackTraceOfException = null;
+				if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
+					exception = new Exception((String)exceptionOrMessage);
+				} else {
+					exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
+				}
+				StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+				stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
+				System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
+				exception.setStackTrace(stackTraceOfException);
 			} else {
-				exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
+				exception = (Throwable)exceptionOrMessage;
 			}
-			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-			stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
-			System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
-			exception.setStackTrace(stackTraceOfException);
-		} else {
-			exception = (Throwable)exceptionOrMessage;
+			accept(exception);
+			return null;
 		}
-		accept(exception);
-		return null;
+		
 	}
 	
-	public static class ForJava7 extends ThrowExceptionFunction {
+	public static class ForJava7 extends Abst {
 		protected sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) {
@@ -72,9 +78,9 @@ public abstract class ThrowExceptionFunction implements Consumer<Throwable> {
 		
 	}
 
-	public static abstract class Native extends ThrowExceptionFunction {
+	public static interface Native extends ThrowExceptionFunction {
 		
-		public static class ForJava7 extends Native {
+		public static class ForJava7 extends Abst implements Native {
 			
 			public ForJava7(Map<Object, Object> context) {}
 			

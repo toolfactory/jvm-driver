@@ -37,9 +37,9 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
-public abstract class GetLoadedPackagesFunction implements Function<ClassLoader, Map<String, ?>> {
+public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<String, ?>> {
 	
-	public static class ForJava7 extends GetLoadedPackagesFunction {
+	public static class ForJava7 implements GetLoadedPackagesFunction {
 		protected sun.misc.Unsafe unsafe;
 		protected Long fieldOffset;
 		
@@ -60,9 +60,9 @@ public abstract class GetLoadedPackagesFunction implements Function<ClassLoader,
 	}
 	
 	
-	public static abstract class Native extends GetLoadedPackagesFunction {
+	public static interface Native extends GetLoadedPackagesFunction {
 		
-		public static class ForJava7 extends Native {
+		public static class ForJava7 implements Native {
 			Field packagesField;
 			
 			public ForJava7(Map<Object, Object> context) {

@@ -36,10 +36,19 @@ import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<MethodHandle> {
-	protected MethodHandle methodHandle;
+public interface PrivateLookupInMethodHandleSupplier extends Supplier<MethodHandle> {
 	
-	public static class ForJava7 extends PrivateLookupInMethodHandleSupplier {
+	public static abstract class Abst implements PrivateLookupInMethodHandleSupplier {
+	
+		protected MethodHandle methodHandle;
+		
+		@Override
+		public MethodHandle get() {
+			return methodHandle;
+		}
+	}
+	
+	public static class ForJava7 extends Abst {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			MethodHandles.Lookup consulter = ObjectProvider.get(context).getOrBuildObject(ConsulterSupplier.class, context).get();
@@ -49,16 +58,11 @@ public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<Me
 				MethodHandles.Lookup.class
 			);
 		}
-		
-		@Override
-		public MethodHandle get() {
-			return methodHandle;
-		}
-		
+
 	}
 	
 	
-	public static class ForJava9 extends PrivateLookupInMethodHandleSupplier {
+	public static class ForJava9 extends Abst {
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			MethodHandles.Lookup consulter = ObjectProvider.get(context).getOrBuildObject(ConsulterSupplier.class, context).get();
@@ -67,13 +71,7 @@ public abstract class PrivateLookupInMethodHandleSupplier implements Supplier<Me
 				MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
 			);
 		}
-		
-		@Override
-		public MethodHandle get() {
-			return methodHandle;
-		}
-		
-		
+	
 	}
 	
 }

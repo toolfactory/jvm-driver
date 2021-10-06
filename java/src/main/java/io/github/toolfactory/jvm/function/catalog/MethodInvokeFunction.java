@@ -36,21 +36,24 @@ import io.github.toolfactory.jvm.function.template.TriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public abstract class MethodInvokeFunction implements TriFunction<Method, Object, Object[], Object> {
-	protected MethodHandle methodHandle;
-	protected ThrowExceptionFunction throwExceptionFunction;
-
+public interface MethodInvokeFunction extends TriFunction<Method, Object, Object[], Object> {
 	
-	@Override
-	public Object apply(Method method, Object target, Object[] params) {
-		try {
-			return methodHandle.invoke(method, target, params);
-		} catch (Throwable exc) {
-			return throwExceptionFunction.apply(exc);
+	public static class Abst implements MethodInvokeFunction {
+		protected MethodHandle methodHandle;
+		protected ThrowExceptionFunction throwExceptionFunction;
+	
+		
+		@Override
+		public Object apply(Method method, Object target, Object[] params) {
+			try {
+				return methodHandle.invoke(method, target, params);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
 		}
 	}
 	
-	public static class ForJava7 extends MethodInvokeFunction {
+	public static class ForJava7 extends Abst {
 		
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
@@ -65,7 +68,7 @@ public abstract class MethodInvokeFunction implements TriFunction<Method, Object
 
 	}
 	
-	public static class ForJava9 extends MethodInvokeFunction {
+	public static class ForJava9 extends Abst {
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");

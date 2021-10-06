@@ -42,9 +42,9 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
-public abstract class GetLoadedClassesFunction implements Function<ClassLoader, ClenableSupplier<Collection<Class<?>>>> {
+public interface GetLoadedClassesFunction extends Function<ClassLoader, ClenableSupplier<Collection<Class<?>>>> {
 	
-	public static class ForJava7 extends GetLoadedClassesFunction {
+	public static class ForJava7 implements GetLoadedClassesFunction {
 		protected sun.misc.Unsafe unsafe;
 		protected Long loadedClassesVectorMemoryOffset;
 		
@@ -84,7 +84,7 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 			};
 		}
 		
-		public static class ForSemeru extends GetLoadedClassesFunction {
+		public static class ForSemeru implements GetLoadedClassesFunction {
 			Function<ClassLoader, Hashtable<String, Object>> classNameBasedLockSupplier;
 			Field classNameBasedLockField;
 			
@@ -167,9 +167,9 @@ public abstract class GetLoadedClassesFunction implements Function<ClassLoader, 
 		
 	}
 	
-	public static abstract class Native extends GetLoadedClassesFunction {
+	public static interface Native extends GetLoadedClassesFunction {
 		
-		public static class ForJava7 extends Native {
+		public static class ForJava7 implements Native {
 			Field classesField;
 			
 			public ForJava7(Map<Object, Object> context) {
