@@ -16,7 +16,7 @@
 
 [![Repository dependents](https://badgen.net/github/dependents-repo/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/network/dependents)
 
-A driver to allow deep interaction with the JVM **without any restrictions** and with a **fully extensible architecture**.
+A driver with a **fully extensible architecture** to allow deep interaction with the JVM **without any restrictions**.
 
 <br/>
 
