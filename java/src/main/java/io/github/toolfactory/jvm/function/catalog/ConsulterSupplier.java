@@ -180,6 +180,16 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			}		
 		}
 		
+		public static interface ForJava14 extends Native, ConsulterSupplier {
+			
+			public static class ForSemeru extends ConsulterSupplier.Native.ForJava7.ForSemeru implements Native.ForJava14 {
+				
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+					super(context);				
+				}
+			}
+		}
+		
 	}
 	
 	
