@@ -37,14 +37,14 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.toolfactory.jvm.function.template.Function;
-import io.github.toolfactory.jvm.util.ClenableSupplier;
+import io.github.toolfactory.jvm.util.CleanableSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
-public interface GetLoadedClassesFunction extends Function<ClassLoader, ClenableSupplier<Collection<Class<?>>>> {
+public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
 	
-	public static class ForJava7 implements GetLoadedClassesFunction {
+	public static class ForJava7 implements GetLoadedClassesRetrieverFunction {
 		protected sun.misc.Unsafe unsafe;
 		protected Long loadedClassesVectorMemoryOffset;
 		
@@ -58,11 +58,11 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 		}		
 		
 		@Override
-		public ClenableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
+		public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
 			if (classLoader == null) {
 				throw new NullPointerException("Input classLoader parameter can't be null");
 			}
-			return new ClenableSupplier<Collection<Class<?>>>() {
+			return new CleanableSupplier<Collection<Class<?>>>() {
 				Collection<Class<?>> classes;
 				
 				@Override
@@ -84,7 +84,7 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 			};
 		}
 		
-		public static class ForSemeru implements GetLoadedClassesFunction {
+		public static class ForSemeru implements GetLoadedClassesRetrieverFunction {
 			protected Function<ClassLoader, Hashtable<String, Object>> classNameBasedLockSupplier;
 			protected Field classNameBasedLockField;
 			
@@ -112,8 +112,8 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 			}	
 			
 			@Override
-			public ClenableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
-				return new ClenableSupplier<Collection<Class<?>>>() {
+			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
+				return new CleanableSupplier<Collection<Class<?>>>() {
 					Hashtable<String, Object> classNameBasedLock;
 					Collection<Class<?>> loadedClasses = ConcurrentHashMap.newKeySet();
 					
@@ -167,7 +167,7 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 		
 	}
 	
-	public static interface Native extends GetLoadedClassesFunction {
+	public static interface Native extends GetLoadedClassesRetrieverFunction {
 		
 		public static class ForJava7 implements Native {
 			protected Field classesField;
@@ -179,11 +179,11 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 			}
 
 			@Override
-			public ClenableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
+			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
 				if (classLoader == null) {
 					throw new NullPointerException("Input classLoader parameter can't be null");
 				}
-				return new ClenableSupplier<Collection<Class<?>>>() {
+				return new CleanableSupplier<Collection<Class<?>>>() {
 					Collection<Class<?>> classes;
 					
 					@Override
@@ -205,7 +205,7 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 				};
 			}
 			
-			public static class ForSemeru extends GetLoadedClassesFunction.ForJava7.ForSemeru {
+			public static class ForSemeru extends GetLoadedClassesRetrieverFunction.ForJava7.ForSemeru {
 				
 				public ForSemeru(Map<Object, Object> context) {
 					super(context);

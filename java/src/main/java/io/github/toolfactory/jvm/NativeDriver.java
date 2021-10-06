@@ -32,7 +32,7 @@ import java.util.Map;
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
-import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
@@ -63,8 +63,8 @@ public class NativeDriver extends DefaultDriver {
 	
 	
 	@Override
-	protected Class<? extends GetLoadedClassesFunction> getGetLoadedClassesFunctionClass() {
-		return GetLoadedClassesFunction.Native.class;
+	protected Class<? extends GetLoadedClassesRetrieverFunction> getGetLoadedClassesRetrieverFunctionClass() {
+		return GetLoadedClassesRetrieverFunction.Native.class;
 	}
 
 	

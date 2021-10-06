@@ -48,7 +48,7 @@ import io.github.toolfactory.jvm.function.catalog.GetDeclaredConstructorsFunctio
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredMethodsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
-import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetPackageFunction;
 import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
@@ -61,7 +61,7 @@ import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.function.template.TriFunction;
-import io.github.toolfactory.jvm.util.ClenableSupplier;
+import io.github.toolfactory.jvm.util.CleanableSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
@@ -83,7 +83,7 @@ public abstract class DriverAbst implements Driver {
 	private TriFunction<Method, Object, Object[], Object> methodInvoker;
 	private Supplier<Class<?>> builtinClassLoaderClassSupplier;
 	private Supplier<Class<?>> classLoaderDelegateClassSupplier;
-	private Function<ClassLoader, ClenableSupplier<Collection<Class<?>>>> loadedClassesRetriever;
+	private Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
 	private Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 
 	public DriverAbst() {}
@@ -139,7 +139,7 @@ public abstract class DriverAbst implements Driver {
 			builtinClassLoaderClassSupplier = getBuiltinClassLoaderClassSupplier(initializationContext);	
 			classLoaderDelegateClassSupplier = getClassLoaderDelegateClassSupplier(initializationContext);
 			consulterRetriever = getDeepConsulterRetriever(initializationContext);
-			loadedClassesRetriever = getLoadedClassesRetriever(initializationContext);
+			loadedClassesRetrieverSupplier = getLoadedClassesRetrieverFunction(initializationContext);
 			loadedPackagesRetriever = getLoadedPackagesRetriever(initializationContext);
 			putNewObjectProviderIfAbsent(initializationContext);
 		} catch (Throwable exc) {
@@ -170,7 +170,7 @@ public abstract class DriverAbst implements Driver {
 		putIfNotNull(initializationContext, getBuiltinClassLoaderClassSupplierClass(), builtinClassLoaderClassSupplier);      
 		putIfNotNull(initializationContext, getClassLoaderDelegateClassSupplierClass(), classLoaderDelegateClassSupplier);    
 		putIfNotNull(initializationContext, getDeepConsulterSupplyFunctionClass(),  consulterRetriever);              
-		putIfNotNull(initializationContext, getGetLoadedClassesFunctionClass(), loadedClassesRetriever);             
+		putIfNotNull(initializationContext, getGetLoadedClassesRetrieverFunctionClass(), loadedClassesRetrieverSupplier);             
 		putIfNotNull(initializationContext, getGetLoadedPackagesFunctionClass(), loadedPackagesRetriever);
 		putNewObjectProviderIfAbsent(initializationContext);
 		return initializationContext;
@@ -221,7 +221,7 @@ public abstract class DriverAbst implements Driver {
 	
 	protected abstract Class<? extends DeepConsulterSupplyFunction> getDeepConsulterSupplyFunctionClass();
 	
-	protected abstract Class<? extends GetLoadedClassesFunction> getGetLoadedClassesFunctionClass();
+	protected abstract Class<? extends GetLoadedClassesRetrieverFunction> getGetLoadedClassesRetrieverFunctionClass();
 	
 	protected abstract Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass();
 	
@@ -322,9 +322,9 @@ public abstract class DriverAbst implements Driver {
 		);
 	}
 
-	protected GetLoadedClassesFunction getOrBuildLoadedClassesRetriever(Map<Object, Object> initializationContext) {
+	protected GetLoadedClassesRetrieverFunction getOrBuildLoadedClassesRetrieverFunction(Map<Object, Object> initializationContext) {
 		return ObjectProvider.get(initializationContext).getOrBuildObject(
-			getGetLoadedClassesFunctionClass(), initializationContext
+			getGetLoadedClassesRetrieverFunctionClass(), initializationContext
 		);
 	}
 
@@ -432,9 +432,9 @@ public abstract class DriverAbst implements Driver {
 		);
 	}
 
-	protected GetLoadedClassesFunction getLoadedClassesRetriever(Map<Object, Object> initializationContext) {
+	protected GetLoadedClassesRetrieverFunction getLoadedClassesRetrieverFunction(Map<Object, Object> initializationContext) {
 		return ObjectProvider.getObject(
-			getGetLoadedClassesFunctionClass(), initializationContext
+			getGetLoadedClassesRetrieverFunctionClass(), initializationContext
 		);
 	}
 
@@ -526,20 +526,20 @@ public abstract class DriverAbst implements Driver {
 	}
 
 	@Override
-	public ClenableSupplier<Collection<Class<?>>> retrieveLoadedClasses(ClassLoader classLoader) {
+	public CleanableSupplier<Collection<Class<?>>> getLoadedClassesRetriever(ClassLoader classLoader) {
 		try {
-			return loadedClassesRetriever.apply(classLoader);
+			return loadedClassesRetrieverSupplier.apply(classLoader);
 		} catch (NullPointerException exc) {
-			if (loadedClassesRetriever == null) {
+			if (loadedClassesRetrieverSupplier == null) {
 				synchronized (this) {
-					if (loadedClassesRetriever == null) {
+					if (loadedClassesRetrieverSupplier == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						loadedClassesRetriever = getOrBuildLoadedClassesRetriever(initContext);
+						loadedClassesRetrieverSupplier = getOrBuildLoadedClassesRetrieverFunction(initContext);
 						refresh(initContext);
 					}
 				}
 			}
-			return loadedClassesRetriever.apply(classLoader);
+			return loadedClassesRetrieverSupplier.apply(classLoader);
 		}
 	}
 
@@ -809,7 +809,7 @@ public abstract class DriverAbst implements Driver {
 		methodInvoker = null;
 		classLoaderDelegateClassSupplier = null;
 		builtinClassLoaderClassSupplier = null;
-		loadedClassesRetriever = null;
+		loadedClassesRetrieverSupplier = null;
 		loadedPackagesRetriever = null;	
 	}
 

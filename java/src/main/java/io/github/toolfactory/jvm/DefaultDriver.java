@@ -38,7 +38,7 @@ import io.github.toolfactory.jvm.function.catalog.GetDeclaredConstructorsFunctio
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredMethodsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
-import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesFunction;
+import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetPackageFunction;
 import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
@@ -146,8 +146,8 @@ public class DefaultDriver extends DriverAbst {
 
 
 	@Override
-	protected Class<? extends GetLoadedClassesFunction> getGetLoadedClassesFunctionClass() {
-		return GetLoadedClassesFunction.class;
+	protected Class<? extends GetLoadedClassesRetrieverFunction> getGetLoadedClassesRetrieverFunctionClass() {
+		return GetLoadedClassesRetrieverFunction.class;
 	}
 
 
