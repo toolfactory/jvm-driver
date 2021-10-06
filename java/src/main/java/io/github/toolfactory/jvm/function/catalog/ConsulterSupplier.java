@@ -64,9 +64,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		}
 		
 		public static class ForSemeru extends Abst {
-			protected static final int PACKAGE = 0x8;
-			protected static final int INTERNAL_PRIVILEGED = 0x80;
-			protected static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
+			public static final int PACKAGE = 0x8;
+			public static final int INTERNAL_PRIVILEGED = 0x80;
+			public static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
 			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
@@ -87,8 +87,8 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		}
 		
 		public static class ForSemeru extends Abst {
-			protected static final int MODULE = 0x10;
-			private static final int FULL_ACCESS_MASK = 
+			public static final int MODULE = 0x10;
+			public static final int FULL_ACCESS_MASK = 
 					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
 			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
