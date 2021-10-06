@@ -35,7 +35,6 @@ import java.util.Map;
 import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -142,10 +141,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			
 			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException {
 				super(context);
-
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
-					Narcissus.findField(consulter.getClass(), "allowedModes"), 
+					io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"), 
 					-1
 				);
 			
@@ -157,7 +155,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					super(context);
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
-						Narcissus.findField(consulter.getClass(), "accessMode"), 
+						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"), 
 						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
 					);
 				
@@ -173,7 +171,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					super(context);
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
-						Narcissus.findField(consulter.getClass(), "accessMode"), 
+						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"), 
 						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | 
 						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
 					);
