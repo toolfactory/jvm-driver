@@ -41,9 +41,13 @@ import io.github.toolfactory.jvm.util.Streams;
 
 @SuppressWarnings("unchecked")
 public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandles.Lookup> {
-
 	
-	public static class ForJava7 extends FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup> implements ConsulterSupplyFunction {
+	public static abstract class Abst<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> implements ConsulterSupplyFunction {
+		
+	}
+	
+	
+	public static class ForJava7 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get();
@@ -71,7 +75,7 @@ public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandle
 		
 	}
 	
-	public static class ForJava9 extends FunctionAdapter<java.util.function.Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup> implements ConsulterSupplyFunction {
+	public static class ForJava9 extends Abst<java.util.function.Function<Class<?>, MethodHandles.Lookup>>  {
 		
 		public ForJava9(Map<Object, Object> context) throws IOException, NoSuchFieldException, SecurityException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);

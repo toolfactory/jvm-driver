@@ -37,16 +37,19 @@ import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public abstract class GetDeclaredMethodsFunction implements Function<Class<?>, Method[]> {
-	protected MethodHandle methodHandle;
-	protected ThrowExceptionFunction throwExceptionFunction;
+public interface GetDeclaredMethodsFunction extends Function<Class<?>, Method[]> {
 	
-	protected GetDeclaredMethodsFunction(Map<Object, Object> context) {
-		ObjectProvider functionProvider = ObjectProvider.get(context);
-		throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+	public static abstract class Abst implements GetDeclaredMethodsFunction {
+		protected MethodHandle methodHandle;
+		protected ThrowExceptionFunction throwExceptionFunction;
+		
+		protected Abst(Map<Object, Object> context) {
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+		}
 	}
 	
-	public static class ForJava7 extends GetDeclaredMethodsFunction {
+	public static class ForJava7 extends Abst {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
@@ -71,7 +74,7 @@ public abstract class GetDeclaredMethodsFunction implements Function<Class<?>, M
 			}
 		}
 		
-		public static class ForSemeru extends GetDeclaredMethodsFunction {
+		public static class ForSemeru extends Abst {
 			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 				super(context);

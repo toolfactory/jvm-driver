@@ -37,9 +37,9 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 
 
-public abstract class GetDeclaredMethodFunction implements TriFunction<Class<?>, String, Class<?>[], Method> {
+public interface GetDeclaredMethodFunction extends TriFunction<Class<?>, String, Class<?>[], Method> {
 	
-	public static class ForJava7 extends GetDeclaredMethodFunction {
+	public static class ForJava7 implements GetDeclaredMethodFunction {
 		protected GetDeclaredMethodsFunction getDeclaredMethodsFunction;
 		protected ThrowExceptionFunction throwExceptionFunction;
 		

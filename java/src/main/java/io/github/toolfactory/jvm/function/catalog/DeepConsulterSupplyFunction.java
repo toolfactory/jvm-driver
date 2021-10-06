@@ -41,8 +41,12 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("unchecked")
 public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHandles.Lookup> {
-
-	public static class ForJava7 extends FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup> implements DeepConsulterSupplyFunction {
+	
+	public static abstract class Abst<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> implements DeepConsulterSupplyFunction {
+		
+	}
+	
+	public static class ForJava7 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
 		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
@@ -58,7 +62,7 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 			return function.apply(input);
 		}
 		
-		public static class ForSemeru extends FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup> implements DeepConsulterSupplyFunction {
+		public static class ForSemeru extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
 			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -93,7 +97,7 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 		
 	}
 	
-	public static class ForJava9 extends FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup> implements DeepConsulterSupplyFunction {
+	public static class ForJava9 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException, SecurityException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -130,7 +134,7 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 	}
 	
 	
-	public static class ForJava14 extends FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, Class<?>, MethodHandles.Lookup> implements DeepConsulterSupplyFunction {
+	public static class ForJava14 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
 		
 		public ForJava14(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
