@@ -37,26 +37,30 @@ import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public class ConstructorInvokeFunction implements BiFunction<Constructor<?>, Object[], Object> {
-	protected MethodHandle methodHandle;
-	protected ThrowExceptionFunction throwExceptionFunction;
+public interface ConstructorInvokeFunction extends BiFunction<Constructor<?>, Object[], Object> {
 	
-	@Override
-	public Object apply(Constructor<?> ctor, Object[] params) {
-		try {
-			return methodHandle.invoke(ctor, params);
-		} catch (Throwable exc) {
-			return throwExceptionFunction.apply(exc);
+	public static class Abst implements ConstructorInvokeFunction { 
+	
+		protected MethodHandle methodHandle;
+		protected ThrowExceptionFunction throwExceptionFunction;
+		
+		@Override
+		public Object apply(Constructor<?> ctor, Object[] params) {
+			try {
+				return methodHandle.invoke(ctor, params);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
 		}
 	}
 	
-	public static class ForJava7 extends ConstructorInvokeFunction {
+	public static class ForJava7 extends Abst {
 		
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
 			method.setAccessible(true);
 			methodHandle = consulter.unreflect(method);
@@ -65,13 +69,13 @@ public class ConstructorInvokeFunction implements BiFunction<Constructor<?>, Obj
 
 	}
 	
-	public static class ForJava9 extends ConstructorInvokeFunction {
+	public static class ForJava9 extends Abst {
 		
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
 			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction<?> getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
 			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);

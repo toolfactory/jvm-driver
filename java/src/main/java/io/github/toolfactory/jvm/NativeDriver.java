@@ -40,7 +40,6 @@ import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("rawtypes")
 public class NativeDriver extends DefaultDriver {
 	
 	

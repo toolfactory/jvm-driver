@@ -76,6 +76,9 @@ public class ObjectProvider {
 			synchronized (context) {
 				if (context.get("classNameOptionalItems") == null) {
 					context.put("classNameOptionalItems", new ArrayList<String>());
+					if (vendor.equals("International Business Machines Corporation")) {
+						putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru");
+					}
 				}
 			}
 		}		
@@ -160,6 +163,7 @@ public class ObjectProvider {
 			}
 		}
 		Class<?> superClass = clazz.getSuperclass();
+		Class<?>[] interfaces;
 		if (superClass != null && !superClass.equals(Object.class)) {
 			try {
 				return (T)getOrBuildObject((Class<? super T>)superClass, context);
@@ -169,11 +173,18 @@ public class ObjectProvider {
 					exc
 				);
 			}
-		} else {
-			throw new BuildingException(
-				"Unable to build the related object of " + clazz.getName() + ": " + Strings.join(", ", searchedClasses) + " have been searched without success"
-			);
+		} else if((interfaces = clazz.getInterfaces()).length > 0) {
+			for (Class<?> interf : interfaces) {
+				try {
+					return (T)getOrBuildObject((Class<? super T>)interf, context);
+				} catch (BuildingException exc) {
+
+				}
+			}
 		}
+		throw new BuildingException(
+			"Unable to build the related object of " + clazz.getName() + ": " + Strings.join(", ", searchedClasses) + " have been searched without success"
+		);
 	}
 
 	

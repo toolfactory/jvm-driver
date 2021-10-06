@@ -55,18 +55,17 @@ import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
+import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.function.template.TriFunction;
-import io.github.toolfactory.jvm.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.util.ClenableSupplier;
-import io.github.toolfactory.jvm.util.FunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked"})
 public abstract class DriverAbst implements Driver {
 
 	private ThrowExceptionFunction exceptionThrower;
@@ -74,11 +73,11 @@ public abstract class DriverAbst implements Driver {
 	private BiFunction<Object, Field, Object> fieldValueRetriever;
 	private TriConsumer<Object, Field, Object> fieldValueSetter;
 	private BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
-	private FunctionAdapter<?, Class<?>, MethodHandles.Lookup> consulterRetriever;
+	private Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
 	private Function<Class<?>, Field[]> declaredFieldsRetriever;
 	private Function<Class<?>, Method[]> declaredMethodsRetriever;
 	private Function<Class<?>, Constructor<?>[]> declaredConstructorsRetriever;
-	private BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
+	private BiConsumer<AccessibleObject, Boolean> accessibleSetter;
 	private BiFunction<Constructor<?>, Object[], Object> constructorInvoker;
 	private BiFunction<ClassLoader, String, Package> packageRetriever;
 	private TriFunction<Method, Object, Object[], Object> methodInvoker;

@@ -41,16 +41,19 @@ import io.github.toolfactory.jvm.util.Streams;
 
 
 @SuppressWarnings("unchecked")
-public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean>{
-	protected ThrowExceptionFunction throwExceptionFunction;
+public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Boolean> {
 	
-	public SetAccessibleFunction(Map<Object, Object> context) {
-		ObjectProvider functionProvider = ObjectProvider.get(context);
-		throwExceptionFunction =
-			functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+	public static abstract class Abst<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean> implements SetAccessibleFunction {
+		protected ThrowExceptionFunction throwExceptionFunction;
+		
+		public Abst(Map<Object, Object> context) {
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			throwExceptionFunction =
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+		}
 	}
 	
-	public static class ForJava7 extends SetAccessibleFunction<BiConsumer<AccessibleObject, Boolean>> {
+	public static class ForJava7 extends Abst<BiConsumer<AccessibleObject, Boolean>> {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
 			super(context);
@@ -81,7 +84,7 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 	}
 	
 	
-	public static class ForJava9 extends SetAccessibleFunction<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
+	public static class ForJava9 extends Abst<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, IOException, NoSuchFieldException {			
 			super(context);
@@ -110,13 +113,9 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 		
 	}
 	
-	public static abstract class Native<B> extends SetAccessibleFunction<B>{		
+	public static interface Native extends SetAccessibleFunction {		
 		
-		public Native(Map<Object, Object> context) {
-			super(context);
-		}
-
-		public static class ForJava7 extends Native<BiConsumer<AccessibleObject, Boolean>> {
+		public static class ForJava7 extends Abst<BiConsumer<AccessibleObject, Boolean>> implements Native {
 			
 			public ForJava7(Map<Object, Object> context) throws IllegalAccessException {
 				super(context);
@@ -146,7 +145,7 @@ public abstract class SetAccessibleFunction<B> extends BiConsumerAdapter<B, Acce
 			}
 		}
 		
-		public static class ForJava9 extends Native<BiConsumer<AccessibleObject, Boolean>> {
+		public static class ForJava9 extends Abst<BiConsumer<AccessibleObject, Boolean>> implements Native {
 			
 			public ForJava9(Map<Object, Object> context) throws IllegalAccessException {
 				super(context);

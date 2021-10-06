@@ -58,7 +58,7 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 		
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
 			MethodType methodType = MethodType.methodType(Package.class, String.class);
 			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);

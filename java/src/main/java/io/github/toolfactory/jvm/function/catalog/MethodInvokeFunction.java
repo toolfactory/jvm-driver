@@ -36,7 +36,6 @@ import io.github.toolfactory.jvm.function.template.TriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("unchecked")
 public abstract class MethodInvokeFunction implements TriFunction<Method, Object, Object[], Object> {
 	protected MethodHandle methodHandle;
 	protected ThrowExceptionFunction throwExceptionFunction;
@@ -57,7 +56,7 @@ public abstract class MethodInvokeFunction implements TriFunction<Method, Object
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
 			methodHandle = consulter.unreflect(invoker);
@@ -72,7 +71,7 @@ public abstract class MethodInvokeFunction implements TriFunction<Method, Object
 			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			ConsulterSupplyFunction<?> consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			ConsulterSupplyFunction consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
 			methodHandle = consulter.unreflect(invoker);

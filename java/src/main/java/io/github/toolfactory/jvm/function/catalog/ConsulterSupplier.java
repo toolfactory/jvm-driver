@@ -39,33 +39,39 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
-public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup> {
-	protected MethodHandles.Lookup consulter;
+public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	
-	@Override
-	public MethodHandles.Lookup get() {
-		return consulter;
-	}
+	public static abstract class Abst implements ConsulterSupplier {
+		protected MethodHandles.Lookup consulter;
+		
+		public Abst(Map<Object, Object> context) {
+			this.consulter = MethodHandles.lookup();
+		}
+		
+		@Override
+		public MethodHandles.Lookup get() {
+			return consulter;
+		}
+	}	
 	
-	
-	public static class ForJava7 extends ConsulterSupplier {
+	public static class ForJava7 extends Abst {
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+			super(context);
 			Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
-			consulter = MethodHandles.lookup();
 			modes.setAccessible(true);
 			modes.setInt(consulter, -1);
 		}
 		
-		public static class ForSemeru extends ConsulterSupplier {
+		public static class ForSemeru extends Abst {
 			protected static final int PACKAGE = 0x8;
 			protected static final int INTERNAL_PRIVILEGED = 0x80;
 			protected static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
 			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				modes.setAccessible(true);
-				consulter = MethodHandles.lookup();
 				modes.setInt(consulter, INTERNAL_PRIVILEGED);
 			}
 			
@@ -74,77 +80,69 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 	}
 	
 	
-	public static class ForJava9 extends ConsulterSupplier {
+	public static class ForJava9 extends Abst {
 		
-		public ForJava9(Map<Object, Object> context) {
-			consulter = MethodHandles.lookup();
+		public ForJava9(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+			super(context);
 		}
 		
-		public static class ForSemeru extends ConsulterSupplier {
+		public static class ForSemeru extends Abst {
 			protected static final int MODULE = 0x10;
 			private static final int FULL_ACCESS_MASK = 
 					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
 			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				consulter = MethodHandles.lookup();
 				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE);
 			}
 			
 		}
 		
 	}
-
 	
-	public static class ForJava17 extends ConsulterSupplier {
+	
+	public static interface ForJava14 extends ConsulterSupplier {
+		
+		public static class ForSemeru extends Abst {
+			protected static final int MODULE = 0x10;
+			private static final int FULL_ACCESS_MASK = 
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
+			
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				super(context);
+				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+			}
+			
+		}
+		
+	}
+	
+	
+	public static class ForJava17 extends Abst {
 		
 		public ForJava17(Map<Object, Object> context) {
+			super(context);
 			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 			final long allowedModesFieldMemoryOffset = Info.Provider.getInfoInstance().is64Bit() ? 12L : 8L;
-			consulter = MethodHandles.lookup();
 			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
 		}
 		
 	}
 	
-	public static abstract class Hybrid extends	ConsulterSupplier {
-		
-		public static class ForJava17 extends Hybrid {
-			
-			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
-				consulter = MethodHandles.lookup();
-				io.github.toolfactory.narcissus.Narcissus.setField(
-					consulter,
-					Narcissus.findField(consulter.getClass(), "allowedModes"), 
-					-1
-				);
-				
-			}
-			
-			public static class ForSemeru extends Hybrid {
-				
-				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
-					consulter = MethodHandles.lookup();
-					io.github.toolfactory.narcissus.Narcissus.setField(
-						consulter,
-						Narcissus.findField(consulter.getClass(), "accessMode"), 
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
-					);
-				
-				}
-			}
-		}
-	}
 	
-	
-	public static abstract class Native extends	ConsulterSupplier {
+	public static interface Native extends ConsulterSupplier {
 		
-		public static class ForJava7 extends Native {
+		public static class ForJava7 extends Abst implements Native {
 			
 			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException {
-				consulter = MethodHandles.lookup();
+				super(context);
+
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
 					Narcissus.findField(consulter.getClass(), "allowedModes"), 
@@ -153,10 +151,10 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			
 			}
 			
-			public static class ForSemeru extends Native {
+			public static class ForSemeru extends Abst implements Native {
 				
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
-					consulter = MethodHandles.lookup();
+					super(context);
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						Narcissus.findField(consulter.getClass(), "accessMode"), 
@@ -167,16 +165,12 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			}
 		}
 		
-		public static class ForJava9 extends ConsulterSupplier {
+		public static interface ForJava9 extends Native, ConsulterSupplier {
 			
-			public ForJava9(Map<Object, Object> context) {
-				consulter = MethodHandles.lookup();
-			}
-			
-			public static class ForSemeru extends Native {
+			public static class ForSemeru extends Abst implements Native.ForJava9 {
 				
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-					consulter = MethodHandles.lookup();
+					super(context);
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						Narcissus.findField(consulter.getClass(), "accessMode"), 
@@ -188,6 +182,24 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 			}		
 		}
 		
+	}
+	
+	
+	public static interface Hybrid extends ConsulterSupplier {
+		
+		public static class ForJava17 extends Abst implements Hybrid {
+			
+			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
+				super(context);
+			}
+			
+			public static class ForSemeru extends ConsulterSupplier.Native.ForJava9.ForSemeru implements Hybrid {
+				
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+					super(context);				
+				}
+			}
+		}
 	}
 	
 }

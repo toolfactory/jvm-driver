@@ -26,8 +26,9 @@
  */
 package io.github.toolfactory.jvm.util;
 
+import io.github.toolfactory.jvm.function.template.BiConsumer;
 
-public abstract class BiConsumerAdapter<F, I, J> {
+public abstract class BiConsumerAdapter<F, I, J> implements BiConsumer<I, J> {
 	
 	protected F function;
 	
@@ -41,7 +42,5 @@ public abstract class BiConsumerAdapter<F, I, J> {
 		this.function = function;
 		return this;
 	}
-	
-	public abstract void accept(I inputOne, J inputTwo);
 	
 }

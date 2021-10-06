@@ -47,7 +47,6 @@ import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 
-@SuppressWarnings({"rawtypes"})
 public class DefaultDriver extends DriverAbst {	
 	
 	@Override

@@ -35,9 +35,9 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 
 
-public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, String, Field> {
+public interface GetDeclaredFieldFunction extends BiFunction<Class<?>, String, Field> {
 	
-	public static class ForJava7 extends GetDeclaredFieldFunction {
+	public static class ForJava7 implements GetDeclaredFieldFunction {
 		protected GetDeclaredFieldsFunction getDeclaredFields;
 		protected ThrowExceptionFunction throwExceptionFunction;
 		

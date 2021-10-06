@@ -51,7 +51,7 @@ public abstract class GetDeclaredMethodsFunction implements Function<Class<?>, M
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			ConsulterSupplyFunction<?> getConsulterFunction =
+			ConsulterSupplyFunction getConsulterFunction =
 				functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
 			methodHandle = consulter.findSpecial(
@@ -76,7 +76,7 @@ public abstract class GetDeclaredMethodsFunction implements Function<Class<?>, M
 			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
-				ConsulterSupplyFunction<?> getConsulterFunction =
+				ConsulterSupplyFunction getConsulterFunction =
 					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 				MethodHandles.Lookup consulter = getConsulterFunction.apply(Class.class);
 				methodHandle = consulter.findSpecial(

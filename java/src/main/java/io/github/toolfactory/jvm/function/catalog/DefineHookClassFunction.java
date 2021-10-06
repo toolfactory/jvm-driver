@@ -40,18 +40,21 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
-public abstract class DefineHookClassFunction implements BiFunction<Class<?>, byte[], Class<?>> {
-	protected MethodHandle defineHookClassMethodHandle;
-	protected ThrowExceptionFunction throwExceptionFunction;
+public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Class<?>> {
 	
-	public DefineHookClassFunction(Map<Object, Object> context) {
-		ObjectProvider functionProvider = ObjectProvider.get(context);
-		throwExceptionFunction =
-			functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+	public static abstract class Abst implements DefineHookClassFunction {
+		protected MethodHandle defineHookClassMethodHandle;
+		protected ThrowExceptionFunction throwExceptionFunction;
+		
+		public Abst(Map<Object, Object> context) {
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			throwExceptionFunction =
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+		}
 	}
 	
 	
-	public static class ForJava7 extends DefineHookClassFunction {
+	public static class ForJava7 extends Abst {
 		protected sun.misc.Unsafe unsafe;
 		
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
@@ -99,7 +102,7 @@ public abstract class DefineHookClassFunction implements BiFunction<Class<?>, by
 	}
 	
 	
-	public static class ForJava17 extends DefineHookClassFunction {
+	public static class ForJava17 extends Abst {
 		protected MethodHandle privateLookupInMethodHandle;
 		protected MethodHandles.Lookup consulter;
 		
