@@ -1,4 +1,4 @@
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.test;
 
 
 import org.junit.Test;
@@ -6,16 +6,16 @@ import org.junit.Test;
 import io.github.toolfactory.util.Reflection;
 
 
-public class NativeDriverTest extends BaseTest {
+public class HybridDriverTest extends BaseTest {
 	
 	public static void main(String[] args) {
-		new NativeDriverTest().getAndSetDirectVolatileTestOne();
+		new HybridDriverTest().getAndSetDirectVolatileTestOne();
 	}
 	
 	Reflection getReflection() {
 		if (reflection == null) {
 			try {
-				reflection = Reflection.Factory.getNewWithNativeDriver();
+				reflection = Reflection.Factory.getNewWithHybridDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
 				throw new RuntimeException(exc);
@@ -24,7 +24,7 @@ public class NativeDriverTest extends BaseTest {
 		return reflection;
 	}
 	
-
+	
 	@Test
 	public void getConsulterTestOne() {
 		super.getConsulterTestOne();
@@ -89,6 +89,4 @@ public class NativeDriverTest extends BaseTest {
 	public void retrieveLoadedPackagesTestOne() {
 		super.retrieveLoadedPackagesTestOne();
 	}
-	
-	
 }

@@ -1,4 +1,4 @@
-package io.github.toolfactory.jvm;
+package io.github.toolfactory.jvm.test;
 
 
 import static org.junit.Assert.assertTrue;
