@@ -60,7 +60,7 @@ public abstract class ConsulterSupplier implements Supplier<MethodHandles.Lookup
 		public static class ForSemeru extends ConsulterSupplier {
 			protected static final int PACKAGE = 0x8;
 			protected static final int INTERNAL_PRIVILEGED = 0x80;
-			private static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
+			protected static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
 			
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
