@@ -85,8 +85,8 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 		}
 		
 		public static class ForSemeru implements GetLoadedClassesFunction {
-			Function<ClassLoader, Hashtable<String, Object>> classNameBasedLockSupplier;
-			Field classNameBasedLockField;
+			protected Function<ClassLoader, Hashtable<String, Object>> classNameBasedLockSupplier;
+			protected Field classNameBasedLockField;
 			
 			public ForSemeru(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -95,7 +95,7 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 				classNameBasedLockSupplier = buildClassNameBasedLockSupplierSupplier(context);
 			}
 
-			Function<ClassLoader, Hashtable<String, Object>> buildClassNameBasedLockSupplierSupplier(final Map<Object, Object> context) {
+			protected Function<ClassLoader, Hashtable<String, Object>> buildClassNameBasedLockSupplierSupplier(final Map<Object, Object> context) {
 				return new Function<ClassLoader, Hashtable<String, Object>>() {
 					protected sun.misc.Unsafe unsafe = 
 						ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
@@ -170,7 +170,7 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 	public static interface Native extends GetLoadedClassesFunction {
 		
 		public static class ForJava7 implements Native {
-			Field classesField;
+			protected Field classesField;
 			
 			public ForJava7(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -212,7 +212,7 @@ public interface GetLoadedClassesFunction extends Function<ClassLoader, Clenable
 				}
 				
 				@Override
-				Function<ClassLoader, Hashtable<String, Object>> buildClassNameBasedLockSupplierSupplier(final Map<Object, Object> context) {
+				protected Function<ClassLoader, Hashtable<String, Object>> buildClassNameBasedLockSupplierSupplier(final Map<Object, Object> context) {
 					return new Function<ClassLoader, Hashtable<String, Object>>() {
 						protected ThrowExceptionFunction throwExceptionFunction = 
 								ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
