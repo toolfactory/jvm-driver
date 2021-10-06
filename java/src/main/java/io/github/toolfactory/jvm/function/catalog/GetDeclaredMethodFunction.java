@@ -80,7 +80,11 @@ public abstract class GetDeclaredMethodFunction implements TriFunction<Class<?>,
 			for (Class<?> paramType : paramTypes) {
 				classNames.add(paramType.getName());
 			}
-			return throwExceptionFunction.apply(Strings.compile("Method {}({}) not found in the class {}", name, Strings.join(", ", classNames), cls.getName()));
+			return throwExceptionFunction.apply(
+				new NoSuchMethodException(	
+					Strings.compile("Method {}({}) not found in the class {}", name, Strings.join(", ", classNames), cls.getName())
+				)
+			);
 		}
 
 

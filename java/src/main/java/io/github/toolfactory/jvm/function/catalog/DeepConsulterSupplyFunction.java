@@ -29,8 +29,8 @@ package io.github.toolfactory.jvm.function.catalog;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -43,9 +43,10 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 @SuppressWarnings("unchecked")
 public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> {
 
-	
 	public static class ForJava7 extends DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
-		public ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException {
+			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
+			MethodHandles.Lookup.class.getDeclaredField("allowedModes");
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			setFunction(
 				(Function<Class<?>, MethodHandles.Lookup>)functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context).getFunction()
@@ -57,11 +58,46 @@ public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, 
 			return function.apply(input);
 		}
 		
+		public static class ForSemeru extends DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
+			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
+				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
+				final MethodHandle methodHandle = lookupCtor.newInstance(
+					MethodHandles.Lookup.class, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+				).findConstructor(
+					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
+				);
+				final ThrowExceptionFunction throwExceptionFunction =
+					functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				setFunction(
+					new Function<Class<?>, MethodHandles.Lookup>() {
+						@Override
+						public Lookup apply(Class<?> cls) {
+							try {
+								return (MethodHandles.Lookup)methodHandle.invoke(cls, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+							} catch (Throwable exc) {
+								return throwExceptionFunction.apply(exc);
+							}
+						}
+					}
+				);
+
+			}
+			
+			@Override
+			public MethodHandles.Lookup apply(Class<?> input) {
+				return function.apply(input);
+			}
+		}
+		
 	}
 	
 	public static class ForJava9 extends DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
 		
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException, SecurityException {
+			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
+			MethodHandles.Lookup.class.getDeclaredField("allowedModes");
 			Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
@@ -91,43 +127,8 @@ public abstract class DeepConsulterSupplyFunction<F> extends FunctionAdapter<F, 
 			return function.apply(input);
 		}
 		
-		public static class ForSemeru extends DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
-			
-			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
-				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
-				ObjectProvider functionProvider = ObjectProvider.get(context);
-				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
-				final MethodHandle methodHandle = lookupCtor.newInstance(
-					MethodHandles.Lookup.class, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
-				).findConstructor(
-					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
-				);
-				final ThrowExceptionFunction throwExceptionFunction =
-					functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
-				setFunction(
-					new Function<Class<?>, MethodHandles.Lookup>() {
-						@Override
-						public Lookup apply(Class<?> cls) {
-							try {
-								return (MethodHandles.Lookup)methodHandle.invoke(cls, -1);
-							} catch (Throwable exc) {
-								return throwExceptionFunction.apply(exc);
-							}
-						}
-					}
-				);
-
-			}
-
-			
-			@Override
-			public MethodHandles.Lookup apply(Class<?> input) {
-				return function.apply(input);
-			}
-			
-		}
-		
 	}
+	
 	
 	public static class ForJava14 extends DeepConsulterSupplyFunction<Function<Class<?>, MethodHandles.Lookup>> {
 		

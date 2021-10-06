@@ -59,7 +59,9 @@ import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
+import io.github.toolfactory.jvm.function.template.TriFunction;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
+import io.github.toolfactory.jvm.util.ClenableSupplier;
 import io.github.toolfactory.jvm.util.FunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
@@ -77,12 +79,12 @@ public abstract class DriverAbst implements Driver {
 	private Function<Class<?>, Method[]> declaredMethodsRetriever;
 	private Function<Class<?>, Constructor<?>[]> declaredConstructorsRetriever;
 	private BiConsumerAdapter<?, AccessibleObject, Boolean> accessibleSetter;
-	private ConstructorInvokeFunction constructorInvoker;
+	private BiFunction<Constructor<?>, Object[], Object> constructorInvoker;
 	private BiFunction<ClassLoader, String, Package> packageRetriever;
-	private MethodInvokeFunction methodInvoker;
-	private BuiltinClassLoaderClassSupplier builtinClassLoaderClassSupplier;
-	private ClassLoaderDelegateClassSupplier classLoaderDelegateClassSupplier;
-	private Function<ClassLoader, Collection<Class<?>>> loadedClassesRetriever;
+	private TriFunction<Method, Object, Object[], Object> methodInvoker;
+	private Supplier<Class<?>> builtinClassLoaderClassSupplier;
+	private Supplier<Class<?>> classLoaderDelegateClassSupplier;
+	private Function<ClassLoader, ClenableSupplier<Collection<Class<?>>>> loadedClassesRetriever;
 	private Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 
 	public DriverAbst() {}
@@ -460,7 +462,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (exceptionThrower == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						exceptionThrower = getOrBuildExceptionThrower(functionsToMap());
+						exceptionThrower = getOrBuildExceptionThrower(initContext);
 						refresh(initContext);
 					}
 				}
@@ -525,7 +527,7 @@ public abstract class DriverAbst implements Driver {
 	}
 
 	@Override
-	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader) {
+	public ClenableSupplier<Collection<Class<?>>> retrieveLoadedClasses(ClassLoader classLoader) {
 		try {
 			return loadedClassesRetriever.apply(classLoader);
 		} catch (NullPointerException exc) {

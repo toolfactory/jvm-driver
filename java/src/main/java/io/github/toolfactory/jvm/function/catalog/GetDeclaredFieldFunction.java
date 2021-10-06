@@ -60,7 +60,9 @@ public abstract class GetDeclaredFieldFunction implements BiFunction<Class<?>, S
 				return throwExceptionFunction.apply(exc);
 			}
 			return throwExceptionFunction.apply(
-				Strings.compile("Field named {} not found in the class {}", name, cls.getName())
+				new NoSuchFieldException(
+					Strings.compile("Field named {} not found in the class {}", name, cls.getName())
+				)
 			);
 		}
 	}	

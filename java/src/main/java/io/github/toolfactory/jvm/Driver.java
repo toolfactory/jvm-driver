@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.github.toolfactory.jvm.util.ClenableSupplier;
 import io.github.toolfactory.jvm.util.Properties;
 
 
@@ -73,7 +74,7 @@ public interface Driver extends Closeable {
 
 	public <T> T newInstance(Constructor<T> ctor, Object[] params);
 
-	public Collection<Class<?>> retrieveLoadedClasses(ClassLoader classLoader);
+	public ClenableSupplier<Collection<Class<?>>> retrieveLoadedClasses(ClassLoader classLoader);
 
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
 	

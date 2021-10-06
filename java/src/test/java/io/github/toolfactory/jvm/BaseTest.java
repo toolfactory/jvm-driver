@@ -214,7 +214,7 @@ abstract class BaseTest {
 	
 	void retrieveLoadedClassesTestOne() {
 		try {
-			Collection<Class<?>> loadedClasses = getReflection().getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader());
+			Collection<Class<?>> loadedClasses = getReflection().getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader()).get();
 			for (Class<?> cls : loadedClasses) {
 				System.out.println(cls.getName());
 			}
