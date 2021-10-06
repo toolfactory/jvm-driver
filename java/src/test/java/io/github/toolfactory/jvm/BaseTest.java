@@ -123,7 +123,7 @@ abstract class BaseTest {
 	void getDeclaredFieldsTestOne() {
 		try {
 			for (Member member : getReflection().getDriver().getDeclaredFields(Class.class)) {
-				System.out.println(member);
+				log(member);
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
@@ -134,7 +134,7 @@ abstract class BaseTest {
 	void getDeclaredMethodsTestOne() {
 		try {
 			for (Member member : getReflection().getDriver().getDeclaredMethods(Class.class)) {
-				System.out.println(member);
+				log(member);
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
@@ -145,7 +145,7 @@ abstract class BaseTest {
 	void getDeclaredConstructorsTestOne() {
 		try {
 			for (Member member : getReflection().getDriver().getDeclaredConstructors(Class.class)) {
-				System.out.println(member);
+				log(member);
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
@@ -156,7 +156,7 @@ abstract class BaseTest {
 	
 	void allocateInstanceTestOne() {
 		try {
-			System.out.println(getReflection().getDriver().allocateInstance(ClassForTest.class).toString());
+			log(getReflection().getDriver().allocateInstance(ClassForTest.class).toString());
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
@@ -169,7 +169,7 @@ abstract class BaseTest {
 			ClassForTest object = new ClassForTest();
 			Field field = ClassForTest.class.getDeclaredField("intValue");
 			getReflection().getDriver().setAccessible(field, true);
-			System.out.println(field.get(object));			
+			log(field.get(object));			
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
@@ -216,7 +216,7 @@ abstract class BaseTest {
 		try {
 			Collection<Class<?>> loadedClasses = getReflection().getDriver().retrieveLoadedClasses(Thread.currentThread().getContextClassLoader()).get();
 			for (Class<?> cls : loadedClasses) {
-				System.out.println(cls.getName());
+				log(cls.getName());
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
@@ -229,7 +229,7 @@ abstract class BaseTest {
 		try {
 			Map<String, ?> loadedClasses = getReflection().getDriver().retrieveLoadedPackages(Thread.currentThread().getContextClassLoader());
 			for (Entry<String, ?> cls : loadedClasses.entrySet()) {
-				System.out.println(cls.getValue().toString());
+				log(cls.getValue().toString());
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
@@ -237,6 +237,9 @@ abstract class BaseTest {
 		}
 	}
 	
+	private void log(Object value) {
+		//System.out.println(value.toString());
+	}
 	
 	private static class ClassForTest {
 		
