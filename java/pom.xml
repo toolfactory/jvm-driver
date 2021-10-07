@@ -249,6 +249,8 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifestEntries>
 							<built-by>ToolFactory</built-by>
+							<Bundle-Vendor>ToolFactory (Luke Hutchison, Roberto Gentili)</Bundle-Vendor>
+                            <Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
 				</configuration>

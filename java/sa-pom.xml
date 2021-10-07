@@ -221,6 +221,20 @@
 							</target>
 						</configuration>
 					</execution>
+					<execution>
+                        <id>add-module-info-to-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
+                                    <zipfileset prefix="META-INF/versions/9" dir="${project.build.directory}/classes" includes="module-info.class" />
+                                </jar>
+                            </target>
+                        </configuration>
+                    </execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -281,17 +295,17 @@
 				<version>${maven-jar-plugin.version}</version>
 				<configuration>
 					<excludes>
+						<exclude>module-info.class</exclude>
 						<exclude>jdk/</exclude>
 						<exclude>java/</exclude>
 						<exclude>META-INF/maven/</exclude>
-						<exclude>**/*.c</exclude>
-						<exclude>**/*.cpp</exclude>
-						<exclude>**/*.h</exclude>
 					</excludes>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifestEntries>
 							<built-by>ToolFactory</built-by>
+							<Bundle-Vendor>ToolFactory (Luke Hutchison, Roberto Gentili)</Bundle-Vendor>
+                            <Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
 				</configuration>
