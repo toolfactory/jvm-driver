@@ -86,7 +86,11 @@ public class ObjectProvider {
 			try {
 				return getOrBuildObjectInternal(clazz, context);
 			} catch (BuildingException exc) {
-				putException(exceptions, exc);			
+				if (putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru")) {
+					exceptions.put("default", exc);
+				} else {
+					exceptions.put("International Business Machines Corporation", exc);
+				}
 			}
 			return getOrBuildObjectInternal(clazz, context);
 		} catch (BuildingException exc) {
