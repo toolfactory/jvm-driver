@@ -94,23 +94,57 @@ public abstract class DriverAbst implements Driver {
 		putNewObjectProviderIfAbsent(initializationContext);
 		getOrBuildExceptionThrower(initializationContext);	
 		try {
-			exceptionThrower = getOrBuildExceptionThrower(initializationContext);
-			allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initializationContext);	
-			fieldValueRetriever = getOrBuildFieldValueRetriever(initializationContext);
-			fieldValueSetter = getOrBuildFieldValueSetter(initializationContext);
-			hookClassDefiner = getOrBuildHookClassDefiner(initializationContext);
-			declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initializationContext);
-			declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(initializationContext);
-			declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(initializationContext);
-			accessibleSetter = getOrBuildAccessibleSetter(initializationContext);
-			constructorInvoker = getOrBuildConstructorInvoker(initializationContext);
-			methodInvoker = getOrBuildMethodInvoker(initializationContext);
-			packageRetriever = getOrBuildPackageRetriever(initializationContext);		
-			builtinClassLoaderClassSupplier = getOrBuildBuiltinClassLoaderClassSupplier(initializationContext);	
-			classLoaderDelegateClassSupplier = getOrBuildClassLoaderDelegateClassSupplier(initializationContext);
-			consulterRetriever = getOrBuildDeepConsulterRetriever(initializationContext);
-			loadedClassesRetrieverSupplier = getOrBuildLoadedClassesRetrieverFunction(initializationContext);
-			loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initializationContext);
+			if (exceptionThrower == null) {
+				exceptionThrower = getOrBuildExceptionThrower(initializationContext);
+			}
+			if (allocateInstanceInvoker == null) {
+				allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initializationContext);
+			}
+			if (fieldValueRetriever == null) {
+				fieldValueRetriever = getOrBuildFieldValueRetriever(initializationContext);
+			}
+			if (fieldValueSetter == null) {
+				fieldValueSetter = getOrBuildFieldValueSetter(initializationContext);
+			}
+			if (hookClassDefiner == null) {
+				hookClassDefiner = getOrBuildHookClassDefiner(initializationContext);
+			}
+			if (declaredFieldsRetriever == null) {
+				declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initializationContext);
+			}
+			if (declaredMethodsRetriever == null) {
+				declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(initializationContext);
+			}
+			if (declaredConstructorsRetriever == null) {
+				declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(initializationContext);
+			}
+			if (accessibleSetter == null) {
+				accessibleSetter = getOrBuildAccessibleSetter(initializationContext);
+			}
+			if (constructorInvoker == null) {
+				constructorInvoker = getOrBuildConstructorInvoker(initializationContext);
+			}
+			if (methodInvoker == null) {
+				methodInvoker = getOrBuildMethodInvoker(initializationContext);
+			}
+			if (packageRetriever == null) {
+				packageRetriever = getOrBuildPackageRetriever(initializationContext);
+			}
+			if (builtinClassLoaderClassSupplier == null) {
+				builtinClassLoaderClassSupplier = getOrBuildBuiltinClassLoaderClassSupplier(initializationContext);	
+			}
+			if (classLoaderDelegateClassSupplier == null) {
+				classLoaderDelegateClassSupplier = getOrBuildClassLoaderDelegateClassSupplier(initializationContext);
+			}
+			if (consulterRetriever == null) {
+				consulterRetriever = getOrBuildDeepConsulterRetriever(initializationContext);
+			}
+			if (loadedClassesRetrieverSupplier == null) {
+				loadedClassesRetrieverSupplier = getOrBuildLoadedClassesRetrieverFunction(initializationContext);
+			}
+			if (loadedPackagesRetriever == null) {
+				loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initializationContext);
+			}			
 		} catch (Throwable exc) {
 			throwException(
 				new InitializeException(
