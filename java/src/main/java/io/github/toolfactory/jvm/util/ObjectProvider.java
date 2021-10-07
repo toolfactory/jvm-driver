@@ -27,6 +27,7 @@
 package io.github.toolfactory.jvm.util;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +72,14 @@ public class ObjectProvider {
 	
 	
 	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
-		Map<String, Throwable> exceptions = new HashMap<String, Throwable>();
+		Map<String, Throwable> exceptions = (Map<String, Throwable>)context.get("exceptions");
+		if (exceptions == null) {
+			synchronized (context) {
+				if ((exceptions = (Map<String, Throwable>)context.get("exceptions")) == null) {
+					context.put("exceptions", exceptions = new HashMap<String, Throwable>());
+				};
+			}
+		}
 		if (context.get("classNameOptionalItems") == null) {
 			synchronized (context) {
 				if (context.get("classNameOptionalItems") == null) {
@@ -85,7 +93,7 @@ public class ObjectProvider {
 		try {
 			try {
 				return getOrBuildObjectInternal(clazz, context);
-			} catch (BuildingException exc) {
+			} catch (Throwable exc) {
 				if (putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru")) {
 					exceptions.put("default", exc);
 					return getOrBuildObjectInternal(clazz, context);
@@ -93,7 +101,7 @@ public class ObjectProvider {
 					exceptions.put("International Business Machines Corporation", exc);
 				}
 			}
-		} catch (BuildingException exc) {
+		} catch (Throwable exc) {
 			putException(context, exceptions, exc);	
 		}
 		throw new BuildingException(
@@ -103,7 +111,7 @@ public class ObjectProvider {
 				Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
 				jVMVersion, vendor
 			),
-			(BuildingException)exceptions.getOrDefault(
+			exceptions.getOrDefault(
 				vendor,
 				exceptions.get("default")
 			)
@@ -111,7 +119,7 @@ public class ObjectProvider {
 	}
 
 
-	private void putException(Map<Object, Object> context, Map<String, Throwable> exceptions, BuildingException exc) {
+	private void putException(Map<Object, Object> context, Map<String, Throwable> exceptions, Throwable exc) {
 		if (((List<String>)context.get("classNameOptionalItems")).contains("ForSemeru")) {
 			exceptions.put("International Business Machines Corporation", exc);
 		} else {
@@ -134,7 +142,7 @@ public class ObjectProvider {
 	}
 	
 	
-	private <T> T getOrBuildObjectInternal(Class<? super T> clazz, Map<Object, Object> context) {
+	private <T> T getOrBuildObjectInternal(Class<? super T> clazz, Map<Object, Object> context) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		String className = clazz.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
 		T object = getObject(clazz, context);	
@@ -158,8 +166,6 @@ public class ObjectProvider {
 					return object;
 				} catch (ClassNotFoundException exc) {
 					continue;
-				} catch (Throwable exc) {
-					throw new BuildingException("Unable to build the related object of " + clazz.getName(), exc);
 				}
 			}			
 			classNameItems.remove(classNameItems.size() -1);
