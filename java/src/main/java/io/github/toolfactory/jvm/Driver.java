@@ -46,6 +46,8 @@ import io.github.toolfactory.jvm.util.Properties;
 
 public interface Driver extends Closeable {
 	
+	public <D extends Driver> D init();
+	
 	public <T> T allocateInstance(Class<?> cls);
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);

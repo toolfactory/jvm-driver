@@ -88,8 +88,8 @@ public abstract class DriverAbst implements Driver {
 
 	public DriverAbst() {}
 	
-//	Replaced by the deferred initialization
-/*	<D extends Driver> D init() {
+
+	public <D extends Driver> D init() {
 		Map<Object, Object> initializationContext = new HashMap<Object, Object>();
 		putNewObjectProviderIfAbsent(initializationContext);
 		getOrBuildExceptionThrower(initializationContext);	
@@ -106,10 +106,10 @@ public abstract class DriverAbst implements Driver {
 			constructorInvoker = getOrBuildConstructorInvoker(initializationContext);
 			methodInvoker = getOrBuildMethodInvoker(initializationContext);
 			packageRetriever = getOrBuildPackageRetriever(initializationContext);		
-			builtinClassLoaderClass = getOrBuildBuiltinClassLoaderClass(initializationContext);	
-			classLoaderDelegateClass = getOrBuildClassLoaderDelegateClass(initializationContext);
+			builtinClassLoaderClassSupplier = getOrBuildBuiltinClassLoaderClassSupplier(initializationContext);	
+			classLoaderDelegateClassSupplier = getOrBuildClassLoaderDelegateClassSupplier(initializationContext);
 			consulterRetriever = getOrBuildDeepConsulterRetriever(initializationContext);
-			loadedClassesRetriever = getOrBuildLoadedClassesRetriever(initializationContext);
+			loadedClassesRetrieverSupplier = getOrBuildLoadedClassesRetrieverFunction(initializationContext);
 			loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initializationContext);
 		} catch (Throwable exc) {
 			throwException(
@@ -120,7 +120,7 @@ public abstract class DriverAbst implements Driver {
 		}
 		return (D)this;
 	}
-*/	
+	
 	
 	<D extends Driver> D refresh(Map<Object, Object> initializationContext) {
 		try {
