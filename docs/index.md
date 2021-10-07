@@ -79,10 +79,6 @@ io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Facto
 
 Each functionality offered by the driver is **initialized in deferred way** at the first call. However, it is possible to initialize all of the functionalities at once by calling the method `Driver.init()`.
 
-<br/>
-
-<br/>
-
 The methods exposed by the Driver interface are the following:
 ```java
 
