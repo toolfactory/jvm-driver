@@ -28,7 +28,13 @@ package io.github.toolfactory.jvm.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,37 +43,76 @@ import java.util.TreeMap;
 public class Properties {
 	
 	
-	public static Map<Long, java.util.Properties> loadFromResources(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException {
+	public static Map<BigDecimal, java.util.Properties> loadFromResources(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
 		Map<URL, InputStream> resources = new HashMap<URL, InputStream>();
 		for (ClassLoader classLoader : classLoaders) {
 			resources.putAll(Resources.getAsInputStreams(classLoader, resRelPath));
 		}
-		TreeMap<Long, java.util.Properties> orderedProperties = new TreeMap<>();
+		TreeMap<BigDecimal, java.util.Properties> orderedProperties = new TreeMap<>();
+		if (resources.isEmpty()) {
+			return orderedProperties;
+		}
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+		symbols.setGroupingSeparator(',');
+		symbols.setDecimalSeparator('.');
+		DecimalFormat decimalFormat = new DecimalFormat("#.#", symbols);
+		decimalFormat.setParseBigDecimal(true);
+		Collection<java.util.Properties> propertiesWithoutPriority = new ArrayList<>();
 		for (Entry<URL, InputStream> entry : resources.entrySet()) {
 		    java.util.Properties props = new java.util.Properties();
 		    try (InputStream inputStream = entry.getValue()) {
 			    props.load(entry.getValue());
 			    String propValue = props.getProperty(propertyName);
-			    if (propValue == null) {
-			    	propValue = "1";
-			    }
-			    orderedProperties.put(Long.parseLong(propValue), props);
-			   
+			    if (propValue != null && !propValue.trim().isEmpty()) {
+			    	try {
+						orderedProperties.put(stringToBigDecimal(propValue, decimalFormat), props);
+					} catch (ParseException exc) {
+						throw new IllegalArgumentException(
+							Strings.compile(
+								"The value '{}' of property named '{}' inside the file {} is incorrect",
+								propValue, propertyName, entry.getKey().getPath()
+							), exc
+						);
+					}
+			    } else {
+			    	propertiesWithoutPriority.add(props);
+			    }		   
 		    }
+		}
+		if (!propertiesWithoutPriority.isEmpty()) {
+			BigDecimal currentMinPriority = stringToBigDecimal("1", decimalFormat);
+			if (!orderedProperties.isEmpty()) {
+				currentMinPriority = orderedProperties.firstKey();
+			}
+			for (java.util.Properties props : propertiesWithoutPriority) {
+				orderedProperties.put(currentMinPriority.subtract(new BigDecimal(1)), props);
+			}
 		}
 		return orderedProperties;
 	}
 	
 	
-	public static java.util.Properties loadFromResourceWithHigherPropertyValue(ClassLoader resourceClassLoader, String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException {
-		Map<Long, java.util.Properties> orderedProperties = ((TreeMap<Long, java.util.Properties>)loadFromResources(resRelPath, propertyName, classLoaders)).descendingMap();
+	private static BigDecimal stringToBigDecimal(String value, DecimalFormat decimalFormat) throws ParseException {
+		value =	value.trim();
+		if (value.contains(".")) {
+			String wholeNumber = value.substring(0, value.indexOf("."));
+			String fractionalPart = value.substring(value.indexOf(".") + 1, value.length());
+			fractionalPart = fractionalPart.replace(".", "");
+			value = wholeNumber + "." + fractionalPart;
+		}
+		return ((BigDecimal)decimalFormat.parse(value));
+	}
+	
+	
+	public static java.util.Properties loadFromResourceWithHigherPropertyValue(ClassLoader resourceClassLoader, String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
+		Map<BigDecimal, java.util.Properties> orderedProperties = ((TreeMap<BigDecimal, java.util.Properties>)loadFromResources(resRelPath, propertyName, classLoaders)).descendingMap();
 		return orderedProperties.entrySet().iterator().next().getValue();
 	}
 	
-	public static java.util.Properties loadFromResourcesAndMerge(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException {
-		Map<Long, java.util.Properties> orderedProperties = loadFromResources(resRelPath, propertyName, classLoaders);
+	public static java.util.Properties loadFromResourcesAndMerge(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
+		Map<BigDecimal, java.util.Properties> orderedProperties = loadFromResources(resRelPath, propertyName, classLoaders);
 		java.util.Properties properties = new java.util.Properties();
-		for (Entry<Long, java.util.Properties> entry : orderedProperties.entrySet()) {
+		for (Entry<BigDecimal, java.util.Properties> entry : orderedProperties.entrySet()) {
 			properties.putAll(entry.getValue());
 		}
 		properties.remove(propertyName);
