@@ -86,15 +86,11 @@ public class ObjectProvider {
 			try {
 				return getOrBuildObjectInternal(clazz, context);
 			} catch (BuildingException exc) {
-				if (putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru")) {
-					exceptions.put("default", exc);
-				} else {
-					exceptions.put("International Business Machines Corporation", exc);
-				}				
+				putException(exceptions, exc);			
 			}
 			return getOrBuildObjectInternal(clazz, context);
 		} catch (BuildingException exc) {
-			exceptions.put("International Business Machines Corporation", exc);
+			putException(exceptions, exc);	
 		}
 		throw new BuildingException(
 			Strings.compile(
@@ -108,6 +104,15 @@ public class ObjectProvider {
 				exceptions.get("default")
 			)
 		);
+	}
+
+
+	private void putException(Map<String, Throwable> exceptions, BuildingException exc) {
+		if (vendor.equals("International Business Machines Corporation")) {
+			exceptions.put("International Business Machines Corporation", exc);
+		} else {
+			exceptions.put("default", exc);
+		}
 	}
 
 
