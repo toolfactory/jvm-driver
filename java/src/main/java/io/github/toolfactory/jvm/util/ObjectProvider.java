@@ -32,10 +32,11 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,12 +45,14 @@ import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-@SuppressWarnings("all")
+@SuppressWarnings({"unchecked", "null"})
 public class ObjectProvider {
 	private final List<String> classNameItems;
+	private Map<String, List<String>> jVMVendorToClassSuffix;
 	private final static String CLASS_NAME;
 	private int jVMVersion;
 	private String vendor;
+	
 	
 	static {
 		CLASS_NAME = ObjectProvider.class.getName();
@@ -57,6 +60,9 @@ public class ObjectProvider {
 	
 	public ObjectProvider(int... versions) {
 		this.classNameItems = new CopyOnWriteArrayList<String>();
+		this.jVMVendorToClassSuffix = new LinkedHashMap<>();
+		this.jVMVendorToClassSuffix.put("Oracle Corporation", new ArrayList<String>());
+		this.jVMVendorToClassSuffix.put("International Business Machines Corporation", Arrays.asList("ForSemeru"));
 		jVMVersion = Info.Provider.getInfoInstance().getVersion();
 		vendor = System.getProperty("java.vendor");
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
@@ -70,60 +76,46 @@ public class ObjectProvider {
 		}
 	}
 	
-	
+
 	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
-		Map<String, Throwable> exceptions = (Map<String, Throwable>)context.get("exceptions");
-		if (exceptions == null) {
-			synchronized (context) {
-				if ((exceptions = (Map<String, Throwable>)context.get("exceptions")) == null) {
-					context.put("exceptions", exceptions = new HashMap<String, Throwable>());
-				};
+		List<String> classNameOptionalItems = jVMVendorToClassSuffix.get(vendor);
+		if (classNameOptionalItems != null) {
+			try {
+				context.put("classNameOptionalItems", classNameOptionalItems);
+				return getOrBuildObjectInternal(clazz, context);
+			} catch (Throwable exc) {
+				throw new BuildingException(
+					Strings.compile(
+						"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
+						clazz.getName(),
+						Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
+						jVMVersion, vendor
+					),
+					exc
+				);
 			}
-		}
-		if (context.get("classNameOptionalItems") == null) {
-			synchronized (context) {
-				if (context.get("classNameOptionalItems") == null) {
-					context.put("classNameOptionalItems", new ArrayList<String>());
-					if (vendor.equals("International Business Machines Corporation")) {
-						putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru");
+		} else {
+			BuildingException mainException = null;
+			for (Entry<String, List<String>> jVMVendorToClassSuffix : this.jVMVendorToClassSuffix.entrySet()) {
+				try {
+					context.put("classNameOptionalItems", jVMVendorToClassSuffix.getValue());
+					return getOrBuildObjectInternal(clazz, context);
+				} catch (Throwable exc) {
+					if (jVMVendorToClassSuffix.getKey().equals("Oracle Corporation")) {
+						mainException = new BuildingException(
+							Strings.compile(
+								"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
+								clazz.getName(),
+								Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
+								jVMVersion, jVMVendorToClassSuffix.getKey()
+							),
+							exc
+						);
 					}
 				}
 			}
-		}		
-		try {
-			try {
-				return getOrBuildObjectInternal(clazz, context);
-			} catch (Throwable exc) {
-				if (putClassNameOptionalItem((List<String>)context.get("classNameOptionalItems"), "ForSemeru")) {
-					exceptions.put("default", exc);
-					return getOrBuildObjectInternal(clazz, context);
-				} else {
-					exceptions.put("International Business Machines Corporation", exc);
-				}
-			}
-		} catch (Throwable exc) {
-			putException(context, exceptions, exc);	
-		}
-		throw new BuildingException(
-			Strings.compile(
-				"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
-				clazz.getName(),
-				Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
-				jVMVersion, vendor
-			),
-			exceptions.getOrDefault(
-				vendor,
-				exceptions.get("default")
-			)
-		);
-	}
-
-
-	private void putException(Map<Object, Object> context, Map<String, Throwable> exceptions, Throwable exc) {
-		if (((List<String>)context.get("classNameOptionalItems")).contains("ForSemeru")) {
-			exceptions.put("International Business Machines Corporation", exc);
-		} else {
-			exceptions.put("default", exc);
+			throw mainException;
+			
 		}
 	}
 
@@ -290,7 +282,9 @@ public class ObjectProvider {
 	
 	public static class BuildingException extends RuntimeException {
 
-	    public BuildingException(String message, Throwable cause) {
+		private static final long serialVersionUID = -7606794206649872816L;
+
+		public BuildingException(String message, Throwable cause) {
 	        super(message, cause);
 	    }
 	    
