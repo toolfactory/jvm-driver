@@ -57,7 +57,9 @@ public interface Driver extends Closeable {
 	public Class<?> getBuiltinClassLoaderClass();
 
 	public Class<?> getClassLoaderDelegateClass();
-
+	
+	public Class<?> getClassByName(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller);
+	
 	public MethodHandles.Lookup getConsulter(Class<?> cls);
 
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
@@ -69,6 +71,8 @@ public interface Driver extends Closeable {
 	public <T> T getFieldValue(Object target, Field field);
 
 	public Package getPackage(ClassLoader classLoader, String packageName);
+	
+	public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
 
 	public <T> T invoke(Object target, Method method, Object[] params);
 
@@ -85,8 +89,6 @@ public interface Driver extends Closeable {
 	public void setAccessible(AccessibleObject object, boolean flag);
 	
 	public void setFieldValue(Object target, Field field, Object value);
-	
-	public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
 
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
 

@@ -26,9 +26,12 @@
  */
 package io.github.toolfactory.jvm.function.catalog;
 
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,45 +39,28 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-@SuppressWarnings("unchecked")
 public interface GetResourcesAsInputStreamsFunction extends BiFunction<String, ClassLoader[], Map<URL, InputStream>>{
 	
 	public abstract class Abst  implements GetResourcesAsInputStreamsFunction {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected BiFunction<ClassLoader, String, Collection<URL>> resourceFinder;
 		
-		public Abst(Map<Object, Object> context) {
+		public Abst(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			throwExceptionFunction =
 				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
-		}
-		
-	}
-	
-	public static class ForJava7 extends Abst {
-		
-		public ForJava7(Map<Object, Object> context) {
-			super(context);
-			resourceFinder = new BiFunction<ClassLoader, String, Collection<URL>>() {
-
-				@Override
-				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath) {
-					try {
-						return Collections.list(classLoader.getResources(resourceRelativePath));
-					
-					} catch (Throwable exc) {
-						return throwExceptionFunction.apply(exc);
-					}	
-				}
-			};
+			resourceFinder = buildResourceFinder(context);
 		}
 
+		protected abstract BiFunction<ClassLoader, String, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable;
+		
 		@Override
 		public Map<URL, InputStream> apply(String resourceRelativePath, ClassLoader[] resourceClassLoaders) {
 			if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
@@ -98,33 +84,71 @@ public interface GetResourcesAsInputStreamsFunction extends BiFunction<String, C
 			}
 			return streams;
 		}
+	}
+	
+	public static class ForJava7 extends Abst {
+		
+		public ForJava7(Map<Object, Object> context) throws Throwable {
+			super(context);
+		}
+
+		@Override
+		protected BiFunction<ClassLoader, String, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
+			return new BiFunction<ClassLoader, String, Collection<URL>>() {
+
+				@Override
+				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath) {
+					try {
+						return Collections.list(classLoader.getResources(resourceRelativePath));	
+					} catch (Throwable exc) {
+						return throwExceptionFunction.apply(exc);
+					}	
+				}
+			};
+		}
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static class ForJava9 extends ForJava7 {
 
-		public ForJava9(final Map<Object, Object> context) {
+		public ForJava9(final Map<Object, Object> context) throws Throwable {
 			super(context);
+		}
+		
+		@Override
+		protected BiFunction<ClassLoader, String, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
 			final ObjectProvider functionProvider = ObjectProvider.get(context);
-			final GetDeclaredMethodFunction getDeclaredMethodFunction =
-				functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
-			resourceFinder = new BiFunction<ClassLoader, String, Collection<URL>>() {
+			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
+			return new BiFunction<ClassLoader, String, Collection<URL>>() {
 				Class<?> builtinClassLoaderClass = functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get();
-				MethodInvokeFunction methodInvokeFunction = functionProvider.getOrBuildObject(MethodInvokeFunction.class, context);
-				Method findResourcesOnClassPathMethod = getDeclaredMethodFunction.apply(builtinClassLoaderClass, "findResourcesOnClassPath", new Class<?>[]{String.class});
-				Method findMiscResourceMethod = getDeclaredMethodFunction.apply(builtinClassLoaderClass, "findMiscResource", new Class<?>[]{String.class});
-				
+				MethodHandle findResourcesOnClassPathMethod = consulter.findVirtual(
+					builtinClassLoaderClass,
+					"findResourcesOnClassPath",
+					MethodType.methodType(
+						Enumeration.class, String.class
+					)
+				);
+				MethodHandle findMiscResourceMethodHandle = consulter.findVirtual(
+					builtinClassLoaderClass,
+					"findMiscResource",
+					MethodType.methodType(
+						List.class, String.class
+					)
+				);				
 
 				@Override
 				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath) {
 					try {
 						if (builtinClassLoaderClass.isAssignableFrom(classLoader.getClass())) {
 							Collection<URL> resources = new ArrayList<>();
-							resources.addAll(Collections.list(
-								(Enumeration<URL>)methodInvokeFunction.apply(findResourcesOnClassPathMethod, classLoader, new Object[]{resourceRelativePath}))
+							resources.addAll(
+								Collections.list(
+									(Enumeration<URL>)findResourcesOnClassPathMethod.invokeWithArguments(classLoader, resourceRelativePath)
+								)
 							);
 							resources.addAll(
-								(Collection<? extends URL>) methodInvokeFunction.apply(findMiscResourceMethod, classLoader, new Object[]{resourceRelativePath})
+								(Collection<? extends URL>)findMiscResourceMethodHandle.invokeWithArguments(classLoader, resourceRelativePath)
 							);
 							return resources;
 						} else {

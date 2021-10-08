@@ -34,6 +34,7 @@ import io.github.toolfactory.jvm.function.catalog.ConstructorInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DeepConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
+import io.github.toolfactory.jvm.function.catalog.GetClassByNameFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredConstructorsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredFieldsFunction;
 import io.github.toolfactory.jvm.function.catalog.GetDeclaredMethodsFunction;
@@ -126,7 +127,19 @@ public class DefaultDriver extends DriverAbst {
 	protected Class<? extends GetPackageFunction> getGetPackageFunctionClass() {
 		return GetPackageFunction.class;
 	}
+	
+	
+	@Override
+	protected Class<? extends GetResourcesAsInputStreamsFunction> getGetResourcesAsInputStreamsFunctionClass() {
+		return GetResourcesAsInputStreamsFunction.class;
+	}
 
+
+	@Override
+	protected Class<? extends GetClassByNameFunction> getGetClassByNameFunctionClass() {
+		return GetClassByNameFunction.class;
+	}
+	
 
 	@Override
 	protected Class<? extends BuiltinClassLoaderClassSupplier> getBuiltinClassLoaderClassSupplierClass() {
@@ -157,9 +170,5 @@ public class DefaultDriver extends DriverAbst {
 		return GetLoadedPackagesFunction.class;
 	}
 
-
-	@Override
-	protected Class<? extends GetResourcesAsInputStreamsFunction> getGetResourcesAsInputStreamsFunctionClass() {
-		return GetResourcesAsInputStreamsFunction.class;
-	}
+	
 }

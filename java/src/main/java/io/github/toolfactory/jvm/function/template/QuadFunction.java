@@ -24,43 +24,11 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.toolfactory.jvm.function.catalog;
+package io.github.toolfactory.jvm.function.template;
 
 
-import java.util.Map;
+public interface QuadFunction<I, J, K, L, R> {
 
-import io.github.toolfactory.jvm.function.template.Supplier;
-import io.github.toolfactory.jvm.util.ObjectProvider;
+	public R apply(I inputOne, J inputTwo, K inputThree, L inputFour);
 
-
-public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
-	
-	public static class ForJava7 implements BuiltinClassLoaderClassSupplier{
-		
-		public ForJava7(Map<Object, Object> context) {}
-		
-		@Override
-		public Class<?> get() {
-			return null;
-		}
-		
-	}
-	
-	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
-		protected Class<?> cls;
-		
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
-			ObjectProvider functionProvider = ObjectProvider.get(context);
-			cls = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context).apply(
-				"jdk.internal.loader.BuiltinClassLoader", false, ForJava9.class.getClassLoader(), ForJava9.class
-			);
-		}
-		
-		@Override
-		public Class<?> get() {
-			return cls;
-		}
-		
-	}
-	
 }
