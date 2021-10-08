@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -233,6 +232,18 @@ abstract class BaseTest {
 			for (Entry<String, ?> cls : loadedClasses.entrySet()) {
 				log(cls.getValue().toString());
 			}
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	public void getClassByNameTestOne() {
+		try {
+			Class<?> cls = getReflection().getDriver().getClassByName(
+				"java.lang.AssertionStatusDirectives", false,
+				this.getClass().getClassLoader(), this.getClass());
+			log(cls);
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
