@@ -90,4 +90,10 @@ public class DefaultDriverTest extends BaseTest {
 		super.retrieveLoadedPackagesTestOne();
 	}
 	
+	
+	@Test
+	public void retrieveResourcesAsStreamsTestOne() {
+		super.retrieveResourcesAsStreamsTestOne();
+	}
+	
 }

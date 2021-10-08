@@ -89,4 +89,9 @@ public class HybridDriverTest extends BaseTest {
 	public void retrieveLoadedPackagesTestOne() {
 		super.retrieveLoadedPackagesTestOne();
 	}
+	
+	@Test
+	public void retrieveResourcesAsStreamsTestOne() {
+		super.retrieveResourcesAsStreamsTestOne();
+	}
 }

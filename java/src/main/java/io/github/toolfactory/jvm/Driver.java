@@ -28,12 +28,14 @@ package io.github.toolfactory.jvm;
 
 
 import java.io.Closeable;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -83,6 +85,8 @@ public interface Driver extends Closeable {
 	public void setAccessible(AccessibleObject object, boolean flag);
 	
 	public void setFieldValue(Object target, Field field, Object value);
+	
+	public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
 
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
 

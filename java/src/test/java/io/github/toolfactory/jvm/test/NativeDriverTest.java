@@ -90,5 +90,10 @@ public class NativeDriverTest extends BaseTest {
 		super.retrieveLoadedPackagesTestOne();
 	}
 	
+	@Test
+	public void retrieveResourcesAsStreamsTestOne() {
+		super.retrieveResourcesAsStreamsTestOne();
+	}
+	
 	
 }

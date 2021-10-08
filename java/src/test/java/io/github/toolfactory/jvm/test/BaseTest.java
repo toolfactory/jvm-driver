@@ -3,9 +3,11 @@ package io.github.toolfactory.jvm.test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -230,6 +232,18 @@ abstract class BaseTest {
 			Map<String, ?> loadedClasses = getReflection().getDriver().retrieveLoadedPackages(Thread.currentThread().getContextClassLoader());
 			for (Entry<String, ?> cls : loadedClasses.entrySet()) {
 				log(cls.getValue().toString());
+			}
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}
+	}
+	
+	public void retrieveResourcesAsStreamsTestOne() {
+		try {
+			Map<URL, InputStream> loadedClasses = getReflection().getDriver().getResourcesAsInputStreams("jvm-driver.properties");
+			for (Entry<URL, InputStream> entry : loadedClasses.entrySet()) {
+				log(entry.getKey().getPath());
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();

@@ -41,6 +41,7 @@ import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.GetPackageFunction;
+import io.github.toolfactory.jvm.function.catalog.GetResourcesAsInputStreamsFunction;
 import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
@@ -154,5 +155,11 @@ public class DefaultDriver extends DriverAbst {
 	@Override
 	protected Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass() {
 		return GetLoadedPackagesFunction.class;
+	}
+
+
+	@Override
+	protected Class<? extends GetResourcesAsInputStreamsFunction> getGetResourcesAsInputStreamsFunctionClass() {
+		return GetResourcesAsInputStreamsFunction.class;
 	}
 }
