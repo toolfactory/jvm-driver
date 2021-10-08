@@ -35,7 +35,6 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -44,10 +43,7 @@ public class Properties {
 	
 	
 	public static Map<BigDecimal, java.util.Properties> loadFromResources(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
-		Map<URL, InputStream> resources = new HashMap<URL, InputStream>();
-		for (ClassLoader classLoader : classLoaders) {
-			resources.putAll(Resources.getAsInputStreams(classLoader, resRelPath));
-		}
+		Map<URL, InputStream> resources = Resources.getAsInputStreams(resRelPath, classLoaders);
 		TreeMap<BigDecimal, java.util.Properties> orderedProperties = new TreeMap<>();
 		if (resources.isEmpty()) {
 			return orderedProperties;

@@ -37,20 +37,21 @@ import java.util.Map;
 
 public class Resources {
 	
-	public static Map<URL, InputStream> getAsInputStreams(ClassLoader resourceClassLoader, String resourceRelativePath) throws IOException {
-		if (resourceClassLoader == null) {
-			resourceClassLoader = ClassLoader.getSystemClassLoader();
+	public static Map<URL, InputStream> getAsInputStreams(String resourceRelativePath, ClassLoader... resourceClassLoaders) throws IOException {
+		if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
+			resourceClassLoaders = new ClassLoader[]{Thread.currentThread().getContextClassLoader()};
 		}
 		Map<URL, InputStream> streams = new HashMap<>();
-		Enumeration<URL> resources = resourceClassLoader.getResources(resourceRelativePath);
-		while (resources.hasMoreElements()) {
-			URL resourceURL = resources.nextElement();
-			streams.put(
-				resourceURL,
-				resourceURL.openStream()
-			);
+		for (ClassLoader classLoader : resourceClassLoaders) {
+			Enumeration<URL> resources = classLoader.getResources(resourceRelativePath);
+			while (resources.hasMoreElements()) {
+				URL resourceURL = resources.nextElement();
+				streams.put(
+					resourceURL,
+					resourceURL.openStream()
+				);
+			}
 		}
-		
 		return streams;
 	}
 
