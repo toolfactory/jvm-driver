@@ -7,9 +7,9 @@
 [![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/7)](https://maven-badges.herokuapp.com/maven-central/io.github.toolfactory/jvm-driver/)
 [![GitHub](https://img.shields.io/github/license/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/blob/main/LICENSE)
 
-[![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1320912092)
+[![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/1321627350)
 
-[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209+%20(17)-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/1320912092)
+[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209+%20(17)-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/1321627350)
 
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>7.3.2</version>
+    <version>7.4.0/version>
 </dependency>	
 ```
 
@@ -83,11 +83,15 @@ The methods exposed by the Driver interface are the following:
 ```java
 public <D extends Driver> D init();
 
+public <T> T allocateInstance(Class<?> cls);
+
 public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 
 public Class<?> getBuiltinClassLoaderClass();
 
 public Class<?> getClassLoaderDelegateClass();
+
+public Class<?> getClassByName(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller);
 
 public MethodHandles.Lookup getConsulter(Class<?> cls);
 
@@ -100,6 +104,8 @@ public Method[] getDeclaredMethods(Class<?> cls);
 public <T> T getFieldValue(Object target, Field field);
 
 public Package getPackage(ClassLoader classLoader, String packageName);
+
+public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
 
 public <T> T invoke(Object target, Method method, Object[] params);
 
@@ -117,9 +123,7 @@ public void setAccessible(AccessibleObject object, boolean flag);
 
 public void setFieldValue(Object target, Field field, Object value);
 
-public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
-
-public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                          
+public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                         
 ```
 
 <br/>
