@@ -117,6 +117,8 @@ public void setAccessible(AccessibleObject object, boolean flag);
 
 public void setFieldValue(Object target, Field field, Object value);
 
+public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
+
 public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                          
 ```
 
@@ -158,8 +160,6 @@ public Collection<Field> getAllFields(Class<?> cls);
 public Collection<Constructor<?>> getDeclaredConstructors(Class<?> cls);
 
 public Collection<Constructor<?>> getAllConstructors(Class<?> cls);
-
-public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
 ```
 
 <br />
