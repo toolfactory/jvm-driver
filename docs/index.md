@@ -81,7 +81,6 @@ Each functionality offered by the driver is **initialized in deferred way** at t
 
 The methods exposed by the Driver interface are the following:
 ```java
-
 public <D extends Driver> D init();
 
 public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
