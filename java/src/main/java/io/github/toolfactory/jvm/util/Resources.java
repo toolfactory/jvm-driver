@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -41,7 +41,7 @@ public class Resources {
 		if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
 			resourceClassLoaders = new ClassLoader[]{Thread.currentThread().getContextClassLoader()};
 		}
-		Map<URL, InputStream> streams = new HashMap<>();
+		Map<URL, InputStream> streams = new LinkedHashMap<>();
 		for (ClassLoader classLoader : resourceClassLoaders) {
 			Enumeration<URL> resources = classLoader.getResources(resourceRelativePath);
 			while (resources.hasMoreElements()) {
