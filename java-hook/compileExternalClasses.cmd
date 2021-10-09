@@ -24,6 +24,6 @@
 ::	OR OTHER DEALINGS IN THE SOFTWARE.
 ::
 
-call "%1/bin/javac.exe" -cp "%2;" --release 9 "%3/jdk/internal/loader/ClassLoaderDelegateForJDK9.java" -d "%4"
-call "%1/bin/javac.exe" -cp "%2;" --release 8 "%3/java/lang/reflect/AccessibleSetterInvokerForJDK9.java" -d "%4"
-call "%1/bin/javac.exe" -cp "%2;" --release 8 "%3/java/lang/ConsulterRetrieverForJDK9.java" -d "%4"
+call "%1/bin/javac.exe" -cp "%2;%3;" --release 9 "%4/jdk/internal/loader/ClassLoaderDelegateForJDK9.java" -d "%5"
+call "%1/bin/javac.exe" -cp "%2;%3;" --release 8 "%4/java/lang/reflect/AccessibleSetterInvokerForJDK9.java" -d "%5"
+call "%1/bin/javac.exe" -cp "%2;%3;" --release 8 "%4/java/lang/ConsulterRetrieverForJDK9.java" -d "%5"

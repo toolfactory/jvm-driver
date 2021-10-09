@@ -63,6 +63,7 @@
 							<arguments>
 								<argument>${java.home}</argument>
 								<argument>${project.basedir}/bin</argument>
+								<argument>${project.basedir}/../java/target/classes</argument>
 								<argument>${project.basedir}/src/main/java</argument>
 								<argument>${project.basedir}/bin</argument>
 							</arguments>
