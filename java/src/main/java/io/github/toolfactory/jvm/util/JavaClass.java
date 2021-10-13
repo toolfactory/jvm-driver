@@ -140,7 +140,4 @@ public class JavaClass {
 		return (modifiers & 0x4000) != 0;
 	}
 	
-	public boolean isModule() {
-		return (modifiers & 0x8000) != 0;
-	}
 }
