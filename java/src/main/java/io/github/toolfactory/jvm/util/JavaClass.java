@@ -29,78 +29,118 @@ package io.github.toolfactory.jvm.util;
 
 import java.nio.ByteBuffer;
 
-import io.github.toolfactory.jvm.function.template.Consumer;
-import io.github.toolfactory.jvm.function.template.Function;
-
 
 public class JavaClass {
-	private String classNameSlashed;
-	private String className;
+	protected int modifiers;
+	protected String name;
+	protected String simpleName;
+	protected String packageName;
+	protected String superClassName;
+	protected String[] interfaceNames;
 
-	private JavaClass(String className, ByteBuffer byteCode) {
-		this.classNameSlashed = className;
+	protected JavaClass(ByteBuffer byteCode) {
+		this(Classes.File.Reader.retrieveInfo(BufferHandler.shareContent(byteCode)));
+	}
+	
+	protected JavaClass(byte[] byteCode) {
+		this(Classes.File.Reader.retrieveInfo(byteCode));
 	}
 
-	private JavaClass(ByteBuffer byteCode) {
-		this(Classes.retrieveName(byteCode), BufferHandler.shareContent(byteCode));
+	protected JavaClass(Classes.RawInfo rawInfo) {
+		this.modifiers = rawInfo.modifiers;
+		String rawName = rawInfo.getName();
+		String[] classNames = retrieveNames(rawName);
+		packageName = classNames[0];
+		simpleName = classNames[1];
+		name = classNames[2];
+		superClassName = retrieveName(rawInfo.getSuperClassName());
+		String[] interfaceRawNames = rawInfo.getInterfaceNames();
+		interfaceNames = new String[interfaceRawNames.length];
+		for (int i = 0; i < interfaceRawNames.length; i++) {
+			interfaceNames[i] = retrieveName(interfaceRawNames[i]);
+		}
+		
 	}
-
+	
 	public static JavaClass create(ByteBuffer byteCode) {
 		return new JavaClass(byteCode);
 	}
-
-	public static void use(ByteBuffer byteCode, Consumer<JavaClass> javaClassConsumer) {
-		javaClassConsumer.accept(JavaClass.create(byteCode));
+	
+	public static JavaClass create(byte[] byteCode) {
+		return new JavaClass(byteCode);
 	}
-
-	public static <T, E extends Throwable> T extractByUsing(ByteBuffer byteCode, Function<JavaClass, T> javaClassConsumer) throws E {
-		return javaClassConsumer.apply(JavaClass.create(byteCode));
-	}
-
-	private  String _getPackageName() {
-		return classNameSlashed.contains("/") ?
-			classNameSlashed.substring(0, classNameSlashed.lastIndexOf("/")) :
-			null;
-	}
-
-	private String _getSimpleName() {
-		return classNameSlashed.contains("/") ?
-			classNameSlashed.substring(classNameSlashed.lastIndexOf("/") + 1) :
-			classNameSlashed;
-	}
-
-	public String getPackageName() {
-		String pckgName = _getPackageName();
-		if (pckgName != null) {
-			pckgName = pckgName.replace("/", ".");
+	
+	private String retrieveName(String rawName) {
+		try {
+			return rawName.replace("/", ".");
+		} catch (NullPointerException exc) {
+			//for module-info.class
+			return null;
 		}
-		return pckgName;
+	}
+	
+	private String[] retrieveNames(String rawName) {
+		String[] names = new String[3];
+		String rawPackageName = rawName.contains("/") ?
+			rawName.substring(0, rawName.lastIndexOf("/")) :
+				null;
+		if (rawPackageName != null) {
+			//packageName
+			names[0] = rawPackageName.replace("/", ".");
+		}
+		//simpleName
+		names[1] = rawName.contains("/") ?
+			rawName.substring(rawName.lastIndexOf("/") + 1) :
+			rawName;
+		names[2] = (names[0] != null? names[0] + "." : "") + names[1];
+		return names;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getSimpleName() {
-		return _getSimpleName();
+		return simpleName;
 	}
 
-
-	public String getName() {
-		if (className == null) {
-			String packageName = getPackageName();
-			String classSimpleName = getSimpleName();
-			String name = null;
-			if (packageName != null) {
-				name = packageName;
-			}
-			if (classSimpleName != null) {
-				if (packageName == null) {
-					name = "";
-				} else {
-					name += ".";
-				}
-				name += classSimpleName;
-			}
-			className = name;
-		}
-		return className;
+	public String getPackageName() {
+		return packageName;
 	}
 
+	public String getSuperClassName() {
+		return superClassName;
+	}
+
+	public String[] getInterfaceNames() {
+		return interfaceNames;
+	}
+	
+	public boolean isPublic() {
+		return (modifiers & 0x0001) != 0;
+	}
+	
+	public boolean isFinal() {
+		return (modifiers & 0x0010) != 0;
+	}
+	
+	public boolean isInterface() {
+		return (modifiers & 0x0200) != 0;
+	}
+	
+	public boolean isAbstract() {
+		return (modifiers & 0x0400) != 0;
+	}
+	
+	public boolean isAnnotation() {
+		return (modifiers & 0x2000) != 0;
+	}
+	
+	public boolean isEnum() {
+		return (modifiers & 0x4000) != 0;
+	}
+	
+	public boolean isModule() {
+		return (modifiers & 0x8000) != 0;
+	}
 }
