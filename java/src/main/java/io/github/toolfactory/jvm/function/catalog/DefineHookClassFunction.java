@@ -34,7 +34,6 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.BiFunction;
-import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.JavaClass;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
@@ -127,15 +126,13 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 				try {
 					return (Class<?>) defineHookClassMethodHandle.invoke(lookup, byteCode);
 				} catch (LinkageError exc) {
-					return JavaClass.extractByUsing(ByteBuffer.wrap(byteCode), new Function<JavaClass, Class<?>>() {
-						public Class<?> apply(JavaClass javaClass) {
-							try {
-								return Class.forName(javaClass.getName());
-							} catch (Throwable inExc) {
-								return throwExceptionFunction.apply(inExc);
-							}
-						};
-					});
+					try {
+						return Class.forName(
+							JavaClass.create(ByteBuffer.wrap(byteCode)).getName()
+						);
+					} catch (Throwable inExc) {
+						return throwExceptionFunction.apply(inExc);
+					}
 				}
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
