@@ -190,25 +190,29 @@ public class Classes {
 				}
 				int maxStringLength = currentMaxStringLength;
 				int header = currentCpInfoOffset;
+				int modifiers = readUnsignedShort(byteSupplier, header);
+				if ((modifiers & 0x8000) == 0) {
+					return new RawInfo(
+							modifiers,
+						readUTF8(
+							byteSupplier,
+							cpInfoOffsets[readUnsignedShort(byteSupplier, header + 2)],
+							new char[maxStringLength],
+							constantUtf8Values,
+							cpInfoOffsets
+						),
+						readUTF8(
+							byteSupplier,
+							cpInfoOffsets[readUnsignedShort(byteSupplier, header + 4)],
+							new char[maxStringLength],
+							constantUtf8Values,
+							cpInfoOffsets
+						),
+						getInterfaceNames(byteSupplier, header, maxStringLength, constantUtf8Values, cpInfoOffsets)
+					);
+				}
+				return null;
 				
-				return new RawInfo(
-					readUnsignedShort(byteSupplier, header),
-					readUTF8(
-						byteSupplier,
-						cpInfoOffsets[readUnsignedShort(byteSupplier, header + 2)],
-						new char[maxStringLength],
-						constantUtf8Values,
-						cpInfoOffsets
-					),
-					readUTF8(
-						byteSupplier,
-						cpInfoOffsets[readUnsignedShort(byteSupplier, header + 4)],
-						new char[maxStringLength],
-						constantUtf8Values,
-						cpInfoOffsets
-					),
-					getInterfaceNames(byteSupplier, header, maxStringLength, constantUtf8Values, cpInfoOffsets)
-				);
 			}
 
 			private static String[] getInterfaceNames(
