@@ -26,7 +26,7 @@
  */	
 module io.github.toolfactory.jvm {
 	
-	requires java.base;
+    requires java.base;
     requires static jdk.unsupported;
     requires static io.github.toolfactory.narcissus;
 	
