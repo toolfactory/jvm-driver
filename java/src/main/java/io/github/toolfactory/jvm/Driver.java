@@ -124,12 +124,12 @@ public interface Driver extends Closeable {
 		public static Driver getNew() {
 			try {
 				try {
-					return getNewDefault();
+					return getNewDefault().init();
 				} catch (InitializeException exc) {
-					return getNewHybrid(); 
+					return getNewHybrid().init(); 
 				}
 			} catch (InitializeException exc) {
-				return getNewNative();
+				return getNewNative().init();
 			}
 		}
 		
