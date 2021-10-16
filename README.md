@@ -71,6 +71,12 @@ If you need to create a specific driver type you should use:
 io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewDefault();
 ```
 
+* this code to create a dynamic driver instance:
+
+```java
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewDynamic();
+```
+
 * this code to create an hybrid driver instance:
 
 ```java
@@ -81,12 +87,6 @@ io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Facto
 
 ```java
 io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewNative();
-```
-
-* this code to create a dynamic driver instance:
-
-```java
-io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNewDynamic();
 ```
 
 <br/>
