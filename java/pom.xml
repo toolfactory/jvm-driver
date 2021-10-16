@@ -107,13 +107,6 @@
 				<targetPath>META-INF</targetPath>
 			</resource>
 			<resource>
-				<directory>${project.build.directory}/classes/</directory>
-				<includes>
-					<include>module-info.class</include>
-				</includes>
-				<targetPath>META-INF/versions/9</targetPath>
-			</resource>
-			<resource>
 				<directory>${project.basedir}/src/main/resources</directory>
 				<includes>
 					<include>**</include>
