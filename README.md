@@ -43,8 +43,8 @@ requires io.github.toolfactory.jvm;
 There are four kinds of driver:
 
 * the **default driver** completely based on Java api
+* the **dynamic driver** that extends the default driver and uses JNI functions only if the the Java based functions offered by the default driver are unable to accomplish the tasks
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
-* the **dynamic driver** that extends the default driver and uses JNI functions only if the the Java based functions offered by the default driver are unable to accomplish the task 
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 All JNI methods used by the native and the hybrid driver are supplied by [**narcissus**](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
