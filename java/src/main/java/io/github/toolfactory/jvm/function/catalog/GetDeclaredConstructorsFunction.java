@@ -68,7 +68,7 @@ public interface GetDeclaredConstructorsFunction extends Function<Class<?>, Cons
 		@Override
 		public Constructor<?>[] apply(Class<?> input) {
 			try {
-				return (Constructor<?>[]) methodHandle.invoke(input, false);
+				return (Constructor<?>[]) methodHandle.invokeWithArguments(input, false);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
@@ -94,7 +94,7 @@ public interface GetDeclaredConstructorsFunction extends Function<Class<?>, Cons
 			@Override
 			public Constructor<?>[] apply(Class<?> cls) {
 				try {
-					return (Constructor<?>[])methodHandle.invoke(cls);
+					return (Constructor<?>[])methodHandle.invokeWithArguments(cls);
 				} catch (Throwable exc) {
 					return throwExceptionFunction.apply(exc);
 				}

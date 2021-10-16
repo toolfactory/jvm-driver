@@ -68,7 +68,7 @@ public interface GetDeclaredMethodsFunction extends Function<Class<?>, Method[]>
 		@Override
 		public Method[] apply(Class<?> input) {
 			try {
-				return (Method[]) methodHandle.invoke(input, false);
+				return (Method[]) methodHandle.invokeWithArguments(input, false);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
@@ -93,7 +93,7 @@ public interface GetDeclaredMethodsFunction extends Function<Class<?>, Method[]>
 			@Override
 			public Method[] apply(Class<?> cls) {
 				try {
-					return (Method[])methodHandle.invoke(cls);
+					return (Method[])methodHandle.invokeWithArguments(cls);
 				} catch (Throwable exc) {
 					return throwExceptionFunction.apply(exc);
 				}

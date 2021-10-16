@@ -79,7 +79,10 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 						@Override
 						public MethodHandles.Lookup apply(Class<?> cls) {
 							try {
-								return (MethodHandles.Lookup)methodHandle.invoke(cls, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+								return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
+									cls,
+									io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+								);
 							} catch (Throwable exc) {
 								return throwExceptionFunction.apply(exc);
 							}
@@ -115,7 +118,7 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) {
 						try {
-							return (MethodHandles.Lookup)methodHandle.invoke(cls, -1);
+							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, -1);
 						} catch (Throwable exc) {
 							return throwExceptionFunction.apply(exc);
 						}
@@ -152,7 +155,7 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) {
 						try {
-							return (MethodHandles.Lookup)mthHandle.invoke(cls, null, -1);
+							return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, -1);
 						} catch (Throwable exc) {
 							return throwExceptionFunction.apply(exc);
 						}

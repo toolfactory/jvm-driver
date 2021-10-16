@@ -46,7 +46,7 @@ public interface MethodInvokeFunction extends TriFunction<Method, Object, Object
 		@Override
 		public Object apply(Method method, Object target, Object[] params) {
 			try {
-				return methodHandle.invoke(method, target, params);
+				return methodHandle.invokeWithArguments(method, target, params);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}

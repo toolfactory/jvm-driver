@@ -67,7 +67,7 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 					@Override
 					public void accept(AccessibleObject accessibleObject, Boolean flag) {
 						try {
-							accessibleSetterMethodHandle.invoke(accessibleObject, flag);
+							accessibleSetterMethodHandle.invokeWithArguments(accessibleObject, flag);
 						} catch (Throwable exc) {
 							throwExceptionFunction.apply(exc);
 						}
@@ -130,7 +130,7 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 						@Override
 						public void accept(AccessibleObject accessibleObject, Boolean flag) {
 							try {
-								accessibleSetterMethodHandle.invoke(accessibleObject, flag);
+								accessibleSetterMethodHandle.invokeWithArguments(accessibleObject, flag);
 							} catch (Throwable exc) {
 								throwExceptionFunction.apply(exc);
 							}

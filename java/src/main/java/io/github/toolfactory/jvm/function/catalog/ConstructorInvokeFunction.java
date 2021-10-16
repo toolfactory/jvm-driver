@@ -47,7 +47,7 @@ public interface ConstructorInvokeFunction extends BiFunction<Constructor<?>, Ob
 		@Override
 		public Object apply(Constructor<?> ctor, Object[] params) {
 			try {
-				return methodHandle.invoke(ctor, params);
+				return methodHandle.invokeWithArguments(ctor, params);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}

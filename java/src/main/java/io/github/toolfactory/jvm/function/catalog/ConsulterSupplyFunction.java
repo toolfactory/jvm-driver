@@ -59,7 +59,7 @@ public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandle
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) {
 						try {
-							return (MethodHandles.Lookup) privateLookupInMethodHandle.invoke(consulter, cls);
+							return (MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(consulter, cls);
 						} catch (Throwable exc) {
 							return throwExceptionFunction.apply(exc);
 						}

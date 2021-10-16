@@ -79,12 +79,13 @@ public class ObjectProvider {
 
 	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
 		List<String> classNameOptionalItems = jVMVendorToClassSuffix.get(vendor);
+		BuildingException mainException = null;
 		if (classNameOptionalItems != null) {
 			try {
 				context.put("classNameOptionalItems", classNameOptionalItems);
 				return getOrBuildObjectInternal(clazz, context);
 			} catch (Throwable exc) {
-				throw new BuildingException(
+				mainException = new BuildingException(
 					Strings.compile(
 						"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
 						clazz.getName(),
@@ -95,7 +96,6 @@ public class ObjectProvider {
 				);
 			}
 		} else {
-			BuildingException mainException = null;
 			for (Entry<String, List<String>> jVMVendorToClassSuffix : this.jVMVendorToClassSuffix.entrySet()) {
 				try {
 					context.put("classNameOptionalItems", jVMVendorToClassSuffix.getValue());
@@ -114,9 +114,12 @@ public class ObjectProvider {
 					}
 				}
 			}
-			throw mainException;
-			
 		}
+		ExceptionHandler exceptionHandler = getExceptionHandler(context);
+		if (exceptionHandler!= null) {
+			return exceptionHandler.handle(this, clazz, context, mainException);
+		}
+		throw mainException;
 	}
 
 
@@ -279,6 +282,19 @@ public class ObjectProvider {
 		}
 	}
 	
+
+	public static void setExceptionHandler(Map<Object, Object> context, ExceptionHandler exceptionHandler) {
+		context.put("exceptionHandler", exceptionHandler);		
+	}
+	
+	public static ExceptionHandler getExceptionHandler(Map<Object, Object> context) {
+		return (ExceptionHandler)context.get("exceptionHandler");
+	}
+	
+	public static interface ExceptionHandler {		
+		
+		public <T> T handle(ObjectProvider objectProvider, Class<? super T> clazz, Map<Object, Object> context, BuildingException exc);
+	}
 	
 	public static class BuildingException extends RuntimeException {
 
@@ -293,4 +309,5 @@ public class ObjectProvider {
 	    }
 
 	}
+
 }

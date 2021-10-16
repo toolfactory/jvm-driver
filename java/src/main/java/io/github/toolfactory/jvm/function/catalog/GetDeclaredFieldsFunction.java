@@ -68,7 +68,7 @@ public interface GetDeclaredFieldsFunction extends Function<Class<?>, Field[]> {
 		@Override
 		public Field[] apply(Class<?> cls) {
 			try {
-				return (Field[])methodHandle.invoke(cls, false);
+				return (Field[])methodHandle.invokeWithArguments(cls, false);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
@@ -93,7 +93,7 @@ public interface GetDeclaredFieldsFunction extends Function<Class<?>, Field[]> {
 			@Override
 			public Field[] apply(Class<?> cls) {
 				try {
-					return (Field[])methodHandle.invoke(cls);
+					return (Field[])methodHandle.invokeWithArguments(cls);
 				} catch (Throwable exc) {
 					return throwExceptionFunction.apply(exc);
 				}

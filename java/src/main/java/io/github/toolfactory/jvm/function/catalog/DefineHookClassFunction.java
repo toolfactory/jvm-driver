@@ -72,13 +72,13 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 		}
 		
 		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
-			return (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(consulter, unsafe.getClass());
+			return (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(consulter, unsafe.getClass());
 		}
 		
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) {
 			try {
-				return (Class<?>) defineHookClassMethodHandle.invoke(unsafe, clientClass, byteCode, null);
+				return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(unsafe, clientClass, byteCode, null);
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
@@ -95,7 +95,7 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 		
 		@Override
 		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
-			return (MethodHandles.Lookup)lookupMethod.invoke(unsafe.getClass(), consulter);
+			return (MethodHandles.Lookup)lookupMethod.invokeWithArguments(unsafe.getClass(), consulter);
 		}
 		
 	}
@@ -122,9 +122,9 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) {
 			try {
-				MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invoke(clientClass, consulter);
+				MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(clientClass, consulter);
 				try {
-					return (Class<?>) defineHookClassMethodHandle.invoke(lookup, byteCode);
+					return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(lookup, byteCode);
 				} catch (LinkageError exc) {
 					try {
 						return Class.forName(

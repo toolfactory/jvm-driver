@@ -113,6 +113,7 @@ public interface Driver extends Closeable {
 				);
 				driverConstructors = new ConcurrentHashMap<String, Constructor<? extends Driver>>();
 				setDriverClass("defaultDriverClass", configuration.getProperty("default-driver.class"));
+				setDriverClass("dynamicDriverClass", configuration.getProperty("dynamic-driver.class"));
 				setDriverClass("hybridDriverClass", configuration.getProperty("hybrid-driver.class"));
 				setDriverClass("nativeDriverClass", configuration.getProperty("native-driver.class"));
 			} catch (Throwable exc) {
@@ -172,6 +173,14 @@ public interface Driver extends Closeable {
 			setDriverClass("hybridDriverClass", className);
 		}
 		
+		public static void setDynamicDriverClass(Class<? extends Driver> cls) {
+			setDriverClass("dynamicDriverClass", cls);
+		}
+		
+		public static void setDynamicDriverClass(String className) {
+			setDriverClass("dynamicDriverClass", className);
+		}
+		
 		public static void setNativeDriverClass(Class<? extends Driver> cls) {
 			setDriverClass("nativeDriverClass", cls);
 		}
@@ -183,6 +192,15 @@ public interface Driver extends Closeable {
 		public static <D extends Driver> D getNewDefault() {
 			try {
 				return ((D)driverConstructors.get("defaultDriverClass").newInstance());
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException exc) {
+				throw new InstantiateException(exc);
+			}
+		}
+		
+		public static <D extends Driver> D getNewDynamic() {
+			try {
+				return ((D)driverConstructors.get("dynamicDriverClass").newInstance());
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException exc) {
 				throw new InstantiateException(exc);
