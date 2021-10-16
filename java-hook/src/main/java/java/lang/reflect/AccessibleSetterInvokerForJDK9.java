@@ -54,7 +54,7 @@ public class AccessibleSetterInvokerForJDK9 implements BiConsumer<AccessibleObje
 	@Override
 	public void accept(AccessibleObject accessibleObject, Boolean flag) {
 		try {
-			accessibleSetterMethodHandle.invoke(accessibleObject, flag);
+			accessibleSetterMethodHandle.invokeWithArguments(accessibleObject, flag);
 		} catch (Throwable exc) {
 			throwException(exc);
 		}		

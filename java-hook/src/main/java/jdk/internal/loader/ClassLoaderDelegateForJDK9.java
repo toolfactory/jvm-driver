@@ -51,7 +51,7 @@ public class ClassLoaderDelegateForJDK9 extends BuiltinClassLoader {
 	@Override
 	protected Class<?> loadClassOrNull(String className, boolean resolve) {
 		try {
-			return (Class<?>)loadClassMethod.invoke(classLoader, className, resolve);
+			return (Class<?>)loadClassMethod.invokeWithArguments(classLoader, className, resolve);
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			return null;
@@ -61,7 +61,7 @@ public class ClassLoaderDelegateForJDK9 extends BuiltinClassLoader {
 	@Override
 	protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
 		try {
-			return (Class<?>)loadClassMethod.invoke(classLoader, className, resolve);
+			return (Class<?>)loadClassMethod.invokeWithArguments(classLoader, className, resolve);
 		} catch (ClassNotFoundException exc) {
 			throw exc;
 		} catch (Throwable exc) {

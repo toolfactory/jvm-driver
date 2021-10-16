@@ -44,7 +44,7 @@ public class ConsulterRetrieverForJDK9 implements Function<Class<?>, MethodHandl
 	@Override
 	public Lookup apply(Class<?> cls) {
 		try {
-			return (MethodHandles.Lookup)consulterRetriever.invoke(cls, mainConsulter);
+			return (MethodHandles.Lookup)consulterRetriever.invokeWithArguments(cls, mainConsulter);
 		} catch (Throwable exc) {
 			return throwExceptionWithReturn(exc);
 		}
