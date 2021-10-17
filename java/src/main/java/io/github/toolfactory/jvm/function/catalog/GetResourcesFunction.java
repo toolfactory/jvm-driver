@@ -65,10 +65,10 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 		
 		@Override
 		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, ClassLoader[] resourceClassLoaders) {
-			if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
-				resourceClassLoaders = new ClassLoader[]{Thread.currentThread().getContextClassLoader()};
-			}
 			Collection<URL> resources = new LinkedHashSet<>();
+			if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
+				return resourceFinder.apply(Thread.currentThread().getContextClassLoader(), resourceRelativePath, findFirst, resources);
+			}			
 			for (ClassLoader classLoader : resourceClassLoaders) {
 				resourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
 			}
@@ -78,6 +78,9 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 		@Override
 		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders) {
 			Collection<URL> resources = new LinkedHashSet<>();
+			if (resourceClassLoaders == null || resourceClassLoaders.isEmpty()) {
+				return resourceFinder.apply(Thread.currentThread().getContextClassLoader(), resourceRelativePath, findFirst, resources);
+			}
 			for (ClassLoader classLoader : resourceClassLoaders) {
 				resourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
 			}
