@@ -36,7 +36,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -109,7 +108,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 	
 	@SuppressWarnings("unchecked")
 	public static class ForJava9 extends ForJava7 {
-
+		
 		public ForJava9(final Map<Object, Object> context) throws Throwable {
 			super(context);
 		}
@@ -120,7 +119,8 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
 			final GetClassByNameFunction getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
 			final GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {
+			final QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> superResourceFinder = super.buildResourceFinder(context);
+			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {				
 				final Class<?> jdk_internal_loader_BuiltinClassLoaderClass = functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get();
 				final Class<?> java_lang_module_ModuleReferenceClass = getClassByNameFunction.apply(
 					"java.lang.module.ModuleReference", false, this.getClass().getClassLoader(), this.getClass()
@@ -196,7 +196,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 							}
 							return resources;
 						} else {
-							return Collections.list(classLoader.getResources(resourceRelativePath));
+							return superResourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
 						}					
 					} catch (Throwable exc) {
 						return throwExceptionFunction.apply(exc);
