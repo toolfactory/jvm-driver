@@ -3,7 +3,6 @@ package io.github.toolfactory.jvm.test;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.net.URL;
@@ -250,11 +249,11 @@ abstract class BaseTest {
 		}
 	}
 	
-	public void retrieveResourcesAsStreamsTestOne() {
+	public void retrieveResourcesTestOne() {
 		try {
-			Map<URL, InputStream> loadedClasses = getReflection().getDriver().getResourcesAsInputStreams("jvm-driver.properties");
-			for (Entry<URL, InputStream> entry : loadedClasses.entrySet()) {
-				log(entry.getKey().getPath());
+			Collection<URL> resource = getReflection().getDriver().getResources("com/sun/source/util/JavacTask.class", false);
+			for (URL resourceURL : resource) {
+				log(resourceURL.getPath());
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();

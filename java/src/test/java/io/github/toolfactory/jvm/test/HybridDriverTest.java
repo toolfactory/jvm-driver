@@ -104,8 +104,8 @@ public class HybridDriverTest extends BaseTest {
 	
 	@Override
 	@Test
-	public void retrieveResourcesAsStreamsTestOne() {
-		super.retrieveResourcesAsStreamsTestOne();
+	public void retrieveResourcesTestOne() {
+		super.retrieveResourcesTestOne();
 	}
 	
 	@Override

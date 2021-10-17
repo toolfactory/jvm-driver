@@ -28,7 +28,6 @@ package io.github.toolfactory.jvm;
 
 
 import java.io.Closeable;
-import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -72,7 +71,7 @@ public interface Driver extends Closeable {
 
 	public Package getPackage(ClassLoader classLoader, String packageName);
 	
-	public Map<URL, InputStream> getResourcesAsInputStreams(String resourceRelativePath, ClassLoader... classLoaders);
+	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, ClassLoader... classLoaders);
 
 	public <T> T invoke(Object target, Method method, Object[] params);
 
