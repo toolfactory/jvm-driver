@@ -100,11 +100,8 @@ jobs:
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
-      - if: endsWith(matrix.java, '-ea') != true 
-        name: Build and test with final version JDK
-        run: |
-           mvn -B clean test -DskipTests=false --file ./java/pom.xml   
-           mvn -B test -DskipTests=false --file ./java/pom.xml   
+      - name: Build and test with final version JDK
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml     
   
   release:
     needs: [build-and-test-with-Java-9-and-later]
