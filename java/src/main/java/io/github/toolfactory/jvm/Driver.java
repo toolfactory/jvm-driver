@@ -72,7 +72,9 @@ public interface Driver extends Closeable {
 	public Package getPackage(ClassLoader classLoader, String packageName);
 	
 	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, ClassLoader... classLoaders);
-
+	
+	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, Collection<ClassLoader> classLoaders);
+	
 	public <T> T invoke(Object target, Method method, Object[] params);
 
 	public boolean isBuiltinClassLoader(ClassLoader classLoader);

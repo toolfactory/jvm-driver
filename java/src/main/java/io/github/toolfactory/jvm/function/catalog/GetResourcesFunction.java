@@ -47,6 +47,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 public interface GetResourcesFunction extends TriFunction<String, Boolean, ClassLoader[], Collection<URL>>{
 	
+	public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders);
+	
 	public abstract class Abst  implements GetResourcesFunction {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> resourceFinder;
@@ -66,6 +68,15 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
 				resourceClassLoaders = new ClassLoader[]{Thread.currentThread().getContextClassLoader()};
 			}
+			Collection<URL> resources = new LinkedHashSet<>();
+			for (ClassLoader classLoader : resourceClassLoaders) {
+				resourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
+			}
+			return resources;
+		}
+		
+		@Override
+		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders) {
 			Collection<URL> resources = new LinkedHashSet<>();
 			for (ClassLoader classLoader : resourceClassLoaders) {
 				resourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);

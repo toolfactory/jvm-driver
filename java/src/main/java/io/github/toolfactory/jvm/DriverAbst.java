@@ -86,7 +86,7 @@ public abstract class DriverAbst implements Driver {
 	private BiFunction<ClassLoader, String, Package> packageRetriever;
 	private TriFunction<Method, Object, Object[], Object> methodInvoker;
 	private QuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>> classByNameRetriever;
-	private TriFunction<String, Boolean, ClassLoader[], Collection<URL>> resourcesRetriver;
+	private GetResourcesFunction resourcesRetriver;
 	private Supplier<Class<?>> builtinClassLoaderClassSupplier;
 	private Supplier<Class<?>> classLoaderDelegateClassSupplier;
 	private Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
@@ -738,8 +738,29 @@ public abstract class DriverAbst implements Driver {
 		} catch (Throwable exc) {
 			return throwException(exc);
 		}
-	}
+	}	
 	
+	@Override
+	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, Collection<ClassLoader> classLoaders) {
+		try {
+			try {
+				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
+			} catch (NullPointerException exc) {
+				if (resourcesRetriver == null) {
+					synchronized (this) {
+						if (resourcesRetriver == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							resourcesRetriver = getOrBuildResourcesRetriever(initContext);
+							refresh(initContext);
+						}
+					}
+				}
+				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
+			}
+		} catch (Throwable exc) {
+			return throwException(exc);
+		}
+	}	
 	
 	@Override
 	public boolean isBuiltinClassLoader(ClassLoader classLoader) {
