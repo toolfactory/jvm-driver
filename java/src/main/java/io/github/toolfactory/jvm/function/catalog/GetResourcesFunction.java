@@ -103,7 +103,10 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) {
 					try {
 						if (findFirst) {
-							resources.add(classLoader.getResource(resourceRelativePath));
+							URL resource = classLoader.getResource(resourceRelativePath);
+							if (resource != null) {
+								resources.add(resource);
+							}
 						} else {
 							Enumeration<URL> resourceURLS = classLoader.getResources(resourceRelativePath);
 							while (resourceURLS.hasMoreElements()) {
