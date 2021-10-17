@@ -120,7 +120,9 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			final GetClassByNameFunction getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
 			final GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 			final QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> superResourceFinder = super.buildResourceFinder(context);
-			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {				
+			
+			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {
+				
 				final Class<?> jdk_internal_loader_BuiltinClassLoaderClass = functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get();
 				final Class<?> java_lang_module_ModuleReferenceClass = getClassByNameFunction.apply(
 					"java.lang.module.ModuleReference", false, this.getClass().getClassLoader(), this.getClass()
@@ -187,7 +189,15 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 								}
 	                        }
 							Object ucp = getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_ucpField);
-							Enumeration<URL> resourceURLS = (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath, false);
+							Enumeration<URL> resourceURLS;
+							try {
+								resourceURLS = (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath, false);
+							} catch (NullPointerException exc) {
+								if (ucp != null) {
+									return throwExceptionFunction.apply(exc);
+								}
+								return resources;
+							}
 							while (resourceURLS.hasMoreElements()) {
 								resources.add(resourceURLS.nextElement());
 								if (findFirst) {
