@@ -173,7 +173,7 @@ public class Reflection {
 			return new Reflection(driver);
 		}
 		
-		public static Reflection getNewWithDinamicDriver() {
+		public static Reflection getNewWithDynamicDriver() {
 			return getNewWith(Driver.Factory.getNewDynamic());
 		}
 		

@@ -16,7 +16,7 @@ public class DynamicDriverTest extends BaseTest {
 	Reflection getReflection() {
 		if (reflection == null) {
 			try {
-				reflection = Reflection.Factory.getNewWithDinamicDriver();
+				reflection = Reflection.Factory.getNewWithDynamicDriver();
 			} catch (Throwable exc) {
 				exc.printStackTrace();
 				throw new RuntimeException(exc);
