@@ -85,27 +85,40 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 		}
 		
 		public static class ForSemeru implements GetLoadedClassesRetrieverFunction {
-			protected Function<ClassLoader, Hashtable<String, Object>> classNameBasedLockSupplier;
+			protected ClassNameBasedLockSupplier classNameBasedLockSupplier;
 			protected Field classNameBasedLockField;
+			protected Field classLoaderField;
+			protected GetClassByNameFunction getClassByNameFunction;
 			
 			public ForSemeru(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
+				getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
 				classNameBasedLockField = getDeclaredFieldFunction.apply(ClassLoader.class, "classNameBasedLock");
-				classNameBasedLockSupplier = buildClassNameBasedLockSupplierSupplier(context);
+				classLoaderField = getDeclaredFieldFunction.apply(Class.class, "classLoader");
+				classNameBasedLockSupplier = buildClassNameBasedLockSupplier(context);
 			}
 
-			protected Function<ClassLoader, Hashtable<String, Object>> buildClassNameBasedLockSupplierSupplier(final Map<Object, Object> context) {
-				return new Function<ClassLoader, Hashtable<String, Object>>() {
+			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
+				return new ClassNameBasedLockSupplier() {
 					protected sun.misc.Unsafe unsafe = 
 						ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-					protected Long classNameBasedLockHashTable = unsafe.objectFieldOffset(
+					protected Long classNameBasedLockHashTableOffset = unsafe.objectFieldOffset(
 						classNameBasedLockField
 					);
+					protected Long classLoaderFieldOffset = unsafe.objectFieldOffset(
+						classLoaderField
+					); 
+					
 					
 					@Override
-					public Hashtable<String, Object> apply(ClassLoader classLoader) {
-						return (Hashtable<String, Object>)unsafe.getObject(classLoader, classNameBasedLockHashTable);
+					public Hashtable<String, Object> get(ClassLoader classLoader) {
+						return (Hashtable<String, Object>)unsafe.getObject(classLoader, classNameBasedLockHashTableOffset);
+					}
+					
+					@Override
+					protected ClassLoader getClassLoader(Class<?> cls) {
+						return (ClassLoader)unsafe.getObject(cls, classLoaderFieldOffset);
 					}
 					
 				};
@@ -137,7 +150,10 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 						
 						for (Entry<String, ?> entry : loadedClassesHS.entrySet()) {
 							try {
-								loadedClasses.add(Class.forName(entry.getKey()));
+								Class<?> cls = getClassByNameFunction.apply(entry.getKey(), false, classLoader, CleanableSupplier.class);
+								if (classNameBasedLockSupplier.getClassLoader(cls) == classLoader) {
+									loadedClasses.add(cls);
+								}
 							} catch (Throwable exc) {
 
 							}
@@ -157,12 +173,19 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 						if (classNameBasedLock != null) {
 							return classNameBasedLock;
 						}
-						return classNameBasedLock = (Hashtable<String, Object>)classNameBasedLockSupplier.apply(classLoader);
+						return classNameBasedLock = (Hashtable<String, Object>)classNameBasedLockSupplier.get(classLoader);
 					}
 					
 				};
 			}
 			
+			protected static abstract class ClassNameBasedLockSupplier {
+				
+				protected abstract Hashtable<String, Object> get(ClassLoader classLoader);
+				
+				protected abstract ClassLoader getClassLoader(Class<?> cls);
+				
+			}
 		}
 		
 	}
@@ -212,17 +235,19 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 				}
 				
 				@Override
-				protected Function<ClassLoader, Hashtable<String, Object>> buildClassNameBasedLockSupplierSupplier(final Map<Object, Object> context) {
-					return new Function<ClassLoader, Hashtable<String, Object>>() {
+				protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
+					return new ClassNameBasedLockSupplier() {
 						protected ThrowExceptionFunction throwExceptionFunction = 
 								ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
+						
 						@Override
-						public Hashtable<String, Object> apply(ClassLoader classLoader) {
-							try {
-								return (Hashtable<String, Object>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classNameBasedLockField);
-							} catch (Throwable exc) {
-								return throwExceptionFunction.apply(exc);
-							}
+						public Hashtable<String, Object> get(ClassLoader classLoader) {
+							return (Hashtable<String, Object>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classNameBasedLockField);
+						}
+						
+						@Override
+						protected ClassLoader getClassLoader(Class<?> cls) {
+							return (ClassLoader)io.github.toolfactory.narcissus.Narcissus.getField(cls, classLoaderField);
 						}
 						
 					};				
