@@ -29,7 +29,7 @@
 	
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>8.2.2-SNAPSHOT</version>
+	<version>8.2.2</version>
 
 	<packaging>jar</packaging>
 
@@ -127,7 +127,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/toolfactory/jvm-driver</url>
-		<tag>HEAD</tag>
+		<tag>jvm-driver-8.2.2</tag>
 	</scm>
 
 	<dependencies>
