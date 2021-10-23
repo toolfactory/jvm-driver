@@ -34,7 +34,7 @@
     </parent>
 	
 	<artifactId>jvm-driver</artifactId>
-	<version>8.2.2-SNAPSHOT</version>
+	<version>8.2.3-SNAPSHOT</version>
 	
 	<packaging>jar</packaging>
 
