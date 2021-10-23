@@ -43,7 +43,7 @@ requires io.github.toolfactory.jvm;
 There are four kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **dynamic driver** that extends the default driver and uses a JNI function only if the a Java based function offered by the default driver cannot be initialized
+* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
