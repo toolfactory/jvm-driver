@@ -56,7 +56,7 @@ All JNI methods used by the dynamik, hybrid and native driver are supplied by [*
 
 ## Usage
 
-To create a driver a driver instance you should use this code:
+To create a driver instance you should use this code:
 ```java
 io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.getNew();
 ```
