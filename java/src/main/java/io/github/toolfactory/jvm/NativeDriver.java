@@ -41,22 +41,23 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "resource"})
 public class NativeDriver extends DefaultDriver {
 	
 	
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
+		NativeDriver thisInstance = this;
 		ObjectProvider objectProvider = ObjectProvider.get(context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getThrowExceptionFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getConsulterSupplierFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getSetFieldValueFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getAllocateInstanceFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getGetFieldValueFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getSetAccessibleFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getGetLoadedPackagesFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(getGetLoadedClassesRetrieverFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getThrowExceptionFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getConsulterSupplierFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getSetFieldValueFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getAllocateInstanceFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getGetFieldValueFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getSetAccessibleFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getGetLoadedPackagesFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getGetLoadedClassesRetrieverFunctionClass(), context);
 		ObjectProvider.setExceptionHandler(
 				context,
 				new ObjectProvider.ExceptionHandler() {
@@ -64,29 +65,29 @@ public class NativeDriver extends DefaultDriver {
 					public <T> T handle(ObjectProvider objectProvider, Class<? super T> clazz, Map<Object, Object> context,
 						BuildingException exception) {
 						if (objectProvider.isMarkedToBeInitializedViaExceptionHandler(exception)) {
-							if (clazz.isAssignableFrom(getConsulterSupplierFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getConsulterSupplierFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getConsulterSupplierFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getConsulterSupplierFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getThrowExceptionFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getThrowExceptionFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getThrowExceptionFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getThrowExceptionFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getSetFieldValueFunctionClass())) {
+							if (clazz.isAssignableFrom(thisInstance.getSetFieldValueFunctionClass())) {
 								return (T)objectProvider.getOrBuildObject(getSetFieldValueFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getAllocateInstanceFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getAllocateInstanceFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getAllocateInstanceFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getAllocateInstanceFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getSetAccessibleFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getSetAccessibleFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getSetAccessibleFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getSetAccessibleFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getGetFieldValueFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getGetFieldValueFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getGetFieldValueFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getGetFieldValueFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getGetLoadedClassesRetrieverFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getGetLoadedClassesRetrieverFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getGetLoadedClassesRetrieverFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getGetLoadedClassesRetrieverFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(getGetLoadedPackagesFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getGetLoadedPackagesFunctionClass(), context);
+							if (clazz.isAssignableFrom(thisInstance.getGetLoadedPackagesFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(thisInstance.getGetLoadedPackagesFunctionClass(), context);
 							}
 						}
 						throw exception;
