@@ -31,17 +31,38 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
+@SuppressWarnings("unchecked")
 public class HybridDriver extends DefaultDriver {
 	
 	
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
-		ObjectProvider.get(context).getOrBuildObject(ConsulterSupplier.Hybrid.class, context);
+		ObjectProvider.get(context).markToBeInitializedViaExceptionHandler(ConsulterSupplier.class, context);
+		ObjectProvider.setExceptionHandler(
+				context,
+				new ObjectProvider.ExceptionHandler() {
+					
+					@Override
+					public <T> T handle(ObjectProvider objectProvider, Class<? super T> clazz, Map<Object, Object> context,
+						BuildingException exception) {
+						if (objectProvider.isMarkedToBeInitializedViaExceptionHandler(exception)) {
+							if (clazz.isAssignableFrom(getConsulterSupplierFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getConsulterSupplierFunctionClass(), context);
+							}
+						}
+						throw exception;
+					}	
+				}
+			);
 		return context;
 	}
 
 	
+	protected Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
+		return ConsulterSupplier.Hybrid.class;
+	}
 }
