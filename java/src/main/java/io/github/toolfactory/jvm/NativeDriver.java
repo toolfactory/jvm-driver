@@ -48,16 +48,16 @@ public class NativeDriver extends DefaultDriver {
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
-		final NativeDriver thisInstance = this;
+		final NativeDriver nativeDriver = this;
 		ObjectProvider objectProvider = ObjectProvider.get(context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getThrowExceptionFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getConsulterSupplierFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getSetFieldValueFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getAllocateInstanceFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getGetFieldValueFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getSetAccessibleFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getGetLoadedPackagesFunctionClass(), context);
-		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getGetLoadedClassesRetrieverFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getThrowExceptionFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getConsulterSupplierFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getSetFieldValueFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getAllocateInstanceFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getGetFieldValueFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getSetAccessibleFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getGetLoadedPackagesFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(nativeDriver.getGetLoadedClassesRetrieverFunctionClass(), context);
 		ObjectProvider.setExceptionHandler(
 				context,
 				new ObjectProvider.ExceptionHandler() {
@@ -65,29 +65,29 @@ public class NativeDriver extends DefaultDriver {
 					public <T> T handle(ObjectProvider objectProvider, Class<? super T> clazz, Map<Object, Object> context,
 						BuildingException exception) {
 						if (objectProvider.isMarkedToBeInitializedViaExceptionHandler(exception)) {
-							if (clazz.isAssignableFrom(thisInstance.getConsulterSupplierFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getConsulterSupplierFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getConsulterSupplierFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getConsulterSupplierFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getThrowExceptionFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getThrowExceptionFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getThrowExceptionFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getThrowExceptionFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getSetFieldValueFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(getSetFieldValueFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getSetFieldValueFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getSetFieldValueFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getAllocateInstanceFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getAllocateInstanceFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getAllocateInstanceFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getAllocateInstanceFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getSetAccessibleFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getSetAccessibleFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getSetAccessibleFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getSetAccessibleFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getGetFieldValueFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getGetFieldValueFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getGetFieldValueFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getGetFieldValueFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getGetLoadedClassesRetrieverFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getGetLoadedClassesRetrieverFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getGetLoadedClassesRetrieverFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getGetLoadedClassesRetrieverFunctionClass(), context);
 							}
-							if (clazz.isAssignableFrom(thisInstance.getGetLoadedPackagesFunctionClass())) {
-								return (T)objectProvider.getOrBuildObject(thisInstance.getGetLoadedPackagesFunctionClass(), context);
+							if (clazz.isAssignableFrom(nativeDriver.getGetLoadedPackagesFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(nativeDriver.getGetLoadedPackagesFunctionClass(), context);
 							}
 						}
 						throw exception;
