@@ -526,7 +526,7 @@ public abstract class DriverAbst implements Driver {
 	}
 	
 	
-	private void putIfNotNull(Map<Object, Object> map, Class<?> cls, Object object) {
+	protected void putIfNotNull(Map<Object, Object> map, Class<?> cls, Object object) {
 		if (object != null) {
 			map.put(cls.getName(), object);
 		}		

@@ -138,16 +138,15 @@ public class ObjectProvider {
 	
 	
 	private <T> T getOrBuildObjectInternal(Class<? super T> clazz, Map<Object, Object> context) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		String className = clazz.getName();
 		Collection<String> searchedClasses = new LinkedHashSet<>();
-		T object = getObject(clazz, context);	
+		T object = getObjectInternal(clazz, context);	
 		if (object != null) {
 			return object;
 		}
 		context.put(CLASS_NAME, this);
 		List<String> classNameOptionalItems = (List<String>)context.get("classNameOptionalItems");
 		List<String> classNameItems = Arrays.asList(new String[classNameOptionalItems.size() + 2]);
-		classNameItems.set(0, className);
+		classNameItems.set(0, clazz.getName());
 		for (int i = 0; i < classNameOptionalItems.size(); i++) {
 			classNameItems.set(i + 2, classNameOptionalItems.get(i));
 		}
@@ -157,7 +156,7 @@ public class ObjectProvider {
 				try {
 					classNameItems.set(1, classNameItem);
 					object = (T)retrieveClass(classNameItems, searchedClasses, "$").getDeclaredConstructor(Map.class).newInstance(context);
-					context.put(className, object);
+					context.put(clazz, object);
 					return object;
 				} catch (ClassNotFoundException exc) {
 					continue;
@@ -252,14 +251,42 @@ public class ObjectProvider {
 		return classNames;
 	}
 	
-	public static <F> F getObject(Class<? super F> clazz, Map<Object, Object> context) {
-		F objectFound = (F) context.get(clazz.getName());
+	private <F> F getObjectInternal(Class<? super F> clazz, Map<Object, Object> context) {
+		F objectFound = (F) context.get(clazz);
 		if (objectFound != null) {
+			if (objectFound  instanceof InitializationMarkViaExceptionHandler) {
+				context.remove(clazz);
+				throw (InitializationMarkViaExceptionHandler)objectFound;
+			}
 			return objectFound;
 		} else {
-			for (Object object : context.values()) {
-				if (clazz.isAssignableFrom(object.getClass())) {
-					return (F)object;
+			for (Entry<Object, Object> entry : context.entrySet()) {
+				if (clazz.isAssignableFrom(entry.getValue().getClass())) {
+					return (F)entry.getValue();
+				}
+				if (entry.getKey() instanceof Class && clazz.isAssignableFrom((Class<?>)entry.getKey()) && entry.getValue() instanceof InitializationMarkViaExceptionHandler) {
+					context.remove(clazz);
+					throw (InitializationMarkViaExceptionHandler)entry.getValue();
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static <F> F getObject(Class<? super F> clazz, Map<Object, Object> context) {
+		F objectFound = (F) context.get(clazz);
+		if (objectFound != null) {
+			if (objectFound  instanceof InitializationMarkViaExceptionHandler) {
+				return null;
+			}
+			return objectFound;
+		} else {
+			for (Entry<Object, Object> entry : context.entrySet()) {
+				if (clazz.isAssignableFrom(entry.getValue().getClass())) {
+					return (F)entry.getValue();
+				}
+				if (entry.getKey() instanceof Class && clazz.isAssignableFrom((Class<?>)entry.getKey()) && entry.getValue() instanceof InitializationMarkViaExceptionHandler) {
+					return null;
 				}
 			}
 		}
@@ -282,6 +309,25 @@ public class ObjectProvider {
 		}
 	}
 	
+	public <T> boolean markToBeInitializedViaExceptionHandler(Class<? super T> clazz, Map<Object, Object> context) {
+		return markToBeInitializedViaExceptionHandler(clazz, context, InitializationMarkViaExceptionHandler.INSTANCE);
+	}
+	
+	public <T> boolean markToBeInitializedViaExceptionHandler(Class<? super T> clazz, Map<Object, Object> context, InitializationMarkViaExceptionHandler exception) {
+		try {
+			if (getObjectInternal(clazz, context) != null) {
+				return false;
+			}
+			context.put(clazz, exception);
+			return true;
+		} catch (InitializationMarkViaExceptionHandler exc) {
+			return true;
+		}
+	}
+	
+	public boolean isMarkedToBeInitializedViaExceptionHandler(BuildingException exception) {
+		return  exception.getCause() instanceof InitializationMarkViaExceptionHandler;
+	}
 
 	public static void setExceptionHandler(Map<Object, Object> context, ExceptionHandler exceptionHandler) {
 		context.put("exceptionHandler", exceptionHandler);		
@@ -309,5 +355,25 @@ public class ObjectProvider {
 	    }
 
 	}
+	
+	public static class InitializationMarkViaExceptionHandler extends io.github.toolfactory.jvm.util.ObjectProvider.BuildingException {
+		
+		private static final long serialVersionUID = -6243247518915161086L;
+		
+		public static final InitializationMarkViaExceptionHandler INSTANCE;
+		
+		static {
+			INSTANCE = new InitializationMarkViaExceptionHandler();
+		}	
+		
+		public InitializationMarkViaExceptionHandler() {
+			super(null);
+		}
 
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+            return this;
+        }
+		
+	}
 }

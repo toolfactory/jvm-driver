@@ -38,8 +38,10 @@ import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
+@SuppressWarnings("unchecked")
 public class NativeDriver extends DefaultDriver {
 	
 	
@@ -47,9 +49,55 @@ public class NativeDriver extends DefaultDriver {
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
 		ObjectProvider objectProvider = ObjectProvider.get(context);
-		objectProvider.getOrBuildObject(ThrowExceptionFunction.Native.class, context);
-		objectProvider.getOrBuildObject(ConsulterSupplier.Native.class, context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getThrowExceptionFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getConsulterSupplierFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getSetFieldValueFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getAllocateInstanceFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getGetFieldValueFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getSetAccessibleFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getGetLoadedPackagesFunctionClass(), context);
+		objectProvider.markToBeInitializedViaExceptionHandler(getGetLoadedClassesRetrieverFunctionClass(), context);
+		ObjectProvider.setExceptionHandler(
+				context,
+				new ObjectProvider.ExceptionHandler() {
+					@Override
+					public <T> T handle(ObjectProvider objectProvider, Class<? super T> clazz, Map<Object, Object> context,
+						BuildingException exception) {
+						if (objectProvider.isMarkedToBeInitializedViaExceptionHandler(exception)) {
+							if (clazz.isAssignableFrom(getConsulterSupplierFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getConsulterSupplierFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getThrowExceptionFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getThrowExceptionFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getSetFieldValueFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getSetFieldValueFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getAllocateInstanceFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getAllocateInstanceFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getSetAccessibleFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getSetAccessibleFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getGetFieldValueFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getGetFieldValueFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getGetLoadedClassesRetrieverFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getGetLoadedClassesRetrieverFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getGetLoadedPackagesFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getGetLoadedPackagesFunctionClass(), context);
+							}
+						}
+						throw exception;
+					}	
+				}
+			);
 		return context;
+	}
+	
+	private Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
+		return ConsulterSupplier.Native.class;
 	}
 	
 	@Override
@@ -92,5 +140,5 @@ public class NativeDriver extends DefaultDriver {
 	protected Class<? extends SetAccessibleFunction> getSetAccessibleFunctionClass() {
 		return SetAccessibleFunction.Native.class;
 	}
-
+	
 }
