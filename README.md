@@ -32,7 +32,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 
 To use ToolFactory JMV Driver as a Java module, add the following to your `module-info.java`: 
 
-```
+```java
 //Mandatory if you use the dynamic, hybrid or native driver
 requires io.github.toolfactory.narcissus;
 //Mandatory if you use the default driver
