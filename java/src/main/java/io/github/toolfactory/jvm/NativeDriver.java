@@ -48,7 +48,7 @@ public class NativeDriver extends DefaultDriver {
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
-		NativeDriver thisInstance = this;
+		final NativeDriver thisInstance = this;
 		ObjectProvider objectProvider = ObjectProvider.get(context);
 		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getThrowExceptionFunctionClass(), context);
 		objectProvider.markToBeInitializedViaExceptionHandler(thisInstance.getConsulterSupplierFunctionClass(), context);
