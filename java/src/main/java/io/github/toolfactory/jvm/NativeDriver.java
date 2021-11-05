@@ -96,9 +96,11 @@ public class NativeDriver extends DefaultDriver {
 		return context;
 	}
 	
-	private Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
+	
+	protected Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
 		return ConsulterSupplier.Native.class;
 	}
+	
 	
 	@Override
 	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {
