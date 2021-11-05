@@ -41,7 +41,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
-@SuppressWarnings({"unchecked", "resource"})
+@SuppressWarnings({"unchecked"})
 public class NativeDriver extends DefaultDriver {
 	
 	
