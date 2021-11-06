@@ -138,7 +138,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			final GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 			final QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> superResourceFinder = super.buildResourceFinder(context);
 
-			return new QuadFunction<>() {
+			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {
 
 				final Class<?> jdk_internal_loader_BuiltinClassLoaderClass = functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get();
 				final Class<?> java_lang_module_ModuleReferenceClass = getClassByNameFunction.apply(

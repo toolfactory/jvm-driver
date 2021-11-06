@@ -125,7 +125,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 			@Override
 			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
-				return new CleanableSupplier<>() {
+				return new CleanableSupplier<Collection<Class<?>>>() {
 					Hashtable<String, Object> classNameBasedLock;
 					Collection<Class<?>> loadedClasses = ConcurrentHashMap.newKeySet();
 
