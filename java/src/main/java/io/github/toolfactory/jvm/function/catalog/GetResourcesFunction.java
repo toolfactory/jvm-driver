@@ -97,7 +97,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 
 		@Override
 		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
-			return new QuadFunction<> () {
+			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> () {
 
 				@Override
 				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) {
