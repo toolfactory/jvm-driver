@@ -37,19 +37,19 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public interface PrivateLookupInMethodHandleSupplier extends Supplier<MethodHandle> {
-	
+
 	public static abstract class Abst implements PrivateLookupInMethodHandleSupplier {
-	
+
 		protected MethodHandle methodHandle;
-		
+
 		@Override
 		public MethodHandle get() {
 			return methodHandle;
 		}
 	}
-	
+
 	public static class ForJava7 extends Abst {
-		
+
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			MethodHandles.Lookup consulter = ObjectProvider.get(context).getOrBuildObject(ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findSpecial(
@@ -60,10 +60,10 @@ public interface PrivateLookupInMethodHandleSupplier extends Supplier<MethodHand
 		}
 
 	}
-	
-	
+
+
 	public static class ForJava9 extends Abst {
-		
+
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			MethodHandles.Lookup consulter = ObjectProvider.get(context).getOrBuildObject(ConsulterSupplier.class, context).get();
 			methodHandle = consulter.findStatic(
@@ -71,7 +71,7 @@ public interface PrivateLookupInMethodHandleSupplier extends Supplier<MethodHand
 				MethodType.methodType(MethodHandles.Lookup.class, Class.class, MethodHandles.Lookup.class)
 			);
 		}
-	
+
 	}
-	
+
 }

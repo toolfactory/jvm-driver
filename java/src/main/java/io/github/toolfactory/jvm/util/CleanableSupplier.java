@@ -29,7 +29,7 @@ package io.github.toolfactory.jvm.util;
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 public interface CleanableSupplier<T> extends Supplier<T> {
-	
+
 	public void clear();
 
 }

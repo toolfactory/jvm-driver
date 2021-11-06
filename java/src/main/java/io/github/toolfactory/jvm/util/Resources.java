@@ -36,7 +36,7 @@ import java.util.Map;
 
 
 public class Resources {
-	
+
 	public static Map<URL, InputStream> getAsInputStreams(String resourceRelativePath, ClassLoader... resourceClassLoaders) throws IOException {
 		if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
 			resourceClassLoaders = new ClassLoader[]{Thread.currentThread().getContextClassLoader()};

@@ -36,22 +36,22 @@ import io.github.toolfactory.jvm.util.Strings;
 
 
 public interface GetDeclaredFieldFunction extends BiFunction<Class<?>, String, Field> {
-	
+
 	public static class ForJava7 implements GetDeclaredFieldFunction {
 		protected GetDeclaredFieldsFunction getDeclaredFields;
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			getDeclaredFields = functionProvider.getOrBuildObject(GetDeclaredFieldsFunction.class, context);
 			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
 		public Field apply(Class<?> cls, String name) {
 			try {
-				for (Field field : (Field[])getDeclaredFields.apply(cls)) {
+				for (Field field : getDeclaredFields.apply(cls)) {
 					if (field.getName().equals(name)) {
 						return field;
 					}
@@ -65,5 +65,5 @@ public interface GetDeclaredFieldFunction extends BiFunction<Class<?>, String, F
 				)
 			);
 		}
-	}	
+	}
 }

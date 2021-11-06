@@ -34,33 +34,33 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
-	
+
 	public static class ForJava7 implements BuiltinClassLoaderClassSupplier{
-		
+
 		public ForJava7(Map<Object, Object> context) {}
-		
+
 		@Override
 		public Class<?> get() {
 			return null;
 		}
-		
+
 	}
-	
+
 	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
 		protected Class<?> cls;
-		
+
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			cls = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context).apply(
 				"jdk.internal.loader.BuiltinClassLoader", false, ForJava9.class.getClassLoader(), ForJava9.class
 			);
 		}
-		
+
 		@Override
 		public Class<?> get() {
 			return cls;
 		}
-		
+
 	}
-	
+
 }

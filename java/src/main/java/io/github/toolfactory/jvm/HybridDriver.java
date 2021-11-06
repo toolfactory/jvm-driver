@@ -36,8 +36,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 @SuppressWarnings("unchecked")
 public class HybridDriver extends DefaultDriver {
-	
-	
+
+
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
@@ -45,7 +45,7 @@ public class HybridDriver extends DefaultDriver {
 		ObjectProvider.setExceptionHandler(
 				context,
 				new ObjectProvider.ExceptionHandler() {
-					
+
 					@Override
 					public <T> T handle(ObjectProvider objectProvider, Class<? super T> clazz, Map<Object, Object> context,
 						BuildingException exception) {
@@ -55,13 +55,13 @@ public class HybridDriver extends DefaultDriver {
 							}
 						}
 						throw exception;
-					}	
+					}
 				}
 			);
 		return context;
 	}
 
-	
+
 	protected Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
 		return ConsulterSupplier.Hybrid.class;
 	}

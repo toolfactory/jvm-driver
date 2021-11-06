@@ -38,16 +38,16 @@ import io.github.toolfactory.jvm.util.Strings;
 
 
 public interface GetDeclaredMethodFunction extends TriFunction<Class<?>, String, Class<?>[], Method> {
-	
+
 	public static class ForJava7 implements GetDeclaredMethodFunction {
 		protected GetDeclaredMethodsFunction getDeclaredMethodsFunction;
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			getDeclaredMethodsFunction = functionProvider.getOrBuildObject(GetDeclaredMethodsFunction.class, context);
 			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
@@ -56,7 +56,7 @@ public interface GetDeclaredMethodFunction extends TriFunction<Class<?>, String,
 				if (paramTypes == null) {
 					paramTypes = new Class<?>[0];
 				}
-				for (Method method : (Method[])getDeclaredMethodsFunction.apply(cls)) {
+				for (Method method : getDeclaredMethodsFunction.apply(cls)) {
 					if (method.getName().equals(name)) {
 						if (paramTypes.length == method.getParameterTypes().length) {
 							Method toRet = method;
@@ -76,17 +76,17 @@ public interface GetDeclaredMethodFunction extends TriFunction<Class<?>, String,
 			} catch (Throwable exc) {
 				return throwExceptionFunction.apply(exc);
 			}
-			Collection<String> classNames = new ArrayList<String>();
+			Collection<String> classNames = new ArrayList<>();
 			for (Class<?> paramType : paramTypes) {
 				classNames.add(paramType.getName());
 			}
 			return throwExceptionFunction.apply(
-				new NoSuchMethodException(	
+				new NoSuchMethodException(
 					Strings.compile("Method {}({}) not found in the class {}", name, Strings.join(", ", classNames), cls.getName())
 				)
 			);
 		}
 
 
-	}	
+	}
 }

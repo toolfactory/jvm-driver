@@ -18,9 +18,9 @@ import io.github.toolfactory.util.Reflection;
 @SuppressWarnings("unused")
 abstract class BaseTest {
 	protected Reflection reflection;
-	
+
 	abstract Reflection getReflection();
-	
+
 
 	void getAndSetDirectVolatileTestOne() {
 		try {
@@ -34,7 +34,7 @@ abstract class BaseTest {
 				volatile byte byteValue;
 				volatile char charValue;
 			};
-			
+
 			Reflection reflection = getReflection();
 			Field field = reflection.getDeclaredField(obj.getClass(), "objectValue");
 			List<Object> objectValue = new ArrayList<>();
@@ -109,8 +109,8 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void getConsulterTestOne() {
 		try {
 			getReflection().getDriver().getConsulter(Class.class);
@@ -119,7 +119,7 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	void getDeclaredFieldsTestOne() {
 		try {
 			for (Member member : getReflection().getDriver().getDeclaredFields(Class.class)) {
@@ -130,7 +130,7 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	void getDeclaredMethodsTestOne() {
 		try {
 			for (Member member : getReflection().getDriver().getDeclaredMethods(Class.class)) {
@@ -141,7 +141,7 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	void getDeclaredConstructorsTestOne() {
 		try {
 			for (Member member : getReflection().getDriver().getDeclaredConstructors(Class.class)) {
@@ -152,8 +152,8 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void allocateInstanceTestOne() {
 		try {
 			log(getReflection().getDriver().allocateInstance(ClassForTest.class).toString());
@@ -162,21 +162,21 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void setAccessibleTestOne() {
 		try {
 			ClassForTest object = new ClassForTest();
 			Field field = ClassForTest.class.getDeclaredField("intValue");
 			getReflection().getDriver().setAccessible(field, true);
-			log(field.get(object));			
+			log(field.get(object));
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void setInvokeTestOne() {
 		try {
 			int newValue = 10;
@@ -193,8 +193,8 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void newInstanceTestOne() {
 		try {
 			int newValue = 20;
@@ -210,8 +210,8 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void retrieveLoadedClassesTestOne() {
 		try {
 			Collection<Class<?>> loadedClasses = getReflection().getDriver().getLoadedClassesRetriever(Thread.currentThread().getContextClassLoader()).get();
@@ -223,8 +223,8 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
-	
+
+
 	void retrieveLoadedPackagesTestOne() {
 		try {
 			Map<String, ?> loadedClasses = getReflection().getDriver().retrieveLoadedPackages(Thread.currentThread().getContextClassLoader());
@@ -236,7 +236,7 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	public void getClassByNameTestOne() {
 		try {
 			Class<?> cls = getReflection().getDriver().getClassByName(
@@ -248,7 +248,7 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	public void retrieveResourcesTestOne() {
 		try {
 			Collection<URL> resource = getReflection().getDriver().getResources("com/sun/source/util/JavacTask.class", false);
@@ -260,13 +260,13 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	private void log(Object value) {
 		//System.out.println(value.toString());
 	}
-	
+
 	private static class ClassForTest {
-		
+
 		private static volatile List<Object> objectValue;
 		private static volatile int intValue;
 		private static volatile long longValue;
@@ -275,16 +275,16 @@ abstract class BaseTest {
 		private static volatile boolean booleanValue;
 		private static volatile byte byteValue;
 		private static volatile char charValue;
-		
+
 		private ClassForTest() {}
-		
+
 		private ClassForTest(int value) {
 			setIntValue(value);
 		}
-		
+
 		private static void setIntValue(int value) {
 			intValue = value;
 		}
-	};
-	
+	}
+
 }

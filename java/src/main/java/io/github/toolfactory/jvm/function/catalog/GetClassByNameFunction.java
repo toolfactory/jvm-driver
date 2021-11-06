@@ -37,11 +37,11 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public interface GetClassByNameFunction extends QuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>> {
-	
+
 	public abstract class Abst  implements GetClassByNameFunction {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected MethodHandle classFinder;
-		
+
 		public Abst(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			throwExceptionFunction =
@@ -50,15 +50,15 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 		}
 
 		protected abstract MethodHandle retrieveClassFinder(final Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException;
-		
+
 	}
-	
+
 	public static class ForJava7 extends Abst {
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
 		}
-		
+
 		@Override
 		protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -68,7 +68,7 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 				MethodType.methodType(Class.class, String.class, boolean.class, ClassLoader.class, Class.class)
 			);
 		}
-		
+
 		@Override
 		public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) {
 			try {
@@ -77,13 +77,13 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 				return throwExceptionFunction.apply(exc);
 			}
 		}
-		
+
 		public static class ForSemeru extends Abst {
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 				super(context);
 			}
-			
+
 			@Override
 			protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -93,7 +93,7 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 					MethodType.methodType(Class.class, String.class, boolean.class, ClassLoader.class)
 				);
 			}
-			
+
 			@Override
 			public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) {
 				try {
@@ -102,9 +102,9 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 					return throwExceptionFunction.apply(exc);
 				}
 			}
-			
+
 		}
-		
+
 	}
 
 }

@@ -30,7 +30,6 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,11 +42,11 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("all")
 public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
-	
+
 	public static class ForJava7 implements GetLoadedClassesRetrieverFunction {
 		protected sun.misc.Unsafe unsafe;
 		protected Long loadedClassesVectorMemoryOffset;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
@@ -55,16 +54,16 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
-		}		
-		
+		}
+
 		@Override
 		public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
 			if (classLoader == null) {
 				throw new NullPointerException("Input classLoader parameter can't be null");
 			}
-			return new CleanableSupplier<Collection<Class<?>>>() {
+			return new CleanableSupplier<>() {
 				Collection<Class<?>> classes;
-				
+
 				@Override
 				public Collection<Class<?>> get() {
 					if (classes != null) {
@@ -80,16 +79,16 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 						classes.clear();
 					}
 				}
-				
+
 			};
 		}
-		
+
 		public static class ForSemeru implements GetLoadedClassesRetrieverFunction {
 			protected ClassNameBasedLockSupplier classNameBasedLockSupplier;
 			protected Field classNameBasedLockField;
 			protected Field classLoaderField;
 			protected GetClassByNameFunction getClassByNameFunction;
-			
+
 			public ForSemeru(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -101,35 +100,35 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
 				return new ClassNameBasedLockSupplier() {
-					protected sun.misc.Unsafe unsafe = 
+					protected sun.misc.Unsafe unsafe =
 						ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 					protected Long classNameBasedLockHashTableOffset = unsafe.objectFieldOffset(
 						classNameBasedLockField
 					);
 					protected Long classLoaderFieldOffset = unsafe.objectFieldOffset(
 						classLoaderField
-					); 
-					
-					
+					);
+
+
 					@Override
 					public Hashtable<String, Object> get(ClassLoader classLoader) {
 						return (Hashtable<String, Object>)unsafe.getObject(classLoader, classNameBasedLockHashTableOffset);
 					}
-					
+
 					@Override
 					protected ClassLoader getClassLoader(Class<?> cls) {
 						return (ClassLoader)unsafe.getObject(cls, classLoaderFieldOffset);
 					}
-					
+
 				};
-			}	
-			
+			}
+
 			@Override
 			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
-				return new CleanableSupplier<Collection<Class<?>>>() {
+				return new CleanableSupplier<>() {
 					Hashtable<String, Object> classNameBasedLock;
 					Collection<Class<?>> loadedClasses = ConcurrentHashMap.newKeySet();
-					
+
 					@Override
 					public Collection<Class<?>> get() {
 						Hashtable<String, Object> loadedClassesHS = null;
@@ -137,17 +136,17 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 						while (loadedClassesHS == null) {
 							try {
 								if (loadedClassesHSTemp != null) {
-									loadedClassesHS = new Hashtable<String, Object>(
+									loadedClassesHS = new Hashtable<>(
 										loadedClassesHSTemp
 									);
 								} else {
-									loadedClassesHS = new Hashtable<String, Object>();
-								}						
+									loadedClassesHS = new Hashtable<>();
+								}
 							} catch (ConcurrentModificationException exc) {
 
 							}
 						}
-						
+
 						for (Entry<String, ?> entry : loadedClassesHS.entrySet()) {
 							try {
 								Class<?> cls = getClassByNameFunction.apply(entry.getKey(), false, classLoader, CleanableSupplier.class);
@@ -157,7 +156,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 							} catch (Throwable exc) {
 
 							}
-						}	
+						}
 						return loadedClasses;
 					}
 
@@ -168,33 +167,33 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 						}
 						loadedClasses.clear();
 					}
-					
+
 					private Hashtable<String, Object> getClassNameBasedLock() {
 						if (classNameBasedLock != null) {
 							return classNameBasedLock;
 						}
-						return classNameBasedLock = (Hashtable<String, Object>)classNameBasedLockSupplier.get(classLoader);
+						return classNameBasedLock = classNameBasedLockSupplier.get(classLoader);
 					}
-					
+
 				};
 			}
-			
+
 			protected static abstract class ClassNameBasedLockSupplier {
-				
+
 				protected abstract Hashtable<String, Object> get(ClassLoader classLoader);
-				
+
 				protected abstract ClassLoader getClassLoader(Class<?> cls);
-				
+
 			}
 		}
-		
+
 	}
-	
+
 	public static interface Native extends GetLoadedClassesRetrieverFunction {
-		
+
 		public static class ForJava7 implements Native {
 			protected Field classesField;
-			
+
 			public ForJava7(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -206,9 +205,9 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 				if (classLoader == null) {
 					throw new NullPointerException("Input classLoader parameter can't be null");
 				}
-				return new CleanableSupplier<Collection<Class<?>>>() {
+				return new CleanableSupplier<>() {
 					Collection<Class<?>> classes;
-					
+
 					@Override
 					public Collection<Class<?>> get() {
 						if (classes != null) {
@@ -224,39 +223,39 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 							classes.clear();
 						}
 					}
-					
+
 				};
 			}
-			
+
 			public static class ForSemeru extends GetLoadedClassesRetrieverFunction.ForJava7.ForSemeru {
-				
+
 				public ForSemeru(Map<Object, Object> context) {
 					super(context);
 				}
-				
+
 				@Override
 				protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
 					return new ClassNameBasedLockSupplier() {
-						protected ThrowExceptionFunction throwExceptionFunction = 
+						protected ThrowExceptionFunction throwExceptionFunction =
 								ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
-						
+
 						@Override
 						public Hashtable<String, Object> get(ClassLoader classLoader) {
 							return (Hashtable<String, Object>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classNameBasedLockField);
 						}
-						
+
 						@Override
 						protected ClassLoader getClassLoader(Class<?> cls) {
 							return (ClassLoader)io.github.toolfactory.narcissus.Narcissus.getField(cls, classLoaderField);
 						}
-						
-					};				
-							
+
+					};
+
 				}
-				
+
 			}
 		}
-		
+
 	}
-	
+
 }

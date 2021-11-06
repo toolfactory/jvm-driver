@@ -2,7 +2,7 @@
  * This file is derived from ToolFactory JVM driver.
  *
  * Hosted at: https://github.com/toolfactory/jvm-driver
- * 
+ *
  * Modified by: Roberto Gentili
  *
  * Modifications hosted at: https://github.com/burningwave/jvm-driver
@@ -33,7 +33,7 @@ package io.github.toolfactory.jvm;
 public interface Info {
 	public final static int[] CRITICAL_VERSIONS = new int[]{7, 9, 14, 17};
 
-	
+
 	boolean isCompressedOopsOffOn64BitHotspot();
 
 	boolean isCompressedOopsOffOn64Bit();
@@ -43,13 +43,13 @@ public interface Info {
 	boolean is64Bit();
 
 	int getVersion();
-	
-	
+
+
 	public static class Provider {
-		
+
 		public static Info getInfoInstance() {
 			return InfoImpl.getInstance();
 		}
-		
+
 	}
 }

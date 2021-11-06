@@ -64,18 +64,18 @@ public class Classes {
 		String name;
 		String superClassName;
 		String[] interfaceNames;
-		
+
 		private RawInfo(int modifiers, String rawName, String superClassRawName, String[] implementedInterfaceRawNames) {
 			this.modifiers = modifiers;
 			this.name = rawName;
 			this.superClassName = superClassRawName;
 			this.interfaceNames = implementedInterfaceRawNames;
 		}
-		
+
 		public int getModifiers() {
 			return modifiers;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
@@ -87,11 +87,11 @@ public class Classes {
 		public String[] getInterfaceNames() {
 			return interfaceNames;
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 	public static class File {
 		private static class Symbol{
 			static class Tag {
@@ -115,9 +115,9 @@ public class Classes {
 
 		    }
 		}
-		
+
 		public static class Reader {
-			
+
 			public static RawInfo retrieveInfo(
 				final byte[] classFileBuffer
 			) {
@@ -125,7 +125,7 @@ public class Classes {
 					@Override
 					public Byte apply(Integer index) {
 						return classFileBuffer[index];
-					};
+					}
 				});
 			}
 
@@ -136,10 +136,10 @@ public class Classes {
 					@Override
 					public Byte apply(Integer index) {
 						return classFileBuffer.get(index);
-					};
+					}
 				});
 			}
-			
+
 			private static RawInfo retrieveInfo(
 				final Function<Integer, Byte> byteSupplier
 			) {
@@ -212,7 +212,7 @@ public class Classes {
 					);
 				}
 				return null;
-				
+
 			}
 
 			private static String[] getInterfaceNames(
@@ -235,7 +235,7 @@ public class Classes {
 				}
 				return interfaces;
 			}
-			
+
 			private static String readUTF8(
 				Function<Integer, Byte> byteSupplier,
 				final int offset,
@@ -249,7 +249,7 @@ public class Classes {
 				}
 				return readUtf(byteSupplier, constantPoolEntryIndex, charBuffer, constantUtf8Values, cpInfoOffsets);
 			}
-			
+
 			private static String readUtf(
 				Function<Integer, Byte> byteSupplier,
 				final int constantPoolEntryIndex,

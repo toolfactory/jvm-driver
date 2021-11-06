@@ -46,13 +46,13 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public interface GetResourcesFunction extends TriFunction<String, Boolean, ClassLoader[], Collection<URL>>{
-	
+
 	public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders);
-	
+
 	public abstract class Abst  implements GetResourcesFunction {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> resourceFinder;
-		
+
 		public Abst(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			throwExceptionFunction =
@@ -61,20 +61,20 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 		}
 
 		protected abstract QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable;
-		
-		
+
+
 		@Override
 		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, ClassLoader[] resourceClassLoaders) {
 			Collection<URL> resources = new LinkedHashSet<>();
 			if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
 				return resourceFinder.apply(Thread.currentThread().getContextClassLoader(), resourceRelativePath, findFirst, resources);
-			}			
+			}
 			for (ClassLoader classLoader : resourceClassLoaders) {
 				resourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
 			}
 			return resources;
 		}
-		
+
 		@Override
 		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders) {
 			Collection<URL> resources = new LinkedHashSet<>();
@@ -86,18 +86,18 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			}
 			return resources;
 		}
-		
+
 	}
-	
+
 	public static class ForJava7 extends Abst {
-		
+
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			super(context);
 		}
 
 		@Override
 		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
-			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> () {
+			return new QuadFunction<> () {
 
 				@Override
 				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) {
@@ -116,20 +116,20 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 						return resources;
 					} catch (Throwable exc) {
 						return throwExceptionFunction.apply(exc);
-					}	
+					}
 				}
 			};
 		}
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static class ForJava9 extends ForJava7 {
-		
+
 		public ForJava9(final Map<Object, Object> context) throws Throwable {
 			super(context);
 		}
-		
+
 		@Override
 		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
 			final ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -137,9 +137,9 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			final GetClassByNameFunction getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
 			final GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 			final QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> superResourceFinder = super.buildResourceFinder(context);
-			
-			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {
-				
+
+			return new QuadFunction<>() {
+
 				final Class<?> jdk_internal_loader_BuiltinClassLoaderClass = functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get();
 				final Class<?> java_lang_module_ModuleReferenceClass = getClassByNameFunction.apply(
 					"java.lang.module.ModuleReference", false, this.getClass().getClassLoader(), this.getClass()
@@ -150,7 +150,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 				final Class<?> jdk_internal_loader_BuiltinClassLoader$loadedModuleClass = getClassByNameFunction.apply(
 					"jdk.internal.loader.BuiltinClassLoader$LoadedModule", false, this.getClass().getClassLoader(), this.getClass()
 				);
-				final Field jdk_internal_loader_BuiltinClassLoader_nameToModuleField = getDeclaredFieldFunction.apply(jdk_internal_loader_BuiltinClassLoaderClass, "nameToModule");				
+				final Field jdk_internal_loader_BuiltinClassLoader_nameToModuleField = getDeclaredFieldFunction.apply(jdk_internal_loader_BuiltinClassLoaderClass, "nameToModule");
 				final Field jdk_internal_loader_BuiltinClassLoader_ucpField = getDeclaredFieldFunction.apply(jdk_internal_loader_BuiltinClassLoaderClass, "ucp");
 				final Field jdk_internal_loader_BuiltinClassLoader_packageToModuleField = getDeclaredFieldFunction.apply(jdk_internal_loader_BuiltinClassLoaderClass, "packageToModule");
 				final GetFieldValueFunction getFieldValueFunction = functionProvider.getOrBuildObject(GetFieldValueFunction.class, context);
@@ -174,7 +174,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 					MethodType.methodType(
 						Enumeration.class, String.class, boolean.class
 					)
-				);	
+				);
 				@Override
 				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) {
 					try {
@@ -195,7 +195,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 										}
 									}
 								}
-							}					
+							}
 							for (Object moduleReference : nameToModule.values()) {
 								URL resource = findResourceInModule(classLoader, moduleReference, resourceRelativePath);
 								if (resource != null) {
@@ -224,12 +224,12 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 							return resources;
 						} else {
 							return superResourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
-						}					
+						}
 					} catch (Throwable exc) {
 						return throwExceptionFunction.apply(exc);
-					}	
+					}
 				}
-				
+
 			    private String toPackageName(String name) {
 			        int index = name.lastIndexOf('/');
 			        if (index == -1 || index == name.length()-1) {
@@ -238,7 +238,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 			            return name.substring(0, index).replace("/", ".");
 			        }
 			    }
-					
+
 				private URL findResourceInModule(ClassLoader classLoader, Object moduleReference, String resourceRelativePath) throws Throwable  {
 					ModuleReader moduleReader = (ModuleReader)jdk_internal_loader_BuiltinClassLoader_moduleReaderFor.invokeWithArguments(classLoader, moduleReference);
 					URI resourceURI = moduleReader.find(resourceRelativePath).orElse(null);

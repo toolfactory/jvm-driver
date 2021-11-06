@@ -38,24 +38,24 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("all")
 public interface GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
-	
-	
+
+
 	public static class ForJava7 implements GetPackageFunction{
 
 		public ForJava7(Map<Object, Object> context) {}
 
-	
+
 		@Override
 		public Package apply(ClassLoader inputOne, String packageName) {
 			return Package.getPackage(packageName);
 		}
-		
+
 	}
-	
+
 	public static class ForJava9 implements GetPackageFunction{
 		protected MethodHandle methodHandle;
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
@@ -63,7 +63,7 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 			MethodType methodType = MethodType.methodType(Package.class, String.class);
 			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
 			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
@@ -74,8 +74,8 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 				return throwExceptionFunction.apply(exc);
 			}
 		}
-		
+
 	}
-	
-	
+
+
 }

@@ -38,22 +38,22 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("all")
 public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object> {
-	
+
 	public static abstract class Abst implements SetFieldValueFunction {
-		
+
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public Abst(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
-		
+
 	}
-	
+
 	public static class ForJava7 extends Abst {
 		final sun.misc.Unsafe unsafe;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			super(context);
 			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
@@ -119,16 +119,16 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				} else {
 					unsafe.putCharVolatile(target, fieldOffset, ((Character)value).charValue());
 				}
-			}				
+			}
 		}
-		
+
 	}
-	
-	
+
+
 	public interface Native extends SetFieldValueFunction{
 
 		public static class ForJava7 extends Abst implements Native {
-			
+
 			public ForJava7(Map<Object, Object> context) {
 				super(context);
 			}
@@ -142,7 +142,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 					io.github.toolfactory.narcissus.Narcissus.setStaticField(field, value);
 				} else {
 					io.github.toolfactory.narcissus.Narcissus.setField(target, field, value);
-				}	
+				}
 			}
 		}
 	}

@@ -28,21 +28,19 @@ package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction.Native;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
 public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<String, ?>> {
-	
+
 	public static class ForJava7 implements GetLoadedPackagesFunction {
 		protected sun.misc.Unsafe unsafe;
 		protected Long fieldOffset;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
@@ -51,20 +49,20 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
 			);
 		}
-		
+
 		@Override
 		public Map<String, ?> apply(ClassLoader classLoader) {
 			return (Map<String, ?>)unsafe.getObject(classLoader, fieldOffset);
-		}		
-		
+		}
+
 	}
-	
-	
+
+
 	public static interface Native extends GetLoadedPackagesFunction {
-		
+
 		public static class ForJava7 implements Native {
 			Field packagesField;
-			
+
 			public ForJava7(Map<Object, Object> context) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -76,7 +74,7 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 				return (Map<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, packagesField);
 			}
 		}
-		
+
 	}
-	
+
 }

@@ -43,8 +43,8 @@ import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 @SuppressWarnings({"unchecked"})
 public class NativeDriver extends DefaultDriver {
-	
-	
+
+
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
@@ -90,57 +90,57 @@ public class NativeDriver extends DefaultDriver {
 							}
 						}
 						throw exception;
-					}	
+					}
 				}
 			);
 		return context;
 	}
-	
-	
+
+
 	protected Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
 		return ConsulterSupplier.Native.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {
 		return ThrowExceptionFunction.Native.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass() {
 		return GetLoadedPackagesFunction.Native.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends GetLoadedClassesRetrieverFunction> getGetLoadedClassesRetrieverFunctionClass() {
 		return GetLoadedClassesRetrieverFunction.Native.class;
 	}
 
-	
+
 	@Override
 	protected Class<? extends SetFieldValueFunction> getSetFieldValueFunctionClass() {
 		return SetFieldValueFunction.Native.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends GetFieldValueFunction> getGetFieldValueFunctionClass() {
 		return GetFieldValueFunction.Native.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends AllocateInstanceFunction> getAllocateInstanceFunctionClass() {
 		return AllocateInstanceFunction.Native.class;
 	}
-	
+
 
 	@Override
 	protected Class<? extends SetAccessibleFunction> getSetAccessibleFunctionClass() {
 		return SetAccessibleFunction.Native.class;
 	}
-	
+
 }

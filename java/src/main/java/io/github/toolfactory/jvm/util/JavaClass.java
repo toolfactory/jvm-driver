@@ -41,7 +41,7 @@ public class JavaClass {
 	protected JavaClass(ByteBuffer byteCode) {
 		this(Classes.File.Reader.retrieveInfo(BufferHandler.shareContent(byteCode)));
 	}
-	
+
 	protected JavaClass(byte[] byteCode) {
 		this(Classes.File.Reader.retrieveInfo(byteCode));
 	}
@@ -59,17 +59,17 @@ public class JavaClass {
 		for (int i = 0; i < interfaceRawNames.length; i++) {
 			interfaceNames[i] = retrieveName(interfaceRawNames[i]);
 		}
-		
+
 	}
-	
+
 	public static JavaClass create(ByteBuffer byteCode) {
 		return new JavaClass(byteCode);
 	}
-	
+
 	public static JavaClass create(byte[] byteCode) {
 		return new JavaClass(byteCode);
 	}
-	
+
 	private String retrieveName(String rawName) {
 		try {
 			return rawName.replace("/", ".");
@@ -78,7 +78,7 @@ public class JavaClass {
 			return null;
 		}
 	}
-	
+
 	private String[] retrieveNames(String rawName) {
 		String[] names = new String[3];
 		String rawPackageName = rawName.contains("/") ?
@@ -115,29 +115,29 @@ public class JavaClass {
 	public String[] getInterfaceNames() {
 		return interfaceNames;
 	}
-	
+
 	public boolean isPublic() {
 		return (modifiers & 0x0001) != 0;
 	}
-	
+
 	public boolean isFinal() {
 		return (modifiers & 0x0010) != 0;
 	}
-	
+
 	public boolean isInterface() {
 		return (modifiers & 0x0200) != 0;
 	}
-	
+
 	public boolean isAbstract() {
 		return (modifiers & 0x0400) != 0;
 	}
-	
+
 	public boolean isAnnotation() {
 		return (modifiers & 0x2000) != 0;
 	}
-	
+
 	public boolean isEnum() {
 		return (modifiers & 0x4000) != 0;
 	}
-	
+
 }

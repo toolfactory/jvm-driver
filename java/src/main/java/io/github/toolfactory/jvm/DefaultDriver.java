@@ -49,14 +49,14 @@ import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 
-public class DefaultDriver extends DriverAbst {	
-	
+public class DefaultDriver extends DriverAbst {
+
 	@Override
 	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {
 		return ThrowExceptionFunction.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends AllocateInstanceFunction> getAllocateInstanceFunctionClass() {
 		return AllocateInstanceFunction.class;
@@ -83,7 +83,7 @@ public class DefaultDriver extends DriverAbst {
 
 	@Override
 	protected Class<? extends ConsulterSupplyFunction> getConsulterSupplyFunctionClass() {
-		return (Class<? extends ConsulterSupplyFunction>)ConsulterSupplyFunction.class;
+		return ConsulterSupplyFunction.class;
 	}
 
 
@@ -127,8 +127,8 @@ public class DefaultDriver extends DriverAbst {
 	protected Class<? extends GetPackageFunction> getGetPackageFunctionClass() {
 		return GetPackageFunction.class;
 	}
-	
-	
+
+
 	@Override
 	protected Class<? extends GetResourcesFunction> getGetResourcesFunctionClass() {
 		return GetResourcesFunction.class;
@@ -139,7 +139,7 @@ public class DefaultDriver extends DriverAbst {
 	protected Class<? extends GetClassByNameFunction> getGetClassByNameFunctionClass() {
 		return GetClassByNameFunction.class;
 	}
-	
+
 
 	@Override
 	protected Class<? extends BuiltinClassLoaderClassSupplier> getBuiltinClassLoaderClassSupplierClass() {
@@ -170,5 +170,5 @@ public class DefaultDriver extends DriverAbst {
 		return GetLoadedPackagesFunction.class;
 	}
 
-	
+
 }

@@ -29,20 +29,20 @@ package io.github.toolfactory.jvm.util;
 import io.github.toolfactory.jvm.function.template.Function;
 
 public abstract class FunctionAdapter<F, I, O> implements Function<I, O> {
-	
+
 	protected F function;
-	
+
 	public FunctionAdapter() {}
-	
+
 	public FunctionAdapter(F function) {
 		this.function = function;
 	}
-	
+
 	public FunctionAdapter<F, I, O> setFunction(F function) {
 		this.function = function;
 		return this;
 	}
-	
+
 	public F getFunction() {
 		return this.function;
 	}

@@ -108,23 +108,28 @@ public class InfoImpl implements Info {
         this.compressedRefsEnabled = compressedOops;
     }
 
-    public boolean isCompressedOopsOffOn64BitHotspot() {
+    @Override
+	public boolean isCompressedOopsOffOn64BitHotspot() {
         return is64BitHotspot && !compressedRefsEnabled;
     }
 
-    public boolean isCompressedOopsOffOn64Bit() {
+    @Override
+	public boolean isCompressedOopsOffOn64Bit() {
         return is64Bit && !compressedRefsEnabled;
     }
 
-    public boolean is32Bit() {
+    @Override
+	public boolean is32Bit() {
     	return is32Bit;
     }
 
-    public boolean is64Bit() {
+    @Override
+	public boolean is64Bit() {
     	return is64Bit;
     }
 
-    public int getVersion() {
+    @Override
+	public int getVersion() {
     	return version;
     }
 

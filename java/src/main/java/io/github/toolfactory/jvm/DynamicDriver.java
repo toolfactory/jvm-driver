@@ -42,7 +42,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
 public class DynamicDriver extends DefaultDriver {
-	
+
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
@@ -77,7 +77,7 @@ public class DynamicDriver extends DefaultDriver {
 						return objectProvider.getOrBuildObject(GetLoadedPackagesFunction.Native.class, context);
 					}
 					throw exc;
-				}	
+				}
 			}
 		);
 		return context;

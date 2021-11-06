@@ -38,21 +38,21 @@ import io.github.toolfactory.jvm.util.Streams;
 
 
 public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
-	
+
 	public static class ForJava7 implements ClassLoaderDelegateClassSupplier {
-		
+
 		public ForJava7(Map<Object, Object> context) {}
-		
+
 		@Override
 		public Class<?> get() {
 			return null;
 		}
-		
+
 	}
-	
+
 	public static class ForJava9 implements ClassLoaderDelegateClassSupplier{
 		protected Class<?> cls;
-		
+
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
 			try (
 				InputStream inputStream = Classes.class.getResourceAsStream(
@@ -63,17 +63,17 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 				cls = functionProvider.getOrBuildObject(
 					DefineHookClassFunction.class, context
 				).apply(
-					functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get(), 
+					functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get(),
 					Streams.toByteArray(inputStream)
 				);
 			}
 		}
-		
+
 		@Override
 		public Class<?> get() {
 			return cls;
 		}
-		
+
 	}
-	
+
 }

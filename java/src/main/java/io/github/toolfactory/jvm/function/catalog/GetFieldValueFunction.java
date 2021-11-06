@@ -37,11 +37,11 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("all")
 public interface GetFieldValueFunction extends BiFunction<Object, Field, Object> {
-	
-	
+
+
 	public static class ForJava7 implements GetFieldValueFunction {
 		protected sun.misc.Unsafe unsafe;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 		}
@@ -106,11 +106,11 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 			}
 		}
 	}
-	
+
 	public static interface Native extends GetFieldValueFunction {
-		
+
 		public static class ForJava7 implements Native {
-			
+
 			public ForJava7(Map<Object, Object> context) {}
 
 			@Override
@@ -122,6 +122,6 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 				}
 			}
 		}
-		
+
 	}
 }

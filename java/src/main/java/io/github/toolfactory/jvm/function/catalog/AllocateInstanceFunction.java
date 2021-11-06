@@ -27,10 +27,6 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaConversionException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Function;
@@ -39,11 +35,11 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("all")
 public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
-	
+
 	public static class ForJava7 implements AllocateInstanceFunction {
 		final sun.misc.Unsafe unsafe;
 		final ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
@@ -59,21 +55,21 @@ public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
 				return throwExceptionFunction.apply(exc);
 			}
 		}
-		
+
 	}
 
 	public static interface Native extends AllocateInstanceFunction {
-		
+
 		public static class ForJava7 implements Native {
-			
+
 			public ForJava7(Map<Object, Object> context) {}
-			
+
 			@Override
 			public Object apply(Class<?> cls) {
 				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
 			}
-			
+
 		}
 	}
-	
+
 }

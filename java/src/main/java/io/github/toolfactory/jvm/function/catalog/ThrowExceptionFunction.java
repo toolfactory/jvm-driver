@@ -36,11 +36,12 @@ import io.github.toolfactory.jvm.util.Strings;
 
 @SuppressWarnings("all")
 public interface ThrowExceptionFunction extends Consumer<Throwable> {
-	
+
 	public <T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements);
-	
+
 	public static abstract class Abst implements ThrowExceptionFunction {
-		
+
+		@Override
 		public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
 			Throwable exception = null;
 			if (exceptionOrMessage instanceof String) {
@@ -60,37 +61,37 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 			accept(exception);
 			return null;
 		}
-		
+
 	}
-	
+
 	public static class ForJava7 extends Abst {
 		protected sun.misc.Unsafe unsafe;
-		
+
 		public ForJava7(Map<Object, Object> context) {
 			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 		}
 
 		@Override
 		public void accept(Throwable exception) {
-			unsafe.throwException(exception);			
+			unsafe.throwException(exception);
 		}
 
-		
+
 	}
 
 	public static interface Native extends ThrowExceptionFunction {
-		
+
 		public static class ForJava7 extends Abst implements Native {
-			
+
 			public ForJava7(Map<Object, Object> context) {}
-			
+
 			@Override
 			public void accept(Throwable exception) {
-				io.github.toolfactory.narcissus.Narcissus.sneakyThrow(exception);			
+				io.github.toolfactory.narcissus.Narcissus.sneakyThrow(exception);
 			}
-			
+
 		}
 	}
-	
-	
+
+
 }

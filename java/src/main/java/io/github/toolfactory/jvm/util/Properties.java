@@ -40,8 +40,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class Properties {
-	
-	
+
+
 	public static Map<BigDecimal, java.util.Properties> loadFromResources(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
 		Map<URL, InputStream> resources = Resources.getAsInputStreams(resRelPath, classLoaders);
 		TreeMap<BigDecimal, java.util.Properties> orderedProperties = new TreeMap<>();
@@ -72,7 +72,7 @@ public class Properties {
 					}
 			    } else {
 			    	propertiesWithoutPriority.add(props);
-			    }		   
+			    }
 		    }
 		}
 		if (!propertiesWithoutPriority.isEmpty()) {
@@ -86,8 +86,8 @@ public class Properties {
 		}
 		return orderedProperties;
 	}
-	
-	
+
+
 	private static BigDecimal stringToBigDecimal(String value, DecimalFormat decimalFormat) throws ParseException {
 		value =	value.trim();
 		if (value.contains(".")) {
@@ -98,13 +98,13 @@ public class Properties {
 		}
 		return ((BigDecimal)decimalFormat.parse(value));
 	}
-	
-	
+
+
 	public static java.util.Properties loadFromResourceWithHigherPropertyValue(ClassLoader resourceClassLoader, String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
 		Map<BigDecimal, java.util.Properties> orderedProperties = ((TreeMap<BigDecimal, java.util.Properties>)loadFromResources(resRelPath, propertyName, classLoaders)).descendingMap();
 		return orderedProperties.entrySet().iterator().next().getValue();
 	}
-	
+
 	public static java.util.Properties loadFromResourcesAndMerge(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
 		Map<BigDecimal, java.util.Properties> orderedProperties = loadFromResources(resRelPath, propertyName, classLoaders);
 		java.util.Properties properties = new java.util.Properties();
@@ -114,5 +114,5 @@ public class Properties {
 		properties.remove(propertyName);
 		return properties;
 	}
-	
+
 }

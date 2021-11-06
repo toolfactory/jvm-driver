@@ -42,19 +42,19 @@ import io.github.toolfactory.jvm.util.Streams;
 
 @SuppressWarnings("unchecked")
 public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Boolean> {
-	
+
 	public static abstract class Abst<B> extends BiConsumerAdapter<B, AccessibleObject, Boolean> implements SetAccessibleFunction {
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public Abst(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 	}
-	
+
 	public static class ForJava7 extends Abst<BiConsumer<AccessibleObject, Boolean>> {
-		
+
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
 			super(context);
 			final Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", AccessibleObject.class, boolean.class);
@@ -75,24 +75,24 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 				}
 			);
 		}
-		
+
 		@Override
 		public void accept(AccessibleObject accessibleObject, Boolean flag) {
 			function.accept(accessibleObject, flag);
 		}
-		
+
 	}
-	
-	
+
+
 	public static class ForJava9 extends Abst<java.util.function.BiConsumer<AccessibleObject, Boolean>> {
-		
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, IOException, NoSuchFieldException {			
+
+		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, IOException, NoSuchFieldException {
 			super(context);
 			try (
 				InputStream inputStream = this.getClass().getResourceAsStream(
 					"AccessibleSetterInvokerForJDK9.bwc"
 				);
-			) {	
+			) {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				Class<?> methodHandleWrapperClass = functionProvider.getOrBuildObject(
 					DefineHookClassFunction.class, context
@@ -105,22 +105,22 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 					functionProvider.getOrBuildObject(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			}
 		}
-		
+
 		@Override
 		public void accept(AccessibleObject accessibleObject, Boolean flag) {
 			function.accept(accessibleObject, flag);
 		}
-		
+
 	}
-	
-	public static interface Native extends SetAccessibleFunction {		
-		
+
+	public static interface Native extends SetAccessibleFunction {
+
 		public static class ForJava7 extends Abst<BiConsumer<AccessibleObject, Boolean>> implements Native {
-			
+
 			public ForJava7(Map<Object, Object> context) throws IllegalAccessException {
 				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
-				final GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);		
+				final GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
 				Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{AccessibleObject.class, boolean.class});
 				final MethodHandle accessibleSetterMethodHandle = functionProvider.getOrBuildObject(
 					ConsulterSupplier.class, context
@@ -138,19 +138,19 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 					}
 				);
 			}
-			
+
 			@Override
 			public void accept(AccessibleObject accessibleObject, Boolean flag) {
 				function.accept(accessibleObject, flag);
 			}
 		}
-		
+
 		public static class ForJava9 extends Abst<BiConsumer<AccessibleObject, Boolean>> implements Native {
-			
+
 			public ForJava9(Map<Object, Object> context) throws IllegalAccessException {
 				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
-				GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);		
+				GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
 				final Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{boolean.class});
 				setFunction(
 					new BiConsumer<AccessibleObject, Boolean>() {
@@ -165,7 +165,7 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 					}
 				);
 			}
-			
+
 			@Override
 			public void accept(AccessibleObject accessibleObject, Boolean flag) {
 				function.accept(accessibleObject, flag);

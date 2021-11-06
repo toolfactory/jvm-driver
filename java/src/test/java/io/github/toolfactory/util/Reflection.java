@@ -39,17 +39,17 @@ import io.github.toolfactory.jvm.Driver;
 import io.github.toolfactory.jvm.function.template.Function;
 
 public class Reflection {
-	private Driver driver;	
-	
-	
+	private Driver driver;
+
+
 	private Reflection(Driver driver) {
 		this.driver = driver;
 	}
-	
+
 	public Driver getDriver() {
 		return this.driver;
 	}
-	
+
 	public Collection<Method> getDeclaredMethods(Class<?> cls) {
 		Set<Method> declaredMembers = new LinkedHashSet<>();
 		for (Method method : driver.getDeclaredMethods(cls)) {
@@ -57,8 +57,8 @@ public class Reflection {
 		}
 		return declaredMembers;
 	}
-	
-	
+
+
 	public Collection<Method> getAllMethods(Class<?> cls) {
 		return getAll(
 			cls,
@@ -70,17 +70,17 @@ public class Reflection {
 			},
 			new HashSet<Class<?>>(),
 			new LinkedHashSet<Method>()
-		);		
+		);
 	}
-	
+
 	public <T> T getFieldValue(Object target, Field field) {
 		return driver.getFieldValue(target, field);
 	}
-	
+
 	public void setFieldValue(Object target, Field field, Object value) {
 		driver.setFieldValue(target, field, value);
 	}
-	
+
 
 	public Field getDeclaredField(Class<?> cls, String name) {
 		for (Field member : driver.getDeclaredFields(cls)) {
@@ -90,7 +90,7 @@ public class Reflection {
 		}
 		return null;
 	}
-	
+
 	public Collection<Field> getDeclaredFields(Class<?> cls) {
 		Set<Field> declaredMembers = new LinkedHashSet<>();
 		for (Field member : driver.getDeclaredFields(cls)) {
@@ -98,8 +98,8 @@ public class Reflection {
 		}
 		return declaredMembers;
 	}
-	
-	
+
+
 	public Collection<Field> getAllFields(Class<?> cls) {
 		return getAll(
 			cls,
@@ -111,10 +111,10 @@ public class Reflection {
 			},
 			new HashSet<Class<?>>(),
 			new LinkedHashSet<Field>()
-		);		
+		);
 	}
-	
-	
+
+
 	public Collection<Constructor<?>> getDeclaredConstructors(Class<?> cls) {
 		Set<Constructor<?>> declaredMembers = new LinkedHashSet<>();
 		for (Constructor<?> member : driver.getDeclaredConstructors(cls)) {
@@ -122,8 +122,8 @@ public class Reflection {
 		}
 		return declaredMembers;
 	}
-	
-	
+
+
 	public Collection<Constructor<?>> getAllConstructors(Class<?> cls) {
 		return getAll(
 			cls,
@@ -135,15 +135,15 @@ public class Reflection {
 			},
 			new HashSet<Class<?>>(),
 			new LinkedHashSet<Constructor<?>>()
-		);		
+		);
 	}
-	
+
 	private <M extends Member> Collection<M> getAll(
-		Class<?> cls, 
+		Class<?> cls,
 		Function<Class<?>, M[]> memberSupplier,
 		Collection<Class<?>> visitedInterfaces,
 		Collection<M> collection
-	) {	
+	) {
 		for (M member : memberSupplier.apply(cls)) {
 			collection.add(member);
 		}
@@ -159,32 +159,32 @@ public class Reflection {
 				memberSupplier,
 				visitedInterfaces,
 				collection
-			) : 
+			) :
 			collection;
 	}
-	
+
 	public static class Factory {
-		
+
 		public static Reflection getNew() {
 			return getNewWith(Driver.Factory.getNew());
 		}
-		
+
 		public static Reflection getNewWith(Driver driver) {
 			return new Reflection(driver);
 		}
-		
+
 		public static Reflection getNewWithDynamicDriver() {
 			return getNewWith(Driver.Factory.getNewDynamic());
 		}
-		
+
 		public static Reflection getNewWithDefaultDriver() {
 			return getNewWith(Driver.Factory.getNewDefault());
 		}
-		
+
 		public static Reflection getNewWithHybridDriver() {
 			return getNewWith(Driver.Factory.getNewHybrid());
 		}
-		
+
 		public static Reflection getNewWithNativeDriver() {
 			return getNewWith(Driver.Factory.getNewNative());
 		}

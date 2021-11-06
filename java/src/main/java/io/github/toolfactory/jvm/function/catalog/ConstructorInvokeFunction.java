@@ -38,12 +38,12 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 public interface ConstructorInvokeFunction extends BiFunction<Constructor<?>, Object[], Object> {
-	
-	public static class Abst implements ConstructorInvokeFunction { 
-	
+
+	public static class Abst implements ConstructorInvokeFunction {
+
 		protected MethodHandle methodHandle;
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		@Override
 		public Object apply(Constructor<?> ctor, Object[] params) {
 			try {
@@ -53,9 +53,9 @@ public interface ConstructorInvokeFunction extends BiFunction<Constructor<?>, Ob
 			}
 		}
 	}
-	
+
 	public static class ForJava7 extends Abst {
-		
+
 		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
@@ -68,9 +68,9 @@ public interface ConstructorInvokeFunction extends BiFunction<Constructor<?>, Ob
 		}
 
 	}
-	
+
 	public static class ForJava9 extends Abst {
-		
+
 		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
@@ -80,7 +80,7 @@ public interface ConstructorInvokeFunction extends BiFunction<Constructor<?>, Ob
 			methodHandle = consulter.unreflect(method);
 			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
-		
+
 	}
-	
+
 }

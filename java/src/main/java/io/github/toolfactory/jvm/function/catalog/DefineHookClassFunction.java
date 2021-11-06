@@ -40,22 +40,22 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 @SuppressWarnings("all")
 public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Class<?>> {
-	
+
 	public static abstract class Abst implements DefineHookClassFunction {
 		protected MethodHandle defineHookClassMethodHandle;
 		protected ThrowExceptionFunction throwExceptionFunction;
-		
+
 		public Abst(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 	}
-	
-	
+
+
 	public static class ForJava7 extends Abst {
 		protected sun.misc.Unsafe unsafe;
-		
+
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -70,11 +70,11 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 				unsafe.getClass()
 			);
 		}
-		
+
 		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
 			return (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(consulter, unsafe.getClass());
 		}
-		
+
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) {
 			try {
@@ -83,28 +83,28 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 				return throwExceptionFunction.apply(exc);
 			}
 		}
-		
+
 	}
-	
-	
+
+
 	public static class ForJava9 extends ForJava7 {
-		
+
 		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 		}
-		
+
 		@Override
 		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
 			return (MethodHandles.Lookup)lookupMethod.invokeWithArguments(unsafe.getClass(), consulter);
 		}
-		
+
 	}
-	
-	
+
+
 	public static class ForJava17 extends Abst {
 		protected MethodHandle privateLookupInMethodHandle;
 		protected MethodHandles.Lookup consulter;
-		
+
 		public ForJava17(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
 			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -118,7 +118,7 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 			privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
 		}
 
-		
+
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) {
 			try {
@@ -138,7 +138,7 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 				return throwExceptionFunction.apply(exc);
 			}
 		}
-		
+
 	}
-	
+
 }

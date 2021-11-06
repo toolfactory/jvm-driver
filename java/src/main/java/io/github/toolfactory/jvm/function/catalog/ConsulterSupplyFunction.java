@@ -41,21 +41,21 @@ import io.github.toolfactory.jvm.util.Streams;
 
 @SuppressWarnings("unchecked")
 public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandles.Lookup> {
-	
+
 	public static abstract class Abst<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> implements ConsulterSupplyFunction {
-		
+
 	}
-	
-	
+
+
 	public static class ForJava7 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get();
 			final MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
 			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context); 
+				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 			setFunction(
-				new Function<Class<?>, MethodHandles.Lookup>() { 
+				new Function<Class<?>, MethodHandles.Lookup>() {
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) {
 						try {
@@ -67,16 +67,16 @@ public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandle
 				}
 			);
 		}
-		
+
 		@Override
 		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
-		
+
 	}
-	
+
 	public static class ForJava9 extends Abst<java.util.function.Function<Class<?>, MethodHandles.Lookup>>  {
-		
+
 		public ForJava9(Map<Object, Object> context) throws IOException, NoSuchFieldException, SecurityException {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			try (
@@ -97,11 +97,11 @@ public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandle
 			}
 		}
 
-		
+
 		@Override
 		public MethodHandles.Lookup apply(Class<?> input) {
 			return function.apply(input);
 		}
-		
+
 	}
 }

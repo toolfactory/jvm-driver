@@ -46,9 +46,9 @@ import io.github.toolfactory.jvm.util.Properties;
 
 
 public interface Driver extends Closeable {
-	
+
 	public <D extends Driver> D init();
-	
+
 	public <T> T allocateInstance(Class<?> cls);
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
@@ -56,9 +56,9 @@ public interface Driver extends Closeable {
 	public Class<?> getBuiltinClassLoaderClass();
 
 	public Class<?> getClassLoaderDelegateClass();
-	
+
 	public Class<?> getClassByName(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller);
-	
+
 	public MethodHandles.Lookup getConsulter(Class<?> cls);
 
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls);
@@ -70,11 +70,11 @@ public interface Driver extends Closeable {
 	public <T> T getFieldValue(Object target, Field field);
 
 	public Package getPackage(ClassLoader classLoader, String packageName);
-	
+
 	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, ClassLoader... classLoaders);
-	
+
 	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, Collection<ClassLoader> classLoaders);
-	
+
 	public <T> T invoke(Object target, Method method, Object[] params);
 
 	public boolean isBuiltinClassLoader(ClassLoader classLoader);
@@ -86,9 +86,9 @@ public interface Driver extends Closeable {
 	public CleanableSupplier<Collection<Class<?>>> getLoadedClassesRetriever(ClassLoader classLoader);
 
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
-	
+
 	public void setAccessible(AccessibleObject object, boolean flag);
-	
+
 	public void setFieldValue(Object target, Field field, Object value);
 
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
@@ -96,15 +96,15 @@ public interface Driver extends Closeable {
 	@Override
 	public void close();
 
-	
+
 	@SuppressWarnings("unchecked")
 	public static class Factory {
 		private static Map<String, Constructor<? extends Driver>> driverConstructors;
 
-		
+
 		static {
 			try {
-				Set<ClassLoader> classLoaders = new HashSet<ClassLoader>();
+				Set<ClassLoader> classLoaders = new HashSet<>();
 				classLoaders.add(Factory.class.getClassLoader());
 				classLoaders.add(Thread.currentThread().getContextClassLoader());
 				java.util.Properties configuration = Properties.loadFromResourcesAndMerge(
@@ -112,7 +112,7 @@ public interface Driver extends Closeable {
 					"priority-of-this-configuration-file",
 					classLoaders.toArray(new ClassLoader[classLoaders.size()])
 				);
-				driverConstructors = new ConcurrentHashMap<String, Constructor<? extends Driver>>();
+				driverConstructors = new ConcurrentHashMap<>();
 				setDriverClass("defaultDriverClass", configuration.getProperty("default-driver.class"));
 				setDriverClass("dynamicDriverClass", configuration.getProperty("dynamic-driver.class"));
 				setDriverClass("hybridDriverClass", configuration.getProperty("hybrid-driver.class"));
@@ -121,24 +121,24 @@ public interface Driver extends Closeable {
 				throw new FactoryException(exc);
 			}
 		}
-		
-		
+
+
 		public static Driver getNew() {
 			try {
 				try {
 					return getNewDefault().init();
 				} catch (InitializeException exc) {
-					return getNewHybrid().init(); 
+					return getNewHybrid().init();
 				}
 			} catch (InitializeException exc) {
 				return getNewNative().init();
 			}
 		}
-		
+
 		public static <D extends Driver> D getNew(String className) throws Throwable {
 			return (D)Class.forName(className).getDeclaredConstructor().newInstance();
 		}
-		
+
 		private static void setDriverClass(String name, String className) {
 			try {
 				setDriverClass(name, Class.forName(className));
@@ -146,50 +146,50 @@ public interface Driver extends Closeable {
 				throw new FactoryException(exc);
 			}
 		}
-		
+
 		private static void setDriverClass(String name, Class<?> cls) {
 			try {
 				driverConstructors.put(
-					name, 
+					name,
 					(Constructor<? extends Driver>)cls.getDeclaredConstructor()
 				);
 			} catch (NoSuchMethodException | SecurityException exc) {
 				throw new FactoryException(exc);
 			}
 		}
-		
+
 		public static void setDefaultDriverClass(Class<? extends Driver> cls) {
 			setDriverClass("defaultDriverClass", cls);
 		}
-		
+
 		public static void setDefaultDriverClass(String className) {
 			setDriverClass("defaultDriverClass", className);
 		}
-		
+
 		public static void setHybridDriverClass(Class<? extends Driver> cls) {
 			setDriverClass("hybridDriverClass", cls);
 		}
-		
+
 		public static void setHybridDriverClass(String className) {
 			setDriverClass("hybridDriverClass", className);
 		}
-		
+
 		public static void setDynamicDriverClass(Class<? extends Driver> cls) {
 			setDriverClass("dynamicDriverClass", cls);
 		}
-		
+
 		public static void setDynamicDriverClass(String className) {
 			setDriverClass("dynamicDriverClass", className);
 		}
-		
+
 		public static void setNativeDriverClass(Class<? extends Driver> cls) {
 			setDriverClass("nativeDriverClass", cls);
 		}
-		
+
 		public static void setNativeDriverClass(String className) {
 			setDriverClass("nativeDriverClass", className);
 		}
-		
+
 		public static <D extends Driver> D getNewDefault() {
 			try {
 				return ((D)driverConstructors.get("defaultDriverClass").newInstance());
@@ -198,7 +198,7 @@ public interface Driver extends Closeable {
 				throw new InstantiateException(exc);
 			}
 		}
-		
+
 		public static <D extends Driver> D getNewDynamic() {
 			try {
 				return ((D)driverConstructors.get("dynamicDriverClass").newInstance());
@@ -207,7 +207,7 @@ public interface Driver extends Closeable {
 				throw new InstantiateException(exc);
 			}
 		}
-		
+
 		public static <D extends Driver> D getNewHybrid() {
 			try {
 				return ((D)driverConstructors.get("hybridDriverClass").newInstance());
@@ -216,7 +216,7 @@ public interface Driver extends Closeable {
 				throw new InstantiateException(exc);
 			}
 		}
-		
+
 		public static <D extends Driver> D getNewNative() {
 			try {
 				return ((D)driverConstructors.get("nativeDriverClass").newInstance());
@@ -225,18 +225,18 @@ public interface Driver extends Closeable {
 				throw new InstantiateException(exc);
 			}
 		}
-		
+
 		public static class	FactoryException extends RuntimeException {
 
 			private static final long serialVersionUID = 6332920978175279534L;
-			
+
 			public FactoryException(Throwable cause) {
 		        super(cause);
 		    }
 
 		}
 	}
-	
+
 	public static class InitializeException extends RuntimeException {
 
 		private static final long serialVersionUID = -1351844562568567842L;
@@ -244,13 +244,13 @@ public interface Driver extends Closeable {
 		public InitializeException(String message, Throwable cause) {
 	        super(message, cause);
 	    }
-		
+
 		public InitializeException(String message) {
 	        super(message);
 	    }
 
 	}
-	
+
 	public static class	InstantiateException extends RuntimeException {
 
 		private static final long serialVersionUID = 558903509767014098L;
@@ -260,5 +260,5 @@ public interface Driver extends Closeable {
 	    }
 
 	}
-	
+
 }
