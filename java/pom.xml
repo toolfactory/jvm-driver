@@ -24,18 +24,20 @@
 	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 	OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-    	<groupId>io.github.toolfactory</groupId>
-    	<artifactId>jvm-driver-parent</artifactId>
-        <version>${revision}</version>
-    </parent>
-	
+		<groupId>io.github.toolfactory</groupId>
+		<artifactId>jvm-driver-parent</artifactId>
+		<version>${revision}</version>
+	</parent>
+
 	<artifactId>jvm-driver</artifactId>
 	<version>8.4.1-SNAPSHOT</version>
-	
+
 	<packaging>jar</packaging>
 
 	<properties>
@@ -60,13 +62,13 @@
 	</properties>
 
 	<dependencies>
-				
+
 		<dependency>
 			<groupId>io.github.toolfactory</groupId>
 			<artifactId>narcissus</artifactId>
 			<version>${narcissus.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
@@ -139,7 +141,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-							<phase>
+						<phase>
 								compile
 							</phase>
 						<configuration>
@@ -157,19 +159,22 @@
 						</configuration>
 					</execution>
 					<execution>
-                        <id>add-module-info-to-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
-                                    <zipfileset prefix="META-INF/versions/9" dir="${project.build.directory}/classes" includes="module-info.class" />
-                                </jar>
-                            </target>
-                        </configuration>
-                    </execution>
+						<id>add-module-info-to-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<jar update="true"
+									destfile="${project.build.directory}/${project.build.finalName}.jar">
+									<zipfileset prefix="META-INF/versions/9"
+										dir="${project.build.directory}/classes"
+										includes="module-info.class" />
+								</jar>
+							</target>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -182,9 +187,7 @@
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
 							<release>9</release>
-						<!-- <excludes>
-								<exclude>module-info.java</exclude>
-							</excludes> -->
+							<!-- <excludes> <exclude>module-info.java</exclude> </excludes> -->
 						</configuration>
 					</execution>
 					<execution>
@@ -243,7 +246,7 @@
 						<manifestEntries>
 							<built-by>ToolFactory</built-by>
 							<Bundle-Vendor>ToolFactory (Luke Hutchison, Roberto Gentili)</Bundle-Vendor>
-                            <Multi-Release>true</Multi-Release>
+							<Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
 				</configuration>
