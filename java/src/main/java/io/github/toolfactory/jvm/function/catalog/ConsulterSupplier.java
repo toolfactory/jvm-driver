@@ -33,8 +33,11 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Info;
+import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.Strings;
+import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -136,10 +139,30 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 
 	public static interface Native extends ConsulterSupplier {
-
+		
+		public static abstract class Abst extends ConsulterSupplier.Abst {
+			
+			public Abst(Map<Object, Object> context) throws InitializeException {
+				super(context);
+				checkNativeEngine();
+			}
+			
+			protected void checkNativeEngine() throws InitializeException {
+				if (!Narcissus.libraryLoaded) {
+					throw new InitializeException(
+						Strings.compile(
+							"Could not initialize the native engine {}", 
+							io.github.toolfactory.narcissus.Narcissus.class.getName()
+						)
+					);
+				}
+			}
+			
+		}
+		
 		public static class ForJava7 extends Abst implements Native {
 
-			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException {
+			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
 				super(context);
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
@@ -149,9 +172,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 			}
 
-			public static class ForSemeru extends Abst implements Native {
+			public static class ForSemeru extends Native.Abst implements Native {
 
-				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException {
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
 					super(context);
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
@@ -165,9 +188,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 		public static interface ForJava9 extends Native, ConsulterSupplier {
 
-			public static class ForSemeru extends Abst implements Native.ForJava9 {
+			public static class ForSemeru extends Native.Abst implements Native.ForJava9 {
 
-				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InitializeException {
 					super(context);
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
@@ -184,7 +207,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 			public static class ForSemeru extends ConsulterSupplier.Native.ForJava7.ForSemeru implements Native.ForJava14 {
 
-				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InitializeException {
 					super(context);
 				}
 			}
@@ -197,13 +220,13 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 		public static class ForJava17 extends Native.ForJava7 implements Hybrid {
 
-			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
+			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
 				super(context);
 			}
 
 			public static class ForSemeru extends ConsulterSupplier.Native.ForJava9.ForSemeru implements Hybrid {
 
-				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InitializeException {
 					super(context);
 				}
 			}

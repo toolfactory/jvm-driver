@@ -31,9 +31,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.util.Classes;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.Strings;
+import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -129,8 +132,20 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 		public static class ForJava7 extends Abst implements Native {
 
-			public ForJava7(Map<Object, Object> context) {
+			public ForJava7(Map<Object, Object> context) throws InitializeException {
 				super(context);
+				checkNativeEngine();
+			}
+			
+			protected void checkNativeEngine() throws InitializeException {
+				if (!Narcissus.libraryLoaded) {
+					throw new InitializeException(
+						Strings.compile(
+							"Could not initialize the native engine {}", 
+							io.github.toolfactory.narcissus.Narcissus.class.getName()
+						)
+					);
+				}
 			}
 
 			@Override

@@ -35,9 +35,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.CleanableSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.Strings;
+import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -194,12 +197,24 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 		public static class ForJava7 implements Native {
 			protected Field classesField;
 
-			public ForJava7(Map<Object, Object> context) {
+			public ForJava7(Map<Object, Object> context) throws InitializeException {
+				checkNativeEngine();
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
-
+			
+			protected void checkNativeEngine() throws InitializeException {
+				if (!Narcissus.libraryLoaded) {
+					throw new InitializeException(
+						Strings.compile(
+							"Could not initialize the native engine {}", 
+							io.github.toolfactory.narcissus.Narcissus.class.getName()
+						)
+					);
+				}
+			}
+			
 			@Override
 			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
 				if (classLoader == null) {

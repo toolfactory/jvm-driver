@@ -34,10 +34,13 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.util.BiConsumerAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Streams;
+import io.github.toolfactory.jvm.util.Strings;
+import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("unchecked")
@@ -147,8 +150,9 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 
 		public static class ForJava9 extends Abst<BiConsumer<AccessibleObject, Boolean>> implements Native {
 
-			public ForJava9(Map<Object, Object> context) throws IllegalAccessException {
+			public ForJava9(Map<Object, Object> context) throws IllegalAccessException, InitializeException {
 				super(context);
+				checkNativeEngine();
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
 				final Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{boolean.class});
@@ -164,6 +168,17 @@ public interface SetAccessibleFunction extends BiConsumer<AccessibleObject, Bool
 						}
 					}
 				);
+			}
+			
+			protected void checkNativeEngine() throws InitializeException {
+				if (!Narcissus.libraryLoaded) {
+					throw new InitializeException(
+						Strings.compile(
+							"Could not initialize the native engine {}", 
+							io.github.toolfactory.narcissus.Narcissus.class.getName()
+						)
+					);
+				}
 			}
 
 			@Override
