@@ -35,8 +35,10 @@ To use ToolFactory JMV Driver as a Java module, add the following to your `modul
 ```java
 //Mandatory if you use the dynamic, hybrid or native driver
 requires io.github.toolfactory.narcissus;
+
 //Mandatory if you use the default, dynamic or hybrid driver
 requires jdk.unsupported;
+
 requires io.github.toolfactory.jvm;
 ```
 
