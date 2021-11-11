@@ -113,10 +113,10 @@ public interface Driver extends Closeable {
 					classLoaders.toArray(new ClassLoader[classLoaders.size()])
 				);
 				driverConstructors = new ConcurrentHashMap<>();
-				setDriverClass("defaultDriverClass", configuration.getProperty("default-driver.class"));
-				setDriverClass("dynamicDriverClass", configuration.getProperty("dynamic-driver.class"));
-				setDriverClass("hybridDriverClass", configuration.getProperty("hybrid-driver.class"));
-				setDriverClass("nativeDriverClass", configuration.getProperty("native-driver.class"));
+				setDriverClass("defaultDriverClass", configuration.getProperty("driver-factory.default-driver.class"));
+				setDriverClass("dynamicDriverClass", configuration.getProperty("driver-factory.dynamic-driver.class"));
+				setDriverClass("hybridDriverClass", configuration.getProperty("driver-factory.hybrid-driver.class"));
+				setDriverClass("nativeDriverClass", configuration.getProperty("driver-factory.native-driver.class"));
 			} catch (Throwable exc) {
 				throw new FactoryException(exc);
 			}
