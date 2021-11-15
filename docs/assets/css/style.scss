@@ -7,17 +7,22 @@
 }
 
 h1.project-name {
-	font-family: 'Cooper Regular';
+	font-family: 'Cooper Std';
 	font-size: 4.25rem;
 	line-height: 1.00em;
 }
 
 @font-face {
-    font-family: 'Cooper Regular';
-    src: local('Cooper Regular'), local('Cooper-Regular'),
-        url('./../fonts/Cooper-Regular.ttf') format('truetype');
-    font-weight: normal;
+    font-family: 'Cooper Std';
+    src: url('CooperBlackStd.eot');
+    src: local('Cooper Std Black'), local('CooperBlackStd'),
+        url('./../fonts/CooperBlackStd.eot?#iefix') format('embedded-opentype'),
+        url('./../fonts/CooperBlackStd.woff2') format('woff2'),
+        url('./../fonts/CooperBlackStd.woff') format('woff'),
+        url('./../fonts/CooperBlackStd.ttf') format('truetype');
+    font-weight: 900;
     font-style: normal;
+    font-display: swap;
 }
 
 .main-content {
