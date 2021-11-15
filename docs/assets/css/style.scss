@@ -7,9 +7,17 @@
 }
 
 h1.project-name {
-	font-family: 'Cooper';
+	font-family: 'Cooper Regular';
 	font-size: 4.25rem;
 	line-height: 1.00em;
+}
+
+@font-face {
+    font-family: 'Cooper Regular';
+    src: local('Cooper Regular'), local('Cooper-Regular'),
+        url('./../fonts/Cooper-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
 .main-content {
