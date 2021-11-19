@@ -90,8 +90,10 @@ public interface Driver extends Closeable {
 	public void setAccessible(AccessibleObject object, boolean flag);
 
 	public void setFieldValue(Object target, Field field, Object value);
-
-	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);
+	
+	public <T> T throwException(Throwable exception);
+	
+	public <T> T throwException(String message, Object... placeHolderReplacements);
 
 	@Override
 	public void close();
