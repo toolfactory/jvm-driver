@@ -56,9 +56,9 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 			if (exceptionOrMessage instanceof String) {
 				StackTraceElement[] stackTraceOfException = null;
 				if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
-					exception = new RuntimeException((String)exceptionOrMessage);
+					exception = new Exception((String)exceptionOrMessage);
 				} else {
-					exception = new RuntimeException(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
+					exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
 				}
 				StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 				stackTraceOfException = new StackTraceElement[stackTrace.length - startingLevel];
