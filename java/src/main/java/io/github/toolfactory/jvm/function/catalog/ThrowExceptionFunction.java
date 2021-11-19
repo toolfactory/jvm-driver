@@ -38,13 +38,20 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 @SuppressWarnings("all")
 public interface ThrowExceptionFunction extends Consumer<Throwable> {
-
+	
 	public <T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements);
+	
+	public <T> T apply(int startingLevel, Object exceptionOrMessage, Object... placeHolderReplacements);
 
 	public static abstract class Abst implements ThrowExceptionFunction {
-
+		
 		@Override
-		public<T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
+		public <T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
+			return apply(3, exceptionOrMessage, placeHolderReplacements);
+		}
+		
+		@Override
+		public<T> T apply(int startingLevel, Object exceptionOrMessage, Object... placeHolderReplacements) {
 			Throwable exception = null;
 			if (exceptionOrMessage instanceof String) {
 				StackTraceElement[] stackTraceOfException = null;
@@ -54,8 +61,8 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 					exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
 				}
 				StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-				stackTraceOfException = new StackTraceElement[stackTrace.length - 2];
-				System.arraycopy(stackTrace, 2, stackTraceOfException, 0, stackTraceOfException.length);
+				stackTraceOfException = new StackTraceElement[stackTrace.length - startingLevel];
+				System.arraycopy(stackTrace, startingLevel, stackTraceOfException, 0, stackTraceOfException.length);
 				exception.setStackTrace(stackTraceOfException);
 			} else {
 				exception = (Throwable)exceptionOrMessage;

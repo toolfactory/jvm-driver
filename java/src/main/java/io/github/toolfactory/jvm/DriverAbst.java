@@ -536,7 +536,7 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements) {
 		try {
-			return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+			return exceptionThrower.apply(3, exceptionOrMessage, placeHolderReplacements);
 		} catch (NullPointerException exc) {
 			if (exceptionThrower == null) {
 				synchronized (this) {
@@ -547,7 +547,7 @@ public abstract class DriverAbst implements Driver {
 					}
 				}
 			}
-			return exceptionThrower.apply(exceptionOrMessage, placeHolderReplacements);
+			return exceptionThrower.apply(3, exceptionOrMessage, placeHolderReplacements);
 		}
 	}
 
