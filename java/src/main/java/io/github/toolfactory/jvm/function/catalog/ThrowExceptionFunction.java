@@ -39,34 +39,37 @@ import io.github.toolfactory.narcissus.Narcissus;
 @SuppressWarnings("all")
 public interface ThrowExceptionFunction extends Consumer<Throwable> {
 	
-	public <T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements);
+	public <T> T apply(Throwable exception);
 	
-	public <T> T apply(int startingLevel, Object exceptionOrMessage, Object... placeHolderReplacements);
+	public <T> T apply(String message, Object... placeHolderReplacements);
+	
+	public <T> T apply(int startingLevel, String message, Object... placeHolderReplacements);
 
 	public static abstract class Abst implements ThrowExceptionFunction {
 		
-		@Override
-		public <T> T apply(Object exceptionOrMessage, Object... placeHolderReplacements) {
-			return apply(3, exceptionOrMessage, placeHolderReplacements);
+		public <T> T apply(Throwable exception) {
+			accept(exception);
+			return null;
 		}
 		
 		@Override
-		public<T> T apply(int startingLevel, Object exceptionOrMessage, Object... placeHolderReplacements) {
+		public <T> T apply(String message, Object... placeHolderReplacements) {
+			return apply(3, message, placeHolderReplacements);
+		}
+		
+		@Override
+		public<T> T apply(int stackTraceStartingLevel, String message, Object... placeHolderReplacements) {
 			Throwable exception = null;
-			if (exceptionOrMessage instanceof String) {
-				StackTraceElement[] stackTraceOfException = null;
-				if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
-					exception = new Exception((String)exceptionOrMessage);
-				} else {
-					exception = new Exception(Strings.compile((String)exceptionOrMessage, placeHolderReplacements));
-				}
-				StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-				stackTraceOfException = new StackTraceElement[stackTrace.length - startingLevel];
-				System.arraycopy(stackTrace, startingLevel, stackTraceOfException, 0, stackTraceOfException.length);
-				exception.setStackTrace(stackTraceOfException);
+			StackTraceElement[] stackTraceOfException = null;
+			if (placeHolderReplacements == null || placeHolderReplacements.length == 0) {
+				exception = new Exception(message);
 			} else {
-				exception = (Throwable)exceptionOrMessage;
+				exception = new Exception(Strings.compile(message, placeHolderReplacements));
 			}
+			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+			stackTraceOfException = new StackTraceElement[stackTrace.length - stackTraceStartingLevel];
+			System.arraycopy(stackTrace, stackTraceStartingLevel, stackTraceOfException, 0, stackTraceOfException.length);
+			exception.setStackTrace(stackTraceOfException);
 			accept(exception);
 			return null;
 		}
