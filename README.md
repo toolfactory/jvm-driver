@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>8.5.1</version>
+    <version>8.6.0</version>
 </dependency>	
 ```
 ### Requiring the ToolFactory JMV Driver module
@@ -145,7 +145,9 @@ public void setAccessible(AccessibleObject object, boolean flag);
 
 public void setFieldValue(Object target, Field field, Object value);
 
-public <T> T throwException(Object exceptionOrMessage, Object... placeHolderReplacements);                                                         
+public <T> T throwException(Throwable exception);
+	
+public <T> T throwException(String message, Object... placeHolderReplacements);                                                        
 ```
 
 <br/>
