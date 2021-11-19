@@ -142,8 +142,8 @@
 							<goal>run</goal>
 						</goals>
 						<phase>
-								compile
-							</phase>
+							compile
+						</phase>
 						<configuration>
 							<target>
 								<copy
@@ -187,7 +187,11 @@
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
 							<release>9</release>
-							<!-- <excludes> <exclude>module-info.java</exclude> </excludes> -->
+							<!-- IMPORTANT: to test locally unconment this
+								<excludes>
+									<exclude>module-info.java</exclude>
+								</excludes>
+							 -->
 						</configuration>
 					</execution>
 					<execution>
