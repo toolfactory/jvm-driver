@@ -151,7 +151,7 @@ public void setFieldValue(Object target, Field field, Object value);
 
 public <T> T throwException(String message, Object... placeHolderReplacements);
 
-public <T> T throwException(Throwable exception);	                                                       
+public <T> T throwException(Throwable exception);
 ```
 
 <br/>
