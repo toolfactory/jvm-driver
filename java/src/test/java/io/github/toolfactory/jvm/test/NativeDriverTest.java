@@ -112,6 +112,11 @@ public class NativeDriverTest extends BaseTest {
 	@Test
 	public void getClassByNameTestOne() {
 		super.getClassByNameTestOne();
+	}	
+	
+	@Override
+	@Test
+	public void convertToBuiltinClassLoader() {
+		super.convertToBuiltinClassLoader();
 	}
-
-}
+}	

@@ -32,6 +32,7 @@ import io.github.toolfactory.jvm.function.catalog.BuiltinClassLoaderClassSupplie
 import io.github.toolfactory.jvm.function.catalog.ClassLoaderDelegateClassSupplier;
 import io.github.toolfactory.jvm.function.catalog.ConstructorInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
+import io.github.toolfactory.jvm.function.catalog.ConvertToBuiltinClassLoaderFunction;
 import io.github.toolfactory.jvm.function.catalog.DeepConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.DefineHookClassFunction;
 import io.github.toolfactory.jvm.function.catalog.GetClassByNameFunction;
@@ -171,4 +172,10 @@ public class DefaultDriver extends DriverAbst {
 	}
 
 
+	@Override
+	protected Class<? extends ConvertToBuiltinClassLoaderFunction> getConvertToBuiltinClassLoaderFunctionClass() {
+		return ConvertToBuiltinClassLoaderFunction.class;
+	}
+
+	
 }

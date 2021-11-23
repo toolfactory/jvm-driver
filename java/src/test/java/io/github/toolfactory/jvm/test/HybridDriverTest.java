@@ -113,4 +113,10 @@ public class HybridDriverTest extends BaseTest {
 	public void getClassByNameTestOne() {
 		super.getClassByNameTestOne();
 	}
+	
+	@Override
+	@Test
+	public void convertToBuiltinClassLoader() {
+		super.convertToBuiltinClassLoader();
+	}
 }

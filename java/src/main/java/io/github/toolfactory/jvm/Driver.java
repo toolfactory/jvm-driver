@@ -50,6 +50,9 @@ public interface Driver extends Closeable {
 	public <D extends Driver> D init();
 
 	public <T> T allocateInstance(Class<?> cls);
+	
+	//Return a ClassLoaderDelegate
+	public ClassLoader convertToBuiltinClassLoader(ClassLoader classLoader);
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
 
@@ -91,9 +94,10 @@ public interface Driver extends Closeable {
 
 	public void setFieldValue(Object target, Field field, Object value);
 	
-	public <T> T throwException(Throwable exception);
-	
 	public <T> T throwException(String message, Object... placeHolderReplacements);
+	
+	public <T> T throwException(Throwable exception);	
+	
 
 	@Override
 	public void close();

@@ -260,9 +260,19 @@ abstract class BaseTest {
 			getReflection().getDriver().throwException(exc);
 		}
 	}
+	
+	public void convertToBuiltinClassLoader() {
+		try {
+			log(getReflection().getDriver().convertToBuiltinClassLoader(new ClassLoader() {}));
+		} catch (Throwable exc) {
+			exc.printStackTrace();
+			getReflection().getDriver().throwException(exc);
+		}		
+	}
+	
 
 	private void log(Object value) {
-		//System.out.println(value.toString());
+		System.out.println(value != null ? value.toString() : "null");
 	}
 
 	private static class ClassForTest {
