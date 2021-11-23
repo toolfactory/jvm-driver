@@ -51,7 +51,6 @@ public interface Driver extends Closeable {
 
 	public <T> T allocateInstance(Class<?> cls);
 	
-	//Return a ClassLoaderDelegate
 	public ClassLoader convertToBuiltinClassLoader(ClassLoader classLoader);
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
