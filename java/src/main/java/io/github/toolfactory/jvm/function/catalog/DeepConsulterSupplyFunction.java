@@ -31,39 +31,39 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Function;
-import io.github.toolfactory.jvm.util.FunctionAdapter;
+
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
+import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("unchecked")
-public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHandles.Lookup> {
+public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> {
 
-	public static abstract class Abst<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> implements DeepConsulterSupplyFunction {
+	public static abstract class Abst<F> extends ThrowingFunctionAdapter<F, Class<?>, MethodHandles.Lookup, Throwable> implements DeepConsulterSupplyFunction {
 
 	}
 
-	public static class ForJava7 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
-		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException {
+	public static class ForJava7 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
 			setFunction(
-				((FunctionAdapter<Function<Class<?>, MethodHandles.Lookup>, ?, ?>)
+				((ThrowingFunctionAdapter<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>, ?, ?, Throwable>)
 					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context)).getFunction()
 			);
 		}
 
 		@Override
-		public MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 			return function.apply(input);
 		}
 
-		public static class ForSemeru extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
-			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
+		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
@@ -72,20 +72,14 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 				).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 				);
-				final ThrowExceptionFunction throwExceptionFunction =
-					functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 				setFunction(
-					new Function<Class<?>, MethodHandles.Lookup>() {
+					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 						@Override
-						public MethodHandles.Lookup apply(Class<?> cls) {
-							try {
-								return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
-									cls,
-									io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
-								);
-							} catch (Throwable exc) {
-								return throwExceptionFunction.apply(exc);
-							}
+						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
+								cls,
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+							);
 						}
 					}
 				);
@@ -93,16 +87,16 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 			}
 
 			@Override
-			public MethodHandles.Lookup apply(Class<?> input) {
+			public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 				return function.apply(input);
 			}
 		}
 
 	}
 
-	public static class ForJava9 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
+	public static class ForJava9 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
 
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException, SecurityException {
+		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
@@ -111,17 +105,11 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 			);
-			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 			setFunction(
-				new Function<Class<?>, MethodHandles.Lookup>() {
+				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
-					public MethodHandles.Lookup apply(Class<?> cls) {
-						try {
-							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, -1);
-						} catch (Throwable exc) {
-							return throwExceptionFunction.apply(exc);
-						}
+					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+						return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, -1);
 					}
 				}
 			);
@@ -130,16 +118,16 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 
 
 		@Override
-		public MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 			return function.apply(input);
 		}
 
 	}
 
 
-	public static class ForJava14 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
+	public static class ForJava14 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
 
-		public ForJava14(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException, InstantiationException, IllegalArgumentException, InvocationTargetException {
+		public ForJava14(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
@@ -148,17 +136,11 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 			);
-			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 			setFunction(
-				new Function<Class<?>, MethodHandles.Lookup>() {
+				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
-					public MethodHandles.Lookup apply(Class<?> cls) {
-						try {
-							return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, -1);
-						} catch (Throwable exc) {
-							return throwExceptionFunction.apply(exc);
-						}
+					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+						return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, -1);
 					}
 				}
 			);
@@ -167,7 +149,7 @@ public interface DeepConsulterSupplyFunction extends Function<Class<?>, MethodHa
 
 
 		@Override
-		public MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 			return function.apply(input);
 		}
 

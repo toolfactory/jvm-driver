@@ -49,7 +49,7 @@ public interface BuiltinClassLoaderClassSupplier extends Supplier<Class<?>> {
 	public static class ForJava9 implements BuiltinClassLoaderClassSupplier{
 		protected Class<?> cls;
 
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException {
+		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			cls = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context).apply(
 				"jdk.internal.loader.BuiltinClassLoader", false, ForJava9.class.getClassLoader(), ForJava9.class

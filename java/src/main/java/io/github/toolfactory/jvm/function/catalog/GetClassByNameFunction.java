@@ -32,35 +32,31 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.QuadFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingQuadFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public interface GetClassByNameFunction extends QuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>> {
+public interface GetClassByNameFunction extends ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> {
 
 	public abstract class Abst  implements GetClassByNameFunction {
-		protected ThrowExceptionFunction throwExceptionFunction;
 		protected MethodHandle classFinder;
 
-		public Abst(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
-			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
+		public Abst(Map<Object, Object> context) throws Throwable {
 			classFinder = retrieveClassFinder(context);
 		}
 
-		protected abstract MethodHandle retrieveClassFinder(final Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException;
+		protected abstract MethodHandle retrieveClassFinder(final Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable;
 
 	}
 
 	public static class ForJava7 extends Abst {
 
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			super(context);
 		}
 
 		@Override
-		protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
 			return consulter.findStatic(
@@ -70,22 +66,18 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 		}
 
 		@Override
-		public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) {
-			try {
-				return (Class<?>)classFinder.invokeWithArguments(className, initialize.booleanValue(), classLoader, caller);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) throws Throwable {
+			return (Class<?>)classFinder.invokeWithArguments(className, initialize.booleanValue(), classLoader, caller);
 		}
 
 		public static class ForSemeru extends Abst {
 
-			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 			}
 
 			@Override
-			protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws Throwable {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
 				return consulter.findStatic(
@@ -95,12 +87,8 @@ public interface GetClassByNameFunction extends QuadFunction<String, Boolean, Cl
 			}
 
 			@Override
-			public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) {
-				try {
-					return (Class<?>)classFinder.invokeWithArguments(className, initialize, classLoader);
-				} catch (Throwable exc) {
-					return throwExceptionFunction.apply(exc);
-				}
+			public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) throws Throwable {
+				return (Class<?>)classFinder.invokeWithArguments(className, initialize, classLoader);
 			}
 
 		}

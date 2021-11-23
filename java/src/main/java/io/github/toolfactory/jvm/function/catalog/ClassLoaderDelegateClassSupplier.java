@@ -27,7 +27,6 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 	public static class ForJava9 implements ClassLoaderDelegateClassSupplier{
 		protected Class<?> cls;
 
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, IOException {
+		public ForJava9(Map<Object, Object> context) throws Throwable {
 			try (
 				InputStream inputStream = Classes.class.getResourceAsStream(
 					"ClassLoaderDelegateForJDK9.bwc"

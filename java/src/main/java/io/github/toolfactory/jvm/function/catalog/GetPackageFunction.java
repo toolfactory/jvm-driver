@@ -32,12 +32,12 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingBiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
-public interface GetPackageFunction extends BiFunction<ClassLoader, String, Package> {
+public interface GetPackageFunction extends ThrowingBiFunction<ClassLoader, String, Package, Throwable> {
 
 
 	public static class ForJava7 implements GetPackageFunction{
@@ -54,25 +54,18 @@ public interface GetPackageFunction extends BiFunction<ClassLoader, String, Pack
 
 	public static class ForJava9 implements GetPackageFunction{
 		protected MethodHandle methodHandle;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
-		public ForJava9(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup classLoaderConsulter =  consulterSupplyFunction.apply(ClassLoader.class);
 			MethodType methodType = MethodType.methodType(Package.class, String.class);
 			methodHandle = classLoaderConsulter.findSpecial(ClassLoader.class, "getDefinedPackage", methodType, ClassLoader.class);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
-		public Package apply(ClassLoader classLoader, String packageName) {
-			try {
-				return (Package)methodHandle.invokeExact(classLoader, packageName);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Package apply(ClassLoader classLoader, String packageName) throws Throwable {
+			return (Package)methodHandle.invokeExact(classLoader, packageName);
 		}
 
 	}

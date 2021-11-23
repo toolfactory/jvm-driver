@@ -50,7 +50,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 		protected sun.misc.Unsafe unsafe;
 		protected Long loadedClassesVectorMemoryOffset;
 
-		public ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -92,7 +92,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 			protected Field classLoaderField;
 			protected GetClassByNameFunction getClassByNameFunction;
 
-			public ForSemeru(Map<Object, Object> context) {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
@@ -197,7 +197,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 		public static class ForJava7 implements Native {
 			protected Field classesField;
 
-			public ForJava7(Map<Object, Object> context) throws InitializeException {
+			public ForJava7(Map<Object, Object> context) throws Throwable {
 				checkNativeEngine();
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -244,15 +244,13 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 			public static class ForSemeru extends GetLoadedClassesRetrieverFunction.ForJava7.ForSemeru {
 
-				public ForSemeru(Map<Object, Object> context) {
+				public ForSemeru(Map<Object, Object> context) throws Throwable {
 					super(context);
 				}
 
 				@Override
 				protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
 					return new ClassNameBasedLockSupplier() {
-						protected ThrowExceptionFunction throwExceptionFunction =
-								ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
 
 						@Override
 						public Hashtable<String, Object> get(ClassLoader classLoader) {

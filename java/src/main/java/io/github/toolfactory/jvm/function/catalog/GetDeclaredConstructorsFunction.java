@@ -33,25 +33,21 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public interface GetDeclaredConstructorsFunction extends Function<Class<?>, Constructor<?>[]> {
+public interface GetDeclaredConstructorsFunction extends ThrowingFunction<Class<?>, Constructor<?>[], Throwable> {
 
 	public static abstract class Abst implements GetDeclaredConstructorsFunction {
 		protected MethodHandle methodHandle;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
-		protected Abst(Map<Object, Object> context) {
-			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
-		}
+		protected Abst(Map<Object, Object> context) {}
 	}
 
 	public static class ForJava7 extends Abst {
 
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction getConsulterFunction =
@@ -66,18 +62,14 @@ public interface GetDeclaredConstructorsFunction extends Function<Class<?>, Cons
 		}
 
 		@Override
-		public Constructor<?>[] apply(Class<?> input) {
-			try {
-				return (Constructor<?>[]) methodHandle.invokeWithArguments(input, false);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Constructor<?>[] apply(Class<?> input) throws Throwable {
+			return (Constructor<?>[]) methodHandle.invokeWithArguments(input, false);
 		}
 
 
 		public static class ForSemeru extends Abst {
 
-			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				ConsulterSupplyFunction getConsulterFunction =
@@ -92,12 +84,8 @@ public interface GetDeclaredConstructorsFunction extends Function<Class<?>, Cons
 			}
 
 			@Override
-			public Constructor<?>[] apply(Class<?> cls) {
-				try {
-					return (Constructor<?>[])methodHandle.invokeWithArguments(cls);
-				} catch (Throwable exc) {
-					return throwExceptionFunction.apply(exc);
-				}
+			public Constructor<?>[] apply(Class<?> cls) throws Throwable {
+				return (Constructor<?>[])methodHandle.invokeWithArguments(cls);
 			}
 		}
 	}

@@ -30,39 +30,30 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingBiFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 
 
-public interface GetDeclaredFieldFunction extends BiFunction<Class<?>, String, Field> {
+public interface GetDeclaredFieldFunction extends ThrowingBiFunction<Class<?>, String, Field, Throwable> {
 
 	public static class ForJava7 implements GetDeclaredFieldFunction {
 		protected GetDeclaredFieldsFunction getDeclaredFields;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			getDeclaredFields = functionProvider.getOrBuildObject(GetDeclaredFieldsFunction.class, context);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
-		public Field apply(Class<?> cls, String name) {
-			try {
-				for (Field field : getDeclaredFields.apply(cls)) {
-					if (field.getName().equals(name)) {
-						return field;
-					}
+		public Field apply(Class<?> cls, String name) throws Throwable {
+			for (Field field : getDeclaredFields.apply(cls)) {
+				if (field.getName().equals(name)) {
+					return field;
 				}
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
 			}
-			return throwExceptionFunction.apply(
-				new NoSuchFieldException(
-					Strings.compile("Field named {} not found in the class {}", name, cls.getName())
-				)
+			throw new NoSuchFieldException(
+				Strings.compile("Field named {} not found in the class {}", name, cls.getName())
 			);
 		}
 	}

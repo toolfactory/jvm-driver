@@ -58,13 +58,15 @@ import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
-import io.github.toolfactory.jvm.function.template.BiConsumer;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
-import io.github.toolfactory.jvm.function.template.QuadFunction;
 import io.github.toolfactory.jvm.function.template.Supplier;
+import io.github.toolfactory.jvm.function.template.ThrowingBiConsumer;
+import io.github.toolfactory.jvm.function.template.ThrowingBiFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingQuadFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingTriFunction;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
-import io.github.toolfactory.jvm.function.template.TriFunction;
 import io.github.toolfactory.jvm.util.CleanableSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
@@ -73,19 +75,19 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 public abstract class DriverAbst implements Driver {
 
 	private ThrowExceptionFunction exceptionThrower;
-	private Function<Class<?>, Object> allocateInstanceInvoker;
+	private ThrowingFunction<Class<?>, Object, Throwable> allocateInstanceInvoker;
 	private BiFunction<Object, Field, Object> fieldValueRetriever;
 	private TriConsumer<Object, Field, Object> fieldValueSetter;
-	private BiFunction<Class<?>, byte[], Class<?>> hookClassDefiner;
-	private Function<Class<?>, MethodHandles.Lookup> consulterRetriever;
-	private Function<Class<?>, Field[]> declaredFieldsRetriever;
-	private Function<Class<?>, Method[]> declaredMethodsRetriever;
-	private Function<Class<?>, Constructor<?>[]> declaredConstructorsRetriever;
-	private BiConsumer<AccessibleObject, Boolean> accessibleSetter;
-	private BiFunction<Constructor<?>, Object[], Object> constructorInvoker;
-	private BiFunction<ClassLoader, String, Package> packageRetriever;
-	private TriFunction<Method, Object, Object[], Object> methodInvoker;
-	private QuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>> classByNameRetriever;
+	private ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> hookClassDefiner;
+	private ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> consulterRetriever;
+	private ThrowingFunction<Class<?>, Field[], Throwable> declaredFieldsRetriever;
+	private ThrowingFunction<Class<?>, Method[], Throwable> declaredMethodsRetriever;
+	private ThrowingFunction<Class<?>, Constructor<?>[], Throwable> declaredConstructorsRetriever;
+	private ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter;
+	private ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> constructorInvoker;
+	private ThrowingBiFunction<ClassLoader, String, Package, Throwable> packageRetriever;
+	private ThrowingTriFunction<Method, Object, Object[], Object, Throwable> methodInvoker;
+	private ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> classByNameRetriever;
 	private GetResourcesFunction resourcesRetriver;
 	private Supplier<Class<?>> builtinClassLoaderClassSupplier;
 	private Supplier<Class<?>> classLoaderDelegateClassSupplier;
@@ -572,55 +574,66 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
 		try {
-			accessibleSetter.accept(object, flag);
-		} catch (NullPointerException exc) {
-			if (accessibleSetter == null) {
-				synchronized (this) {
-					if (accessibleSetter == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						accessibleSetter = getOrBuildAccessibleSetter(initContext);
-						refresh(initContext);
+			try {
+				accessibleSetter.accept(object, flag);
+			} catch (NullPointerException exc) {
+				if (accessibleSetter == null) {
+					synchronized (this) {
+						if (accessibleSetter == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							accessibleSetter = getOrBuildAccessibleSetter(initContext);
+							refresh(initContext);
+						}
 					}
 				}
-			}
-			accessibleSetter.accept(object, flag);
+				accessibleSetter.accept(object, flag);
+			}			
+		} catch (Throwable exc) {
+			throwException(exc);
 		}
-
 	}
 
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
-		try {
-			return hookClassDefiner.apply(clientClass, byteCode);
-		} catch (NullPointerException exc) {
-			if (hookClassDefiner == null) {
-				synchronized (this) {
-					if (hookClassDefiner == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						hookClassDefiner = getOrBuildHookClassDefiner(initContext);
-						refresh(initContext);
+		try {		
+			try {
+				return hookClassDefiner.apply(clientClass, byteCode);
+			} catch (NullPointerException exc) {
+				if (hookClassDefiner == null) {
+					synchronized (this) {
+						if (hookClassDefiner == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							hookClassDefiner = getOrBuildHookClassDefiner(initContext);
+							refresh(initContext);
+						}
 					}
 				}
+				return hookClassDefiner.apply(clientClass, byteCode);
 			}
-			return hookClassDefiner.apply(clientClass, byteCode);
+		} catch (Throwable exc) {
+			return throwException(exc);
 		}
 	}
 
 	@Override
 	public Package getPackage(ClassLoader classLoader, String packageName) {
 		try {
-			return packageRetriever.apply(classLoader, packageName);
-		} catch (NullPointerException exc) {
-			if (packageRetriever == null) {
-				synchronized (this) {
-					if (packageRetriever == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						packageRetriever = getOrBuildPackageRetriever(initContext);
-						refresh(initContext);
+			try {
+				return packageRetriever.apply(classLoader, packageName);
+			} catch (NullPointerException exc) {
+				if (packageRetriever == null) {
+					synchronized (this) {
+						if (packageRetriever == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							packageRetriever = getOrBuildPackageRetriever(initContext);
+							refresh(initContext);
+						}
 					}
 				}
+				return packageRetriever.apply(classLoader, packageName);
 			}
-			return packageRetriever.apply(classLoader, packageName);
+		} catch (Throwable exc) {
+			return throwException(exc);
 		}
 	}
 
@@ -699,18 +712,22 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> T allocateInstance(Class<?> cls) {
 		try {
-			return (T)allocateInstanceInvoker.apply(cls);
-		} catch (NullPointerException exc) {
-			if (allocateInstanceInvoker == null) {
-				synchronized (this) {
-					if (allocateInstanceInvoker == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initContext);
-						refresh(initContext);
+			try {
+				return (T)allocateInstanceInvoker.apply(cls);
+			} catch (NullPointerException exc) {
+				if (allocateInstanceInvoker == null) {
+					synchronized (this) {
+						if (allocateInstanceInvoker == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initContext);
+							refresh(initContext);
+						}
 					}
 				}
+				return (T)allocateInstanceInvoker.apply(cls);
 			}
-			return (T)allocateInstanceInvoker.apply(cls);
+		} catch (Throwable exc) {
+			return throwException(exc);
 		}
 	}
 
@@ -831,18 +848,22 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Lookup getConsulter(Class<?> cls) {
 		try {
-			return consulterRetriever.apply(cls);
-		} catch (NullPointerException exc) {
-			if (consulterRetriever == null) {
-				synchronized (this) {
-					if (consulterRetriever == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						consulterRetriever = getOrBuildDeepConsulterRetriever(initContext);
-						refresh(initContext);
+			try {
+				return consulterRetriever.apply(cls);
+			} catch (NullPointerException exc) {
+				if (consulterRetriever == null) {
+					synchronized (this) {
+						if (consulterRetriever == null) {
+							Map<Object, Object> initContext = functionsToMap();
+							consulterRetriever = getOrBuildDeepConsulterRetriever(initContext);
+							refresh(initContext);
+						}
 					}
 				}
+				return consulterRetriever.apply(cls);
 			}
-			return consulterRetriever.apply(cls);
+		} catch (Throwable exc) {
+			return throwException(exc);
 		}
 	}
 

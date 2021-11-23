@@ -30,33 +30,26 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.InitializeException;
-import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
-public interface AllocateInstanceFunction extends Function<Class<?>, Object> {
+public interface AllocateInstanceFunction extends ThrowingFunction<Class<?>, Object, Throwable> {
 
 	public static class ForJava7 implements AllocateInstanceFunction {
 		final sun.misc.Unsafe unsafe;
-		final ThrowExceptionFunction throwExceptionFunction;
 
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
-		public Object apply(Class<?> input) {
-			try {
-				return unsafe.allocateInstance(input);
-			} catch (InstantiationException exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Object apply(Class<?> input) throws InstantiationException {
+			return unsafe.allocateInstance(input);
 		}
 
 	}

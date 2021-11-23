@@ -27,49 +27,41 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Function;
-import io.github.toolfactory.jvm.util.FunctionAdapter;
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
+import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Streams;
 
 
 @SuppressWarnings("unchecked")
-public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandles.Lookup> {
+public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> {
 
-	public static abstract class Abst<F> extends FunctionAdapter<F, Class<?>, MethodHandles.Lookup> implements ConsulterSupplyFunction {
+	public static abstract class Abst<F> extends ThrowingFunctionAdapter<F, Class<?>, MethodHandles.Lookup, Throwable> implements ConsulterSupplyFunction {
 
 	}
 
-
-	public static class ForJava7 extends Abst<Function<Class<?>, MethodHandles.Lookup>> {
+	public static class ForJava7 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get();
 			final MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
-			final ThrowExceptionFunction throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 			setFunction(
-				new Function<Class<?>, MethodHandles.Lookup>() {
+				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
-					public MethodHandles.Lookup apply(Class<?> cls) {
-						try {
-							return (MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(consulter, cls);
-						} catch (Throwable exc) {
-							return throwExceptionFunction.apply(exc);
-						}
+					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+						return (MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(consulter, cls);
 					}
 				}
 			);
 		}
 
 		@Override
-		public MethodHandles.Lookup apply(Class<?> input) {
+		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 			return function.apply(input);
 		}
 
@@ -77,7 +69,7 @@ public interface ConsulterSupplyFunction extends Function<Class<?>, MethodHandle
 
 	public static class ForJava9 extends Abst<java.util.function.Function<Class<?>, MethodHandles.Lookup>>  {
 
-		public ForJava9(Map<Object, Object> context) throws IOException, NoSuchFieldException, SecurityException {
+		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			try (
 				InputStream inputStream =

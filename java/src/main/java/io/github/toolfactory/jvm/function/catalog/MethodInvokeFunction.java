@@ -32,30 +32,25 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.TriFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingTriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public interface MethodInvokeFunction extends TriFunction<Method, Object, Object[], Object> {
+public interface MethodInvokeFunction extends ThrowingTriFunction<Method, Object, Object[], Object, Throwable> {
 
 	public static class Abst implements MethodInvokeFunction {
 		protected MethodHandle methodHandle;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
 
 		@Override
-		public Object apply(Method method, Object target, Object[] params) {
-			try {
-				return methodHandle.invokeWithArguments(method, target, params);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Object apply(Method method, Object target, Object[] params) throws Throwable {
+			return methodHandle.invokeWithArguments(method, target, params);
 		}
 	}
 
 	public static class ForJava7 extends Abst {
 
-		public ForJava7(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -63,14 +58,13 @@ public interface MethodInvokeFunction extends TriFunction<Method, Object, Object
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeAccessorImplClass);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
 			methodHandle = consulter.unreflect(invoker);
-			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 	}
 
 	public static class ForJava9 extends Abst {
 
-		public ForJava9(Map<Object, Object> context) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava9(Map<Object, Object> context) throws Throwable {
 			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.NativeMethodAccessorImpl");
 			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
@@ -78,7 +72,6 @@ public interface MethodInvokeFunction extends TriFunction<Method, Object, Object
 			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
 			methodHandle = consulter.unreflect(invoker);
-			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 	}

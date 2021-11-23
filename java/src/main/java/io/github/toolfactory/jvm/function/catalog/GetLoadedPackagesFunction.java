@@ -44,7 +44,7 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 		protected sun.misc.Unsafe unsafe;
 		protected Long fieldOffset;
 
-		public ForJava7(Map<Object, Object> context) {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -66,7 +66,7 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 		public static class ForJava7 implements Native {
 			Field packagesField;
 
-			public ForJava7(Map<Object, Object> context) throws InitializeException {
+			public ForJava7(Map<Object, Object> context) throws Throwable {
 				checkNativeEngine();
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);

@@ -33,22 +33,19 @@ import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.BiFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingBiFunction;
 import io.github.toolfactory.jvm.util.JavaClass;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
 @SuppressWarnings("all")
-public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Class<?>> {
+public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> {
 
 	public static abstract class Abst implements DefineHookClassFunction {
 		protected MethodHandle defineHookClassMethodHandle;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
 		public Abst(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 	}
 
@@ -76,12 +73,8 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 		}
 
 		@Override
-		public Class<?> apply(Class<?> clientClass, byte[] byteCode) {
-			try {
-				return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(unsafe, clientClass, byteCode, null);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
+			return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(unsafe, clientClass, byteCode, null);
 		}
 
 	}
@@ -120,22 +113,14 @@ public interface DefineHookClassFunction extends BiFunction<Class<?>, byte[], Cl
 
 
 		@Override
-		public Class<?> apply(Class<?> clientClass, byte[] byteCode) {
+		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
+			MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(clientClass, consulter);
 			try {
-				MethodHandles.Lookup lookup = (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(clientClass, consulter);
-				try {
-					return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(lookup, byteCode);
-				} catch (LinkageError exc) {
-					try {
-						return Class.forName(
-							JavaClass.create(ByteBuffer.wrap(byteCode)).getName()
-						);
-					} catch (Throwable inExc) {
-						return throwExceptionFunction.apply(inExc);
-					}
-				}
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
+				return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(lookup, byteCode);
+			} catch (LinkageError exc) {
+				return Class.forName(
+					JavaClass.create(ByteBuffer.wrap(byteCode)).getName()
+				);
 			}
 		}
 

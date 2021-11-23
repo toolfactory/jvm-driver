@@ -26,21 +26,25 @@
  */
 package io.github.toolfactory.jvm.util;
 
-import io.github.toolfactory.jvm.function.template.BiConsumer;
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 
-public abstract class BiConsumerAdapter<F, I, J> implements BiConsumer<I, J> {
+public abstract class ThrowingFunctionAdapter<F, I, O, E extends Throwable> implements ThrowingFunction<I, O, E> {
 
 	protected F function;
 
-	public BiConsumerAdapter(){}
+	public ThrowingFunctionAdapter() {}
 
-	public BiConsumerAdapter(F function) {
+	public ThrowingFunctionAdapter(F function) {
 		this.function = function;
 	}
 
-	public BiConsumerAdapter<F, I, J> setFunction(F function) {
+	public ThrowingFunctionAdapter<F, I, O, E> setFunction(F function) {
 		this.function = function;
 		return this;
+	}
+
+	public F getFunction() {
+		return this.function;
 	}
 
 }

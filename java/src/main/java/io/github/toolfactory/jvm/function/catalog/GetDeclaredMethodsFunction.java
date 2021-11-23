@@ -33,25 +33,22 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.Function;
+import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public interface GetDeclaredMethodsFunction extends Function<Class<?>, Method[]> {
+public interface GetDeclaredMethodsFunction extends ThrowingFunction<Class<?>, Method[], Throwable> {
 
 	public static abstract class Abst implements GetDeclaredMethodsFunction {
 		protected MethodHandle methodHandle;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
-		protected Abst(Map<Object, Object> context) {
-			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
-		}
+		protected Abst(Map<Object, Object> context) {}
+		
 	}
 
 	public static class ForJava7 extends Abst {
 
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			ConsulterSupplyFunction getConsulterFunction =
@@ -66,17 +63,13 @@ public interface GetDeclaredMethodsFunction extends Function<Class<?>, Method[]>
 		}
 
 		@Override
-		public Method[] apply(Class<?> input) {
-			try {
-				return (Method[]) methodHandle.invokeWithArguments(input, false);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+		public Method[] apply(Class<?> input) throws Throwable {
+			return (Method[]) methodHandle.invokeWithArguments(input, false);
 		}
 
 		public static class ForSemeru extends Abst {
 
-			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				ConsulterSupplyFunction getConsulterFunction =
@@ -91,12 +84,8 @@ public interface GetDeclaredMethodsFunction extends Function<Class<?>, Method[]>
 			}
 
 			@Override
-			public Method[] apply(Class<?> cls) {
-				try {
-					return (Method[])methodHandle.invokeWithArguments(cls);
-				} catch (Throwable exc) {
-					return throwExceptionFunction.apply(exc);
-				}
+			public Method[] apply(Class<?> cls) throws Throwable {
+				return (Method[])methodHandle.invokeWithArguments(cls);
 			}
 		}
 

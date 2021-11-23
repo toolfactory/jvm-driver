@@ -27,12 +27,12 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.module.ModuleReader;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
@@ -40,31 +40,28 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.QuadFunction;
-import io.github.toolfactory.jvm.function.template.TriFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingQuadFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingTriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
-public interface GetResourcesFunction extends TriFunction<String, Boolean, ClassLoader[], Collection<URL>>{
+public interface GetResourcesFunction extends ThrowingTriFunction<String, Boolean, ClassLoader[], Collection<URL>, Throwable>{
 
-	public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders);
+	public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders) throws Throwable;
 
 	public abstract class Abst  implements GetResourcesFunction {
-		protected ThrowExceptionFunction throwExceptionFunction;
-		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> resourceFinder;
+		protected ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> resourceFinder;
 
 		public Abst(Map<Object, Object> context) throws Throwable {
-			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 			resourceFinder = buildResourceFinder(context);
 		}
 
-		protected abstract QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable;
+		protected abstract ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable>
+			buildResourceFinder(final Map<Object, Object> context) throws Throwable;
 
 
 		@Override
-		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, ClassLoader[] resourceClassLoaders) {
+		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, ClassLoader[] resourceClassLoaders) throws Throwable {
 			Collection<URL> resources = new LinkedHashSet<>();
 			if (resourceClassLoaders == null || resourceClassLoaders.length == 0) {
 				return resourceFinder.apply(Thread.currentThread().getContextClassLoader(), resourceRelativePath, findFirst, resources);
@@ -76,7 +73,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 		}
 
 		@Override
-		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders) {
+		public Collection<URL> apply(String resourceRelativePath, Boolean findFirst, Collection<ClassLoader> resourceClassLoaders) throws Throwable {
 			Collection<URL> resources = new LinkedHashSet<>();
 			if (resourceClassLoaders == null || resourceClassLoaders.isEmpty()) {
 				return resourceFinder.apply(Thread.currentThread().getContextClassLoader(), resourceRelativePath, findFirst, resources);
@@ -96,27 +93,23 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 		}
 
 		@Override
-		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
-			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> () {
+		protected ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
+			return new ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> () {
 
 				@Override
-				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) {
-					try {
-						if (findFirst) {
-							URL resource = classLoader.getResource(resourceRelativePath);
-							if (resource != null) {
-								resources.add(resource);
-							}
-						} else {
-							Enumeration<URL> resourceURLS = classLoader.getResources(resourceRelativePath);
-							while (resourceURLS.hasMoreElements()) {
-								resources.add(resourceURLS.nextElement());
-							}
+				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) throws IOException {
+					if (findFirst) {
+						URL resource = classLoader.getResource(resourceRelativePath);
+						if (resource != null) {
+							resources.add(resource);
 						}
-						return resources;
-					} catch (Throwable exc) {
-						return throwExceptionFunction.apply(exc);
+					} else {
+						Enumeration<URL> resourceURLS = classLoader.getResources(resourceRelativePath);
+						while (resourceURLS.hasMoreElements()) {
+							resources.add(resourceURLS.nextElement());
+						}
 					}
+					return resources;
 				}
 			};
 		}
@@ -131,14 +124,14 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 		}
 
 		@Override
-		protected QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
+		protected ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
 			final ObjectProvider functionProvider = ObjectProvider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
 			final GetClassByNameFunction getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
 			final GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			final QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>> superResourceFinder = super.buildResourceFinder(context);
+			final ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> superResourceFinder = super.buildResourceFinder(context);
 
-			return new QuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>>() {
+			return new ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable>() {
 
 				final Class<?> jdk_internal_loader_BuiltinClassLoaderClass = functionProvider.getOrBuildObject(BuiltinClassLoaderClassSupplier.class, context).get();
 				final Class<?> java_lang_module_ModuleReferenceClass = getClassByNameFunction.apply(
@@ -176,27 +169,16 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 					)
 				);
 				@Override
-				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) {
-					try {
-						if (jdk_internal_loader_BuiltinClassLoaderClass.isAssignableFrom(classLoader.getClass())) {
-							Map<String, ?> packageToModule = (Map<String, ?>)getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_packageToModuleField);
-							String packageName = toPackageName(resourceRelativePath);
-							Object loadedModule = packageToModule.get(packageName);
-							Map<String, ?> nameToModule = (Map<String, ?>)getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_nameToModuleField);
-							if (loadedModule != null) {
-								String moduleName = (String)jdk_internal_loader_BuiltinClassLoader$loadedModule_name.invokeWithArguments(loadedModule);
-								Object moduleReference = nameToModule.get(moduleName);
-								if (moduleReference != null) {
-									URL resource = findResourceInModule(classLoader, moduleReference, resourceRelativePath);
-									if (resource != null) {
-										resources.add(resource);
-										if (findFirst) {
-											return resources;
-										}
-									}
-								}
-							}
-							for (Object moduleReference : nameToModule.values()) {
+				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) throws Throwable {
+					if (jdk_internal_loader_BuiltinClassLoaderClass.isAssignableFrom(classLoader.getClass())) {
+						Map<String, ?> packageToModule = (Map<String, ?>)getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_packageToModuleField);
+						String packageName = toPackageName(resourceRelativePath);
+						Object loadedModule = packageToModule.get(packageName);
+						Map<String, ?> nameToModule = (Map<String, ?>)getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_nameToModuleField);
+						if (loadedModule != null) {
+							String moduleName = (String)jdk_internal_loader_BuiltinClassLoader$loadedModule_name.invokeWithArguments(loadedModule);
+							Object moduleReference = nameToModule.get(moduleName);
+							if (moduleReference != null) {
 								URL resource = findResourceInModule(classLoader, moduleReference, resourceRelativePath);
 								if (resource != null) {
 									resources.add(resource);
@@ -204,29 +186,36 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 										return resources;
 									}
 								}
-	                        }
-							Object ucp = getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_ucpField);
-							Enumeration<URL> resourceURLS;
-							try {
-								resourceURLS = (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath, false);
-							} catch (NullPointerException exc) {
-								if (ucp != null) {
-									return throwExceptionFunction.apply(exc);
-								}
-								return resources;
 							}
-							while (resourceURLS.hasMoreElements()) {
-								resources.add(resourceURLS.nextElement());
+						}
+						for (Object moduleReference : nameToModule.values()) {
+							URL resource = findResourceInModule(classLoader, moduleReference, resourceRelativePath);
+							if (resource != null) {
+								resources.add(resource);
 								if (findFirst) {
 									return resources;
 								}
 							}
+                        }
+						Object ucp = getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_ucpField);
+						Enumeration<URL> resourceURLS;
+						try {
+							resourceURLS = (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath, false);
+						} catch (NullPointerException exc) {
+							if (ucp != null) {
+								throw exc;
+							}
 							return resources;
-						} else {
-							return superResourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
 						}
-					} catch (Throwable exc) {
-						return throwExceptionFunction.apply(exc);
+						while (resourceURLS.hasMoreElements()) {
+							resources.add(resourceURLS.nextElement());
+							if (findFirst) {
+								return resources;
+							}
+						}
+						return resources;
+					} else {
+						return superResourceFinder.apply(classLoader, resourceRelativePath, findFirst, resources);
 					}
 				}
 
@@ -243,11 +232,7 @@ public interface GetResourcesFunction extends TriFunction<String, Boolean, Class
 					ModuleReader moduleReader = (ModuleReader)jdk_internal_loader_BuiltinClassLoader_moduleReaderFor.invokeWithArguments(classLoader, moduleReference);
 					URI resourceURI = moduleReader.find(resourceRelativePath).orElse(null);
 					if (resourceURI != null) {
-						try {
-							return resourceURI.toURL();
-						} catch (MalformedURLException exc) {
-							return throwExceptionFunction.apply(exc);
-						}
+						return resourceURI.toURL();
 					}
 					return null;
 				}

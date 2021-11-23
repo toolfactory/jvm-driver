@@ -44,12 +44,8 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 	public static abstract class Abst implements SetFieldValueFunction {
 
-		protected ThrowExceptionFunction throwExceptionFunction;
-
 		public Abst(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 	}
@@ -65,7 +61,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		@Override
 		public void accept(Object origTarget, Field field, Object value) {
 			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-				throwExceptionFunction.apply("Value {} is not assignable to {}", value , field.getName());
+				throw new IllegalArgumentException(Strings.compile("Value {} is not assignable to {}", value , field.getName()));
 			}
 			Object target = Modifier.isStatic(field.getModifiers())?
 				field.getDeclaringClass() :
@@ -151,7 +147,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			@Override
 			public void accept(Object target, Field field, Object value) {
 				if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
-					throwExceptionFunction.apply("Value {} is not assignable to {}", value , field.getName());
+					throw new IllegalArgumentException(Strings.compile("Value {} is not assignable to {}", value , field.getName()));
 				}
 				if (Modifier.isStatic(field.getModifiers())) {
 					io.github.toolfactory.narcissus.Narcissus.setStaticField(field, value);

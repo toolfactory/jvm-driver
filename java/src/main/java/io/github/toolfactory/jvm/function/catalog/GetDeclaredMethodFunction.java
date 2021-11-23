@@ -32,58 +32,49 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.template.TriFunction;
+import io.github.toolfactory.jvm.function.template.ThrowingTriFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 
 
-public interface GetDeclaredMethodFunction extends TriFunction<Class<?>, String, Class<?>[], Method> {
+public interface GetDeclaredMethodFunction extends ThrowingTriFunction<Class<?>, String, Class<?>[], Method, Throwable> {
 
 	public static class ForJava7 implements GetDeclaredMethodFunction {
 		protected GetDeclaredMethodsFunction getDeclaredMethodsFunction;
-		protected ThrowExceptionFunction throwExceptionFunction;
 
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			getDeclaredMethodsFunction = functionProvider.getOrBuildObject(GetDeclaredMethodsFunction.class, context);
-			throwExceptionFunction =
-				functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
 		}
 
 		@Override
-		public Method apply(Class<?> cls, String name, Class<?>[] paramTypes) {
-			try {
-				if (paramTypes == null) {
-					paramTypes = new Class<?>[0];
-				}
-				for (Method method : getDeclaredMethodsFunction.apply(cls)) {
-					if (method.getName().equals(name)) {
-						if (paramTypes.length == method.getParameterTypes().length) {
-							Method toRet = method;
-							Class<?>[] parameterTypes = method.getParameterTypes();
-							for (int i = 0; i < parameterTypes.length; i++) {
-								if (!parameterTypes[i].equals(paramTypes[i])) {
-									toRet = null;
-									break;
-								}
+		public Method apply(Class<?> cls, String name, Class<?>[] paramTypes) throws Throwable {
+			if (paramTypes == null) {
+				paramTypes = new Class<?>[0];
+			}
+			for (Method method : getDeclaredMethodsFunction.apply(cls)) {
+				if (method.getName().equals(name)) {
+					if (paramTypes.length == method.getParameterTypes().length) {
+						Method toRet = method;
+						Class<?>[] parameterTypes = method.getParameterTypes();
+						for (int i = 0; i < parameterTypes.length; i++) {
+							if (!parameterTypes[i].equals(paramTypes[i])) {
+								toRet = null;
+								break;
 							}
-							if (toRet != null) {
-								return toRet;
-							}
+						}
+						if (toRet != null) {
+							return toRet;
 						}
 					}
 				}
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
 			}
 			Collection<String> classNames = new ArrayList<>();
 			for (Class<?> paramType : paramTypes) {
 				classNames.add(paramType.getName());
 			}
-			return throwExceptionFunction.apply(
-				new NoSuchMethodException(
-					Strings.compile("Method {}({}) not found in the class {}", name, Strings.join(", ", classNames), cls.getName())
-				)
+			throw new NoSuchMethodException(
+				Strings.compile("Method {}({}) not found in the class {}", name, Strings.join(", ", classNames), cls.getName())
 			);
 		}
 
