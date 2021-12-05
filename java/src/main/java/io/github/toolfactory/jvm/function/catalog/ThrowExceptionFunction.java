@@ -47,7 +47,11 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 
 	public static abstract class Abst implements ThrowExceptionFunction {
 		
+		@Override
 		public <T> T apply(Throwable exception) {
+			if (exception == null) {
+				throw new NullPointerException("Input exception is null");
+			}
 			accept(exception);
 			return null;
 		}
