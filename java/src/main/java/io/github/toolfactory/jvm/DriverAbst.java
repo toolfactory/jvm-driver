@@ -614,6 +614,7 @@ public abstract class DriverAbst implements Driver {
 						}
 					}
 					this.accessibleSetter.accept(object, flag);
+					return;
 				}
 				throw exc;
 			}			
