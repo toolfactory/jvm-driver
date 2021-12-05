@@ -116,6 +116,9 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 			
 			@Override
 			public void accept(Throwable exception) {
+				if (exception == null) {
+					throw new NullPointerException("Input exception is null");
+				}
 				io.github.toolfactory.narcissus.Narcissus.sneakyThrow(exception);
 			}
 
