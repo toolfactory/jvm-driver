@@ -568,7 +568,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (this.exceptionThrower == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						exceptionThrower = getOrBuildExceptionThrower(initContext);
+						this.exceptionThrower = getOrBuildExceptionThrower(initContext);
 						refresh(initContext);
 					}
 				}
@@ -588,7 +588,7 @@ public abstract class DriverAbst implements Driver {
 				synchronized (this) {
 					if (this.exceptionThrower == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						exceptionThrower = getOrBuildExceptionThrower(initContext);
+						this.exceptionThrower = getOrBuildExceptionThrower(initContext);
 						refresh(initContext);
 					}
 				}
@@ -609,7 +609,7 @@ public abstract class DriverAbst implements Driver {
 					synchronized (this) {
 						if (this.accessibleSetter == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							accessibleSetter = getOrBuildAccessibleSetter(initContext);
+							this.accessibleSetter = getOrBuildAccessibleSetter(initContext);
 							refresh(initContext);
 						}
 					}
