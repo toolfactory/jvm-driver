@@ -560,63 +560,56 @@ public abstract class DriverAbst implements Driver {
 
 	@Override
 	public <T> T throwException(Throwable exception) {
-		ThrowExceptionFunction exceptionThrower = this.exceptionThrower;
 		try {
 			return exceptionThrower.apply(exception);
 		} catch (NullPointerException exc) {
 			if (exceptionThrower == null) {
 				synchronized (this) {
-					if (this.exceptionThrower == null) {
+					if (exceptionThrower == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						this.exceptionThrower = getOrBuildExceptionThrower(initContext);
+						exceptionThrower = getOrBuildExceptionThrower(initContext);
 						refresh(initContext);
 					}
 				}
-				return this.exceptionThrower.apply(exception);
 			}
-			throw exc;
+			return exceptionThrower.apply(exception);
 		}
 	}
 	
 	@Override
 	public <T> T throwException(String message, Object... placeHolderReplacements) {
-		ThrowExceptionFunction exceptionThrower = this.exceptionThrower;
 		try {
 			return exceptionThrower.apply(3, message, placeHolderReplacements);
 		} catch (NullPointerException exc) {
 			if (exceptionThrower == null) {
 				synchronized (this) {
-					if (this.exceptionThrower == null) {
+					if (exceptionThrower == null) {
 						Map<Object, Object> initContext = functionsToMap();
-						this.exceptionThrower = getOrBuildExceptionThrower(initContext);
+						exceptionThrower = getOrBuildExceptionThrower(initContext);
 						refresh(initContext);
 					}
 				}
-				return this.exceptionThrower.apply(3, message, placeHolderReplacements);
 			}
-			throw exc;
+			return exceptionThrower.apply(3, message, placeHolderReplacements);
 		}
 	}
 
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
-		ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter = this.accessibleSetter;
 		try {
 			try {
 				accessibleSetter.accept(object, flag);
 			} catch (NullPointerException exc) {
 				if (accessibleSetter == null) {
 					synchronized (this) {
-						if (this.accessibleSetter == null) {
+						if (accessibleSetter == null) {
 							Map<Object, Object> initContext = functionsToMap();
-							this.accessibleSetter = getOrBuildAccessibleSetter(initContext);
+							accessibleSetter = getOrBuildAccessibleSetter(initContext);
 							refresh(initContext);
 						}
 					}
-					this.accessibleSetter.accept(object, flag);
-					return;
 				}
-				throw exc;
+				accessibleSetter.accept(object, flag);
 			}			
 		} catch (Throwable exc) {
 			throwException(exc);
