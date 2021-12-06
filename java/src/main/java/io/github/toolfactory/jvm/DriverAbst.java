@@ -560,56 +560,62 @@ public abstract class DriverAbst implements Driver {
 
 	@Override
 	public <T> T throwException(Throwable exception) {
+		ThrowExceptionFunction exceptionThrower = this.exceptionThrower;
 		try {
 			return exceptionThrower.apply(exception);
 		} catch (NullPointerException exc) {
-			if (exceptionThrower == null) {
-				synchronized (this) {
-					if (exceptionThrower == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						exceptionThrower = getOrBuildExceptionThrower(initContext);
-						refresh(initContext);
-					}
+			if (exceptionThrower != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.exceptionThrower == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.exceptionThrower = getOrBuildExceptionThrower(initContext);
+					refresh(initContext);
 				}
 			}
-			return exceptionThrower.apply(exception);
+			return this.exceptionThrower.apply(exception);
 		}
 	}
 	
 	@Override
 	public <T> T throwException(String message, Object... placeHolderReplacements) {
+		ThrowExceptionFunction exceptionThrower = this.exceptionThrower;
 		try {
 			return exceptionThrower.apply(3, message, placeHolderReplacements);
 		} catch (NullPointerException exc) {
-			if (exceptionThrower == null) {
-				synchronized (this) {
-					if (exceptionThrower == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						exceptionThrower = getOrBuildExceptionThrower(initContext);
-						refresh(initContext);
-					}
+			if (exceptionThrower != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.exceptionThrower == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.exceptionThrower = getOrBuildExceptionThrower(initContext);
+					refresh(initContext);
 				}
 			}
-			return exceptionThrower.apply(3, message, placeHolderReplacements);
+			return this.exceptionThrower.apply(3, message, placeHolderReplacements);
 		}
 	}
 
 	@Override
 	public void setAccessible(AccessibleObject object, boolean flag) {
 		try {
+			ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter = this.accessibleSetter;
 			try {
 				accessibleSetter.accept(object, flag);
 			} catch (NullPointerException exc) {
-				if (accessibleSetter == null) {
-					synchronized (this) {
-						if (accessibleSetter == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							accessibleSetter = getOrBuildAccessibleSetter(initContext);
-							refresh(initContext);
-						}
+				if (accessibleSetter != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.accessibleSetter == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.accessibleSetter = getOrBuildAccessibleSetter(initContext);
+						refresh(initContext);
 					}
 				}
-				accessibleSetter.accept(object, flag);
+				this.accessibleSetter.accept(object, flag);
 			}			
 		} catch (Throwable exc) {
 			throwException(exc);
@@ -618,20 +624,22 @@ public abstract class DriverAbst implements Driver {
 
 	@Override
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode) {
-		try {		
+		try {
+			ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> hookClassDefiner = this.hookClassDefiner;
 			try {
 				return hookClassDefiner.apply(clientClass, byteCode);
 			} catch (NullPointerException exc) {
-				if (hookClassDefiner == null) {
-					synchronized (this) {
-						if (hookClassDefiner == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							hookClassDefiner = getOrBuildHookClassDefiner(initContext);
-							refresh(initContext);
-						}
+				if (hookClassDefiner != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.hookClassDefiner == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.hookClassDefiner = getOrBuildHookClassDefiner(initContext);
+						refresh(initContext);
 					}
 				}
-				return hookClassDefiner.apply(clientClass, byteCode);
+				return this.hookClassDefiner.apply(clientClass, byteCode);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -641,19 +649,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Package getPackage(ClassLoader classLoader, String packageName) {
 		try {
+			ThrowingBiFunction<ClassLoader, String, Package, Throwable> packageRetriever = this.packageRetriever;
 			try {
 				return packageRetriever.apply(classLoader, packageName);
 			} catch (NullPointerException exc) {
-				if (packageRetriever == null) {
-					synchronized (this) {
-						if (packageRetriever == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							packageRetriever = getOrBuildPackageRetriever(initContext);
-							refresh(initContext);
-						}
+				if (packageRetriever != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.packageRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.packageRetriever = getOrBuildPackageRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return packageRetriever.apply(classLoader, packageName);
+				return this.packageRetriever.apply(classLoader, packageName);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -662,92 +672,103 @@ public abstract class DriverAbst implements Driver {
 
 	@Override
 	public CleanableSupplier<Collection<Class<?>>> getLoadedClassesRetriever(ClassLoader classLoader) {
+		Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier = this.loadedClassesRetrieverSupplier;
 		try {
 			return loadedClassesRetrieverSupplier.apply(classLoader);
 		} catch (NullPointerException exc) {
-			if (loadedClassesRetrieverSupplier == null) {
-				synchronized (this) {
-					if (loadedClassesRetrieverSupplier == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						loadedClassesRetrieverSupplier = getOrBuildLoadedClassesRetrieverFunction(initContext);
-						refresh(initContext);
-					}
+			if (loadedClassesRetrieverSupplier != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.loadedClassesRetrieverSupplier == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.loadedClassesRetrieverSupplier = getOrBuildLoadedClassesRetrieverFunction(initContext);
+					refresh(initContext);
 				}
 			}
-			return loadedClassesRetrieverSupplier.apply(classLoader);
+			
+			return this.loadedClassesRetrieverSupplier.apply(classLoader);
 		}
 	}
 
 	@Override
 	public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader) {
+		Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever = this.loadedPackagesRetriever;
 		try {
 			return loadedPackagesRetriever.apply(classLoader);
 		} catch (NullPointerException exc) {
-			if (loadedPackagesRetriever == null) {
-				synchronized (this) {
-					if (loadedPackagesRetriever == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initContext);
-						refresh(initContext);
-					}
+			if (loadedPackagesRetriever != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.loadedPackagesRetriever == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initContext);
+					refresh(initContext);
 				}
 			}
-			return loadedPackagesRetriever.apply(classLoader);
+			return this.loadedPackagesRetriever.apply(classLoader);
 		}
 	}
 
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
+		BiFunction<Object, Field, Object> fieldValueRetriever = this.fieldValueRetriever;
 		try {
 			return (T)fieldValueRetriever.apply(target, field);
 		} catch (NullPointerException exc) {
-			if (fieldValueRetriever == null) {
-				synchronized (this) {
-					if (fieldValueRetriever == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						fieldValueRetriever = getOrBuildFieldValueRetriever(initContext);
-						refresh(initContext);
-					}
+			if (fieldValueRetriever != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.fieldValueRetriever == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.fieldValueRetriever = getOrBuildFieldValueRetriever(initContext);
+					refresh(initContext);
 				}
 			}
-			return (T)fieldValueRetriever.apply(target, field);
+			return (T)this.fieldValueRetriever.apply(target, field);
 		}
 	}
 
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
+		TriConsumer<Object, Field, Object> fieldValueSetter = this.fieldValueSetter;
 		try {
 			fieldValueSetter.accept(target, field, value);
 		} catch (NullPointerException exc) {
-			if (fieldValueSetter == null) {
-				synchronized (this) {
-					if (fieldValueSetter == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						fieldValueSetter = getOrBuildFieldValueSetter(initContext);
-						refresh(initContext);
-					}
+			if (fieldValueSetter != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.fieldValueSetter == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.fieldValueSetter = getOrBuildFieldValueSetter(initContext);
+					refresh(initContext);
 				}
 			}
-			fieldValueSetter.accept(target, field, value);
+			this.fieldValueSetter.accept(target, field, value);
 		}
 	}
 
 	@Override
 	public <T> T allocateInstance(Class<?> cls) {
 		try {
+			ThrowingFunction<Class<?>, Object, Throwable> allocateInstanceInvoker = this.allocateInstanceInvoker;
 			try {
 				return (T)allocateInstanceInvoker.apply(cls);
 			} catch (NullPointerException exc) {
-				if (allocateInstanceInvoker == null) {
-					synchronized (this) {
-						if (allocateInstanceInvoker == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initContext);
-							refresh(initContext);
-						}
+				if (allocateInstanceInvoker != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.allocateInstanceInvoker == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.allocateInstanceInvoker = getOrBuildAllocateInstanceInvoker(initContext);
+						refresh(initContext);
 					}
 				}
-				return (T)allocateInstanceInvoker.apply(cls);
+				return (T)this.allocateInstanceInvoker.apply(cls);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -757,19 +778,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Class<?> getClassByName(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) {
 		try {
+			ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> classByNameRetriever = this.classByNameRetriever;
 			try {
 				return classByNameRetriever.apply(className, initialize, classLoader, caller);
 			} catch (NullPointerException exc) {
-				if (classByNameRetriever == null) {
-					synchronized (this) {
-						if (classByNameRetriever == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							classByNameRetriever = getOrBuildClassByNameRetriever(initContext);
-							refresh(initContext);
-						}
+				if (classByNameRetriever != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.classByNameRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.classByNameRetriever = getOrBuildClassByNameRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return classByNameRetriever.apply(className, initialize, classLoader, caller);
+				return this.classByNameRetriever.apply(className, initialize, classLoader, caller);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -801,19 +824,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, Collection<ClassLoader> classLoaders) {
 		try {
+			GetResourcesFunction resourcesRetriver = this.resourcesRetriver;
 			try {
 				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
 			} catch (NullPointerException exc) {
-				if (resourcesRetriver == null) {
-					synchronized (this) {
-						if (resourcesRetriver == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							resourcesRetriver = getOrBuildResourcesRetriever(initContext);
-							refresh(initContext);
-						}
+				if (resourcesRetriver != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.resourcesRetriver == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.resourcesRetriver = getOrBuildResourcesRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
+				return this.resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -834,56 +859,62 @@ public abstract class DriverAbst implements Driver {
 
 	@Override
 	public Class<?> getBuiltinClassLoaderClass() {
+		Supplier<Class<?>> builtinClassLoaderClassSupplier = this.builtinClassLoaderClassSupplier;
 		try {
 			return builtinClassLoaderClassSupplier.get();
 		} catch (NullPointerException exc) {
-			if (builtinClassLoaderClassSupplier == null) {
-				synchronized (this) {
-					if (builtinClassLoaderClassSupplier == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						builtinClassLoaderClassSupplier = getOrBuildBuiltinClassLoaderClassSupplier(initContext);
-						refresh(initContext);
-					}
+			if (builtinClassLoaderClassSupplier != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.builtinClassLoaderClassSupplier == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.builtinClassLoaderClassSupplier = getOrBuildBuiltinClassLoaderClassSupplier(initContext);
+					refresh(initContext);
 				}
 			}
-			return builtinClassLoaderClassSupplier.get();
+			return this.builtinClassLoaderClassSupplier.get();
 		}
 	}
 
 	@Override
 	public Class<?> getClassLoaderDelegateClass() {
+		Supplier<Class<?>> classLoaderDelegateClassSupplier = this.classLoaderDelegateClassSupplier;
 		try {
 			return classLoaderDelegateClassSupplier.get();
 		} catch (NullPointerException exc) {
-			if (classLoaderDelegateClassSupplier == null) {
-				synchronized (this) {
-					if (classLoaderDelegateClassSupplier == null) {
-						Map<Object, Object> initContext = functionsToMap();
-						classLoaderDelegateClassSupplier = getOrBuildClassLoaderDelegateClassSupplier(initContext);
-						refresh(initContext);
-					}
+			if (classLoaderDelegateClassSupplier != null) {
+				throw exc;
+			}
+			synchronized (this) {
+				if (this.classLoaderDelegateClassSupplier == null) {
+					Map<Object, Object> initContext = functionsToMap();
+					this.classLoaderDelegateClassSupplier = getOrBuildClassLoaderDelegateClassSupplier(initContext);
+					refresh(initContext);
 				}
 			}
-			return classLoaderDelegateClassSupplier.get();
+			return this.classLoaderDelegateClassSupplier.get();
 		}
 	}
 
 	@Override
 	public Lookup getConsulter(Class<?> cls) {
 		try {
+			ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> consulterRetriever = this.consulterRetriever;
 			try {
 				return consulterRetriever.apply(cls);
 			} catch (NullPointerException exc) {
-				if (consulterRetriever == null) {
-					synchronized (this) {
-						if (consulterRetriever == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							consulterRetriever = getOrBuildDeepConsulterRetriever(initContext);
-							refresh(initContext);
-						}
+				if (consulterRetriever != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.consulterRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.consulterRetriever = getOrBuildDeepConsulterRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return consulterRetriever.apply(cls);
+				return this.consulterRetriever.apply(cls);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -893,19 +924,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> T invoke(Object target, Method method, Object[] params) {
 		try {
+			ThrowingTriFunction<Method, Object, Object[], Object, Throwable> methodInvoker = this.methodInvoker;
 			try {
 				return (T)methodInvoker.apply(method, target, params);
 			} catch (NullPointerException exc) {
-				if (methodInvoker == null) {
-					synchronized (this) {
-						if (methodInvoker == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							methodInvoker = getOrBuildMethodInvoker(initContext);
-							refresh(initContext);
-						}
+				if (methodInvoker != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.methodInvoker == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.methodInvoker = getOrBuildMethodInvoker(initContext);
+						refresh(initContext);
 					}
 				}
-				return (T)methodInvoker.apply(method, target, params);
+				return (T)this.methodInvoker.apply(method, target, params);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -915,19 +948,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> T newInstance(Constructor<T> ctor, Object[] params) {
 		try {
+			ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> constructorInvoker = this.constructorInvoker;
 			try {
 				return (T)constructorInvoker.apply(ctor, params);
 			} catch (NullPointerException exc) {
-				if (constructorInvoker == null) {
-					synchronized (this) {
-						if (constructorInvoker == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							constructorInvoker = getOrBuildConstructorInvoker(initContext);
-							refresh(initContext);
-						}
-					}
+				if (constructorInvoker != null) {
+					throw exc;
 				}
-				return (T)constructorInvoker.apply(ctor, params);
+				synchronized (this) {
+					if (this.constructorInvoker == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.constructorInvoker = getOrBuildConstructorInvoker(initContext);
+						refresh(initContext);
+					}
+				}				
+				return (T)this.constructorInvoker.apply(ctor, params);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -937,19 +972,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Field[] getDeclaredFields(Class<?> cls) {
 		try {
+			ThrowingFunction<Class<?>, Field[], Throwable> declaredFieldsRetriever = this.declaredFieldsRetriever;
 			try {
 				return declaredFieldsRetriever.apply(cls);
 			} catch (NullPointerException exc) {
-				if (declaredFieldsRetriever == null) {
-					synchronized (this) {
-						if (declaredFieldsRetriever == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initContext);
-							refresh(initContext);
-						}
+				if (declaredFieldsRetriever != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.declaredFieldsRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return declaredFieldsRetriever.apply(cls);
+				return this.declaredFieldsRetriever.apply(cls);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -959,19 +996,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> Constructor<T>[] getDeclaredConstructors(Class<T> cls) {
 		try {
+			ThrowingFunction<Class<?>, Constructor<?>[], Throwable> declaredConstructorsRetriever = this.declaredConstructorsRetriever;
 			try {
 				return (Constructor<T>[])declaredConstructorsRetriever.apply(cls);
 			} catch (NullPointerException exc) {
-				if (declaredConstructorsRetriever == null) {
-					synchronized (this) {
-						if (declaredConstructorsRetriever == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(initContext);
-							refresh(initContext);
-						}
+				if (declaredConstructorsRetriever != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.declaredConstructorsRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.declaredConstructorsRetriever = getOrBuildDeclaredConstructorsRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return (Constructor<T>[])declaredConstructorsRetriever.apply(cls);
+				return (Constructor<T>[])this.declaredConstructorsRetriever.apply(cls);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -981,19 +1020,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Method[] getDeclaredMethods(Class<?> cls) {
 		try {
+			ThrowingFunction<Class<?>, Method[], Throwable> declaredMethodsRetriever = this.declaredMethodsRetriever;
 			try {
 				return declaredMethodsRetriever.apply(cls);
 			} catch (NullPointerException exc) {
-				if (declaredMethodsRetriever == null) {
-					synchronized (this) {
-						if (declaredMethodsRetriever == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(initContext);
-							refresh(initContext);
-						}
+				if (declaredMethodsRetriever != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.declaredMethodsRetriever == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.declaredMethodsRetriever = getOrBuildDeclaredMethodsRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return declaredMethodsRetriever.apply(cls);
+				return this.declaredMethodsRetriever.apply(cls);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
@@ -1005,19 +1046,21 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public ClassLoader convertToBuiltinClassLoader(ClassLoader classLoader) {
 		try {
+			ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter = this.classLoaderToBuiltinClassLoaderConverter;
 			try {
 				return classLoaderToBuiltinClassLoaderConverter.apply(classLoader);
 			} catch (NullPointerException exc) {
-				if (classLoaderToBuiltinClassLoaderConverter == null) {
-					synchronized (this) {
-						if (classLoaderToBuiltinClassLoaderConverter == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							classLoaderToBuiltinClassLoaderConverter = getOrBuildClassLoaderToBuiltinClassLoaderConverter(initContext);
-							refresh(initContext);
-						}
+				if (classLoaderToBuiltinClassLoaderConverter != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.classLoaderToBuiltinClassLoaderConverter == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.classLoaderToBuiltinClassLoaderConverter = getOrBuildClassLoaderToBuiltinClassLoaderConverter(initContext);
+						refresh(initContext);
 					}
 				}
-				return classLoaderToBuiltinClassLoaderConverter.apply(classLoader);
+				return this.classLoaderToBuiltinClassLoaderConverter.apply(classLoader);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
