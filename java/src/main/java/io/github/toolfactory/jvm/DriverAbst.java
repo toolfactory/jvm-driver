@@ -806,16 +806,17 @@ public abstract class DriverAbst implements Driver {
 			try {
 				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
 			} catch (NullPointerException exc) {
-				if (resourcesRetriver == null) {
-					synchronized (this) {
-						if (resourcesRetriver == null) {
-							Map<Object, Object> initContext = functionsToMap();
-							resourcesRetriver = getOrBuildResourcesRetriever(initContext);
-							refresh(initContext);
-						}
+				if (resourcesRetriver != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.resourcesRetriver == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.resourcesRetriver = getOrBuildResourcesRetriever(initContext);
+						refresh(initContext);
 					}
 				}
-				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
+				return this.resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
 			}
 		} catch (Throwable exc) {
 			return throwException(exc);
