@@ -50,8 +50,8 @@
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
 
-		<junit-jupiter.version>5.8.1</junit-jupiter.version>
-		<junit.version>1.8.1</junit.version>
+		<junit-jupiter.version>5.8.2</junit-jupiter.version>
+		<junit.version>1.8.2</junit.version>
 		<maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
