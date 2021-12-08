@@ -181,26 +181,69 @@ public abstract class DriverAbst implements Driver {
 
 	<D extends Driver> D refresh(Map<Object, Object> initializationContext) {
 		try {
-			exceptionThrower = getExceptionThrower(initializationContext);
-			allocateInstanceInvoker = getAllocateInstanceInvoker(initializationContext);
-			fieldValueRetriever = getFieldValueRetriever(initializationContext);
-			fieldValueSetter = getFieldValueSetter(initializationContext);
-			hookClassDefiner = getHookClassDefiner(initializationContext);
-			declaredFieldsRetriever = getDeclaredFieldsRetriever(initializationContext);
-			declaredMethodsRetriever = getDeclaredMethodsRetriever(initializationContext);
-			declaredConstructorsRetriever = getDeclaredConstructorsRetriever(initializationContext);
-			accessibleSetter = getAccessibleSetter(initializationContext);
-			constructorInvoker = getConstructorInvoker(initializationContext);
-			methodInvoker = getMethodInvoker(initializationContext);
-			packageRetriever = getPackageRetriever(initializationContext);
-			classByNameRetriever = getOrBuildClassByNameRetriever(initializationContext);
-			resourcesRetriver = getOrBuildResourcesRetriever(initializationContext);
-			builtinClassLoaderClassSupplier = getBuiltinClassLoaderClassSupplier(initializationContext);
-			classLoaderDelegateClassSupplier = getClassLoaderDelegateClassSupplier(initializationContext);
-			consulterRetriever = getDeepConsulterRetriever(initializationContext);
-			loadedClassesRetrieverSupplier = getLoadedClassesRetrieverFunction(initializationContext);
-			loadedPackagesRetriever = getLoadedPackagesRetriever(initializationContext);
-			classLoaderToBuiltinClassLoaderConverter = getClassLoaderToBuiltinClassLoaderConverter(initializationContext);
+			if (exceptionThrower == null) {
+				exceptionThrower = getExceptionThrower(initializationContext);
+			}
+			if (allocateInstanceInvoker == null) {
+				allocateInstanceInvoker = getAllocateInstanceInvoker(initializationContext);
+			}
+			if (fieldValueRetriever == null) {
+				fieldValueRetriever = getFieldValueRetriever(initializationContext);
+			}
+			if (fieldValueSetter == null) {
+				fieldValueSetter = getFieldValueSetter(initializationContext);
+			}
+			if (hookClassDefiner == null) {
+				hookClassDefiner = getHookClassDefiner(initializationContext);
+			}
+			
+			if (declaredFieldsRetriever == null) {
+				declaredFieldsRetriever = getDeclaredFieldsRetriever(initializationContext);
+			}
+			if (declaredMethodsRetriever == null) {
+				declaredMethodsRetriever = getDeclaredMethodsRetriever(initializationContext);
+			}
+			if (declaredConstructorsRetriever == null) {
+				declaredConstructorsRetriever = getDeclaredConstructorsRetriever(initializationContext);
+			}
+			if (accessibleSetter == null) {
+				accessibleSetter = getAccessibleSetter(initializationContext);
+			}
+			if (constructorInvoker == null) {
+				constructorInvoker = getConstructorInvoker(initializationContext);
+			}
+			
+			if (methodInvoker == null) {
+				methodInvoker = getMethodInvoker(initializationContext);
+			}
+			if (packageRetriever == null) {
+				packageRetriever = getPackageRetriever(initializationContext);
+			}
+			if (classByNameRetriever == null) {
+				classByNameRetriever = getOrBuildClassByNameRetriever(initializationContext);
+			}
+			if (resourcesRetriver == null) {
+				resourcesRetriver = getOrBuildResourcesRetriever(initializationContext);
+			}
+			if (builtinClassLoaderClassSupplier == null) {
+				builtinClassLoaderClassSupplier = getBuiltinClassLoaderClassSupplier(initializationContext);
+			}
+			
+			if (classLoaderDelegateClassSupplier == null) {
+				classLoaderDelegateClassSupplier = getClassLoaderDelegateClassSupplier(initializationContext);
+			}
+			if (consulterRetriever == null) {
+				consulterRetriever = getDeepConsulterRetriever(initializationContext);
+			}
+			if (loadedClassesRetrieverSupplier == null) {
+				loadedClassesRetrieverSupplier = getLoadedClassesRetrieverFunction(initializationContext);
+			}
+			if (loadedPackagesRetriever == null) {
+				loadedPackagesRetriever = getLoadedPackagesRetriever(initializationContext);
+			}
+			if (classLoaderToBuiltinClassLoaderConverter == null) {
+				classLoaderToBuiltinClassLoaderConverter = getClassLoaderToBuiltinClassLoaderConverter(initializationContext);
+			}
 			putNewObjectProviderIfAbsent(initializationContext);
 		} catch (Throwable exc) {
 			throwException(
