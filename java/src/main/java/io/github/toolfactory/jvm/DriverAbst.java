@@ -75,26 +75,26 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 @SuppressWarnings({"unchecked"})
 public abstract class DriverAbst implements Driver {
 
-	private ThrowExceptionFunction exceptionThrower;
-	private ThrowingFunction<Class<?>, Object, Throwable> allocateInstanceInvoker;
-	private BiFunction<Object, Field, Object> fieldValueRetriever;
-	private TriConsumer<Object, Field, Object> fieldValueSetter;
-	private ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> hookClassDefiner;
-	private ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> consulterRetriever;
-	private ThrowingFunction<Class<?>, Field[], Throwable> declaredFieldsRetriever;
-	private ThrowingFunction<Class<?>, Method[], Throwable> declaredMethodsRetriever;
-	private ThrowingFunction<Class<?>, Constructor<?>[], Throwable> declaredConstructorsRetriever;
-	private ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter;
-	private ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> constructorInvoker;
-	private ThrowingBiFunction<ClassLoader, String, Package, Throwable> packageRetriever;
-	private ThrowingTriFunction<Method, Object, Object[], Object, Throwable> methodInvoker;
-	private ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> classByNameRetriever;
-	private GetResourcesFunction resourcesRetriver;
-	private Supplier<Class<?>> builtinClassLoaderClassSupplier;
-	private Supplier<Class<?>> classLoaderDelegateClassSupplier;
-	private Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
-	private Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
-	private ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter;
+	private volatile ThrowExceptionFunction exceptionThrower;
+	private volatile ThrowingFunction<Class<?>, Object, Throwable> allocateInstanceInvoker;
+	private volatile BiFunction<Object, Field, Object> fieldValueRetriever;
+	private volatile TriConsumer<Object, Field, Object> fieldValueSetter;
+	private volatile ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> hookClassDefiner;
+	private volatile ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> consulterRetriever;
+	private volatile ThrowingFunction<Class<?>, Field[], Throwable> declaredFieldsRetriever;
+	private volatile ThrowingFunction<Class<?>, Method[], Throwable> declaredMethodsRetriever;
+	private volatile ThrowingFunction<Class<?>, Constructor<?>[], Throwable> declaredConstructorsRetriever;
+	private volatile ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter;
+	private volatile ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> constructorInvoker;
+	private volatile ThrowingBiFunction<ClassLoader, String, Package, Throwable> packageRetriever;
+	private volatile ThrowingTriFunction<Method, Object, Object[], Object, Throwable> methodInvoker;
+	private volatile ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> classByNameRetriever;
+	private volatile GetResourcesFunction resourcesRetriver;
+	private volatile Supplier<Class<?>> builtinClassLoaderClassSupplier;
+	private volatile Supplier<Class<?>> classLoaderDelegateClassSupplier;
+	private volatile Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
+	private volatile Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
+	private volatile ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter;
 
 	public DriverAbst() {}
 
@@ -802,6 +802,7 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public Collection<URL> getResources(String resourceRelativePath, boolean findFirst, ClassLoader... classLoaders) {
 		try {
+			GetResourcesFunction resourcesRetriver = this.resourcesRetriver;
 			try {
 				return resourcesRetriver.apply(resourceRelativePath, findFirst, classLoaders);
 			} catch (NullPointerException exc) {
