@@ -87,6 +87,9 @@ jobs:
         exclude:
           - os: macOS-latest
             architecture: x86
+          - os: ubuntu-latest
+            architecture: x86
+            java: 10
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
