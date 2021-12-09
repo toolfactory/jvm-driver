@@ -23,7 +23,7 @@
 ::	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 ::	OR OTHER DEALINGS IN THE SOFTWARE.
 ::
-
+@echo off
 call "%1/bin/javac.exe" -cp "%2;%3;" --release 9 "%4/jdk/internal/loader/ClassLoaderDelegateForJDK9.java" -d "%5"
 call "%1/bin/javac.exe" -cp "%2;%3;" --release 8 "%4/java/lang/reflect/AccessibleSetterInvokerForJDK9.java" -d "%5"
 call "%1/bin/javac.exe" -cp "%2;%3;" --release 8 "%4/java/lang/ConsulterRetrieverForJDK9.java" -d "%5"
