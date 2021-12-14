@@ -110,9 +110,14 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 				Object javaLangAccess = methodInvoker.apply(getJavaLangAccessMethod, null, null);
 
 				methodInvoker.apply(
-					addExportsToAllUnnamedMethod, javaLangAccess, new Object[] {
-						get.invoke(findModuleMethod.invoke(moduleLayer, "java.base")), "jdk.internal.loader"}
-					);
+					addExportsToAllUnnamedMethod,
+					javaLangAccess,
+					new Object[] {
+						//get.invoke(findModuleMethod.invoke(moduleLayer, "java.base")),
+						java.lang.ModuleLayer.boot().findModule("java.base").get(),
+						"jdk.internal.loader"
+					}
+				);
 				super.loadClass(context);
 			}
 
