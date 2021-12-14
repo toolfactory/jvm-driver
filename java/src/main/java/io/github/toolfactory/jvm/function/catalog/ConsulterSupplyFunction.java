@@ -32,7 +32,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Streams;
@@ -164,11 +163,7 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 
 	public static interface Hybrid extends ConsulterSupplyFunction {
 
-		public static class ForJava17 extends Native.ForJava7 implements Hybrid {
-
-			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
-				super(context);
-			}
+		public static interface ForJava17 extends Hybrid {
 
 			public static class ForSemeru extends Native.ForJava17.ForSemeru implements Hybrid {
 
