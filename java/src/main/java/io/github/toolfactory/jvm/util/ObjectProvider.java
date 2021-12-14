@@ -113,6 +113,9 @@ public class ObjectProvider {
 							exc
 						);
 					}
+					if (exc instanceof InitializationMarkViaExceptionHandler) {
+						break;
+					}
 				}
 			}
 		}
