@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
@@ -130,12 +131,15 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		public ForJava17(Map<Object, Object> context) {
 			super(context);
 			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-			unsafe.putInt(consulter, 20, -1);
+			final long allowedModesFieldMemoryOffset = Info.Provider.getInfoInstance().is64Bit() ? 12L : 8L;
+			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
 		}
 
-		public static class ForSemeru extends ForJava17 {
+		public static class ForSemeru extends Abst {
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				unsafe.putInt(consulter, 20, -1);
 			}
 
 		}
