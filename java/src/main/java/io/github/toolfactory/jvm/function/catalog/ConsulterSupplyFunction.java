@@ -165,7 +165,7 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 
 		public static interface ForJava17 extends Hybrid {
 
-			public static class ForSemeru extends Native.ForJava17.ForSemeru implements Hybrid {
+			public static class ForSemeru extends Native.ForJava17.ForSemeru implements Hybrid.ForJava17 {
 
 				public ForSemeru(Map<Object, Object> context) throws Throwable {
 					super(context);
