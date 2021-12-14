@@ -63,6 +63,7 @@ public class ObjectProvider {
 		this.jVMVendorToClassSuffix = new LinkedHashMap<>();
 		this.jVMVendorToClassSuffix.put("Oracle Corporation", new ArrayList<String>());
 		this.jVMVendorToClassSuffix.put("International Business Machines Corporation", Arrays.asList("ForSemeru"));
+		this.jVMVendorToClassSuffix.put("IBM Corporation", Arrays.asList("ForSemeru"));
 		jVMVersion = Info.Provider.getInfoInstance().getVersion();
 		vendor = System.getProperty("java.vendor");
 		TreeSet<Integer> registeredVersions = new TreeSet<>();

@@ -118,9 +118,13 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 			try {
 				return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(lookup, byteCode);
 			} catch (LinkageError exc) {
-				return Class.forName(
-					JavaClass.create(ByteBuffer.wrap(byteCode)).getName()
-				);
+				try {
+					return Class.forName(
+						JavaClass.create(ByteBuffer.wrap(byteCode)).getName()
+					);
+				} catch (Throwable excTwo) {
+					throw exc;
+				}
 			}
 		}
 

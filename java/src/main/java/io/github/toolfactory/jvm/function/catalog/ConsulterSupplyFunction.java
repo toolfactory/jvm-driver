@@ -32,10 +32,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
-import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Streams;
+import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 
 
 @SuppressWarnings("unchecked")
@@ -95,5 +96,86 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 			return function.apply(input);
 		}
 
+	}
+
+	public static interface ForJava17 extends ConsulterSupplyFunction {
+
+		public static class ForSemeru extends Abst<java.util.function.Function<Class<?>, MethodHandles.Lookup>> implements ForJava17 {
+
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				try (
+					InputStream inputStream =
+						this.getClass().getResourceAsStream("ConsulterRetrieverForJDK9.bwc"
+					);
+				) {
+					MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
+					Class<?> methodHandleWrapperClass = functionProvider.getOrBuildObject(
+						DefineHookClassFunction.class, context
+					).apply(Class.class, Streams.toByteArray(inputStream));
+					functionProvider.getOrBuildObject(SetFieldValueFunction.class, context).accept(
+						methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"),
+						privateLookupInMethodHandle
+					);
+					empowerMainConsulter((MethodHandles.Lookup)methodHandleWrapperClass.getDeclaredField("mainConsulter").get(null), context);
+					setFunction((java.util.function.Function<Class<?>, MethodHandles.Lookup>)
+						functionProvider.getOrBuildObject(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
+				}
+			}
+
+			protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				unsafe.putInt(consulter, 20, -1);
+			}
+
+
+			@Override
+			public MethodHandles.Lookup apply(Class<?> input) {
+				return function.apply(input);
+			}
+		}
+
+	}
+
+	public static interface Native extends ConsulterSupplyFunction {
+
+		public static interface ForJava17 extends Native {
+
+			public static class ForSemeru extends ConsulterSupplyFunction.ForJava17.ForSemeru implements ForJava17 {
+
+				public ForSemeru(Map<Object, Object> context) throws Throwable {
+					super(context);
+				}
+
+				@Override
+				protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
+					io.github.toolfactory.narcissus.Narcissus.setField(
+						consulter,
+						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"),
+						-1
+					);
+				}
+
+			}
+
+		}
+
+	}
+
+	public static interface Hybrid extends ConsulterSupplyFunction {
+
+		public static class ForJava17 extends Native.ForJava7 implements Hybrid {
+
+			public ForJava17(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
+				super(context);
+			}
+
+			public static class ForSemeru extends Native.ForJava17.ForSemeru implements Hybrid {
+
+				public ForSemeru(Map<Object, Object> context) throws Throwable {
+					super(context);
+				}
+			}
+		}
 	}
 }

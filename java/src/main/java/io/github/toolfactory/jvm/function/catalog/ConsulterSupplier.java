@@ -32,7 +32,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
@@ -131,35 +130,41 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		public ForJava17(Map<Object, Object> context) {
 			super(context);
 			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-			final long allowedModesFieldMemoryOffset = Info.Provider.getInfoInstance().is64Bit() ? 12L : 8L;
-			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, -1);
+			unsafe.putInt(consulter, 20, -1);
+		}
+
+		public static class ForSemeru extends ForJava17 {
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+				super(context);
+			}
+
 		}
 
 	}
 
 
 	public static interface Native extends ConsulterSupplier {
-		
+
 		public static abstract class Abst extends ConsulterSupplier.Abst {
-			
+
 			public Abst(Map<Object, Object> context) throws InitializeException {
 				super(context);
 				checkNativeEngine();
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-			
+
 		}
-		
+
 		public static class ForJava7 extends Abst implements Native {
 
 			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
@@ -213,6 +218,16 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			}
 		}
 
+		public static interface ForJava17 extends Native, ConsulterSupplier {
+
+			public static class ForSemeru extends Native.ForJava7 implements Native.ForJava17 {
+
+				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InitializeException {
+					super(context);
+				}
+			}
+		}
+
 	}
 
 
@@ -224,7 +239,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				super(context);
 			}
 
-			public static class ForSemeru extends ConsulterSupplier.Native.ForJava9.ForSemeru implements Hybrid {
+			public static class ForSemeru extends Native.ForJava17.ForSemeru implements Hybrid {
 
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InitializeException {
 					super(context);

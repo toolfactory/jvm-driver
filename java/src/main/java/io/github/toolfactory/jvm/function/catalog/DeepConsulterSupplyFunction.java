@@ -33,10 +33,9 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
-import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 import io.github.toolfactory.jvm.util.ObjectProvider;
+import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 
 
 @SuppressWarnings("unchecked")
@@ -151,6 +150,41 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 		@Override
 		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 			return function.apply(input);
+		}
+
+	}
+
+	public static interface ForJava17 extends DeepConsulterSupplyFunction {
+
+		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> implements ForJava17 {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
+				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
+				final MethodHandle methodHandle = lookupCtor.newInstance(
+					MethodHandles.Lookup.class, null, -1
+				).findConstructor(
+					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
+				);
+				setFunction(
+					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
+						@Override
+						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
+								cls,
+								null,
+								-1
+							);
+						}
+					}
+				);
+
+			}
+
+			@Override
+			public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
+				return function.apply(input);
+			}
 		}
 
 	}

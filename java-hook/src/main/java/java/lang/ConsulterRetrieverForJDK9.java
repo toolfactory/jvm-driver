@@ -35,7 +35,7 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public class ConsulterRetrieverForJDK9 implements Function<Class<?>, MethodHandles.Lookup> {
 	private static MethodHandle consulterRetriever;
-	private static MethodHandles.Lookup mainConsulter;
+	public final static MethodHandles.Lookup mainConsulter;
 	
 	static {
 		mainConsulter = MethodHandles.lookup();

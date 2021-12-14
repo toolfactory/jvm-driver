@@ -31,6 +31,7 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
@@ -51,6 +52,7 @@ public class NativeDriver extends DefaultDriver {
 		ObjectProvider objectProvider = ObjectProvider.get(context);
 		objectProvider.markToBeInitializedViaExceptionHandler(ThrowExceptionFunction.class, context);
 		objectProvider.markToBeInitializedViaExceptionHandler(ConsulterSupplier.class, context);
+		ObjectProvider.get(context).markToBeInitializedViaExceptionHandler(ConsulterSupplyFunction.class, context);
 		objectProvider.markToBeInitializedViaExceptionHandler(SetFieldValueFunction.class, context);
 		objectProvider.markToBeInitializedViaExceptionHandler(io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction.class, context);
 		objectProvider.markToBeInitializedViaExceptionHandler(GetFieldValueFunction.class, context);
@@ -66,6 +68,9 @@ public class NativeDriver extends DefaultDriver {
 						if (objectProvider.isMarkedToBeInitializedViaExceptionHandler(exception)) {
 							if (clazz.isAssignableFrom(getConsulterSupplierFunctionClass())) {
 								return (T)objectProvider.getOrBuildObject(getConsulterSupplierFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getConsulterSupplyFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getConsulterSupplyFunctionClass(), context);
 							}
 							if (clazz.isAssignableFrom(getThrowExceptionFunctionClass())) {
 								return (T)objectProvider.getOrBuildObject(getThrowExceptionFunctionClass(), context);
@@ -99,6 +104,12 @@ public class NativeDriver extends DefaultDriver {
 
 	protected Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
 		return ConsulterSupplier.Native.class;
+	}
+
+
+	@Override
+	protected Class<? extends ConsulterSupplyFunction> getConsulterSupplyFunctionClass() {
+		return ConsulterSupplyFunction.Native.class;
 	}
 
 

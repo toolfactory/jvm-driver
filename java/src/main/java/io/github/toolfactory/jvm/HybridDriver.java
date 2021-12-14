@@ -30,6 +30,7 @@ package io.github.toolfactory.jvm;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
@@ -42,6 +43,7 @@ public class HybridDriver extends DefaultDriver {
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
 		ObjectProvider.get(context).markToBeInitializedViaExceptionHandler(ConsulterSupplier.class, context);
+		ObjectProvider.get(context).markToBeInitializedViaExceptionHandler(ConsulterSupplyFunction.class, context);
 		ObjectProvider.setExceptionHandler(
 				context,
 				new ObjectProvider.ExceptionHandler() {
@@ -52,6 +54,9 @@ public class HybridDriver extends DefaultDriver {
 						if (objectProvider.isMarkedToBeInitializedViaExceptionHandler(exception)) {
 							if (clazz.isAssignableFrom(getConsulterSupplierFunctionClass())) {
 								return (T)objectProvider.getOrBuildObject(getConsulterSupplierFunctionClass(), context);
+							}
+							if (clazz.isAssignableFrom(getConsulterSupplyFunctionClass())) {
+								return (T)objectProvider.getOrBuildObject(getConsulterSupplyFunctionClass(), context);
 							}
 						}
 						throw exception;
@@ -65,4 +70,11 @@ public class HybridDriver extends DefaultDriver {
 	protected Class<? extends ConsulterSupplier> getConsulterSupplierFunctionClass() {
 		return ConsulterSupplier.Hybrid.class;
 	}
+
+
+	@Override
+	protected Class<? extends ConsulterSupplyFunction> getConsulterSupplyFunctionClass() {
+		return ConsulterSupplyFunction.Hybrid.class;
+	}
+
 }
