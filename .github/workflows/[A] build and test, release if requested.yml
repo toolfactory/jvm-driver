@@ -85,9 +85,11 @@ jobs:
         architecture: [x86, x64]
         distribution: [zulu, adopt-openj9]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea, 19-ea]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
+            architecture: x86
+          - distribution: adopt-openj9
             architecture: x86
           - distribution: adopt-openj9
             java: 9
@@ -101,8 +103,6 @@ jobs:
             java: 14
           - distribution: adopt-openj9
             java: 15
-          - distribution: adopt-openj9
-            java: 17
           - distribution: adopt-openj9
             java: 18-ea
           - distribution: adopt-openj9
