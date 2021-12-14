@@ -76,7 +76,7 @@ jobs:
 
           
   build-and-test-with-Java-9-and-later:
-    name: Build and test with 7 target (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.java }})
+    name: Build and test with 7 target (${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }})
     needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
@@ -90,7 +90,23 @@ jobs:
           - os: macOS-latest
             architecture: x86
           - distribution: adopt-openj9
-            java: [9, 10, 12, 13, 14, 15, 17, 18-ea, 19-ea]
+            java: 9
+          - distribution: adopt-openj9
+            java: 10
+          - distribution: adopt-openj9
+            java: 12
+          - distribution: adopt-openj9
+            java: 13
+          - distribution: adopt-openj9
+            java: 14
+          - distribution: adopt-openj9
+            java: 15
+          - distribution: adopt-openj9
+            java: 17
+          - distribution: adopt-openj9
+            java: 18-ea
+          - distribution: adopt-openj9
+            java: 19-ea
 #          - os: ubuntu-latest
 #            architecture: x86
 #            java: 10
