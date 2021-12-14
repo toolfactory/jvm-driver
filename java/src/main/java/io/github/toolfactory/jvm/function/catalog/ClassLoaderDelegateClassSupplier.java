@@ -98,24 +98,15 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 				Class<?> sharedSecretsClass = getClassByNameFunction.apply("jdk.internal.access.SharedSecrets", false, thisClassClassLoader, thisClass);
 				Method getJavaLangAccessMethod = sharedSecretsClass.getDeclaredMethod("getJavaLangAccess");
 				Class<?> javaLangAccessClass = getClassByNameFunction.apply("jdk.internal.access.JavaLangAccess", false, thisClassClassLoader, thisClass);
-				Method addExportsToAllUnnamedMethod = javaLangAccessClass.getDeclaredMethod("addExportsToAllUnnamed", Module.class, String.class);
+				Method addExports = javaLangAccessClass.getDeclaredMethod("addExports", java.lang.Module.class, String.class, java.lang.Module.class);
 				MethodInvokeFunction methodInvoker = functionProvider.getOrBuildObject(MethodInvokeFunction.class, context);
-
-				Class<?> moduleLayerClass = getClassByNameFunction.apply("java.lang.ModuleLayer", false, thisClassClassLoader, thisClass);
-				Method bootMethod =	moduleLayerClass.getDeclaredMethod("boot");
-				Object moduleLayer = bootMethod.invoke(null);
-				Method findModuleMethod = moduleLayerClass.getDeclaredMethod("findModule", String.class);
-				Class<?> optionalClass = getClassByNameFunction.apply("java.util.Optional", false, thisClassClassLoader, thisClass);
-				Method get = optionalClass.getDeclaredMethod("get");
-				Object javaLangAccess = methodInvoker.apply(getJavaLangAccessMethod, null, null);
-
 				methodInvoker.apply(
-					addExportsToAllUnnamedMethod,
-					javaLangAccess,
+					addExports,
+					methodInvoker.apply(getJavaLangAccessMethod, null, null),
 					new Object[] {
-						//get.invoke(findModuleMethod.invoke(moduleLayer, "java.base")),
 						java.lang.ModuleLayer.boot().findModule("java.base").get(),
-						"jdk.internal.loader"
+						"jdk.internal.loader",
+						thisClass.getModule()
 					}
 				);
 				super.loadClass(context);
