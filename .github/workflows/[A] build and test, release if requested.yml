@@ -83,11 +83,14 @@ jobs:
       max-parallel: 15
       matrix:
         architecture: [x86, x64]
+        distribution: [zulu, adopt-openj9]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea, 19-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
+          - distribution: adopt-openj9
+            java: [9, 10, 12, 13, 14, 15, 17, 18-ea, 19-ea]
 #          - os: ubuntu-latest
 #            architecture: x86
 #            java: 10
@@ -98,7 +101,7 @@ jobs:
         uses: actions/setup-java@v2.4.0
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'zulu'
+          distribution: ${{ matrix.distribution }}
           architecture: ${{ matrix.architecture }}
       - name: Update repositories
         run: |
@@ -106,7 +109,8 @@ jobs:
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
       - name: Build and test with final version JDK
-        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml     
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+
   
   release:
     needs: [build-and-test-with-Java-9-and-later]
