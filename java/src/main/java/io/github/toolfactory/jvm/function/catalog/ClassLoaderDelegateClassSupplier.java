@@ -27,7 +27,9 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
@@ -49,10 +51,14 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 
 	}
 
-	public static class ForJava9 implements ClassLoaderDelegateClassSupplier{
+	public static class ForJava9 implements ClassLoaderDelegateClassSupplier {
 		protected Class<?> cls;
 
 		public ForJava9(Map<Object, Object> context) throws Throwable {
+			loadClass(context);
+		}
+
+		protected void loadClass(Map<Object, Object> context) throws Throwable, IOException {
 			try (
 				InputStream inputStream = Classes.class.getResourceAsStream(
 					"ClassLoaderDelegateForJDK9.bwc"
@@ -74,5 +80,46 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 		}
 
 	}
+
+	public static interface ForJava17 extends ClassLoaderDelegateClassSupplier {
+
+		public static class ForSemeru extends ForJava9 implements ForJava17 {
+
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
+				super(context);
+			}
+
+			@Override
+			protected void loadClass(Map<Object, Object> context) throws Throwable, IOException {
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				Class<?> thisClass = getClass();
+				ClassLoader thisClassClassLoader = thisClass.getClassLoader();
+				GetClassByNameFunction getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
+				Class<?> sharedSecretsClass = getClassByNameFunction.apply("jdk.internal.access.SharedSecrets", false, thisClassClassLoader, thisClass);
+				Method getJavaLangAccessMethod = sharedSecretsClass.getDeclaredMethod("getJavaLangAccess");
+				Class<?> javaLangAccessClass = getClassByNameFunction.apply("jdk.internal.access.JavaLangAccess", false, thisClassClassLoader, thisClass);
+				Method addExportsToAllUnnamedMethod = javaLangAccessClass.getDeclaredMethod("addExportsToAllUnnamed", Module.class, String.class);
+				MethodInvokeFunction methodInvoker = functionProvider.getOrBuildObject(MethodInvokeFunction.class, context);
+
+				Class<?> moduleLayerClass = getClassByNameFunction.apply("java.lang.ModuleLayer", false, thisClassClassLoader, thisClass);
+				Method bootMethod =	moduleLayerClass.getDeclaredMethod("boot");
+				Object moduleLayer = bootMethod.invoke(null);
+				Method findModuleMethod = moduleLayerClass.getDeclaredMethod("findModule", String.class);
+				Class<?> optionalClass = getClassByNameFunction.apply("java.util.Optional", false, thisClassClassLoader, thisClass);
+				Method get = optionalClass.getDeclaredMethod("get");
+				Object javaLangAccess = methodInvoker.apply(getJavaLangAccessMethod, null, null);
+
+				methodInvoker.apply(
+					addExportsToAllUnnamedMethod, javaLangAccess, new Object[] {
+						get.invoke(findModuleMethod.invoke(moduleLayer, "java.base")), "jdk.internal.loader"}
+					);
+				super.loadClass(context);
+			}
+
+		}
+
+
+	}
+
 
 }
