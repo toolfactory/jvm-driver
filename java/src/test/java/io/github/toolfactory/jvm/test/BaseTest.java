@@ -20,6 +20,7 @@ abstract class BaseTest {
 	protected Reflection reflection;
 
 
+	//For JDK 7 testing
 	void executeTests() {
 		getAndSetDirectVolatileTestOne();
 		getConsulterTestOne();
@@ -294,7 +295,7 @@ abstract class BaseTest {
 	}
 
 	private void log(Object value) {
-		//System.out.println(value.toString());
+		System.out.println(value != null ? value.toString() : "null");
 	}
 
 	private static class ClassForTest {

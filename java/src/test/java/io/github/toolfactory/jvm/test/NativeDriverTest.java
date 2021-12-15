@@ -8,6 +8,7 @@ import io.github.toolfactory.util.Reflection;
 
 public class NativeDriverTest extends BaseTest {
 
+	//For JDK 7 testing
 	public static void main(String[] args) {
 		new NativeDriverTest().executeTests();
 	}

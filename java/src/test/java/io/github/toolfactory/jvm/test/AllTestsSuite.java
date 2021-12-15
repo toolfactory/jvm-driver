@@ -14,4 +14,12 @@ import org.junit.runners.Suite;
 })
 public class AllTestsSuite {
 
+	//For JDK 7 testing
+	public static void main(String[] args) {
+		new DefaultDriverTest().executeTests();
+		new DynamicDriverTest().executeTests();
+		new HybridDriverTest().executeTests();
+		new NativeDriverTest().executeTests();
+	}
+
 }
