@@ -9,7 +9,7 @@ import io.github.toolfactory.util.Reflection;
 public class HybridDriverTest extends BaseTest {
 
 	public static void main(String[] args) {
-		new HybridDriverTest().getAndSetDirectVolatileTestOne();
+		new HybridDriverTest().executeTests();
 	}
 
 	@Override
@@ -77,8 +77,8 @@ public class HybridDriverTest extends BaseTest {
 
 	@Override
 	@Test
-	public void setInvokeTestOne() {
-		super.setInvokeTestOne();
+	public void invokeTestOne() {
+		super.invokeTestOne();
 	}
 
 
@@ -104,8 +104,8 @@ public class HybridDriverTest extends BaseTest {
 
 	@Override
 	@Test
-	public void retrieveResourcesTestOne() {
-		super.retrieveResourcesTestOne();
+	public void retrieveResourcesAsStreamsTestOne() {
+		super.retrieveResourcesAsStreamsTestOne();
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class HybridDriverTest extends BaseTest {
 	public void getClassByNameTestOne() {
 		super.getClassByNameTestOne();
 	}
-	
+
 	@Override
 	@Test
 	public void convertToBuiltinClassLoader() {

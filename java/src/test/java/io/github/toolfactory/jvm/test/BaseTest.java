@@ -19,6 +19,25 @@ import io.github.toolfactory.util.Reflection;
 abstract class BaseTest {
 	protected Reflection reflection;
 
+
+	void executeTests() {
+		getAndSetDirectVolatileTestOne();
+		getConsulterTestOne();
+		getDeclaredFieldsTestOne();
+		getDeclaredMethodsTestOne();
+		getDeclaredConstructorsTestOne();
+		allocateInstanceTestOne();
+		setAccessibleTestOne();
+		invokeTestOne();
+		newInstanceTestOne();
+		retrieveLoadedClassesTestOne();
+		retrieveLoadedPackagesTestOne();
+		getClassByNameTestOne();
+		retrieveResourcesAsStreamsTestOne();
+		convertToBuiltinClassLoader();
+	}
+
+
 	abstract Reflection getReflection();
 
 
@@ -177,7 +196,7 @@ abstract class BaseTest {
 	}
 
 
-	void setInvokeTestOne() {
+	void invokeTestOne() {
 		try {
 			int newValue = 10;
 			getReflection().getDriver().invoke(
@@ -249,30 +268,33 @@ abstract class BaseTest {
 		}
 	}
 
-	public void retrieveResourcesTestOne() {
+	public void retrieveResourcesAsStreamsTestOne() {
 		try {
-			Collection<URL> resource = getReflection().getDriver().getResources("com/sun/source/util/JavacTask.class", false);
-			for (URL resourceURL : resource) {
-				log(resourceURL.getPath());
+			Collection<URL> loadedClasses = getReflection().getDriver().getResources(
+				"jvm-driver.properties",
+				false,
+				Thread.currentThread().getContextClassLoader()
+			);
+			for (URL entry : loadedClasses) {
+				log(entry.getPath());
 			}
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
 		}
 	}
-	
+
 	public void convertToBuiltinClassLoader() {
 		try {
 			log(getReflection().getDriver().convertToBuiltinClassLoader(new ClassLoader() {}));
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
-		}		
+		}
 	}
-	
 
 	private void log(Object value) {
-		System.out.println(value != null ? value.toString() : "null");
+		//System.out.println(value.toString());
 	}
 
 	private static class ClassForTest {
@@ -295,6 +317,6 @@ abstract class BaseTest {
 		private static void setIntValue(int value) {
 			intValue = value;
 		}
-	}
+	};
 
 }

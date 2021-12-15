@@ -9,7 +9,7 @@ import io.github.toolfactory.util.Reflection;
 public class DefaultDriverTest extends BaseTest {
 
 	public static void main(String[] args) {
-		new DefaultDriverTest().getAndSetDirectVolatileTestOne();
+		new DefaultDriverTest().executeTests();
 	}
 
 	@Override
@@ -77,8 +77,8 @@ public class DefaultDriverTest extends BaseTest {
 
 	@Override
 	@Test
-	public void setInvokeTestOne() {
-		super.setInvokeTestOne();
+	public void invokeTestOne() {
+		super.invokeTestOne();
 	}
 
 
@@ -105,8 +105,8 @@ public class DefaultDriverTest extends BaseTest {
 
 	@Override
 	@Test
-	public void retrieveResourcesTestOne() {
-		super.retrieveResourcesTestOne();
+	public void retrieveResourcesAsStreamsTestOne() {
+		super.retrieveResourcesAsStreamsTestOne();
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class DefaultDriverTest extends BaseTest {
 	public void getClassByNameTestOne() {
 		super.getClassByNameTestOne();
 	}
-	
+
 	@Override
 	@Test
 	public void convertToBuiltinClassLoader() {
