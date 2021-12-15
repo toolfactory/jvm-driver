@@ -101,16 +101,7 @@ public interface ClassLoaderDelegateClassSupplier extends Supplier<Class<?>> {
 				MethodInvokeFunction methodInvoker = functionProvider.getOrBuildObject(MethodInvokeFunction.class, context);
 				Object javaLangAccess = methodInvoker.apply(getJavaLangAccessMethod, null, null);
 				methodInvoker.apply(
-						javaLangAccessClass.getDeclaredMethod("addExports", java.lang.Module.class, String.class, java.lang.Module.class),
-					javaLangAccess,
-					new Object[] {
-						java.lang.ModuleLayer.boot().findModule("java.base").get(),
-						"jdk.internal.loader",
-						thisClass.getModule()
-					}
-				);
-				methodInvoker.apply(
-						javaLangAccessClass.getDeclaredMethod("addExportsToAllUnnamed", Module.class, String.class),
+					javaLangAccessClass.getDeclaredMethod("addExportsToAllUnnamed", Module.class, String.class),
 					javaLangAccess,
 					new Object[] {
 						java.lang.ModuleLayer.boot().findModule("java.base").get(), "jdk.internal.loader"
