@@ -83,7 +83,7 @@ jobs:
       max-parallel: 15
       matrix:
         architecture: [x86, x64]
-        distribution: [zulu, adopt-openj9]
+        distribution: [zulu, adopt , adopt-openj9]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
@@ -107,6 +107,26 @@ jobs:
             java: 18-ea
           - distribution: adopt-openj9
             java: 19-ea
+          - distribution: adopt
+            architecture: x86
+          - distribution: adopt
+            java: 9
+          - distribution: adopt
+            java: 10
+          - distribution: adopt
+            java: 12
+          - distribution: adopt
+            java: 13
+          - distribution: adopt
+            java: 14
+          - distribution: adopt
+            java: 15
+          - distribution: adopt
+            java: 17
+          - distribution: adopt
+            java: 18-ea
+          - distribution: adopt
+            java: 19-ea         
 #          - os: ubuntu-latest
 #            architecture: x86
 #            java: 10
