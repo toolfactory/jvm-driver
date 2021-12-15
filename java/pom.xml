@@ -194,7 +194,6 @@
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
 							<release>9</release>
-							<!-- IMPORTANT: to run locally the tests in the package io.github.toolfactory.jvm.test unconment the lines below -->
 							<!--
 							<excludes>
 								<exclude>module-info.java</exclude>
