@@ -34,7 +34,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.java"
-      - ".github/workflows/**"
+#      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
@@ -181,7 +181,7 @@ jobs:
           mv ./java/temp-pom.xml ./java/sa-pom.xml
           newVersion=$(sed -n -r 's%.*<version>[[:space:]]*(.*-SNAPSHOT)</version>.*%\1%p' ./java/sa-pom.xml)
           sed -r -i "s%<version>[[:space:]]*(.*-SNAPSHOT)</version>%<version>${newVersion}</version>%" ./java/pom.xml
-          git commit -am "Released new version"
+          git commit -am "Prepare for next development iteration"
           git push    
         env:
           MAVEN_USERNAME: ${{ secrets.nexus_username }}
