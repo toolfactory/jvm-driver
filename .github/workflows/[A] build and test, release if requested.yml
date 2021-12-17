@@ -77,7 +77,7 @@ jobs:
           
   build-and-test-with-Java-9-and-later:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }} (build and test with 7 target)
-    needs: [elaborate-java-hook-module]
+#    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -85,7 +85,7 @@ jobs:
         architecture: [x86, x64]
         distribution: [zulu, adopt , adopt-openj9, temurin]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea, 19-ea]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
