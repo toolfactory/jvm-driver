@@ -75,74 +75,20 @@ jobs:
           git push
 
           
-  build-and-test-with-Java-9-and-later:
+  build-and-test-with-standard-JDK:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }} (build and test with 7 target)
-#    needs: [elaborate-java-hook-module]
+    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
       matrix:
         architecture: [x86, x64]
-        distribution: [zulu, adopt , adopt-openj9, temurin]
+        distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
-          - distribution: adopt-openj9
-            architecture: x86
-          - distribution: adopt-openj9
-            java: 9
-          - distribution: adopt-openj9
-            java: 10
-          - distribution: adopt-openj9
-            java: 12
-          - distribution: adopt-openj9
-            java: 13
-          - distribution: adopt-openj9
-            java: 14
-          - distribution: adopt-openj9
-            java: 15
-          - distribution: adopt-openj9
-            java: 18-ea
-          - distribution: adopt-openj9
-            java: 19-ea
-          - distribution: adopt
-            architecture: x86
-          - distribution: adopt
-            java: 9
-          - distribution: adopt
-            java: 10
-          - distribution: adopt
-            java: 12
-          - distribution: adopt
-            java: 13
-          - distribution: adopt
-            java: 14
-          - distribution: adopt
-            java: 15
-          - distribution: adopt
-            java: 17
-          - distribution: adopt
-            java: 18-ea
-          - distribution: adopt
-            java: 19-ea
-          - distribution: temurin
-            architecture: x86
-          - distribution: temurin
-            java: 9
-          - distribution: temurin
-            java: 10
-          - distribution: temurin
-            java: 12
-          - distribution: temurin
-            java: 13
-          - distribution: temurin
-            java: 14
-          - distribution: temurin
-            java: 15
-          - distribution: adopt
-            java: 19-ea        
 #          - os: ubuntu-latest
 #            architecture: x86
 #            java: 10
@@ -163,6 +109,40 @@ jobs:
       - name: Build and test with final version JDK
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
 
+  build-and-test-with-others-JDK:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }} (build and test with 7 target)
+    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x64]
+        distribution: [adopt, adopt-openj9, temurin]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [11, 16, 17, 18-ea]
+        exclude:
+          - distribution: adopt-openj9
+            java: 18-ea
+          - distribution: adopt
+            java: 17
+          - distribution: adopt
+            java: 18-ea
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2.4.0
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}  
+      - name: Build and test with final version JDK
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
   
   release:
     needs: [build-and-test-with-Java-9-and-later]
