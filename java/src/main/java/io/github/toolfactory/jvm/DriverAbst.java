@@ -75,26 +75,26 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 @SuppressWarnings({"unchecked"})
 public abstract class DriverAbst implements Driver {
 
-	private ThrowExceptionFunction exceptionThrower;
-	private ThrowingFunction<Class<?>, Object, Throwable> allocateInstanceInvoker;
-	private BiFunction<Object, Field, Object> fieldValueRetriever;
-	private TriConsumer<Object, Field, Object> fieldValueSetter;
-	private ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> hookClassDefiner;
-	private ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> consulterRetriever;
-	private ThrowingFunction<Class<?>, Field[], Throwable> declaredFieldsRetriever;
-	private ThrowingFunction<Class<?>, Method[], Throwable> declaredMethodsRetriever;
-	private ThrowingFunction<Class<?>, Constructor<?>[], Throwable> declaredConstructorsRetriever;
-	private ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter;
-	private ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> constructorInvoker;
-	private ThrowingBiFunction<ClassLoader, String, Package, Throwable> packageRetriever;
-	private ThrowingTriFunction<Method, Object, Object[], Object, Throwable> methodInvoker;
-	private ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> classByNameRetriever;
-	private GetResourcesFunction resourcesRetriver;
-	private Supplier<Class<?>> builtinClassLoaderClassSupplier;
-	private Supplier<Class<?>> classLoaderDelegateClassSupplier;
-	private Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
-	private Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
-	private ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter;
+	protected ThrowExceptionFunction exceptionThrower;
+	protected ThrowingFunction<Class<?>, Object, Throwable> allocateInstanceInvoker;
+	protected BiFunction<Object, Field, Object> fieldValueRetriever;
+	protected TriConsumer<Object, Field, Object> fieldValueSetter;
+	protected ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> hookClassDefiner;
+	protected ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> consulterRetriever;
+	protected ThrowingFunction<Class<?>, Field[], Throwable> declaredFieldsRetriever;
+	protected ThrowingFunction<Class<?>, Method[], Throwable> declaredMethodsRetriever;
+	protected ThrowingFunction<Class<?>, Constructor<?>[], Throwable> declaredConstructorsRetriever;
+	protected ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> accessibleSetter;
+	protected ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> constructorInvoker;
+	protected ThrowingBiFunction<ClassLoader, String, Package, Throwable> packageRetriever;
+	protected ThrowingTriFunction<Method, Object, Object[], Object, Throwable> methodInvoker;
+	protected ThrowingQuadFunction<String, Boolean, ClassLoader, Class<?>, Class<?>, Throwable> classByNameRetriever;
+	protected GetResourcesFunction resourcesRetriver;
+	protected Supplier<Class<?>> builtinClassLoaderClassSupplier;
+	protected Supplier<Class<?>> classLoaderDelegateClassSupplier;
+	protected Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
+	protected Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
+	protected ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter;
 
 	public DriverAbst() {}
 
@@ -120,7 +120,7 @@ public abstract class DriverAbst implements Driver {
 			if (hookClassDefiner == null) {
 				hookClassDefiner = getOrBuildHookClassDefiner(initializationContext);
 			}
-			
+
 			if (declaredFieldsRetriever == null) {
 				declaredFieldsRetriever = getOrBuildDeclaredFieldsRetriever(initializationContext);
 			}
@@ -136,7 +136,7 @@ public abstract class DriverAbst implements Driver {
 			if (constructorInvoker == null) {
 				constructorInvoker = getOrBuildConstructorInvoker(initializationContext);
 			}
-			
+
 			if (methodInvoker == null) {
 				methodInvoker = getOrBuildMethodInvoker(initializationContext);
 			}
@@ -148,11 +148,11 @@ public abstract class DriverAbst implements Driver {
 			}
 			if (resourcesRetriver == null) {
 				resourcesRetriver = getOrBuildResourcesRetriever(initializationContext);
-			}			
+			}
 			if (builtinClassLoaderClassSupplier == null) {
 				builtinClassLoaderClassSupplier = getOrBuildBuiltinClassLoaderClassSupplier(initializationContext);
 			}
-			
+
 			if (classLoaderDelegateClassSupplier == null) {
 				classLoaderDelegateClassSupplier = getOrBuildClassLoaderDelegateClassSupplier(initializationContext);
 			}
@@ -179,7 +179,7 @@ public abstract class DriverAbst implements Driver {
 	}
 
 
-	<D extends Driver> D refresh(Map<Object, Object> initializationContext) {
+	protected <D extends Driver> D refresh(Map<Object, Object> initializationContext) {
 		try {
 			if (exceptionThrower == null) {
 				exceptionThrower = getExceptionThrower(initializationContext);
@@ -196,7 +196,7 @@ public abstract class DriverAbst implements Driver {
 			if (hookClassDefiner == null) {
 				hookClassDefiner = getHookClassDefiner(initializationContext);
 			}
-			
+
 			if (declaredFieldsRetriever == null) {
 				declaredFieldsRetriever = getDeclaredFieldsRetriever(initializationContext);
 			}
@@ -212,7 +212,7 @@ public abstract class DriverAbst implements Driver {
 			if (constructorInvoker == null) {
 				constructorInvoker = getConstructorInvoker(initializationContext);
 			}
-			
+
 			if (methodInvoker == null) {
 				methodInvoker = getMethodInvoker(initializationContext);
 			}
@@ -228,7 +228,7 @@ public abstract class DriverAbst implements Driver {
 			if (builtinClassLoaderClassSupplier == null) {
 				builtinClassLoaderClassSupplier = getBuiltinClassLoaderClassSupplier(initializationContext);
 			}
-			
+
 			if (classLoaderDelegateClassSupplier == null) {
 				classLoaderDelegateClassSupplier = getClassLoaderDelegateClassSupplier(initializationContext);
 			}
@@ -283,7 +283,7 @@ public abstract class DriverAbst implements Driver {
 	}
 
 
-	ObjectProvider putNewObjectProviderIfAbsent(Map<Object, Object> context) {
+	protected ObjectProvider putNewObjectProviderIfAbsent(Map<Object, Object> context) {
 		ObjectProvider.putIfAbsent(context, new Supplier<ObjectProvider>() {
 			@Override
 			public ObjectProvider get() {
@@ -334,9 +334,9 @@ public abstract class DriverAbst implements Driver {
 	protected abstract Class<? extends GetLoadedClassesRetrieverFunction> getGetLoadedClassesRetrieverFunctionClass();
 
 	protected abstract Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass();
-	
+
 	protected abstract Class<? extends ConvertToBuiltinClassLoaderFunction> getConvertToBuiltinClassLoaderFunctionClass();
-	
+
 
 	protected ThrowExceptionFunction getOrBuildExceptionThrower(Map<Object, Object> initializationContext) {
 		return ObjectProvider.get(initializationContext).getOrBuildObject(
@@ -458,7 +458,7 @@ public abstract class DriverAbst implements Driver {
 			getGetLoadedPackagesFunctionClass(), initializationContext
 		);
 	}
-	
+
 	protected ConvertToBuiltinClassLoaderFunction getOrBuildClassLoaderToBuiltinClassLoaderConverter(Map<Object, Object> initializationContext) {
 		return ObjectProvider.get(initializationContext).getOrBuildObject(
 			getConvertToBuiltinClassLoaderFunctionClass(), initializationContext
@@ -586,7 +586,7 @@ public abstract class DriverAbst implements Driver {
 			getGetLoadedPackagesFunctionClass(), initializationContext
 		);
 	}
-	
+
 	protected ConvertToBuiltinClassLoaderFunction getClassLoaderToBuiltinClassLoaderConverter(Map<Object, Object> initializationContext) {
 		return ObjectProvider.getObject(
 			getConvertToBuiltinClassLoaderFunctionClass(), initializationContext
@@ -620,7 +620,7 @@ public abstract class DriverAbst implements Driver {
 			return this.exceptionThrower.apply(exception);
 		}
 	}
-	
+
 	@Override
 	public <T> T throwException(String message, Object... placeHolderReplacements) {
 		ThrowExceptionFunction exceptionThrower = this.exceptionThrower;
@@ -659,7 +659,7 @@ public abstract class DriverAbst implements Driver {
 					}
 				}
 				this.accessibleSetter.accept(object, flag);
-			}			
+			}
 		} catch (Throwable exc) {
 			throwException(exc);
 		}
@@ -729,7 +729,7 @@ public abstract class DriverAbst implements Driver {
 					refresh(initContext);
 				}
 			}
-			
+
 			return this.loadedClassesRetrieverSupplier.apply(classLoader);
 		}
 	}
@@ -1006,7 +1006,7 @@ public abstract class DriverAbst implements Driver {
 						this.constructorInvoker = getOrBuildConstructorInvoker(initContext);
 						refresh(initContext);
 					}
-				}				
+				}
 				return (T)this.constructorInvoker.apply(ctor, params);
 			}
 		} catch (Throwable exc) {
@@ -1085,7 +1085,7 @@ public abstract class DriverAbst implements Driver {
 			return throwException(exc);
 		}
 	}
-	
+
 
 
 	@Override
