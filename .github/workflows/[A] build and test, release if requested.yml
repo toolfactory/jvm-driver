@@ -26,6 +26,7 @@
 name: Build and release if requested
 
 
+
 on:
   push:
     branches:
@@ -39,7 +40,9 @@ on:
       - "**.xml"
 
 
+
 jobs:
+
 
   elaborate-java-hook-module:
     name: Elaborate java hook module (${{ matrix.os }})
@@ -109,6 +112,7 @@ jobs:
       - name: Build and test with final version JDK
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
 
+
   build-and-test-with-others-JDK:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }} (build and test with 7 target)
     needs: [elaborate-java-hook-module]
@@ -143,9 +147,10 @@ jobs:
           git pull origin ${{github.ref}}  
       - name: Build and test with final version JDK
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+
   
   release:
-    needs: [build-and-test-with-Java-9-and-later]
+    needs: [build-and-test-with-standard-JDK, build-and-test-with-others-JDK]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
