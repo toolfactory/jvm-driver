@@ -72,8 +72,8 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			try (
-				InputStream inputStream =
-					this.getClass().getResourceAsStream("ConsulterRetrieverForJDK9.bwc"
+				InputStream inputStream = ConsulterSupplyFunction.class.getResourceAsStream(
+					"ConsulterRetrieverForJDK9.bwc"
 				);
 			) {
 				MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
@@ -84,11 +84,15 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"),
 					privateLookupInMethodHandle
 				);
+				empowerMainConsulter((MethodHandles.Lookup)methodHandleWrapperClass.getDeclaredField("mainConsulter").get(null), context);
 				setFunction((java.util.function.Function<Class<?>, MethodHandles.Lookup>)
 					functionProvider.getOrBuildObject(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			}
 		}
 
+		protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
+
+		}
 
 		@Override
 		public MethodHandles.Lookup apply(Class<?> input) {
@@ -99,29 +103,13 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 
 	public static interface ForJava17 extends ConsulterSupplyFunction {
 
-		public static class ForSemeru extends Abst<java.util.function.Function<Class<?>, MethodHandles.Lookup>> implements ForJava17 {
+		public static class ForSemeru extends ConsulterSupplyFunction.ForJava9 implements ForJava17 {
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
-				ObjectProvider functionProvider = ObjectProvider.get(context);
-				try (
-					InputStream inputStream =
-						this.getClass().getResourceAsStream("ConsulterRetrieverForJDK9.bwc"
-					);
-				) {
-					MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
-					Class<?> methodHandleWrapperClass = functionProvider.getOrBuildObject(
-						DefineHookClassFunction.class, context
-					).apply(Class.class, Streams.toByteArray(inputStream));
-					functionProvider.getOrBuildObject(SetFieldValueFunction.class, context).accept(
-						methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("consulterRetriever"),
-						privateLookupInMethodHandle
-					);
-					empowerMainConsulter((MethodHandles.Lookup)methodHandleWrapperClass.getDeclaredField("mainConsulter").get(null), context);
-					setFunction((java.util.function.Function<Class<?>, MethodHandles.Lookup>)
-						functionProvider.getOrBuildObject(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
-				}
+				super(context);
 			}
 
+			@Override
 			protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				unsafe.putInt(consulter, 20, -1);

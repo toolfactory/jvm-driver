@@ -82,7 +82,7 @@ public interface SetAccessibleFunction extends ThrowingBiConsumer<AccessibleObje
 		public ForJava9(Map<Object, Object> context) throws Throwable {
 			super(context);
 			try (
-				InputStream inputStream = this.getClass().getResourceAsStream(
+				InputStream inputStream = SetAccessibleFunction.class.getResourceAsStream(
 					"AccessibleSetterInvokerForJDK9.bwc"
 				);
 			) {
@@ -151,12 +151,12 @@ public interface SetAccessibleFunction extends ThrowingBiConsumer<AccessibleObje
 					}
 				);
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
