@@ -35,7 +35,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.java"
-#      - ".github/workflows/**"
+      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
@@ -79,7 +79,7 @@ jobs:
 
           
   build-and-test-with-standard-JDK:
-    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }} (build and test with 7 target)
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
@@ -109,12 +109,12 @@ jobs:
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
-      - name: Build and test with final version JDK
+      - name: Build and test with Java 7 target
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
 
 
   build-and-test-with-others-JDK:
-    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }} (build and test with 7 target)
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
@@ -145,7 +145,7 @@ jobs:
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
-      - name: Build and test with final version JDK
+      - name: Build and test with Java 7 target
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
 
   
