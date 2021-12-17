@@ -34,7 +34,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.java"
-#      - ".github/workflows/**"
+      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
@@ -83,7 +83,7 @@ jobs:
       max-parallel: 15
       matrix:
         architecture: [x86, x64]
-        distribution: [zulu, adopt , adopt-openj9]
+        distribution: [zulu, adopt , adopt-openj9, temurin]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea, 19-ea]
         exclude:
@@ -126,7 +126,21 @@ jobs:
           - distribution: adopt
             java: 18-ea
           - distribution: adopt
-            java: 19-ea         
+            java: 19-ea
+          - distribution: temurin
+            java: 9
+          - distribution: temurin
+            java: 10
+          - distribution: temurin
+            java: 12
+          - distribution: temurin
+            java: 13
+          - distribution: temurin
+            java: 14
+          - distribution: temurin
+            java: 15
+          - distribution: adopt
+            java: 19-ea        
 #          - os: ubuntu-latest
 #            architecture: x86
 #            java: 10
