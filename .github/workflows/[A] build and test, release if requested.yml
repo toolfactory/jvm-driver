@@ -35,7 +35,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.java"
-      - ".github/workflows/**"
+#      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
@@ -78,7 +78,7 @@ jobs:
           git push
 
           
-  build-and-test-with-standard-JDK:
+  build-and-test-with-JDK-group-1:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
     strategy:
@@ -116,7 +116,7 @@ jobs:
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
 
 
-  build-and-test-with-others-JDK:
+  build-and-test-with-JDK-group-2:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
     strategy:
@@ -153,7 +153,7 @@ jobs:
 
   
   release:
-    needs: [build-and-test-with-standard-JDK, build-and-test-with-others-JDK]
+    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
