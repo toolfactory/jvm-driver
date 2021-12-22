@@ -66,6 +66,9 @@ public class ObjectProvider {
 		this.jVMVendorToClassSuffix.put("IBM Corporation", Arrays.asList("ForSemeru"));
 		jVMVersion = Info.Provider.getInfoInstance().getVersion();
 		vendor = System.getProperty("java.vendor");
+		if (!this.jVMVendorToClassSuffix.containsKey(vendor)) {
+			this.jVMVendorToClassSuffix.put("Oracle Corporation", this.jVMVendorToClassSuffix.get("Oracle Corporation"));
+		}
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int version : versions) {
 			if (jVMVersion >= version) {
@@ -79,45 +82,20 @@ public class ObjectProvider {
 
 
 	public <T> T getOrBuildObject(Class<? super T> clazz, Map<Object, Object> context) {
-		List<String> classNameOptionalItems = jVMVendorToClassSuffix.get(vendor);
 		BuildingException mainException = null;
-		if (classNameOptionalItems != null) {
-			try {
-				context.put("classNameOptionalItems", classNameOptionalItems);
-				return getOrBuildObjectInternal(clazz, context);
-			} catch (Throwable exc) {
-				mainException = new BuildingException(
-					Strings.compile(
-						"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
-						clazz.getName(),
-						Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
-						jVMVersion, vendor
-					),
-					exc
-				);
-			}
-		} else {
-			for (Entry<String, List<String>> jVMVendorToClassSuffix : this.jVMVendorToClassSuffix.entrySet()) {
-				try {
-					context.put("classNameOptionalItems", jVMVendorToClassSuffix.getValue());
-					return getOrBuildObjectInternal(clazz, context);
-				} catch (Throwable exc) {
-					if (jVMVendorToClassSuffix.getKey().equals("Oracle Corporation")) {
-						mainException = new BuildingException(
-							Strings.compile(
-								"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
-								clazz.getName(),
-								Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
-								jVMVersion, jVMVendorToClassSuffix.getKey()
-							),
-							exc
-						);
-					}
-					if (exc instanceof InitializationMarkViaExceptionHandler) {
-						break;
-					}
-				}
-			}
+		try {
+			context.put("classNameOptionalItems", jVMVendorToClassSuffix.get(vendor));
+			return getOrBuildObjectInternal(clazz, context);
+		} catch (Throwable exc) {
+			mainException = new BuildingException(
+				Strings.compile(
+					"Exception occurred while retrieving the implentation of class {} (jvm architecture: {}, jvm version: {}, jvm vendor: {})",
+					clazz.getName(),
+					Info.Provider.getInfoInstance().is64Bit() ? "x64" : "x86",
+					jVMVersion, vendor
+				),
+				exc
+			);
 		}
 		ExceptionHandler exceptionHandler = getExceptionHandler(context);
 		if (exceptionHandler!= null) {
