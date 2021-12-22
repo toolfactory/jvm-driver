@@ -67,7 +67,7 @@ public class ObjectProvider {
 		jVMVersion = Info.Provider.getInfoInstance().getVersion();
 		vendor = System.getProperty("java.vendor");
 		if (!this.jVMVendorToClassSuffix.containsKey(vendor)) {
-			this.jVMVendorToClassSuffix.put("Oracle Corporation", this.jVMVendorToClassSuffix.get("Oracle Corporation"));
+			this.jVMVendorToClassSuffix.put(vendor, this.jVMVendorToClassSuffix.get("Oracle Corporation"));
 		}
 		TreeSet<Integer> registeredVersions = new TreeSet<>();
 		for (int version : versions) {
