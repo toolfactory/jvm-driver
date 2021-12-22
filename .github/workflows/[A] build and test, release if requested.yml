@@ -92,9 +92,12 @@ jobs:
         exclude:
           - os: macOS-latest
             architecture: x86
-#          - os: ubuntu-latest
-#            architecture: x86
-#            java: 10
+          - distribution: liberica
+            java: 9
+          - distribution: liberica
+            java: 10
+          - distribution: liberica
+            java: 18-ea
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
