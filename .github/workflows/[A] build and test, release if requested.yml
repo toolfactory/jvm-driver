@@ -35,7 +35,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.java"
-#      - ".github/workflows/**"
+      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
@@ -88,7 +88,7 @@ jobs:
         architecture: [x86, x64]
         distribution: [liberica, zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18-ea, 19-ea]
         exclude:
           - os: macOS-latest
             architecture: x86
@@ -98,6 +98,8 @@ jobs:
             java: 10
           - distribution: liberica
             java: 18-ea
+          - distribution: liberica
+            java: 19-ea
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -126,14 +128,18 @@ jobs:
         architecture: [x64]
         distribution: [adopt, adopt-openj9, temurin]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18-ea]
+        java: [11, 16, 17, 18-ea, 19-ea]
         exclude:
           - distribution: adopt-openj9
             java: 18-ea
+          - distribution: adopt-openj9
+            java: 19-ea
           - distribution: adopt
             java: 17
           - distribution: adopt
             java: 18-ea
+          - distribution: adopt
+            java: 19-ea
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
