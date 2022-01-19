@@ -114,7 +114,7 @@ public interface Driver extends Closeable {
 				classLoaders.add(Thread.currentThread().getContextClassLoader());
 				java.util.Properties configuration = Properties.loadFromResourcesAndMerge(
 					"jvm-driver.properties",
-					"priority-of-this-configuration-file",
+					"priority-of-this-configuration",
 					classLoaders
 				);
 				driverConstructors = new ConcurrentHashMap<>();
