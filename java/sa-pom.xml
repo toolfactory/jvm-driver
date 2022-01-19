@@ -55,6 +55,7 @@
 	<developers>
 		<developer>
 			<name>Luke Hutchison</name>
+			<id>lukehutch</id>
 			<email>tool.factory.heads@gmail.com</email>
 			<organization>ToolFactory</organization>
 			<organizationUrl>https://github.com/toolfactory</organizationUrl>
