@@ -44,15 +44,11 @@ public class Properties {
 
 	public static Map<BigDecimal, java.util.Properties> loadFromResources(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
 		Map<URL, InputStream> resources = Resources.getAsInputStreams(resRelPath, classLoaders);
-		TreeMap<BigDecimal, java.util.Properties> orderedProperties = new TreeMap<>();
+		Map<BigDecimal, java.util.Properties> orderedProperties = new TreeMap<>();
 		if (resources.isEmpty()) {
 			return orderedProperties;
 		}
-		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-		symbols.setGroupingSeparator(',');
-		symbols.setDecimalSeparator('.');
-		DecimalFormat decimalFormat = new DecimalFormat("#.#", symbols);
-		decimalFormat.setParseBigDecimal(true);
+		DecimalFormat decimalFormat = getNewDecimalFormat();
 		Collection<java.util.Properties> propertiesWithoutPriority = new ArrayList<>();
 		for (Entry<URL, InputStream> entry : resources.entrySet()) {
 		    java.util.Properties props = new java.util.Properties();
@@ -75,6 +71,78 @@ public class Properties {
 			    }
 		    }
 		}
+		setPriorities((TreeMap<BigDecimal, java.util.Properties>) orderedProperties, propertiesWithoutPriority, decimalFormat);
+		return orderedProperties;
+	}
+
+
+	public static java.util.Properties loadFromResourceWithHigherPropertyValue(
+		String resRelPath,
+		String propertyName,
+		Collection<ClassLoader> classLoaders,
+		Map<?, ?>... otherMaps
+	) throws IOException, ParseException {
+		TreeMap<BigDecimal, java.util.Properties> orderedProperties = ((TreeMap<BigDecimal, java.util.Properties>)loadFromResources(
+			resRelPath,
+			propertyName,
+			classLoaders != null? classLoaders.toArray(new ClassLoader[classLoaders.size()]) : null
+		));
+		addOtherMaps(propertyName, orderedProperties, otherMaps);
+		return orderedProperties.entrySet().iterator().next().getValue();
+	}
+
+	public static java.util.Properties loadFromResourcesAndMerge(
+		String resRelPath,
+		String propertyName,
+		Collection<ClassLoader> classLoaders,
+		Map<?, ?>... otherMaps
+	) throws IOException, ParseException {
+		Map<BigDecimal, java.util.Properties> orderedProperties = loadFromResources(
+			resRelPath,
+			propertyName,
+			classLoaders != null? classLoaders.toArray(new ClassLoader[classLoaders.size()]) : null
+		);
+		addOtherMaps(propertyName, orderedProperties, otherMaps);
+		java.util.Properties properties = new java.util.Properties();
+		for (Entry<BigDecimal, java.util.Properties> entry : orderedProperties.entrySet()) {
+			properties.putAll(entry.getValue());
+		}
+		properties.remove(propertyName);
+		return properties;
+	}
+
+
+	private static void addOtherMaps(String propertyName, Map<BigDecimal, java.util.Properties> orderedProperties, Map<?, ?>... otherValueMaps) throws ParseException {
+		if (otherValueMaps != null && otherValueMaps.length > 0) {
+			DecimalFormat decimalFormat = getNewDecimalFormat();
+			Collection<java.util.Properties> propertiesWithoutPriority = new ArrayList<>();
+			for (Map<?, ?> otherValueMap : otherValueMaps) {
+				String propValue = (String)otherValueMap.get(propertyName);
+	    		java.util.Properties properties = new java.util.Properties();
+	    		properties.putAll(otherValueMap);
+			    if (propValue != null && !propValue.trim().isEmpty()) {
+			    	try {
+						orderedProperties.put(stringToBigDecimal(propValue, decimalFormat), properties);
+					} catch (ParseException exc) {
+						throw new IllegalArgumentException(
+							Strings.compile(
+								"The value '{}' of property named '{}' inside the map {} is incorrect",
+								propValue, propertyName, otherValueMap
+							), exc
+						);
+					}
+			    } else {
+			    	propertiesWithoutPriority.add(properties);
+			    }
+			}
+			setPriorities((TreeMap<BigDecimal, java.util.Properties>) orderedProperties, propertiesWithoutPriority, decimalFormat);
+		}
+	}
+
+
+	private static void setPriorities(TreeMap<BigDecimal, java.util.Properties> orderedProperties,
+			Collection<java.util.Properties> propertiesWithoutPriority, DecimalFormat decimalFormat
+	) throws ParseException {
 		if (!propertiesWithoutPriority.isEmpty()) {
 			BigDecimal currentMinPriority = stringToBigDecimal("1", decimalFormat);
 			if (!orderedProperties.isEmpty()) {
@@ -84,7 +152,16 @@ public class Properties {
 				orderedProperties.put(currentMinPriority.subtract(new BigDecimal(1)), props);
 			}
 		}
-		return orderedProperties;
+	}
+
+
+	private static DecimalFormat getNewDecimalFormat() {
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+		symbols.setGroupingSeparator(',');
+		symbols.setDecimalSeparator('.');
+		DecimalFormat decimalFormat = new DecimalFormat("#.#", symbols);
+		decimalFormat.setParseBigDecimal(true);
+		return decimalFormat;
 	}
 
 
@@ -99,20 +176,5 @@ public class Properties {
 		return ((BigDecimal)decimalFormat.parse(value));
 	}
 
-
-	public static java.util.Properties loadFromResourceWithHigherPropertyValue(ClassLoader resourceClassLoader, String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
-		Map<BigDecimal, java.util.Properties> orderedProperties = ((TreeMap<BigDecimal, java.util.Properties>)loadFromResources(resRelPath, propertyName, classLoaders)).descendingMap();
-		return orderedProperties.entrySet().iterator().next().getValue();
-	}
-
-	public static java.util.Properties loadFromResourcesAndMerge(String resRelPath, String propertyName, ClassLoader... classLoaders) throws IOException, ParseException {
-		Map<BigDecimal, java.util.Properties> orderedProperties = loadFromResources(resRelPath, propertyName, classLoaders);
-		java.util.Properties properties = new java.util.Properties();
-		for (Entry<BigDecimal, java.util.Properties> entry : orderedProperties.entrySet()) {
-			properties.putAll(entry.getValue());
-		}
-		properties.remove(propertyName);
-		return properties;
-	}
 
 }

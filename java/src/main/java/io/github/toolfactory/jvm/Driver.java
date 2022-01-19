@@ -50,7 +50,7 @@ public interface Driver extends Closeable {
 	public <D extends Driver> D init();
 
 	public <T> T allocateInstance(Class<?> cls);
-	
+
 	public ClassLoader convertToBuiltinClassLoader(ClassLoader classLoader);
 
 	public Class<?> defineHookClass(Class<?> clientClass, byte[] byteCode);
@@ -92,11 +92,11 @@ public interface Driver extends Closeable {
 	public void setAccessible(AccessibleObject object, boolean flag);
 
 	public void setFieldValue(Object target, Field field, Object value);
-	
+
 	public <T> T throwException(String message, Object... placeHolderReplacements);
-	
-	public <T> T throwException(Throwable exception);	
-	
+
+	public <T> T throwException(Throwable exception);
+
 
 	@Override
 	public void close();
@@ -115,7 +115,7 @@ public interface Driver extends Closeable {
 				java.util.Properties configuration = Properties.loadFromResourcesAndMerge(
 					"jvm-driver.properties",
 					"priority-of-this-configuration-file",
-					classLoaders.toArray(new ClassLoader[classLoaders.size()])
+					classLoaders
 				);
 				driverConstructors = new ConcurrentHashMap<>();
 				setDriverClass("defaultDriverClass", configuration.getProperty("driver-factory.default-driver.class"));
