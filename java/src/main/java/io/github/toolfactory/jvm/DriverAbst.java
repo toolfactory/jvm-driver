@@ -171,7 +171,7 @@ public abstract class DriverAbst implements Driver {
 		} catch (Throwable exc) {
 			throwException(
 				new InitializeException(
-					"Could not initiliaze " + this.getClass().getSimpleName(), exc
+					"Could not initialize " + this.getClass().getSimpleName(), exc
 				)
 			);
 		}
@@ -248,7 +248,7 @@ public abstract class DriverAbst implements Driver {
 		} catch (Throwable exc) {
 			throwException(
 				new InitializeException(
-					"Could not initiliaze " + this.getClass().getSimpleName(), exc
+					"Could not initialize " + this.getClass().getSimpleName(), exc
 				)
 			);
 		}
