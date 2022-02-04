@@ -29,7 +29,7 @@
 
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>8.9.0-SNAPSHOT</version>
+	<version>8.9.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -314,7 +314,7 @@
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
                             <Bundle-Name>JVM Driver</Bundle-Name>
                             <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                            <Bundle-Vendor>ToolFactory</Bundle-Vendor>
+                            <Bundle-Vendor>ToolFactory (Luke Hutchison, Roberto Gentili)</Bundle-Vendor>
                             <Bundle-Description>${project.description}</Bundle-Description>
                             <Bundle-Version>${project.version}</Bundle-Version>
                             <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
@@ -338,6 +338,12 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			  <plugin>
+    <groupId>org.apache.felix</groupId>
+    <artifactId>maven-bundle-plugin</artifactId>
+    <extensions>true</extensions>
+  </plugin>
 			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
