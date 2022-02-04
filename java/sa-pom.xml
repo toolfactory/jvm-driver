@@ -314,12 +314,12 @@
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
                             <Bundle-Name>JVM Driver</Bundle-Name>
                             <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                            <Bundle-Vendor>ToolFactory (Luke Hutchison, Roberto Gentili)</Bundle-Vendor>
+                            <Bundle-Vendor>ToolFactory</Bundle-Vendor>
                             <Bundle-Description>${project.description}</Bundle-Description>
                             <Bundle-Version>${project.version}</Bundle-Version>
                             <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                             <Import-Package>io.github.toolfactory.narcissus;version="[1.0,7)",com.sun.management,jdk.internal.reflect,sun.misc,sun.reflect</Import-Package>
-                            <Export-Package>io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.function,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm.util,sun.misc";version="${project.version}",io.github.toolfactory.jvm.function.template;version="${project.version}",io.github.toolfactory.jvm.function;version="${project.version}",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template";version="${project.version}",io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm.util";version="${project.version}"</Export-Package>
+                            <Export-Package>io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.util,io.github.toolfactory.jvm.function.template";version="${project.version}",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function.template;version="${project.version}",io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.util,sun.misc,io.github.toolfactory.jvm.function,io.github.toolfactory.narcissus,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function;version="${project.version}"</Export-Package>
 	 						<Multi-Release>true</Multi-Release>
 	 					</manifestEntries>
 					</archive>
@@ -338,12 +338,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			  <plugin>
-    <groupId>org.apache.felix</groupId>
-    <artifactId>maven-bundle-plugin</artifactId>
-    <extensions>true</extensions>
-  </plugin>
 			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
