@@ -318,7 +318,7 @@
                             <Bundle-Description>${project.description}</Bundle-Description>
                             <Bundle-Version>${project.version}</Bundle-Version>
                             <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
-                            <Import-Package>io.github.toolfactory.narcissus;version="[1.0,7)",com.sun.management,jdk.internal.reflect,sun.misc,sun.reflect</Import-Package>
+                            <Import-Package>io.github.toolfactory.narcissus;version="1.0.7",com.sun.management,jdk.internal.reflect,sun.misc,sun.reflect</Import-Package>
                             <Export-Package>io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.util,io.github.toolfactory.jvm.function.template";version="${project.version}",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function.template;version="${project.version}",io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.util,sun.misc,io.github.toolfactory.jvm.function,io.github.toolfactory.narcissus,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function;version="${project.version}"</Export-Package>
 	 						<Multi-Release>true</Multi-Release>
 	 					</manifestEntries>
