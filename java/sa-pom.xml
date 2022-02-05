@@ -24,7 +24,9 @@
 	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 	OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.github.toolfactory</groupId>
@@ -216,9 +218,15 @@
 						</phase>
 						<configuration>
 							<target>
-								<copy file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ConsulterRetrieverForJDK9.bwc" />
-								<copy file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/AccessibleSetterInvokerForJDK9.bwc" />
-								<copy file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
+								<copy
+									file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class"
+									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ConsulterRetrieverForJDK9.bwc" />
+								<copy
+									file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class"
+									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/AccessibleSetterInvokerForJDK9.bwc" />
+								<copy
+									file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class"
+									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
 							</target>
 						</configuration>
 					</execution>
@@ -230,8 +238,11 @@
 						</goals>
 						<configuration>
 							<target>
-								<jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
-									<zipfileset prefix="META-INF/versions/9" dir="${project.build.directory}/classes" includes="module-info.class" />
+								<jar update="true"
+									destfile="${project.build.directory}/${project.build.finalName}.jar">
+									<zipfileset prefix="META-INF/versions/9"
+										dir="${project.build.directory}/classes"
+										includes="module-info.class" />
 								</jar>
 							</target>
 						</configuration>
@@ -303,25 +314,25 @@
 					</excludes>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
 						<manifestEntries>
 							<built-by>ToolFactory</built-by>
 							<Bundle-Category>Utilities</Bundle-Category>
-                            <Bundle-License>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</Bundle-License>
-                            <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-                            <Bundle-Name>JVM Driver</Bundle-Name>
-                            <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                            <Bundle-Vendor>ToolFactory</Bundle-Vendor>
-                            <Bundle-Description>${project.description}</Bundle-Description>
-                            <Bundle-Version>${project.version}</Bundle-Version>
-                            <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
-                            <Import-Package>io.github.toolfactory.narcissus;version="1.0.7",com.sun.management,jdk.internal.reflect,sun.misc,sun.reflect</Import-Package>
-                            <Export-Package>io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.util,io.github.toolfactory.jvm.function.template";version="${project.version}",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function.template;version="${project.version}",io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.util,sun.misc,io.github.toolfactory.jvm.function,io.github.toolfactory.narcissus,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function;version="${project.version}"</Export-Package>
-	 						<Multi-Release>true</Multi-Release>
-	 					</manifestEntries>
+							<Bundle-License>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</Bundle-License>
+							<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+							<Bundle-Name>JVM Driver</Bundle-Name>
+							<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+							<Bundle-Vendor>ToolFactory</Bundle-Vendor>
+							<Bundle-Description>${project.description}</Bundle-Description>
+							<Bundle-Version>${project.version}</Bundle-Version>
+							<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+							<Import-Package>io.github.toolfactory.narcissus;version="1.0.7",com.sun.management,jdk.internal.reflect,sun.misc,sun.reflect</Import-Package>
+							<Export-Package>io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.util,io.github.toolfactory.jvm.function.template";version="${project.version}",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function.template;version="${project.version}",io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.util,sun.misc,io.github.toolfactory.jvm.function,io.github.toolfactory.narcissus,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="${project.version}",io.github.toolfactory.jvm.function;version="${project.version}"</Export-Package>
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -338,7 +349,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
