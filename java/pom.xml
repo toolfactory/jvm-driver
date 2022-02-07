@@ -92,7 +92,7 @@
 		<repository.url>https://toolfactory@github.com/toolfactory/jvm-driver.git</repository.url>
 
 		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 		<junit.version>1.8.2</junit.version>
 		<maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
