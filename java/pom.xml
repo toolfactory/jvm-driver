@@ -103,7 +103,7 @@
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-scm-provider-gitexe.version>1.9.5</maven-scm-provider-gitexe.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<narcissus.version>1.0.7</narcissus.version>
