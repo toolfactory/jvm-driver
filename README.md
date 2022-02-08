@@ -14,6 +14,7 @@
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
 
+[![Artifact downloads](https://burningwave.herokuapp.com/miscellaneous-services/stats/total-downloads-badge?groupId=io.github.toolfactory&artifactId=jvm-driver)](https://www.burningwave.org/artifact-downloads/?show-monthly-trend-chart=false)
 [![Repository dependents](https://badgen.net/github/dependents-repo/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/network/dependents)
 
 A driver with a **fully extensible architecture** to allow deep interaction with the JVM **without any restrictions**.
