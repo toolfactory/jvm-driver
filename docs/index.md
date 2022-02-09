@@ -17,7 +17,7 @@
 [![Artifact downloads](https://burningwave.herokuapp.com/miscellaneous-services/stats/total-downloads-badge?groupId=io.github.toolfactory&artifactId=jvm-driver)](#toolfactory-jvm-driver-)
 [![Repository dependents](https://badgen.net/github/dependents-repo/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/network/dependents)
 
-Extracted from [**Burningwave Core 8**](https://github.com/burningwave/core/releases/tag/core-8.22.0) and completely refactored, the JVM Driver is a driver with a **fully extensible architecture** to allow deep interaction with the JVM **without any restrictions**.
+Extracted from [**Burningwave Core 8**](https://github.com/burningwave/core/releases/tag/core-8.22.0), completely refactored and with a **fully extensible architecture** the JVM Driver allows a deep interaction with the JVM **without any restrictions**.
 
 <br/>
 
