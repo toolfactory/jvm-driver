@@ -107,7 +107,7 @@
 		<maven-scm-provider-gitexe.version>1.12.2</maven-scm-provider-gitexe.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<narcissus.version>1.0.7</narcissus.version>
-		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.9</nexus-staging-maven-plugin.version>
 	</properties>
 
 	<issueManagement>
