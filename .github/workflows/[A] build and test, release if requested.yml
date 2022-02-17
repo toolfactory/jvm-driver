@@ -128,7 +128,7 @@ jobs:
         architecture: [x64]
         distribution: [adopt, adopt-openj9, temurin]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18-ea]
+        java: [11, 16, 17, 18-ea, 19-ea]
         exclude:
           - distribution: adopt-openj9
             java: 18-ea
@@ -159,7 +159,7 @@ jobs:
 
   
   release:
-    needs: [elaborate-java-hook-module]
+    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
