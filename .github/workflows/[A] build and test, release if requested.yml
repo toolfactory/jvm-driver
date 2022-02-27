@@ -140,6 +140,8 @@ jobs:
             java: 18-ea
           - distribution: adopt
             java: 19-ea
+          - distribution: temurin
+            java: 19-ea
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
