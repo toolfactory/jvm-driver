@@ -161,7 +161,7 @@ jobs:
 
   
   release:
-    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
+#    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
