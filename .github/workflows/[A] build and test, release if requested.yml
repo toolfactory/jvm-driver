@@ -161,6 +161,7 @@ jobs:
 
   
   release:
+    needs: [elaborate-java-hook-module]
 #    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
     name: Release if requested
     runs-on: ubuntu-latest
