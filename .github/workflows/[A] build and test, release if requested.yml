@@ -140,8 +140,6 @@ jobs:
             java: 18-ea
           - distribution: adopt
             java: 19-ea
-          - distribution: temurin
-            java: 19-ea
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -161,8 +159,7 @@ jobs:
 
   
   release:
-    needs: [elaborate-java-hook-module]
-#    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
+    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
