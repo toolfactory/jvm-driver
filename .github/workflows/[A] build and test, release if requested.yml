@@ -35,7 +35,7 @@ on:
       - "**.sh"
       - "**.cmd"
       - "**.java"
-#      - ".github/workflows/**"
+      - ".github/workflows/**"
       - "**.properties"
       - "**.xml"
 
@@ -139,8 +139,6 @@ jobs:
           - distribution: adopt
             java: 18-ea
           - distribution: adopt
-            java: 19-ea
-          - distribution: temurin
             java: 19-ea
     runs-on: ${{ matrix.os }}
     steps:
