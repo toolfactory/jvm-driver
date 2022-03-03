@@ -14,7 +14,7 @@
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
 
-[![Artifact downloads](https://shared-software.herokuapp.com/miscellaneous-services/stats/total-downloads-badge?groupId=io.github.toolfactory&artifactId=jvm-driver)](https://shared-software.herokuapp.com/miscellaneous-services/stats/artifact-download-chart.html?groupId=io.github.toolfactory&startDate=2021-12)
+[![Artifact downloads](https://shared-software.herokuapp.com/miscellaneous-services/stats/total-downloads-badge?groupId=io.github.toolfactory&artifactId=jvm-driver)](https://shared-software.herokuapp.com/miscellaneous-services/stats/artifact-download-chart?groupId=io.github.toolfactory&startDate=2021-12)
 [![Repository dependents](https://badgen.net/github/dependents-repo/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/network/dependents)
 
 Extracted from [**Burningwave Core 8**](https://github.com/burningwave/core/releases/tag/core-8.22.0), fully refactored and with an **extensible architecture** the JVM Driver allows a deep interaction with the JVM **without any restrictions**.
