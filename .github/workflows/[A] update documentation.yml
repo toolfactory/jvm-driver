@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Update index page
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Overwrite the index.md
         run: |
           git config user.name "${{ github.event.head_commit.committer.name }}"
