@@ -130,8 +130,9 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
 				final MethodHandle methodHandle = lookupCtor.newInstance(
 					MethodHandles.Lookup.class,
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK |
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+
 				).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 				);
@@ -141,8 +142,8 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
-								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK |
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
 							);
 						}
 					}
