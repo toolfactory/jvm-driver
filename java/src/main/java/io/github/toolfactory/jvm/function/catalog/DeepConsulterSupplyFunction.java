@@ -112,13 +112,45 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 					}
 				}
 			);
-
 		}
 
 
 		@Override
 		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 			return function.apply(input);
+		}
+
+		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
+				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
+				final MethodHandle methodHandle = lookupCtor.newInstance(
+					MethodHandles.Lookup.class,
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+				).findConstructor(
+					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
+				);
+				setFunction(
+					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
+						@Override
+						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
+								cls,
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+							);
+						}
+					}
+				);
+
+			}
+
+			@Override
+			public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
+				return function.apply(input);
+			}
 		}
 
 	}
