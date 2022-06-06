@@ -74,7 +74,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				modes.setAccessible(true);
-				modes.setInt(consulter, INTERNAL_PRIVILEGED);
+				modes.setInt(consulter, FULL_ACCESS_MASK);
 			}
 
 		}
@@ -98,7 +98,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, FULL_ACCESS_MASK);
 			}
 
 		}
@@ -118,7 +118,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, FULL_ACCESS_MASK);
 			}
 
 		}
@@ -188,7 +188,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK
 					);
 
 				}
@@ -204,8 +204,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
 					);
 				}
 
