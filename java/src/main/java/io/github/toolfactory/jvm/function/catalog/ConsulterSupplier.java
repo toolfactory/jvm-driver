@@ -109,6 +109,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	public static interface ForJava14 extends ConsulterSupplier {
 
 		public static class ForSemeru extends Abst {
+			protected static final int MODULE = 0x10;
+			private static final int FULL_ACCESS_MASK =
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
