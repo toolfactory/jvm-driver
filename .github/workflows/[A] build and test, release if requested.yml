@@ -80,7 +80,7 @@ jobs:
           
   build-and-test-with-JDK-group-1:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
+#    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -120,7 +120,7 @@ jobs:
 
   build-and-test-with-JDK-group-2:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
+#    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
