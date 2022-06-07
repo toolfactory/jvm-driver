@@ -214,7 +214,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
 					);
 
 				}
@@ -230,7 +230,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
 					);
 				}
 
