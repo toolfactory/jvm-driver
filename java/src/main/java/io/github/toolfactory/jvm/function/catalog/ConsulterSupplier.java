@@ -60,13 +60,12 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	}
 
 	public static class ForJava7 extends Abst {
-		public static final int TRUSTED = -1;
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 			super(context);
 			Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
 			modes.setAccessible(true);
-			modes.setInt(consulter, TRUSTED);
+			modes.setInt(consulter, -1);
 		}
 
 		public static class ForSemeru extends Abst {
@@ -74,7 +73,6 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public static final int INTERNAL_PRIVILEGED = 0x80;
 			public static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
 			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
-
 			static {
 				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
 				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
@@ -122,42 +120,14 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		public static class ForSemeru extends Abst {
 			public static final int MODULE = 0x10;
 			public static final int FULL_ACCESS_MASK =
-				io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
-			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
-
-			static {
-				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
-				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
-				INTERNAL_PACKAGES_PREFIXES.add("java.");
-				INTERNAL_PACKAGES_PREFIXES.add("javax.");
-				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
-				INTERNAL_PACKAGES_PREFIXES.add("sun.");
-			}
-
-			static boolean isInternal(Package pckg) {
-				if (pckg == null) {
-					return false;
-				}
-				return isInternal(pckg.getName());
-			}
-
-			static boolean isInternal(String pckgName) {
-				Iterator<String> itr = INTERNAL_PACKAGES_PREFIXES.iterator();
-				while (itr.hasNext()) {
-					if (pckgName.startsWith(itr.next())) {
-						return true;
-					}
-				}
-				return false;
-			}
-
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE);
 			}
 
 		}
@@ -173,11 +143,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				unsafe.putInt(
-					consulter,
-					allowedModesFieldMemoryOffset,
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
-				);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
 			}
 
 		}
@@ -198,7 +164,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-				unsafe.putInt(consulter, 20, ForJava7.TRUSTED);
+				unsafe.putInt(consulter, 20, -1);
 			}
 
 		}
@@ -235,7 +201,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
 					io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"),
-					ConsulterSupplier.ForJava7.TRUSTED
+					-1
 				);
 
 			}
@@ -263,7 +229,8 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
-						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
+						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
 					);
 				}
 

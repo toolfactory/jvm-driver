@@ -31,9 +31,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
@@ -65,32 +62,6 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 		}
 
 		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
-			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
-			static {
-				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
-				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
-				INTERNAL_PACKAGES_PREFIXES.add("java.");
-				INTERNAL_PACKAGES_PREFIXES.add("javax.");
-				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
-				INTERNAL_PACKAGES_PREFIXES.add("sun.");
-			}
-
-			static boolean isInternal(Package pckg) {
-				if (pckg == null) {
-					return false;
-				}
-				return isInternal(pckg.getName());
-			}
-
-			static boolean isInternal(String pckgName) {
-				Iterator<String> itr = INTERNAL_PACKAGES_PREFIXES.iterator();
-				while (itr.hasNext()) {
-					if (pckgName.startsWith(itr.next())) {
-						return true;
-					}
-				}
-				return false;
-			}
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
@@ -107,7 +78,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								isInternal(cls.getPackage()) ?
+								ConsulterSupplier.ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK
 							);
@@ -170,7 +141,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
+								ConsulterSupplier.ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
 							);
