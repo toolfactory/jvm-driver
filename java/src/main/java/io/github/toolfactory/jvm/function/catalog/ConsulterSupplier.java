@@ -74,6 +74,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public static final int INTERNAL_PRIVILEGED = 0x80;
 			public static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
 			final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+
 			static {
 				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
 				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
@@ -122,6 +123,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public static final int FULL_ACCESS_MASK =
 					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
 			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+
 			static {
 				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
 				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
