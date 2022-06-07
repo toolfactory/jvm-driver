@@ -157,7 +157,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
 			}
 
 		}
@@ -176,8 +176,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				unsafe.putInt(
 					consulter,
 					allowedModesFieldMemoryOffset,
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
 				);
 			}
 

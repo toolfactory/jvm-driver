@@ -31,6 +31,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
@@ -62,6 +65,32 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 		}
 
 		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+			static {
+				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
+				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
+				INTERNAL_PACKAGES_PREFIXES.add("java.");
+				INTERNAL_PACKAGES_PREFIXES.add("javax.");
+				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
+				INTERNAL_PACKAGES_PREFIXES.add("sun.");
+			}
+
+			static boolean isInternal(Package pckg) {
+				if (pckg == null) {
+					return false;
+				}
+				return isInternal(pckg.getName());
+			}
+
+			static boolean isInternal(String pckgName) {
+				Iterator<String> itr = INTERNAL_PACKAGES_PREFIXES.iterator();
+				while (itr.hasNext()) {
+					if (pckgName.startsWith(itr.next())) {
+						return true;
+					}
+				}
+				return false;
+			}
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
@@ -78,7 +107,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
+								isInternal(cls.getPackage()) ?
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK
 							);
@@ -104,14 +133,14 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
 			Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
-			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, ConsulterSupplier.ForJava7.TRUSTED).findConstructor(
+			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 			);
 			setFunction(
 				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
-						return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, ConsulterSupplier.ForJava7.TRUSTED);
+						return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, -1);
 					}
 				}
 			);
@@ -141,7 +170,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.isInternal(cls.getPackage()) ?
+								ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
 							);
@@ -168,14 +197,14 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
 			Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
-			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, ConsulterSupplier.ForJava7.TRUSTED)).findConstructor(
+			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 			);
 			setFunction(
 				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
-						return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, ConsulterSupplier.ForJava7.TRUSTED);
+						return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, -1);
 					}
 				}
 			);
@@ -198,7 +227,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
 				final MethodHandle methodHandle = lookupCtor.newInstance(
-					MethodHandles.Lookup.class, null, ConsulterSupplier.ForJava7.TRUSTED
+					MethodHandles.Lookup.class, null, -1
 				).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 				);
@@ -209,7 +238,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
 								null,
-								ConsulterSupplier.ForJava7.TRUSTED
+								-1
 							);
 						}
 					}
