@@ -80,6 +80,8 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
 				INTERNAL_PACKAGES_PREFIXES.add("java.");
 				INTERNAL_PACKAGES_PREFIXES.add("javax.");
+				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
+				INTERNAL_PACKAGES_PREFIXES.add("sun.");
 			}
 
 			static boolean isInternal(Package pckg) {
@@ -197,7 +199,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-				unsafe.putInt(consulter, 20, -1);
+				unsafe.putInt(consulter, 20, ForJava7.TRUSTED);
 			}
 
 		}
@@ -234,7 +236,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				io.github.toolfactory.narcissus.Narcissus.setField(
 					consulter,
 					io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"),
-					-1
+					ConsulterSupplier.ForJava7.TRUSTED
 				);
 
 			}

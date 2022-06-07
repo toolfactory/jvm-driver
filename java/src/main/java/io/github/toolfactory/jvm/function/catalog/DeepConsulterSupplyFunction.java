@@ -104,14 +104,14 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
 			Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
-			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, -1).findConstructor(
+			final MethodHandle methodHandle = lookupCtor.newInstance(MethodHandles.Lookup.class, ConsulterSupplier.ForJava7.TRUSTED).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 			);
 			setFunction(
 				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
-						return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, -1);
+						return (MethodHandles.Lookup)methodHandle.invokeWithArguments(cls, ConsulterSupplier.ForJava7.TRUSTED);
 					}
 				}
 			);
@@ -168,14 +168,14 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
 			Constructor<?> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, Class.class, int.class);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
-			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, -1)).findConstructor(
+			final MethodHandle mthHandle = ((MethodHandles.Lookup)lookupCtor.newInstance(MethodHandles.Lookup.class, null, ConsulterSupplier.ForJava7.TRUSTED)).findConstructor(
 				MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 			);
 			setFunction(
 				new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 					@Override
 					public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
-						return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, -1);
+						return (MethodHandles.Lookup)mthHandle.invokeWithArguments(cls, null, ConsulterSupplier.ForJava7.TRUSTED);
 					}
 				}
 			);
@@ -198,7 +198,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
 				final MethodHandle methodHandle = lookupCtor.newInstance(
-					MethodHandles.Lookup.class, null, -1
+					MethodHandles.Lookup.class, null, ConsulterSupplier.ForJava7.TRUSTED
 				).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, Class.class, int.class)
 				);
@@ -209,7 +209,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
 								null,
-								-1
+								ConsulterSupplier.ForJava7.TRUSTED
 							);
 						}
 					}
