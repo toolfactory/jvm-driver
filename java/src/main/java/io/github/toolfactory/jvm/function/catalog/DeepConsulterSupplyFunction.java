@@ -45,56 +45,56 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 
 	}
 
-//	public static class ForJava7 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
-//		public ForJava7(Map<Object, Object> context) throws Throwable {
-//			ObjectProvider functionProvider = ObjectProvider.get(context);
-//			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
-//			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
-//			setFunction(
-//				((ThrowingFunctionAdapter<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>, ?, ?, Throwable>)
-//					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context)).getFunction()
-//			);
-//		}
-//
-//		@Override
-//		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
-//			return function.apply(input);
-//		}
-//
-//		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
-//
-//			public ForSemeru(Map<Object, Object> context) throws Throwable {
-//				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
-//				ObjectProvider functionProvider = ObjectProvider.get(context);
-//				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
-//				final MethodHandle methodHandle = lookupCtor.newInstance(
-//					MethodHandles.Lookup.class, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
-//				).findConstructor(
-//					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
-//				);
-//				setFunction(
-//					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
-//						@Override
-//						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
-//							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
-//								cls,
-//								ConsulterSupplier.ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
-//								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
-//								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK
-//							);
-//						}
-//					}
-//				);
-//
-//			}
-//
-//			@Override
-//			public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
-//				return function.apply(input);
-//			}
-//		}
+	public static class ForJava7 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			//Check if allowedModes exists if not throw NoSuchFieldException (for Semeru JDK compatibility)
+			functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context).apply(MethodHandles.Lookup.class, "allowedModes");
+			setFunction(
+				((ThrowingFunctionAdapter<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>, ?, ?, Throwable>)
+					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context)).getFunction()
+			);
+		}
 
-//	}
+		@Override
+		public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
+			return function.apply(input);
+		}
+
+		/*public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
+				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+				ObjectProvider functionProvider = ObjectProvider.get(context);
+				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
+				final MethodHandle methodHandle = lookupCtor.newInstance(
+					MethodHandles.Lookup.class, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+				).findConstructor(
+					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
+				);
+				setFunction(
+					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
+						@Override
+						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
+								cls,
+								ConsulterSupplier.ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK
+							);
+						}
+					}
+				);
+
+			}
+
+			@Override
+			public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
+				return function.apply(input);
+			}
+		}*/
+
+	}
 
 	public static class ForJava9 extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
 
