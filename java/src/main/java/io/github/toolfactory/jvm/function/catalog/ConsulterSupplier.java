@@ -30,6 +30,9 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Info;
@@ -69,6 +72,31 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public static final int PACKAGE = 0x8;
 			public static final int INTERNAL_PRIVILEGED = 0x80;
 			public static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
+			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+
+			static {
+				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
+				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
+				INTERNAL_PACKAGES_PREFIXES.add("java.");
+				INTERNAL_PACKAGES_PREFIXES.add("javax.");
+			}
+
+			static boolean isInternal(Package pckg) {
+				if (pckg == null) {
+					return false;
+				}
+				return isInternal(pckg.getName());
+			}
+
+			static boolean isInternal(String pckgName) {
+				Iterator<String> itr = INTERNAL_PACKAGES_PREFIXES.iterator();
+				while (itr.hasNext()) {
+					if (pckgName.startsWith(itr.next())) {
+						return true;
+					}
+				}
+				return false;
+			}
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
@@ -91,7 +119,35 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		public static class ForSemeru extends Abst {
 			public static final int MODULE = 0x10;
 			public static final int FULL_ACCESS_MASK =
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
+				io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
+			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+
+			static {
+				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
+				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
+				INTERNAL_PACKAGES_PREFIXES.add("java.");
+				INTERNAL_PACKAGES_PREFIXES.add("javax.");
+				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
+				INTERNAL_PACKAGES_PREFIXES.add("sun.");
+			}
+
+			static boolean isInternal(Package pckg) {
+				if (pckg == null) {
+					return false;
+				}
+				return isInternal(pckg.getName());
+			}
+
+			static boolean isInternal(String pckgName) {
+				Iterator<String> itr = INTERNAL_PACKAGES_PREFIXES.iterator();
+				while (itr.hasNext()) {
+					if (pckgName.startsWith(itr.next())) {
+						return true;
+					}
+				}
+				return false;
+			}
+
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
@@ -114,7 +170,11 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
-				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+				unsafe.putInt(
+					consulter,
+					allowedModesFieldMemoryOffset,
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+				);
 			}
 
 		}
