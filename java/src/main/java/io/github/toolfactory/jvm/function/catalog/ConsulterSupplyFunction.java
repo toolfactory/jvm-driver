@@ -112,7 +112,7 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 			@Override
 			protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
 				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-				unsafe.putInt(consulter, 20, -1);
+				unsafe.putInt(consulter, 20, ConsulterSupplier.ForJava7.TRUSTED);
 			}
 
 
@@ -139,7 +139,7 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 					io.github.toolfactory.narcissus.Narcissus.setField(
 						consulter,
 						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"),
-						-1
+						ConsulterSupplier.ForJava7.TRUSTED
 					);
 				}
 
