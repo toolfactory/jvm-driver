@@ -75,9 +75,12 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 						@Override
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+							boolean needInternal = cls.getPackage() != null && cls.getPackage().getName().startsWith("java.");
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+								needInternal ?
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK
 							);
 						}
 					}
@@ -127,7 +130,9 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (lookupCtor, true);
 				final MethodHandle methodHandle = lookupCtor.newInstance(
-					MethodHandles.Lookup.class, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+					MethodHandles.Lookup.class,
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
 				).findConstructor(
 					MethodHandles.Lookup.class, MethodType.methodType(void.class, Class.class, int.class)
 				);
@@ -135,9 +140,13 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 					new ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>() {
 						@Override
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
+							boolean needInternal = cls.getPackage() != null && cls.getPackage().getName().startsWith("java.");
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+								needInternal ?
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE :
+								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
 							);
 						}
 					}
