@@ -122,4 +122,10 @@ public class DefaultDriverTest extends BaseTest {
 		super.convertToBuiltinClassLoader();
 	}
 
+	@Override
+	@Test
+	public void stopThread() {
+		super.stopThread();
+	}
+
 }

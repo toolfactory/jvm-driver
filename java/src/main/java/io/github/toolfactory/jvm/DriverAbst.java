@@ -58,6 +58,7 @@ import io.github.toolfactory.jvm.function.catalog.GetResourcesFunction;
 import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.catalog.StopThreadFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.function.template.BiFunction;
 import io.github.toolfactory.jvm.function.template.Function;
@@ -95,6 +96,7 @@ public abstract class DriverAbst implements Driver {
 	protected Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> loadedClassesRetrieverSupplier;
 	protected Function<ClassLoader, Map<String, ?>> loadedPackagesRetriever;
 	protected ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter;
+	protected ThrowingBiConsumer<Thread, Throwable, Throwable> threadStopper;
 
 	public DriverAbst() {}
 
@@ -165,8 +167,12 @@ public abstract class DriverAbst implements Driver {
 			if (loadedPackagesRetriever == null) {
 				loadedPackagesRetriever = getOrBuildLoadedPackagesRetriever(initializationContext);
 			}
-			if (classLoaderToBuiltinClassLoaderConverter != null) {
+			if (classLoaderToBuiltinClassLoaderConverter == null) {
 				classLoaderToBuiltinClassLoaderConverter = getOrBuildClassLoaderToBuiltinClassLoaderConverter(initializationContext);
+			}
+
+			if (threadStopper == null) {
+				threadStopper = getOrBuildThreadStopper(initializationContext);
 			}
 		} catch (Throwable exc) {
 			throwException(
@@ -244,6 +250,9 @@ public abstract class DriverAbst implements Driver {
 			if (classLoaderToBuiltinClassLoaderConverter == null) {
 				classLoaderToBuiltinClassLoaderConverter = getClassLoaderToBuiltinClassLoaderConverter(initializationContext);
 			}
+			if (threadStopper == null) {
+				threadStopper = getThreadStopper(initializationContext);
+			}
 			putNewObjectProviderIfAbsent(initializationContext);
 		} catch (Throwable exc) {
 			throwException(
@@ -278,6 +287,7 @@ public abstract class DriverAbst implements Driver {
 		putIfNotNull(initializationContext, getGetLoadedClassesRetrieverFunctionClass(), loadedClassesRetrieverSupplier);
 		putIfNotNull(initializationContext, getGetLoadedPackagesFunctionClass(), loadedPackagesRetriever);
 		putIfNotNull(initializationContext, getConvertToBuiltinClassLoaderFunctionClass(), classLoaderToBuiltinClassLoaderConverter);
+		putIfNotNull(initializationContext, getStopThreadFunctionClass(), threadStopper);
 		putNewObjectProviderIfAbsent(initializationContext);
 		return initializationContext;
 	}
@@ -336,6 +346,8 @@ public abstract class DriverAbst implements Driver {
 	protected abstract Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass();
 
 	protected abstract Class<? extends ConvertToBuiltinClassLoaderFunction> getConvertToBuiltinClassLoaderFunctionClass();
+
+	protected abstract Class<? extends StopThreadFunction> getStopThreadFunctionClass();
 
 
 	protected ThrowExceptionFunction getOrBuildExceptionThrower(Map<Object, Object> initializationContext) {
@@ -465,6 +477,11 @@ public abstract class DriverAbst implements Driver {
 		);
 	}
 
+	protected StopThreadFunction getOrBuildThreadStopper(Map<Object, Object> initializationContext) {
+		return ObjectProvider.get(initializationContext).getOrBuildObject(
+			getStopThreadFunctionClass(), initializationContext
+		);
+	}
 
 //
 	protected ThrowExceptionFunction getExceptionThrower(Map<Object, Object> initializationContext) {
@@ -590,6 +607,12 @@ public abstract class DriverAbst implements Driver {
 	protected ConvertToBuiltinClassLoaderFunction getClassLoaderToBuiltinClassLoaderConverter(Map<Object, Object> initializationContext) {
 		return ObjectProvider.getObject(
 			getConvertToBuiltinClassLoaderFunctionClass(), initializationContext
+		);
+	}
+
+	protected StopThreadFunction getThreadStopper(Map<Object, Object> initializationContext) {
+		return ObjectProvider.getObject(
+			getStopThreadFunctionClass(), initializationContext
 		);
 	}
 
@@ -1089,6 +1112,30 @@ public abstract class DriverAbst implements Driver {
 
 
 	@Override
+	public void stop(Thread thread) {
+		try {
+			ThrowingBiConsumer<Thread, Throwable, Throwable> threadStopper = this.threadStopper;
+			try {
+				threadStopper.accept(thread, new ThreadDeath());
+			} catch (NullPointerException exc) {
+				if (threadStopper != null) {
+					throw exc;
+				}
+				synchronized (this) {
+					if (this.threadStopper == null) {
+						Map<Object, Object> initContext = functionsToMap();
+						this.threadStopper = getOrBuildThreadStopper(initContext);
+						refresh(initContext);
+					}
+				}
+				this.threadStopper.accept(thread, new ThreadDeath());
+			}
+		} catch (Throwable exc) {
+			throwException(exc);
+		}
+	}
+
+	@Override
 	public ClassLoader convertToBuiltinClassLoader(ClassLoader classLoader) {
 		try {
 			ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter = this.classLoaderToBuiltinClassLoaderConverter;
@@ -1135,6 +1182,7 @@ public abstract class DriverAbst implements Driver {
 		loadedClassesRetrieverSupplier = null;
 		loadedPackagesRetriever = null;
 		classLoaderToBuiltinClassLoaderConverter = null;
+		threadStopper = null;
 	}
 
 }

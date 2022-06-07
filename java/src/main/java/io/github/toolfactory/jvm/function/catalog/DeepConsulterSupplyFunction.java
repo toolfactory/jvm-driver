@@ -61,7 +61,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 			return function.apply(input);
 		}
 
-		/*public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
+		public static class ForSemeru extends Abst<ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable>> {
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				Constructor<MethodHandles.Lookup> lookupCtor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
@@ -92,7 +92,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 			public MethodHandles.Lookup apply(Class<?> input) throws Throwable {
 				return function.apply(input);
 			}
-		}*/
+		}
 
 	}
 

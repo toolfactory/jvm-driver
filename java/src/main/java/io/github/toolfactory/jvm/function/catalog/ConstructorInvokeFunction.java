@@ -39,7 +39,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructor<?>, Object[], Object, Throwable> {
 
-	public static class Abst implements ConstructorInvokeFunction {
+	public static abstract class Abst implements ConstructorInvokeFunction {
 
 		protected MethodHandle methodHandle;
 

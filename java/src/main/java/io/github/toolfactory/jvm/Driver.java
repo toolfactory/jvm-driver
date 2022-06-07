@@ -97,6 +97,8 @@ public interface Driver extends Closeable {
 
 	public <T> T throwException(Throwable exception);
 
+	public void stop(Thread thread);
+
 
 	@Override
 	public void close();

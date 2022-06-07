@@ -47,6 +47,7 @@ import io.github.toolfactory.jvm.function.catalog.GetResourcesFunction;
 import io.github.toolfactory.jvm.function.catalog.MethodInvokeFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.catalog.StopThreadFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 
@@ -177,5 +178,11 @@ public class DefaultDriver extends DriverAbst {
 		return ConvertToBuiltinClassLoaderFunction.class;
 	}
 
-	
+
+	@Override
+	protected Class<? extends StopThreadFunction> getStopThreadFunctionClass() {
+		return StopThreadFunction.class;
+	}
+
+
 }
