@@ -48,9 +48,10 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 
 	public static class ForJava7 extends Abst {
 
-		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
+		public ForJava7(Map<Object, Object> context) throws Throwable {
 			final Method stopThreadMethod = Thread.class.getDeclaredMethod("stop0", Object.class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
+			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (stopThreadMethod, true);
 			methodHandle = functionProvider.getOrBuildObject(
 				ConsulterSupplier.class, context
 			).get().unreflect(stopThreadMethod);
@@ -58,9 +59,10 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 
 		public static class ForSemeru extends Abst {
 
-			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				final Method stopThreadMethod = Thread.class.getDeclaredMethod("stopImpl", Throwable.class);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
+				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (stopThreadMethod, true);
 				methodHandle = functionProvider.getOrBuildObject(
 					ConsulterSupplier.class, context
 				).get().unreflect(stopThreadMethod);
