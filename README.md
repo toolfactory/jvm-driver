@@ -9,7 +9,7 @@
 
 [![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/2027923946)
 
-[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209+%20(18)-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/2027923946)
+[![Supported JVM](https://img.shields.io/badge/supported%20JVM-7%2C%208%2C%209+%20(18)-blueviolet)](https://github.com/toolfactory/jvm-driver/actions/runs/2453702930)
 
 [![GitHub open issues](https://img.shields.io/github/issues/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/issues?q=is%3Aissue+is%3Aclosed)
@@ -26,7 +26,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>8.9.6</version>
+    <version>9.0.0</version>
 </dependency>	
 ```
 ### Requiring the ToolFactory JMV Driver module
@@ -149,6 +149,8 @@ public Map<String, ?> retrieveLoadedPackages(ClassLoader classLoader);
 public void setAccessible(AccessibleObject object, boolean flag);
 
 public void setFieldValue(Object target, Field field, Object value);
+
+public void stop(Thread thread);
 
 public <T> T throwException(String message, Object... placeHolderReplacements);
 
