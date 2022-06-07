@@ -45,7 +45,7 @@ import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.function.template.Supplier;
 
 
-@SuppressWarnings({"unchecked", "null"})
+@SuppressWarnings({"unchecked"})
 public class ObjectProvider {
 	private final List<String> classNameItems;
 	private Map<String, List<String>> jVMVendorToClassSuffix;
