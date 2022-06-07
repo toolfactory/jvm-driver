@@ -73,13 +73,12 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public static final int PACKAGE = 0x8;
 			public static final int INTERNAL_PRIVILEGED = 0x80;
 			public static final int FULL_ACCESS_MASK = Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED | PACKAGE;
-			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+			final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
 			static {
 				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
 				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
 				INTERNAL_PACKAGES_PREFIXES.add("java.");
 				INTERNAL_PACKAGES_PREFIXES.add("javax.");
-				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
 				INTERNAL_PACKAGES_PREFIXES.add("sun.");
 			}
 
@@ -122,6 +121,32 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			public static final int MODULE = 0x10;
 			public static final int FULL_ACCESS_MASK =
 					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.FULL_ACCESS_MASK | MODULE;
+			private final static Collection<String> INTERNAL_PACKAGES_PREFIXES;
+			static {
+				INTERNAL_PACKAGES_PREFIXES = new HashSet<>();
+				INTERNAL_PACKAGES_PREFIXES.add("com.sun.");
+				INTERNAL_PACKAGES_PREFIXES.add("java.");
+				INTERNAL_PACKAGES_PREFIXES.add("javax.");
+				INTERNAL_PACKAGES_PREFIXES.add("jdk.internal.");
+				INTERNAL_PACKAGES_PREFIXES.add("sun.");
+			}
+
+			static boolean isInternal(Package pckg) {
+				if (pckg == null) {
+					return false;
+				}
+				return isInternal(pckg.getName());
+			}
+
+			static boolean isInternal(String pckgName) {
+				Iterator<String> itr = INTERNAL_PACKAGES_PREFIXES.iterator();
+				while (itr.hasNext()) {
+					if (pckgName.startsWith(itr.next())) {
+						return true;
+					}
+				}
+				return false;
+			}
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);

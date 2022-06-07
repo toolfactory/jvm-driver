@@ -141,7 +141,7 @@ public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, 
 						public MethodHandles.Lookup apply(Class<?> cls) throws Throwable {
 							return (MethodHandles.Lookup)methodHandle.invokeWithArguments(
 								cls,
-								ConsulterSupplier.ForJava7.ForSemeru.isInternal(cls.getPackage()) ?
+								ConsulterSupplier.ForJava9.ForSemeru.isInternal(cls.getPackage()) ?
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED :
 								io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.FULL_ACCESS_MASK
 							);
