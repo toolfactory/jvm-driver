@@ -27,7 +27,6 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -50,7 +49,7 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 	public static class ForJava7 extends Abst {
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
-			final Method stopThreadMethod = Thread.class.getDeclaredMethod("stop0", AccessibleObject.class, boolean.class);
+			final Method stopThreadMethod = Thread.class.getDeclaredMethod("stop0", Throwable.class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			methodHandle = functionProvider.getOrBuildObject(
 				ConsulterSupplier.class, context
@@ -60,7 +59,7 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 		public static class ForSemeru extends Abst {
 
 			public ForSemeru(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
-				final Method stopThreadMethod = Thread.class.getDeclaredMethod("stopImpl", AccessibleObject.class, boolean.class);
+				final Method stopThreadMethod = Thread.class.getDeclaredMethod("stopImpl", Throwable.class);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				methodHandle = functionProvider.getOrBuildObject(
 					ConsulterSupplier.class, context
