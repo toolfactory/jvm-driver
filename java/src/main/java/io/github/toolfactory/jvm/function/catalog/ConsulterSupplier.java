@@ -60,12 +60,13 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	}
 
 	public static class ForJava7 extends Abst {
+		public static final int TRUSTED = -1;
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 			super(context);
 			Field modes = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
 			modes.setAccessible(true);
-			modes.setInt(consulter, -1);
+			modes.setInt(consulter, TRUSTED);
 		}
 
 		public static class ForSemeru extends Abst {
@@ -173,7 +174,8 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				unsafe.putInt(
 					consulter,
 					allowedModesFieldMemoryOffset,
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
+					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
 				);
 			}
 
