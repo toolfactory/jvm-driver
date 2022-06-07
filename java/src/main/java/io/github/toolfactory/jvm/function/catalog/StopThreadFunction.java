@@ -49,7 +49,7 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 	public static class ForJava7 extends Abst {
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, SecurityException, IllegalAccessException {
-			final Method stopThreadMethod = Thread.class.getDeclaredMethod("stop0", Throwable.class);
+			final Method stopThreadMethod = Thread.class.getDeclaredMethod("stop0", Object.class);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			methodHandle = functionProvider.getOrBuildObject(
 				ConsulterSupplier.class, context
