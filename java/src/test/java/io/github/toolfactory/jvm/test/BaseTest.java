@@ -317,7 +317,7 @@ abstract class BaseTest {
 			Thread.sleep(5000);
 			getReflection().getDriver().stop(thread);
 			Thread.sleep(2000);
-			log(Thread.currentThread().getName() + " - " + thread.getState());
+			log(thread + " - " + thread.getState());
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);
