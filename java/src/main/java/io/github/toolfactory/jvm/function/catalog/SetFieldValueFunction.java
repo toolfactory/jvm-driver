@@ -76,6 +76,12 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				} else {
 					unsafe.putObjectVolatile(target, fieldOffset, value);
 				}
+			} else if (cls == short.class) {
+				if (!Modifier.isVolatile(field.getModifiers())) {
+					unsafe.putShort(target, fieldOffset, ((Short)value).shortValue());
+				} else {
+					unsafe.putShortVolatile(target, fieldOffset, ((Short)value).shortValue());
+				}
 			} else if (cls == int.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
 					unsafe.putInt(target, fieldOffset, ((Integer)value).intValue());
@@ -132,12 +138,12 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				super(context);
 				checkNativeEngine();
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);

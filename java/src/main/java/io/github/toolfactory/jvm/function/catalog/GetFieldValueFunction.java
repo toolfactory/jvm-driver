@@ -64,6 +64,12 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 				} else {
 					return unsafe.getObjectVolatile(target, fieldOffset);
 				}
+			} else if (cls == short.class) {
+				if (!Modifier.isVolatile(field.getModifiers())) {
+					return Short.valueOf(unsafe.getShort(target, fieldOffset));
+				} else {
+					return Short.valueOf(unsafe.getShortVolatile(target, fieldOffset));
+				}
 			} else if (cls == int.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
 					return Integer.valueOf(unsafe.getInt(target, fieldOffset));
@@ -117,18 +123,18 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 			public ForJava7(Map<Object, Object> context) throws InitializeException {
 				checkNativeEngine();
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-			
+
 			@Override
 			public Object apply(Object target, Field field) {
 				if (Modifier.isStatic(field.getModifiers())) {
