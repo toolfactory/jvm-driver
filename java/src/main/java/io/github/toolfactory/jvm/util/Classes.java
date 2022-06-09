@@ -39,9 +39,9 @@ public class Classes {
 
 	public static Class<?> getClassOrWrapper(Class<?> cls) {
 		if (cls.isPrimitive()) {
-			if (cls == int.class) {
-				return Integer.class;
-			} else if (cls == short.class) {
+			if (cls == short.class) {
+				return Short.class;
+			} else if (cls == int.class) {
 				return Integer.class;
 			} else if (cls == long.class) {
 				return Long.class;
