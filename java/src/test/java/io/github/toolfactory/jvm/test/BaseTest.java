@@ -64,7 +64,7 @@ abstract class BaseTest {
 			List<Object> objectValue2Var = reflection.getFieldValue(obj, field);
 			assertTrue(objectValue2Var == objectValue);
 			field = reflection.getDeclaredField(obj.getClass(), "shortValue");
-			reflection.setFieldValue(obj, field, 1);
+			reflection.setFieldValue(obj, field, (short)1);
 			short shortValue = reflection.getFieldValue(obj, field);
 			assertTrue(shortValue == 1);
 			field = reflection.getDeclaredField(obj.getClass(), "intValue");
@@ -103,7 +103,7 @@ abstract class BaseTest {
 			objectValue2Var = reflection.getFieldValue(obj, field);
 			assertTrue(objectValue2Var == objectValue);
 			field = reflection.getDeclaredField(obj.getClass(), "shortValue");
-			reflection.setFieldValue(obj, field, 1);
+			reflection.setFieldValue(obj, field, (short)1);
 			shortValue = reflection.getFieldValue(obj, field);
 			assertTrue(shortValue == 1);
 			field = reflection.getDeclaredField(obj.getClass(), "intValue");
@@ -341,6 +341,7 @@ abstract class BaseTest {
 	private static class ClassForTest {
 
 		private static volatile List<Object> objectValue;
+		private static volatile short shortValue;
 		private static volatile int intValue;
 		private static volatile long longValue;
 		private static volatile float floatValue;
