@@ -29,7 +29,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
     <version>9.1.0</version>
 </dependency>	
 ```
-### Requiring the ToolFactory JMV Driver module
+### Requiring the ToolFactory JVM Driver module
 
 To use ToolFactory JMV Driver as a Java module, add the following to your `module-info.java`: 
 
