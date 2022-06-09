@@ -41,6 +41,8 @@ public class Classes {
 		if (cls.isPrimitive()) {
 			if (cls == int.class) {
 				return Integer.class;
+			} else if (cls == short.class) {
+				return Integer.class;
 			} else if (cls == long.class) {
 				return Long.class;
 			} else if (cls == float.class) {
