@@ -64,21 +64,21 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				throw new IllegalArgumentException(Strings.compile("Value {} is not assignable to {}", value , field.getName()));
 			}
 			Class<?> fieldDeclaringClass = field.getDeclaringClass();
-			Object target = Modifier.isStatic(field.getModifiers())?
-				fieldDeclaringClass :
-				origTarget;
-			boolean isStatic;
-			long fieldOffset = (isStatic = Modifier.isStatic(field.getModifiers()))?
-				unsafe.staticFieldOffset(field) :
-				unsafe.objectFieldOffset(field);
-			if (!isStatic) {
-				if (target == null) {
+			long fieldOffset;
+			Object target;
+			if (Modifier.isStatic(field.getModifiers())) {
+				fieldOffset = unsafe.staticFieldOffset(field);
+				target = fieldDeclaringClass;
+			} else {
+				if ((target = origTarget) == null) {
 					throw new IllegalArgumentException("Target object is null");
 				}
 				Class<?> targetObjectClass = target.getClass();
 	 			if (!Classes.isAssignableFrom(fieldDeclaringClass, targetObjectClass)) {
 					throw new IllegalArgumentException("Target object class " + targetObjectClass + " is not assignable to " + fieldDeclaringClass);
 				}
+				fieldOffset = unsafe.objectFieldOffset(field);
+
 			}
 			Class<?> cls = field.getType();
 			if(!cls.isPrimitive()) {
