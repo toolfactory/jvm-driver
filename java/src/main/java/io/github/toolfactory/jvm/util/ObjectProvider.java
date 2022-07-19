@@ -49,10 +49,9 @@ import io.github.toolfactory.jvm.function.template.Supplier;
 public class ObjectProvider {
 	private List<String> classNameItems;
 	private Map<String, List<String>> jVMVendorToClassSuffix;
-	private final static String CLASS_NAME;
+	private static String CLASS_NAME;
 	private int jVMVersion;
 	private String vendor;
-	private Runnable initializer;
 
 
 	static {
@@ -60,36 +59,29 @@ public class ObjectProvider {
 	}
 
 	public ObjectProvider(int... versions) {
-		initializer = new Runnable() {
-			@Override
-			public void run() {
-				classNameItems = new CopyOnWriteArrayList<>();
-				ObjectProvider.this.jVMVendorToClassSuffix = new LinkedHashMap<>();
-				ObjectProvider.this.jVMVendorToClassSuffix.put("Oracle Corporation", new ArrayList<String>());
-				ObjectProvider.this.jVMVendorToClassSuffix.put("International Business Machines Corporation", Arrays.asList("ForSemeru"));
-				ObjectProvider.this.jVMVendorToClassSuffix.put("IBM Corporation", Arrays.asList("ForSemeru"));
-				jVMVersion = Info.Provider.getInfoInstance().getVersion();
-				vendor = System.getProperty("java.vendor");
-				if (!ObjectProvider.this.jVMVendorToClassSuffix.containsKey(vendor)) {
-					ObjectProvider.this.jVMVendorToClassSuffix.put(vendor, ObjectProvider.this.jVMVendorToClassSuffix.get("Oracle Corporation"));
-				}
-				TreeSet<Integer> registeredVersions = new TreeSet<>();
-				for (int version : versions) {
-					if (jVMVersion >= version) {
-						registeredVersions.add(version);
-					}
-				}
-				for (Integer version : registeredVersions.descendingSet().toArray(new Integer[registeredVersions.size()])) {
-					classNameItems.add("ForJava" + version);
-				}
-			}
-		};
-		initializer.run();
+		init(versions);
 	}
 
-
-	public void reinit() {
-		initializer.run();
+	private void init(int... versions) {
+		this.classNameItems = new CopyOnWriteArrayList<>();
+		this.jVMVendorToClassSuffix = new LinkedHashMap<>();
+		this.jVMVendorToClassSuffix.put("Oracle Corporation", new ArrayList<String>());
+		this.jVMVendorToClassSuffix.put("International Business Machines Corporation", Arrays.asList("ForSemeru"));
+		this.jVMVendorToClassSuffix.put("IBM Corporation", Arrays.asList("ForSemeru"));
+		jVMVersion = Info.Provider.getInfoInstance().getVersion();
+		vendor = System.getProperty("java.vendor");
+		if (!this.jVMVendorToClassSuffix.containsKey(vendor)) {
+			this.jVMVendorToClassSuffix.put(vendor, this.jVMVendorToClassSuffix.get("Oracle Corporation"));
+		}
+		TreeSet<Integer> registeredVersions = new TreeSet<>();
+		for (int version : versions) {
+			if (jVMVersion >= version) {
+				registeredVersions.add(version);
+			}
+		}
+		for (Integer version : registeredVersions.descendingSet().toArray(new Integer[registeredVersions.size()])) {
+			classNameItems.add("ForJava" + version);
+		}
 	}
 
 
