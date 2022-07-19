@@ -32,12 +32,12 @@ import java.lang.reflect.Method;
 
 public class InfoImpl implements Info {
 
-    private final String osArch;
-    private boolean is64Bit;
-    private boolean is64BitHotspot;
-    private boolean is32Bit;
-    private boolean compressedRefsEnabled;
-    private int version;
+    public String osArch;
+    public boolean is64Bit;
+    public boolean is64BitHotspot;
+    public boolean is32Bit;
+    public boolean compressedRefsEnabled;
+    public int version;
 
     public InfoImpl() {
     	osArch = System.getProperty("os.arch");
@@ -65,7 +65,8 @@ public class InfoImpl implements Info {
         		if(separatorIdx != -1) {
             		version = version.substring(0, separatorIdx);
             	}
-        	}        }
+        	}
+        }
         this.version = Integer.parseInt(version);
         boolean is64Bit = false;
         boolean is32Bit = false;

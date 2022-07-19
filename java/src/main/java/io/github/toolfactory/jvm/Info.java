@@ -31,18 +31,18 @@
 package io.github.toolfactory.jvm;
 
 public interface Info {
-	public final static int[] CRITICAL_VERSIONS = new int[]{7, 9, 14, 17};
+	public final static int[] CRITICAL_VERSIONS = {7, 9, 14, 17};
 
 
-	boolean isCompressedOopsOffOn64BitHotspot();
+	public boolean isCompressedOopsOffOn64BitHotspot();
 
-	boolean isCompressedOopsOffOn64Bit();
+	public boolean isCompressedOopsOffOn64Bit();
 
-	boolean is32Bit();
+	public boolean is32Bit();
 
-	boolean is64Bit();
+	public boolean is64Bit();
 
-	int getVersion();
+	public int getVersion();
 
 
 	public static class Provider {
