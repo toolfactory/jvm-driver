@@ -178,6 +178,9 @@
 								<copy
 									file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class"
 									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
+								<copy
+									file="${project.basedir}/../java-hook/bin/io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunctionForJava7.class"
+									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunctionForJava7.class" />
 							</target>
 						</configuration>
 					</execution>
@@ -210,11 +213,9 @@
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
 							<release>9</release>
-							<!--
 							<excludes>
-								<exclude>module-info.java</exclude>
+								<exclude>io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunctionForJava7.java</exclude>
 							</excludes>
-							-->
 						</configuration>
 					</execution>
 					<execution>
@@ -235,6 +236,7 @@
 						<!-- recompile everything for target VM except the module-info.java -->
 						<configuration>
 							<excludes>
+								<exclude>io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunctionForJava7.java</exclude>
 								<exclude>module-info.java</exclude>
 							</excludes>
 							<source>${project_jdk_version}</source>
