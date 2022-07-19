@@ -114,12 +114,6 @@ public class NativeDriver extends DefaultDriver {
 
 
 	@Override
-	protected Class<? extends ThrowExceptionFunction> getThrowExceptionFunctionClass() {
-		return ThrowExceptionFunction.Native.class;
-	}
-
-
-	@Override
 	protected Class<? extends GetLoadedPackagesFunction> getGetLoadedPackagesFunctionClass() {
 		return GetLoadedPackagesFunction.Native.class;
 	}

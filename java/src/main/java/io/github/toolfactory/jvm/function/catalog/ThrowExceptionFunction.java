@@ -27,12 +27,8 @@
 package io.github.toolfactory.jvm.function.catalog;
 
 
-import java.util.Map;
-
-import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Consumer;
 import io.github.toolfactory.jvm.util.Strings;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -78,36 +74,5 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 		}
 
 	}
-
-	public static interface Native extends ThrowExceptionFunction {
-
-		public static class ForJava7 extends Abst implements Native {
-
-			public ForJava7(Map<Object, Object> context) throws InitializeException {
-				checkNativeEngine();
-			}
-
-			protected void checkNativeEngine() throws InitializeException {
-				if (!Narcissus.libraryLoaded) {
-					throw new InitializeException(
-						Strings.compile(
-							"Could not initialize the native engine {}",
-							io.github.toolfactory.narcissus.Narcissus.class.getName()
-						)
-					);
-				}
-			}
-
-			@Override
-			public void accept(Throwable exception) {
-				if (exception == null) {
-					throw new NullPointerException("Input exception is null");
-				}
-				io.github.toolfactory.narcissus.Narcissus.sneakyThrow(exception);
-			}
-
-		}
-	}
-
 
 }

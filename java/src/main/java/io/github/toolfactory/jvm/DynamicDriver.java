@@ -36,7 +36,6 @@ import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunct
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
-import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
@@ -54,9 +53,6 @@ public class DynamicDriver extends DefaultDriver {
 						BuildingException exc) {
 					if (clazz.equals(ConsulterSupplier.class)) {
 						return objectProvider.getOrBuildObject(ConsulterSupplier.Native.class, context);
-					}
-					if (clazz.equals(ThrowExceptionFunction.class)) {
-						return objectProvider.getOrBuildObject(ThrowExceptionFunction.Native.class, context);
 					}
 					if (clazz.equals(SetFieldValueFunction.class)) {
 						return objectProvider.getOrBuildObject(SetFieldValueFunction.Native.class, context);
