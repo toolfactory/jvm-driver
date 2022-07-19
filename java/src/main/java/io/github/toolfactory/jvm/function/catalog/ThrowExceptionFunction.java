@@ -31,22 +31,21 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Consumer;
-import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
 public interface ThrowExceptionFunction extends Consumer<Throwable> {
-	
+
 	public <T> T apply(Throwable exception);
-	
+
 	public <T> T apply(String message, Object... placeHolderReplacements);
-	
+
 	public <T> T apply(int startingLevel, String message, Object... placeHolderReplacements);
 
 	public static abstract class Abst implements ThrowExceptionFunction {
-		
+
 		@Override
 		public <T> T apply(Throwable exception) {
 			if (exception == null) {
@@ -55,12 +54,12 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 			accept(exception);
 			return null;
 		}
-		
+
 		@Override
 		public <T> T apply(String message, Object... placeHolderReplacements) {
 			return apply(3, message, placeHolderReplacements);
 		}
-		
+
 		@Override
 		public<T> T apply(int stackTraceStartingLevel, String message, Object... placeHolderReplacements) {
 			Throwable exception = null;
@@ -81,17 +80,17 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 	}
 
 	public static class ForJava7 extends Abst {
-		protected sun.misc.Unsafe unsafe;
 
-		public ForJava7(Map<Object, Object> context) {
-			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-		}
+		public ForJava7(Map<Object, Object> context) {}
 
 		@Override
 		public void accept(Throwable exception) {
-			unsafe.throwException(exception);
+			throwException(exception);
 		}
 
+		private <E extends Throwable> void throwException(Throwable exc) throws E {
+			throw (E)exc;
+		}
 
 	}
 
@@ -102,18 +101,18 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 			public ForJava7(Map<Object, Object> context) throws InitializeException {
 				checkNativeEngine();
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-			
+
 			@Override
 			public void accept(Throwable exception) {
 				if (exception == null) {
