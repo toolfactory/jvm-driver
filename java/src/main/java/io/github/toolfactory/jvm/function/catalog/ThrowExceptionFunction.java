@@ -31,6 +31,7 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Consumer;
+import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Strings;
 import io.github.toolfactory.narcissus.Narcissus;
 
@@ -80,17 +81,17 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 	}
 
 	public static class ForJava7 extends Abst {
+		protected sun.misc.Unsafe unsafe;
 
-		public ForJava7(Map<Object, Object> context) {}
+		public ForJava7(Map<Object, Object> context) {
+			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+		}
 
 		@Override
 		public void accept(Throwable exception) {
-			throwException(exception);
+			unsafe.throwException(exception);
 		}
 
-		private <E extends Throwable> void throwException(Throwable exc) throws E {
-			throw (E)exc;
-		}
 
 	}
 
