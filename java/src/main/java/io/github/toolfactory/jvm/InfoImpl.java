@@ -33,6 +33,8 @@ import java.lang.reflect.Method;
 public class InfoImpl implements Info {
 
     public String osArch;
+    public String operatingSystemName;
+    public String sunArchDataModel;
     public boolean is64Bit;
     public boolean is64BitHotspot;
     public boolean is32Bit;
@@ -40,7 +42,6 @@ public class InfoImpl implements Info {
     public int version;
 
     public InfoImpl() {
-    	osArch = System.getProperty("os.arch");
     	init();
     }
 
@@ -54,6 +55,9 @@ public class InfoImpl implements Info {
 
     private void init() {
     	String version = System.getProperty("java.version");
+    	osArch = System.getProperty("os.arch");
+    	operatingSystemName = System.getProperty("os.name");
+    	sunArchDataModel = System.getProperty("sun.arch.data.model");
         if(version.startsWith("1.")) {
         	version = version.substring(2, 3);
         } else {
@@ -70,10 +74,9 @@ public class InfoImpl implements Info {
         this.version = Integer.parseInt(version);
         boolean is64Bit = false;
         boolean is32Bit = false;
-        final String x = System.getProperty("sun.arch.data.model");
-        if (x != null) {
-            is64Bit = x.contains("64");
-            is32Bit = x.contains("32");
+        if (sunArchDataModel != null) {
+            is64Bit = sunArchDataModel.contains("64");
+            is32Bit = sunArchDataModel.contains("32");
         } else {
             if (osArch != null && osArch.contains("64")) {
                 is64Bit = true;
