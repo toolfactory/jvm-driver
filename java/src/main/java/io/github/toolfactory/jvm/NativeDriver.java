@@ -37,7 +37,6 @@ import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunct
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
-import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
@@ -50,7 +49,6 @@ public class NativeDriver extends DefaultDriver {
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
 		ObjectProvider objectProvider = ObjectProvider.get(context);
-		objectProvider.markToBeInitializedViaExceptionHandler(ThrowExceptionFunction.class, context);
 		objectProvider.markToBeInitializedViaExceptionHandler(ConsulterSupplier.class, context);
 		ObjectProvider.get(context).markToBeInitializedViaExceptionHandler(ConsulterSupplyFunction.class, context);
 		objectProvider.markToBeInitializedViaExceptionHandler(SetFieldValueFunction.class, context);
