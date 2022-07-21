@@ -103,9 +103,7 @@ public abstract class DriverAbst implements Driver {
 
 	@Override
 	public <D extends Driver> D init() {
-		Map<Object, Object> initializationContext = new HashMap<>();
-		putNewObjectProviderIfAbsent(initializationContext);
-		getOrBuildExceptionThrower(initializationContext);
+		Map<Object, Object> initializationContext = functionsToMap();
 		try {
 			if (exceptionThrower == null) {
 				exceptionThrower = getOrBuildExceptionThrower(initializationContext);
