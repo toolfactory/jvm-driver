@@ -88,7 +88,7 @@ jobs:
         architecture: [x86, x64]
         distribution: [liberica, zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19-ea]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         exclude:
           - os: macOS-latest
             architecture: x86
@@ -99,7 +99,7 @@ jobs:
           - distribution: liberica
             java: 18
           - distribution: liberica
-            java: 19-ea
+            java: 19
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -161,10 +161,10 @@ jobs:
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 18
+      - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
