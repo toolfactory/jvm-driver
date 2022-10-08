@@ -97,6 +97,7 @@ public interface Driver extends Closeable {
 
 	public <T> T throwException(Throwable exception);
 
+	@Deprecated(since="9.4.0")
 	public void stop(Thread thread);
 
 

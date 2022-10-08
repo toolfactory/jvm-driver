@@ -2,6 +2,8 @@ package io.github.toolfactory.jvm.test;
 
 
 import org.junit.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import io.github.toolfactory.util.Reflection;
 
@@ -124,6 +126,7 @@ public class DynamicDriverTest extends BaseTest {
 
 	@Override
 	@Test
+	@EnabledForJreRange(max = JRE.JAVA_19)
 	public void stopThread() {
 		super.stopThread();
 	}

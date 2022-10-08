@@ -49,7 +49,7 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 	public static class ForJava7 extends Abst {
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
-			final Method stopThreadMethod = Thread.class.getDeclaredMethod("stop0", Object.class);
+			final Method stopThreadMethod = retrieveStopThreadMethod();
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (stopThreadMethod, true);
 			methodHandle = functionProvider.getOrBuildObject(
@@ -57,17 +57,40 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 			).get().unreflect(stopThreadMethod);
 		}
 
-		public static class ForSemeru extends Abst {
+		protected Method retrieveStopThreadMethod() throws NoSuchMethodException, SecurityException {
+			return Thread.class.getDeclaredMethod("stop0", Object.class);
+		}
+
+		public static class ForSemeru extends ForJava7 {
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
-				final Method stopThreadMethod = Thread.class.getDeclaredMethod("stopImpl", Throwable.class);
-				ObjectProvider functionProvider = ObjectProvider.get(context);
-				functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept (stopThreadMethod, true);
-				methodHandle = functionProvider.getOrBuildObject(
-					ConsulterSupplier.class, context
-				).get().unreflect(stopThreadMethod);
+				super(context);
 			}
 
+			@Override
+			protected Method retrieveStopThreadMethod() throws NoSuchMethodException, SecurityException {
+				return Thread.class.getDeclaredMethod("stopImpl", Throwable.class);
+			}
+
+		}
+
+	}
+
+	public static class ForJava20 extends ForJava7 {
+
+		public ForJava20(Map<Object, Object> context) throws Throwable {
+			super(context);
+		}
+
+		@Override
+		protected Method retrieveStopThreadMethod() throws NoSuchMethodException, SecurityException {
+			System.err.println("Warrning! The native method for stopping threads has been removed in this JVM version: the interrupt method will be used.");
+			return Thread.class.getDeclaredMethod("interrupt0");
+		}
+
+		@Override
+		public void accept(Thread thread, Throwable threadDeath) throws Throwable {
+			methodHandle.invokeWithArguments(thread);
 		}
 
 	}

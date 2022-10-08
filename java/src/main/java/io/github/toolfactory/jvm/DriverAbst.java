@@ -98,8 +98,6 @@ public abstract class DriverAbst implements Driver {
 	protected ThrowingFunction<ClassLoader, ClassLoader, Throwable> classLoaderToBuiltinClassLoaderConverter;
 	protected ThrowingBiConsumer<Thread, Throwable, Throwable> threadStopper;
 
-	public DriverAbst() {}
-
 
 	@Override
 	public <D extends Driver> D init() {
@@ -1110,6 +1108,7 @@ public abstract class DriverAbst implements Driver {
 
 
 	@Override
+	@Deprecated(since="9.4.0")
 	public void stop(Thread thread) {
 		try {
 			ThrowingBiConsumer<Thread, Throwable, Throwable> threadStopper = this.threadStopper;
