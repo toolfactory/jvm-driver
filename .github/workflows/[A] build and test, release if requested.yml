@@ -80,7 +80,7 @@ jobs:
           
   build-and-test-with-JDK-group-1:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
+    #needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -88,7 +88,7 @@ jobs:
         architecture: [x86, x64]
         distribution: [liberica, zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20-ea]
+        java: [20-ea, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         exclude:
           - os: macOS-latest
             architecture: x86
@@ -117,7 +117,7 @@ jobs:
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
       - name: Build and test with Java 7 target
-        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+        run: mvn -B clean test -DskipTests=false -Dproject_jdk_version=8 --file ./java/pom.xml
 
 
   build-and-test-with-JDK-group-2:
