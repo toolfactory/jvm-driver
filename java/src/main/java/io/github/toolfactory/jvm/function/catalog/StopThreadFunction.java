@@ -84,7 +84,6 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 
 		@Override
 		protected Method retrieveStopThreadMethod() throws NoSuchMethodException, SecurityException {
-			System.err.println("Warrning! The native method for stopping threads has been removed in this JVM version: the interrupt method will be used.");
 			return Thread.class.getDeclaredMethod("interrupt0");
 		}
 
