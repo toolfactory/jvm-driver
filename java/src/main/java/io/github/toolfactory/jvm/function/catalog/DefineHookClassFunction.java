@@ -41,7 +41,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 @SuppressWarnings("all")
 public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, byte[], Class<?>, Throwable> {
 
-	public static abstract class Abst implements DefineHookClassFunction {
+	public abstract static class Abst implements DefineHookClassFunction {
 		protected MethodHandle defineHookClassMethodHandle;
 
 		public Abst(Map<Object, Object> context) {

@@ -39,7 +39,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 public interface GetDeclaredMethodsFunction extends ThrowingFunction<Class<?>, Method[], Throwable> {
 
-	public static abstract class Abst implements GetDeclaredMethodsFunction {
+	public abstract static class Abst implements GetDeclaredMethodsFunction {
 		protected MethodHandle methodHandle;
 
 		protected Abst(Map<Object, Object> context) {}

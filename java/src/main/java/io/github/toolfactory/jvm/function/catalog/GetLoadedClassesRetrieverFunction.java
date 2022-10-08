@@ -181,7 +181,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 				};
 			}
 
-			protected static abstract class ClassNameBasedLockSupplier {
+			protected abstract static class ClassNameBasedLockSupplier {
 
 				protected abstract Hashtable<String, Object> get(ClassLoader classLoader);
 

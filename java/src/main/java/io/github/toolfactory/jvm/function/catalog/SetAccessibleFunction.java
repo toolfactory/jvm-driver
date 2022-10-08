@@ -45,7 +45,7 @@ import io.github.toolfactory.narcissus.Narcissus;
 @SuppressWarnings("unchecked")
 public interface SetAccessibleFunction extends ThrowingBiConsumer<AccessibleObject, Boolean, Throwable> {
 
-	public static abstract class Abst<B> extends ThrowingBiConsumerAdapter<B, AccessibleObject, Boolean, Throwable> implements SetAccessibleFunction {
+	public abstract static class Abst<B> extends ThrowingBiConsumerAdapter<B, AccessibleObject, Boolean, Throwable> implements SetAccessibleFunction {
 
 		public Abst(Map<Object, Object> context) {}
 	}

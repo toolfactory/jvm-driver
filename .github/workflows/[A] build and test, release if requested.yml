@@ -52,7 +52,7 @@ jobs:
       matrix:
         architecture: [x64]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [18]
+        java: [19]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -114,9 +114,38 @@ jobs:
           git pull origin ${{github.ref}}  
       - name: Build and test with Java 7 target
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
-
-
+        
   build-and-test-with-JDK-group-2:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
+    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x86, x64]
+        distribution: [zulu]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [20-ea]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}  
+      - name: Build and test with Java 8 target
+        run: mvn -B clean test -DskipTests=false -Dproject_jdk_version=8 --file ./java/pom.xml      
+        
+
+
+  build-and-test-with-JDK-group-3:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
     strategy:
@@ -157,7 +186,7 @@ jobs:
 
   
   release:
-    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2]
+    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2, build-and-test-with-JDK-group-3]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')

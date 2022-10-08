@@ -46,7 +46,7 @@ import io.github.toolfactory.narcissus.Narcissus;
 @SuppressWarnings("all")
 public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
-	public static abstract class Abst implements ConsulterSupplier {
+	public abstract static class Abst implements ConsulterSupplier {
 		protected MethodHandles.Lookup consulter;
 
 		public Abst(Map<Object, Object> context) {
@@ -202,7 +202,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 	public static interface Native extends ConsulterSupplier {
 
-		public static abstract class Abst extends ConsulterSupplier.Abst {
+		public abstract static class Abst extends ConsulterSupplier.Abst {
 
 			public Abst(Map<Object, Object> context) throws InitializeException {
 				super(context);

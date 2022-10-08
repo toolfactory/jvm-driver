@@ -42,7 +42,7 @@ import io.github.toolfactory.narcissus.Narcissus;
 @SuppressWarnings("all")
 public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object> {
 
-	public static abstract class Abst implements SetFieldValueFunction {
+	public abstract static class Abst implements SetFieldValueFunction {
 
 		public Abst(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);

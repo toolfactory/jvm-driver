@@ -41,7 +41,7 @@ import io.github.toolfactory.jvm.util.ThrowingFunctionAdapter;
 @SuppressWarnings("unchecked")
 public interface DeepConsulterSupplyFunction extends ThrowingFunction<Class<?>, MethodHandles.Lookup, Throwable> {
 
-	public static abstract class Abst<F> extends ThrowingFunctionAdapter<F, Class<?>, MethodHandles.Lookup, Throwable> implements DeepConsulterSupplyFunction {
+	public abstract static class Abst<F> extends ThrowingFunctionAdapter<F, Class<?>, MethodHandles.Lookup, Throwable> implements DeepConsulterSupplyFunction {
 
 	}
 

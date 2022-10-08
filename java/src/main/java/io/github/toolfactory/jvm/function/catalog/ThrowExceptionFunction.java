@@ -40,7 +40,7 @@ public interface ThrowExceptionFunction extends Consumer<Throwable> {
 
 	public <T> T apply(int startingLevel, String message, Object... placeHolderReplacements);
 
-	public static abstract class Abst implements ThrowExceptionFunction {
+	public abstract static class Abst implements ThrowExceptionFunction {
 
 		@Override
 		public <T> T apply(Throwable exception) {

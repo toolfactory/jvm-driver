@@ -35,7 +35,7 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 
 public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable, Throwable> {
 
-	public static abstract class Abst implements StopThreadFunction {
+	public abstract static class Abst implements StopThreadFunction {
 
 		protected MethodHandle methodHandle;
 
