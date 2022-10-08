@@ -306,6 +306,7 @@ abstract class BaseTest {
 
 
 	public void stopThread() {
+		log("stopThread test starting");
 		try {
 			Thread thread = new Thread(new Runnable() {
 
