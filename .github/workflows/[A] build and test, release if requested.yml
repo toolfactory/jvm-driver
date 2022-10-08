@@ -126,6 +126,9 @@ jobs:
         distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [20-ea]
+        exclude:
+          - os: macOS-latest
+            architecture: x86        
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
