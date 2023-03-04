@@ -33,6 +33,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -776,6 +777,9 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public <T> T getFieldValue(Object target, Field field) {
 		BiFunction<Object, Field, Object> fieldValueRetriever = this.fieldValueRetriever;
+		if (target == null && !Modifier.isStatic(field.getModifiers())) {
+			throw new IllegalArgumentException("Target cannot be null when the field is not static");
+		}
 		try {
 			return (T)fieldValueRetriever.apply(target, field);
 		} catch (NullPointerException exc) {
@@ -796,6 +800,9 @@ public abstract class DriverAbst implements Driver {
 	@Override
 	public void setFieldValue(Object target, Field field, Object value) {
 		TriConsumer<Object, Field, Object> fieldValueSetter = this.fieldValueSetter;
+		if (target == null && !Modifier.isStatic(field.getModifiers())) {
+			throw new IllegalArgumentException("Target cannot be null when the field is not static");
+		}
 		try {
 			fieldValueSetter.accept(target, field, value);
 		} catch (NullPointerException exc) {
