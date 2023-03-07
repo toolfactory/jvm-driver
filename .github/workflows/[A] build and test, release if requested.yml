@@ -92,6 +92,10 @@ jobs:
         exclude:
           - os: macOS-latest
             architecture: x86
+          - os: ubuntu-latest
+            architecture: x86
+            distribution: zulu
+            java: 19
           - distribution: liberica
             java: 9
           - distribution: liberica
