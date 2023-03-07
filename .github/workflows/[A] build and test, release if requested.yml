@@ -90,9 +90,6 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         exclude:
-          - os: macOS-latest
-            architecture: x86
-            distribution: zulu
           - os: ubuntu-latest
             architecture: x86
             distribution: zulu
