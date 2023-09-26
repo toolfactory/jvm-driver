@@ -135,7 +135,7 @@ jobs:
         architecture: [x86, x64]
         distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [20, 21]
+        java: [20-ea]
         exclude:
           - os: macOS-latest
             architecture: x86        
