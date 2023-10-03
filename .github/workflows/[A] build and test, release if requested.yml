@@ -175,7 +175,7 @@ jobs:
         architecture: [x64]
         distribution: [adopt]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18, 19, 20, 21]
+        java: [11, 16, 17, 18, 19, 20]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
