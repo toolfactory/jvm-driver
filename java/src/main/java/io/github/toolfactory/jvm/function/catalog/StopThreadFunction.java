@@ -94,7 +94,7 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 
 	}
 
-	public interface ForJava21 {
+	public static abstract class ForJava21 extends Abst {
 
 		public static class ForSemeru extends ForJava7 {
 
