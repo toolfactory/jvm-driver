@@ -91,12 +91,8 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 		public void accept(Thread thread, Throwable threadDeath) throws Throwable {
 			methodHandle.invokeWithArguments(thread);
 		}
-
-	}
-
-	public static abstract class ForJava21 extends Abst {
-
-		public static class ForSemeru extends ForJava7 {
+		
+		public static class ForSemeru extends ForJava7.ForSemeru {
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
@@ -112,6 +108,7 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 				methodHandle.invokeWithArguments(thread);
 			}
 		}
+
 	}
 
 }
