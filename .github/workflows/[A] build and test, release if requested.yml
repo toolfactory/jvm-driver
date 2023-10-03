@@ -44,6 +44,7 @@ on:
 jobs:
 
 
+#To ensure compatibility with the Java 7 version the build must never be run with a JDK version higher than 19  
   elaborate-java-hook-module:
     name: Elaborate java hook module (${{ matrix.os }})
     strategy:
@@ -78,36 +79,26 @@ jobs:
           git push
 
           
-  build-and-test-with-JDK-group-1:
+  build-and-test-with-zulu-JDK:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
+#    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
       matrix:
         architecture: [x86, x64]
-        distribution: [liberica, zulu]
+        distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
         exclude:
           - os: macOS-latest
             architecture: x86
-          - os: ubuntu-latest
-            architecture: x86
-            java: 19
-          - os: ubuntu-latest
-            architecture: x64
-            distribution: zulu
+          - architecture: x64
             java: 10
-          - os: windows-latest
-            architecture: x86
-            java: 19
-          - distribution: liberica
-            java: 9
-          - distribution: liberica
-            java: 10
-          - distribution: liberica
-            java: 18
+          - architecture: x86
+            java: 20
+          - architecture: x86
+            java: 21
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -123,11 +114,159 @@ jobs:
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
       - name: Build and test with Java 7 target
+        if: ${{ fromJSON(matrix.java) <= 19 }}
         run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
-        
-  build-and-test-with-JDK-group-2:
+      - name: Build and test with Java 8 target
+        if: ${{ fromJSON(matrix.java) > 19}}
+        run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
+ 
+   
+  build-and-test-with-liberica-JDK:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
+#    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x86, x64]
+        distribution: [liberica]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        exclude:
+          - os: macOS-latest
+            architecture: x86
+          - java: 9
+          - java: 10
+          - architecture: x86
+            os: ubuntu-latest
+            java: 20
+          - architecture: x86
+            os: ubuntu-latest
+            java: 21
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}  
+      - name: Build and test with Java 7 target
+        if: ${{ fromJSON(matrix.java) <= 19 }}
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+      - name: Build and test with Java 8 target
+        if: ${{ fromJSON(matrix.java) > 19}}
+        run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
+
+
+  build-and-test-with-adopt-JDK:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
+#    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x64]
+        distribution: [adopt]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [11, 16, 17, 18, 19, 20, 21]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}  
+      - name: Build and test with Java 7 target
+        if: ${{ fromJSON(matrix.java) <= 19 }}
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+      - name: Build and test with Java 8 target
+        if: ${{ fromJSON(matrix.java) > 19}}
+        run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
+  
+  
+  build-and-test-with-adopt-openj9-JDK:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
+#    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x64]
+        distribution: [adopt-openj9]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [11, 16, 17, 18, 19, 20]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}  
+      - name: Build and test with Java 7 target
+        if: ${{ fromJSON(matrix.java) <= 19 }}
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+      - name: Build and test with Java 8 target
+        if: ${{ fromJSON(matrix.java) > 19}}
+        run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
+  
+  
+  build-and-test-with-temurin-JDK:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
+#    needs: [elaborate-java-hook-module]
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        architecture: [x64]
+        distribution: [temurin]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [11, 16, 17, 18, 19, 20]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.distribution }}
+          architecture: ${{ matrix.architecture }}
+      - name: Update repositories
+        run: |
+          git config user.name "${{ github.event.head_commit.committer.name }}"
+          git config user.email "${{ github.event.head_commit.committer.email }}"
+          git pull origin ${{github.ref}}
+      - name: Build and test with Java 7 target
+        if: ${{ fromJSON(matrix.java) <= 19 }}
+        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
+      - name: Build and test with Java 8 target
+        if: ${{ fromJSON(matrix.java) > 19}}
+        run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
+   
+   
+  build-and-test-with-ea-JDK:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
+#    needs: [elaborate-java-hook-module]
     strategy:
       fail-fast: false
       max-parallel: 15
@@ -135,10 +274,7 @@ jobs:
         architecture: [x86, x64]
         distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [20-ea]
-        exclude:
-          - os: macOS-latest
-            architecture: x86        
+        java: [22-ea]      
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -154,61 +290,20 @@ jobs:
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}  
       - name: Build and test with Java 8 target
-        run: mvn -B clean test -DskipTests=false -Dproject_jdk_version=8 --file ./java/pom.xml      
-        
+        run: mvn -B clean test -DskipTests=false -Dproject_jdk_version=8 --file ./java/pom.xml
 
-
-  build-and-test-with-JDK-group-3:
-    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
-    strategy:
-      fail-fast: false
-      max-parallel: 15
-      matrix:
-        architecture: [x64]
-        distribution: [adopt, adopt-openj9, temurin]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18, 19]
-        exclude:
-          - distribution: adopt-openj9
-            java: 18
-          - distribution: adopt-openj9
-            java: 19
-          - distribution: adopt
-            java: 17
-          - distribution: adopt
-            java: 18
-          - distribution: adopt
-            java: 19
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: ${{ matrix.distribution }}
-          architecture: ${{ matrix.architecture }}
-      - name: Update repositories
-        run: |
-          git config user.name "${{ github.event.head_commit.committer.name }}"
-          git config user.email "${{ github.event.head_commit.committer.email }}"
-          git pull origin ${{github.ref}}  
-      - name: Build and test with Java 7 target
-        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
-
-  
+#To ensure compatibility with the Java 7 version the build must never be run with a JDK version higher than 19  
   release:
-    needs: [build-and-test-with-JDK-group-1, build-and-test-with-JDK-group-2, build-and-test-with-JDK-group-3]
+    needs: [build-and-test-with-zulu-JDK, build-and-test-with-liberica-JDK, build-and-test-with-adopt-JDK, build-and-test-with-adopt-openj9-JDK, build-and-test-with-temurin-JDK]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 21
+      - name: Set up JDK 19
         uses: actions/setup-java@v3
         with:
-          java-version: 21
+          java-version: 19
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
