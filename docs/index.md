@@ -53,10 +53,12 @@ There are four kinds of driver:
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
-All JNI methods used by the dynamic, hybrid and native driver are supplied by [**Narcissus**](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
+By default all JNI methods used by the dynamic, hybrid and native driver are supplied by [**Narcissus**](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
 * Windows (x86, x64)
 * Linux (x86, x64)
-* MacOs (x64) 
+* MacOs (x64)
+
+If you need [**a faster JNI engine than Narcissus**](https://github.com/burningwave/jvm-driver/issues/3#issuecomment-1149840706) consider to use the [**Burningwave JVM Driver**](https://burningwave.github.io/jvm-driver/).
 
 <br/>
 
