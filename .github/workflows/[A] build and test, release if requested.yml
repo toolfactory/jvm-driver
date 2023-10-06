@@ -163,9 +163,9 @@ jobs:
       - name: Build and test with Java 8 target
         if: ${{ fromJSON(matrix.java) > 19}}
         run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
-
-
-  build-and-test-with-adopt-JDK:
+ 
+  
+  build-and-test-with-semeru-JDK:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
     strategy:
@@ -173,40 +173,7 @@ jobs:
       max-parallel: 15
       matrix:
         architecture: [x64]
-        distribution: [adopt]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18, 19, 20]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: ${{ matrix.distribution }}
-          architecture: ${{ matrix.architecture }}
-      - name: Update repositories
-        run: |
-          git config user.name "${{ github.event.head_commit.committer.name }}"
-          git config user.email "${{ github.event.head_commit.committer.email }}"
-          git pull origin ${{github.ref}}  
-      - name: Build and test with Java 7 target
-        if: ${{ fromJSON(matrix.java) <= 19 }}
-        run: mvn -B clean test -DskipTests=false --file ./java/pom.xml
-      - name: Build and test with Java 8 target
-        if: ${{ fromJSON(matrix.java) > 19}}
-        run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
-  
-  
-  build-and-test-with-adopt-openj9-JDK:
-    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
-    strategy:
-      fail-fast: false
-      max-parallel: 15
-      matrix:
-        architecture: [x64]
-        distribution: [adopt-openj9]
+        distribution: [semeru]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [11, 16, 17, 18, 19, 20]
     runs-on: ${{ matrix.os }}
@@ -296,7 +263,7 @@ jobs:
 
 #To ensure compatibility with the Java 7 version the build must never be run with a JDK version higher than 19  
   release:
-    needs: [build-and-test-with-zulu-JDK, build-and-test-with-liberica-JDK, build-and-test-with-adopt-JDK, build-and-test-with-adopt-openj9-JDK, build-and-test-with-temurin-JDK]
+    needs: [build-and-test-with-zulu-JDK, build-and-test-with-liberica-JDK, build-and-test-with-semeru-JDK, build-and-test-with-temurin-JDK]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
