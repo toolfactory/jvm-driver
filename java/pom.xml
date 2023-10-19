@@ -36,7 +36,7 @@
 	</parent>
 
 	<artifactId>jvm-driver</artifactId>
-	<version>9.4.9-SNAPSHOT</version>
+	<version>9.4.10-SNAPSHOT</version>
 
 	<packaging>bundle</packaging>
 
