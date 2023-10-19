@@ -29,7 +29,7 @@
 
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>9.4.10-SNAPSHOT</version>
+	<version>9.5.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -292,6 +292,20 @@
 					</includes>
 					<useModulePath>false</useModulePath>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>module-info.class</exclude>
+						<exclude>jdk/</exclude>
+						<exclude>java/</exclude>
+						<exclude>META-INF/maven/</exclude>
+					</excludes>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
