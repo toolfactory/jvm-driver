@@ -311,12 +311,12 @@
 					<manifestLocation>${project.build.outputDirectory}/META-INF/</manifestLocation>
 					<instructions>					
 						<Bundle-Category>Utilities</Bundle-Category>
-						<built-by>ToolFactory</built-by>
+						<built-by>${organization.name}</built-by>
 						<Bundle-License>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</Bundle-License>
 						<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
 						<Bundle-Name>JVM Driver</Bundle-Name>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Vendor>ToolFactory</Bundle-Vendor>
+						<Bundle-Vendor>${organization.name}</Bundle-Vendor>
 						<Bundle-Description>${project.description}</Bundle-Description>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
