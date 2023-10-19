@@ -91,22 +91,13 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 		public void accept(Thread thread, Throwable threadDeath) throws Throwable {
 			methodHandle.invokeWithArguments(thread);
 		}
-		
-		public static class ForSemeru extends ForJava7.ForSemeru {
+
+		public static class ForSemeru extends ForJava20 {
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 			}
 
-			@Override
-			protected Method retrieveStopThreadMethod() throws NoSuchMethodException, SecurityException {
-				return Thread.class.getDeclaredMethod("interrupt0");
-			}
-
-			@Override
-			public void accept(Thread thread, Throwable threadDeath) throws Throwable {
-				methodHandle.invokeWithArguments(thread);
-			}
 		}
 
 	}
