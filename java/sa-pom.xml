@@ -293,39 +293,26 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${maven-jar-plugin.version}</version>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven-bundle-plugin.version}</version>
+				<extensions>true</extensions>
 				<configuration>
-					<excludes>
-						<exclude>module-info.class</exclude>
-						<exclude>jdk/</exclude>
-						<exclude>java/</exclude>
-						<exclude>META-INF/maven/</exclude>
-					</excludes>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<built-by>ToolFactory</built-by>
-							<Bundle-Category>Utilities</Bundle-Category>
-							<Bundle-License>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</Bundle-License>
-							<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-							<Bundle-Name>JVM Driver</Bundle-Name>
-							<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-							<Bundle-Vendor>ToolFactory</Bundle-Vendor>
-							<Bundle-Description>${project.description}</Bundle-Description>
-							<Bundle-Version>${project.version}</Bundle-Version>
-							<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
-							<Import-Package>io.github.toolfactory.narcissus;version="1.0.7",com.sun.management,jdk.internal.reflect;resolution:=optional,sun.misc;resolution:=optional,sun.reflect;resolution:=optional</Import-Package>
-							<Export-Package>io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.util,io.github.toolfactory.jvm.function.template";version="8.9.4",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="8.9.4",io.github.toolfactory.jvm.function.template;version="8.9.4",io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.util,sun.misc,io.github.toolfactory.jvm.function,io.github.toolfactory.narcissus,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="8.9.4",io.github.toolfactory.jvm.function;version="8.9.4"</Export-Package>
-							<Multi-Release>true</Multi-Release>
-						</manifestEntries>
-					</archive>
+					<instructions>
+						<Bundle-Category>Utilities</Bundle-Category>
+						<built-by>ToolFactory</built-by>
+						<Bundle-License>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</Bundle-License>
+						<Bundle-Name>JVM Driver</Bundle-Name>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Vendor>ToolFactory</Bundle-Vendor>
+						<Bundle-Description>${project.description}</Bundle-Description>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+						<Import-Package>io.github.toolfactory.narcissus;version="${narcissus.version}",com.sun.management,jdk.internal.reflect;resolution:=optional,sun.misc;resolution:=optional,sun.reflect;resolution:=optional</Import-Package>
+						<Multi-Release>true</Multi-Release>
+					</instructions>
 				</configuration>
-			</plugin>
+		 	</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>${maven-deploy-plugin.version}</version>
