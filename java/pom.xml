@@ -313,6 +313,7 @@
                 </executions>
 				<configuration>
 					<manifestLocation>${project.build.outputDirectory}/META-INF/</manifestLocation>
+					<exportScr>true</exportScr>
 					<instructions>					
 						<Bundle-Category>Utilities</Bundle-Category>
 						<built-by>${organization.name}</built-by>
@@ -326,6 +327,8 @@
 						<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
 						<Import-Package>io.github.toolfactory.narcissus;version="${narcissus.version}",com.sun.management,jdk.internal.reflect;resolution:=optional,sun.misc;resolution:=optional,sun.reflect;resolution:=optional</Import-Package>
 						<Multi-Release>true</Multi-Release>
+    					<_dsannotations>*</_dsannotations><!-- Enable processing of OSGI DS component annotations -->
+						<_metatypeannotations>*</_metatypeannotations><!-- Enable processing of OSGI metatype annotations -->
 					</instructions>
 				</configuration>
 		 	</plugin>
