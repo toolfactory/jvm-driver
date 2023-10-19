@@ -297,7 +297,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Previous OSGI data generation
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${maven-jar-plugin.version}</version>
@@ -310,6 +309,7 @@
 					</excludes>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
+						<!-- Previous OSGI data generation
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
@@ -329,10 +329,10 @@
 							<Export-Package>io.github.toolfactory.jvm;uses:="io.github.toolfactory.jvm.function.catalog,io.github.toolfactory.jvm.util,io.github.toolfactory.jvm.function.template";version="8.9.4",io.github.toolfactory.jvm.util;uses:="io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="8.9.4",io.github.toolfactory.jvm.function.template;version="8.9.4",io.github.toolfactory.jvm.function.catalog;uses:="io.github.toolfactory.jvm.util,sun.misc,io.github.toolfactory.jvm.function,io.github.toolfactory.narcissus,io.github.toolfactory.jvm.function.template,io.github.toolfactory.jvm";version="8.9.4",io.github.toolfactory.jvm.function;version="8.9.4"</Export-Package>
 							<Multi-Release>true</Multi-Release>
 						</manifestEntries>
+						-->
 					</archive>
 				</configuration>
 			</plugin>
-			-->
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
