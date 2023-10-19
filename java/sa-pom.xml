@@ -29,7 +29,7 @@
 
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>9.5.1-SNAPSHOT</version>
+	<version>9.6.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -294,30 +294,26 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${maven-jar-plugin.version}</version>
-				<configuration>
-					<excludes>
-						<exclude>module-info.class</exclude>
-						<exclude>jdk/</exclude>
-						<exclude>java/</exclude>
-						<exclude>META-INF/maven/</exclude>
-					</excludes>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<version>${maven-bundle-plugin.version}</version>
 				<extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>generate-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
 				<configuration>
-					<instructions>
+					<manifestLocation>${project.build.outputDirectory}/META-INF/</manifestLocation>
+					<instructions>					
 						<Bundle-Category>Utilities</Bundle-Category>
 						<built-by>ToolFactory</built-by>
 						<Bundle-License>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</Bundle-License>
+						<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
 						<Bundle-Name>JVM Driver</Bundle-Name>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Vendor>ToolFactory</Bundle-Vendor>
@@ -329,6 +325,22 @@
 					</instructions>
 				</configuration>
 		 	</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>module-info.class</exclude>
+						<exclude>jdk/</exclude>
+						<exclude>java/</exclude>
+						<exclude>META-INF/maven/</exclude>
+					</excludes>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>${maven-deploy-plugin.version}</version>
