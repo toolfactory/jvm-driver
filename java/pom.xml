@@ -297,7 +297,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--
+			<!-- Previous OSGI data generation
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${maven-jar-plugin.version}</version>
