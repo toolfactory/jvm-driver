@@ -76,4 +76,17 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 	}
 
+	public static class ForJava22 extends Abst {
+
+		public ForJava22(Map<Object, Object> context) throws Throwable {
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			Class<?> constructorAccessorImplClass = Class.forName("jdk.internal.reflect.DirectConstructorHandleAccessor$NativeAccessor");
+			Method method = constructorAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(constructorAccessorImplClass);
+			methodHandle = consulter.unreflect(method);
+		}
+
+	}
+
 }

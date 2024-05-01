@@ -76,4 +76,18 @@ public interface MethodInvokeFunction extends ThrowingTriFunction<Method, Object
 
 	}
 
+	public static class ForJava22 extends Abst {
+
+		public ForJava22(Map<Object, Object> context) throws Throwable {
+			Class<?> nativeMethodAccessorImplClass = Class.forName("jdk.internal.reflect.DirectMethodHandleAccessor$NativeAccessor");
+			Method invoker = nativeMethodAccessorImplClass.getDeclaredMethod("invoke0", Method.class, Object.class, Object[].class);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			ConsulterSupplyFunction consulterSupplyFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
+			MethodHandles.Lookup consulter = consulterSupplyFunction.apply(nativeMethodAccessorImplClass);
+			functionProvider.getOrBuildObject(SetAccessibleFunction.class, context).accept(invoker, true);
+			methodHandle = consulter.unreflect(invoker);
+		}
+
+	}
+
 }
