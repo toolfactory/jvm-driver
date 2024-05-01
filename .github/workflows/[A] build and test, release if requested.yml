@@ -93,6 +93,9 @@ jobs:
         exclude:
           - os: macOS-latest
             architecture: x86
+          - os: ubuntu-latest
+            architecture: x86
+            java: 10
           - architecture: x64
             java: 10
           - architecture: x86
