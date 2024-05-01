@@ -53,10 +53,10 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> constructorAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
-			Method method = constructorAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+			Class<?> accessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
+			Method method = accessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(constructorAccessorImplClass);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(accessorImplClass);
 			method.setAccessible(true);
 			methodHandle = consulter.unreflect(method);
 		}
@@ -67,10 +67,10 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> constructorAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
-			Method method = constructorAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+			Class<?> accessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
+			Method method = accessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(constructorAccessorImplClass);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(accessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
 
@@ -80,10 +80,10 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 		public ForJava22(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> constructorAccessorImplClass = Class.forName("jdk.internal.reflect.DirectConstructorHandleAccessor$NativeAccessor");
-			Method method = constructorAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+			Class<?> accessorImplClass = Class.forName("jdk.internal.reflect.DirectConstructorHandleAccessor$NativeAccessor");
+			Method method = accessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(constructorAccessorImplClass);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(accessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
 
