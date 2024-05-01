@@ -67,24 +67,28 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> accessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
+			Class<?> accessorImplClass = Class.forName(retrieveNativeAccessorClassName());
 			Method method = accessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
 			MethodHandles.Lookup consulter = getConsulterFunction.apply(accessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
 
+		protected String retrieveNativeAccessorClassName() {
+			return "jdk.internal.reflect.NativeConstructorAccessorImpl";
+		}
+
 	}
 
-	public static class ForJava22 extends Abst {
+	public static class ForJava22 extends ForJava9 {
 
 		public ForJava22(Map<Object, Object> context) throws Throwable {
-			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> accessorImplClass = Class.forName("jdk.internal.reflect.DirectConstructorHandleAccessor$NativeAccessor");
-			Method method = accessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
-			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(accessorImplClass);
-			methodHandle = consulter.unreflect(method);
+			super(context);
+		}
+
+		@Override
+		protected String retrieveNativeAccessorClassName() {
+			return "jdk.internal.reflect.DirectConstructorHandleAccessor$NativeAccessor";
 		}
 
 	}
