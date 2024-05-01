@@ -53,10 +53,10 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> nativeAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+			Class<?> constructorAccessorImplClass = Class.forName("sun.reflect.NativeConstructorAccessorImpl");
+			Method method = constructorAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(constructorAccessorImplClass);
 			method.setAccessible(true);
 			methodHandle = consulter.unreflect(method);
 		}
@@ -67,10 +67,10 @@ public interface ConstructorInvokeFunction extends ThrowingBiFunction<Constructo
 
 		public ForJava9(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			Class<?> nativeAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
-			Method method = nativeAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
+			Class<?> constructorAccessorImplClass = Class.forName("jdk.internal.reflect.NativeConstructorAccessorImpl");
+			Method method = constructorAccessorImplClass.getDeclaredMethod("newInstance0", Constructor.class, Object[].class);
 			ConsulterSupplyFunction getConsulterFunction = functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context);
-			MethodHandles.Lookup consulter = getConsulterFunction.apply(nativeAccessorImplClass);
+			MethodHandles.Lookup consulter = getConsulterFunction.apply(constructorAccessorImplClass);
 			methodHandle = consulter.unreflect(method);
 		}
 
