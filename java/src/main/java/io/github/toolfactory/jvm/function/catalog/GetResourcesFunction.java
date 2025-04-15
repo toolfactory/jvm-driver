@@ -124,7 +124,9 @@ public interface GetResourcesFunction extends ThrowingTriFunction<String, Boolea
 		}
 
 		@Override
-		protected ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> buildResourceFinder(final Map<Object, Object> context) throws Throwable {
+		protected ThrowingQuadFunction<ClassLoader, String, Boolean, Collection<URL>, Collection<URL>, Throwable> buildResourceFinder(
+			final Map<Object, Object> context
+		) throws Throwable {
 			final ObjectProvider functionProvider = ObjectProvider.get(context);
 			final MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
 			final GetClassByNameFunction getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
@@ -161,13 +163,7 @@ public interface GetResourcesFunction extends ThrowingTriFunction<String, Boolea
 						ModuleReader.class, java_lang_module_ModuleReferenceClass
 					)
 				);
-				final MethodHandle jdk_internal_loader_URLClassPath_findResources = consulter.findVirtual(
-					jdk_internal_loader_URLClassPathClass,
-					"findResources",
-					MethodType.methodType(
-						Enumeration.class, String.class, boolean.class
-					)
-				);
+				final MethodHandle jdk_internal_loader_URLClassPath_findResources = initFindResourcesMethodHandle(consulter, jdk_internal_loader_URLClassPathClass);
 				@Override
 				public Collection<URL> apply(ClassLoader classLoader, String resourceRelativePath, Boolean findFirst, Collection<URL> resources) throws Throwable {
 					if (jdk_internal_loader_BuiltinClassLoaderClass.isAssignableFrom(classLoader.getClass())) {
@@ -200,7 +196,9 @@ public interface GetResourcesFunction extends ThrowingTriFunction<String, Boolea
 						Object ucp = getFieldValueFunction.apply(classLoader, jdk_internal_loader_BuiltinClassLoader_ucpField);
 						Enumeration<URL> resourceURLS;
 						try {
-							resourceURLS = (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath, false);
+							resourceURLS = invokeFindResources(
+								jdk_internal_loader_URLClassPath_findResources, ucp, resourceRelativePath
+							);
 						} catch (NullPointerException exc) {
 							if (ucp != null) {
 								throw exc;
@@ -239,5 +237,58 @@ public interface GetResourcesFunction extends ThrowingTriFunction<String, Boolea
 			};
 		}
 
+		protected MethodHandle initFindResourcesMethodHandle(
+			final MethodHandles.Lookup consulter,
+			Class<?> jdk_internal_loader_URLClassPathClass
+		) throws NoSuchMethodException, IllegalAccessException {
+			return consulter.findVirtual(
+				jdk_internal_loader_URLClassPathClass,
+				"findResources",
+				MethodType.methodType(
+					Enumeration.class, String.class, boolean.class
+				)
+			);
+		}
+
+		protected Enumeration<URL> invokeFindResources(
+			MethodHandle jdk_internal_loader_URLClassPath_findResources,
+			Object ucp,
+			String resourceRelativePath
+		) throws Throwable {
+			return (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath, false);
+		}
+
 	}
+
+	@SuppressWarnings("unchecked")
+	public static class ForJava24 extends ForJava9 {
+
+		public ForJava24(Map<Object, Object> context) throws Throwable {
+			super(context);
+		}
+
+		@Override
+		protected MethodHandle initFindResourcesMethodHandle(
+			final MethodHandles.Lookup consulter,
+			Class<?> jdk_internal_loader_URLClassPathClass
+		) throws NoSuchMethodException, IllegalAccessException {
+			return consulter.findVirtual(
+				jdk_internal_loader_URLClassPathClass,
+				"findResources",
+				MethodType.methodType(
+					Enumeration.class, String.class
+				)
+			);
+		}
+
+		@Override
+		protected Enumeration<URL> invokeFindResources(
+			MethodHandle jdk_internal_loader_URLClassPath_findResources,
+			Object ucp,
+			String resourceRelativePath
+		) throws Throwable {
+			return (Enumeration<URL>)jdk_internal_loader_URLClassPath_findResources.invokeWithArguments(ucp, resourceRelativePath);
+		}
+	}
+
 }
