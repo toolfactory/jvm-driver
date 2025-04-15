@@ -86,23 +86,13 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        architecture: [x86, x64]
+        architecture: [x64]
         distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         exclude:
-          - os: macOS-latest
-            architecture: x86
           - architecture: x64
             java: 10
-          - architecture: x86
-            java: 20
-          - architecture: x86
-            java: 21
-          - architecture: x86
-            java: 22
-          - architecture: x86
-            java: 23
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -132,21 +122,13 @@ jobs:
       fail-fast: false
       max-parallel: 15
       matrix:
-        architecture: [x86, x64]
+        architecture: [x86]
         distribution: [liberica]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         exclude:
-          - os: macOS-latest
-            architecture: x86
           - java: 9
           - java: 10
-          - architecture: x86
-            os: ubuntu-latest
-            java: 20
-          - architecture: x86
-            os: ubuntu-latest
-            java: 21
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
