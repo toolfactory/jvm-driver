@@ -89,7 +89,7 @@ jobs:
         architecture: [x64]
         distribution: [zulu]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
         exclude:
           - architecture: x64
             java: 10
@@ -125,7 +125,7 @@ jobs:
         architecture: [x64]
         distribution: [semeru]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18, 19, 20]
+        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -158,7 +158,7 @@ jobs:
         architecture: [x64]
         distribution: [temurin]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [11, 16, 17, 18, 19, 20]
+        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -179,36 +179,6 @@ jobs:
       - name: Build and test with Java 8 target
         if: ${{ fromJSON(matrix.java) > 19}}
         run: mvn -B clean test -Dproject_jdk_version=8 -DskipTests=false --file ./java/pom.xml
-   
-   
-  build-and-test-with-ea-JDK:
-    if: ${{ false }}
-    name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
-    needs: [elaborate-java-hook-module]
-    strategy:
-      fail-fast: false
-      max-parallel: 15
-      matrix:
-        architecture: [x86, x64]
-        distribution: [zulu]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [22-ea]      
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: ${{ matrix.distribution }}
-          architecture: ${{ matrix.architecture }}
-      - name: Update repositories
-        run: |
-          git config user.name "${{ github.event.head_commit.committer.name }}"
-          git config user.email "${{ github.event.head_commit.committer.email }}"
-          git pull origin ${{github.ref}}  
-      - name: Build and test with Java 8 target
-        run: mvn -B clean test -DskipTests=false -Dproject_jdk_version=8 --file ./java/pom.xml
 
 
 #To ensure compatibility with the Java 7 version the build must never be run with a JDK version higher than 19  
