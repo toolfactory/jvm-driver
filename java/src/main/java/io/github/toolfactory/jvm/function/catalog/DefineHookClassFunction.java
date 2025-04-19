@@ -51,30 +51,30 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 
 	public static class ForJava7 extends Abst {
-		protected sun.misc.Unsafe unsafe;
+		protected UnsafeWrapper unsafeWrapper;
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			defineHookClassMethodHandle = retrieveConsulter(
 				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
 				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get()
 			).findSpecial(
-				unsafe.getClass(),
+				unsafeWrapper.getUnsafeClass(),
 				"defineAnonymousClass",
 				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-				unsafe.getClass()
+				unsafeWrapper.getUnsafeClass()
 			);
 		}
 
 		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
-			return (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(consulter, unsafe.getClass());
+			return (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(consulter, unsafeWrapper.getUnsafeClass());
 		}
 
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
-			return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(unsafe, clientClass, byteCode, null);
+			return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
 		}
 
 	}
@@ -88,7 +88,7 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 		@Override
 		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
-			return (MethodHandles.Lookup)lookupMethod.invokeWithArguments(unsafe.getClass(), consulter);
+			return (MethodHandles.Lookup)lookupMethod.invokeWithArguments(unsafeWrapper.getUnsafeClass(), consulter);
 		}
 
 	}

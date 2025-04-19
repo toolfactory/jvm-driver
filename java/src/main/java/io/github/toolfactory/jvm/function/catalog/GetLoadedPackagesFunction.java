@@ -41,21 +41,21 @@ import io.github.toolfactory.narcissus.Narcissus;
 public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<String, ?>> {
 
 	public static class ForJava7 implements GetLoadedPackagesFunction {
-		protected sun.misc.Unsafe unsafe;
+		protected UnsafeWrapper unsafeWrapper;
 		protected Long fieldOffset;
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			fieldOffset = unsafe.objectFieldOffset(
+			fieldOffset = unsafeWrapper.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
 			);
 		}
 
 		@Override
 		public Map<String, ?> apply(ClassLoader classLoader) {
-			return (Map<String, ?>)unsafe.getObject(classLoader, fieldOffset);
+			return (Map<String, ?>)unsafeWrapper.getObject(classLoader, fieldOffset);
 		}
 
 	}
@@ -72,18 +72,18 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-			
+
 			@Override
 			public Map<String, ?> apply(ClassLoader classLoader) {
 				return (Map<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, packagesField);

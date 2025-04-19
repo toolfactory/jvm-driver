@@ -40,16 +40,16 @@ import io.github.toolfactory.narcissus.Narcissus;
 public interface AllocateInstanceFunction extends ThrowingFunction<Class<?>, Object, Throwable> {
 
 	public static class ForJava7 implements AllocateInstanceFunction {
-		final sun.misc.Unsafe unsafe;
+		final UnsafeWrapper unsafeWrapper;
 
 		public ForJava7(Map<Object, Object> context) {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 		}
 
 		@Override
 		public Object apply(Class<?> input) throws InstantiationException {
-			return unsafe.allocateInstance(input);
+			return unsafeWrapper.allocateInstance(input);
 		}
 
 	}
@@ -61,18 +61,18 @@ public interface AllocateInstanceFunction extends ThrowingFunction<Class<?>, Obj
 			public ForJava7(Map<Object, Object> context) throws InitializeException {
 				checkNativeEngine();
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-			
+
 			@Override
 			public Object apply(Class<?> cls) {
 				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);

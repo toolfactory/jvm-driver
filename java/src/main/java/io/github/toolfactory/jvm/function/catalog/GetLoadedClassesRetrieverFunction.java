@@ -47,14 +47,14 @@ import io.github.toolfactory.narcissus.Narcissus;
 public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
 
 	public static class ForJava7 implements GetLoadedClassesRetrieverFunction {
-		protected sun.misc.Unsafe unsafe;
+		protected UnsafeWrapper unsafeWrapper;
 		protected Long loadedClassesVectorMemoryOffset;
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
+			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
+			loadedClassesVectorMemoryOffset = unsafeWrapper.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
 		}
@@ -72,7 +72,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 					if (classes != null) {
 						return classes;
 					}
-					return classes = (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
+					return classes = (Collection<Class<?>>)unsafeWrapper.getObject(classLoader, loadedClassesVectorMemoryOffset);
 				}
 
 				@Override
@@ -103,24 +103,24 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
 				return new ClassNameBasedLockSupplier() {
-					protected sun.misc.Unsafe unsafe =
-						ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-					protected Long classNameBasedLockHashTableOffset = unsafe.objectFieldOffset(
+					protected UnsafeWrapper unsafeWrapper =
+						ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
+					protected Long classNameBasedLockHashTableOffset = unsafeWrapper.objectFieldOffset(
 						classNameBasedLockField
 					);
-					protected Long classLoaderFieldOffset = unsafe.objectFieldOffset(
+					protected Long classLoaderFieldOffset = unsafeWrapper.objectFieldOffset(
 						classLoaderField
 					);
 
 
 					@Override
 					public Hashtable<String, Object> get(ClassLoader classLoader) {
-						return (Hashtable<String, Object>)unsafe.getObject(classLoader, classNameBasedLockHashTableOffset);
+						return (Hashtable<String, Object>)unsafeWrapper.getObject(classLoader, classNameBasedLockHashTableOffset);
 					}
 
 					@Override
 					protected ClassLoader getClassLoader(Class<?> cls) {
-						return (ClassLoader)unsafe.getObject(cls, classLoaderFieldOffset);
+						return (ClassLoader)unsafeWrapper.getObject(cls, classLoaderFieldOffset);
 					}
 
 				};
@@ -203,18 +203,18 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
-			
+
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}", 
+							"Could not initialize the native engine {}",
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-			
+
 			@Override
 			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
 				if (classLoader == null) {

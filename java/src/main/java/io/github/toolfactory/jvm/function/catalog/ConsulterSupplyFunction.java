@@ -111,8 +111,8 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 
 			@Override
 			protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
-				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-				unsafe.putInt(consulter, 20, -1);
+				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
+				unsafeWrapper.putInt(consulter, 20, -1);
 			}
 
 

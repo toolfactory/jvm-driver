@@ -43,10 +43,10 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 
 
 	public static class ForJava7 implements GetFieldValueFunction {
-		protected sun.misc.Unsafe unsafe;
+		protected UnsafeWrapper unsafeWrapper;
 
 		public ForJava7(Map<Object, Object> context) {
-			unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+			unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
 		}
 
 		@Override
@@ -55,62 +55,62 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 				field.getDeclaringClass() :
 				target;
 			long fieldOffset = Modifier.isStatic(field.getModifiers())?
-				unsafe.staticFieldOffset(field) :
-				unsafe.objectFieldOffset(field);
+				unsafeWrapper.staticFieldOffset(field) :
+				unsafeWrapper.objectFieldOffset(field);
 			Class<?> cls = field.getType();
 			if(!cls.isPrimitive()) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return unsafe.getObject(target, fieldOffset);
+					return unsafeWrapper.getObject(target, fieldOffset);
 				} else {
-					return unsafe.getObjectVolatile(target, fieldOffset);
+					return unsafeWrapper.getObjectVolatile(target, fieldOffset);
 				}
 			} else if (cls == short.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Short.valueOf(unsafe.getShort(target, fieldOffset));
+					return Short.valueOf(unsafeWrapper.getShort(target, fieldOffset));
 				} else {
-					return Short.valueOf(unsafe.getShortVolatile(target, fieldOffset));
+					return Short.valueOf(unsafeWrapper.getShortVolatile(target, fieldOffset));
 				}
 			} else if (cls == int.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Integer.valueOf(unsafe.getInt(target, fieldOffset));
+					return Integer.valueOf(unsafeWrapper.getInt(target, fieldOffset));
 				} else {
-					return Integer.valueOf(unsafe.getIntVolatile(target, fieldOffset));
+					return Integer.valueOf(unsafeWrapper.getIntVolatile(target, fieldOffset));
 				}
 			} else if (cls == long.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Long.valueOf(unsafe.getLong(target, fieldOffset));
+					return Long.valueOf(unsafeWrapper.getLong(target, fieldOffset));
 				} else {
-					return Long.valueOf(unsafe.getLongVolatile(target, fieldOffset));
+					return Long.valueOf(unsafeWrapper.getLongVolatile(target, fieldOffset));
 				}
 			} else if (cls == float.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Float.valueOf(unsafe.getFloat(target, fieldOffset));
+					return Float.valueOf(unsafeWrapper.getFloat(target, fieldOffset));
 				} else {
-					return Float.valueOf(unsafe.getFloatVolatile(target, fieldOffset));
+					return Float.valueOf(unsafeWrapper.getFloatVolatile(target, fieldOffset));
 				}
 			} else if (cls == double.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Double.valueOf(unsafe.getDouble(target, fieldOffset));
+					return Double.valueOf(unsafeWrapper.getDouble(target, fieldOffset));
 				} else {
-					return Double.valueOf(unsafe.getDoubleVolatile(target, fieldOffset));
+					return Double.valueOf(unsafeWrapper.getDoubleVolatile(target, fieldOffset));
 				}
 			} else if (cls == boolean.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Boolean.valueOf(unsafe.getBoolean(target, fieldOffset));
+					return Boolean.valueOf(unsafeWrapper.getBoolean(target, fieldOffset));
 				} else {
-					return Boolean.valueOf(unsafe.getBooleanVolatile(target, fieldOffset));
+					return Boolean.valueOf(unsafeWrapper.getBooleanVolatile(target, fieldOffset));
 				}
 			} else if (cls == byte.class) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Byte.valueOf(unsafe.getByte(target, fieldOffset));
+					return Byte.valueOf(unsafeWrapper.getByte(target, fieldOffset));
 				} else {
-					return Byte.valueOf(unsafe.getByteVolatile(target, fieldOffset));
+					return Byte.valueOf(unsafeWrapper.getByteVolatile(target, fieldOffset));
 				}
 			} else {
 				if (!Modifier.isVolatile(field.getModifiers())) {
-					return Character.valueOf(unsafe.getChar(target, fieldOffset));
+					return Character.valueOf(unsafeWrapper.getChar(target, fieldOffset));
 				} else {
-					return Character.valueOf(unsafe.getCharVolatile(target, fieldOffset));
+					return Character.valueOf(unsafeWrapper.getCharVolatile(target, fieldOffset));
 				}
 			}
 		}
