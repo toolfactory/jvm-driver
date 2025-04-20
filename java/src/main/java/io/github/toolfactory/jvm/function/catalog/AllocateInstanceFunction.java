@@ -48,7 +48,7 @@ public interface AllocateInstanceFunction extends ThrowingFunction<Class<?>, Obj
 		}
 
 		@Override
-		public Object apply(Class<?> input) throws InstantiationException {
+		public Object apply(Class<?> input) throws Throwable {
 			return unsafeWrapper.allocateInstance(input);
 		}
 

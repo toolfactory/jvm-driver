@@ -150,7 +150,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				return false;
 			}
 
-			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
@@ -170,7 +170,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	public static interface ForJava14 extends ConsulterSupplier {
 
 		public static class ForSemeru extends Abst {
-			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
 				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
@@ -185,7 +185,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 	public static class ForJava17 extends Abst {
 
-		public ForJava17(Map<Object, Object> context) {
+		public ForJava17(Map<Object, Object> context) throws Throwable {
 			super(context);
 			UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
 			final long allowedModesFieldMemoryOffset = Info.Provider.getInfoInstance().is64Bit() ? 12L : 8L;
@@ -193,7 +193,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 		}
 
 		public static class ForSemeru extends Abst {
-			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+			public ForSemeru(Map<Object, Object> context) throws Throwable {
 				super(context);
 				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
 				unsafeWrapper.putInt(consulter, 20, ForJava7.TRUSTED);

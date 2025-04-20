@@ -44,13 +44,20 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
-public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
+public abstract class GetLoadedClassesRetrieverFunction implements Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
+	protected ThrowExceptionFunction throwExceptionFunction;
 
-	public static class ForJava7 implements GetLoadedClassesRetrieverFunction {
+	GetLoadedClassesRetrieverFunction(Map<Object, Object> context) {
+		ObjectProvider functionProvider = ObjectProvider.get(context);
+		throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
+	}
+	public static class ForJava7 extends GetLoadedClassesRetrieverFunction {
 		protected UnsafeWrapper unsafeWrapper;
+
 		protected Long loadedClassesVectorMemoryOffset;
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
+			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
 			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
@@ -72,7 +79,11 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 					if (classes != null) {
 						return classes;
 					}
-					return classes = (Collection<Class<?>>)unsafeWrapper.getObject(classLoader, loadedClassesVectorMemoryOffset);
+					try {
+						return classes = (Collection<Class<?>>)unsafeWrapper.getObject(classLoader, loadedClassesVectorMemoryOffset);
+					} catch (Throwable exc) {
+						return throwExceptionFunction.apply(exc);
+					}
 				}
 
 				@Override
@@ -86,13 +97,14 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 			};
 		}
 
-		public static class ForSemeru implements GetLoadedClassesRetrieverFunction {
+		public static class ForSemeru extends GetLoadedClassesRetrieverFunction {
 			protected ClassNameBasedLockSupplier classNameBasedLockSupplier;
 			protected Field classNameBasedLockField;
 			protected Field classLoaderField;
 			protected GetClassByNameFunction getClassByNameFunction;
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
+				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
@@ -101,7 +113,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 				classNameBasedLockSupplier = buildClassNameBasedLockSupplier(context);
 			}
 
-			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
+			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) throws Throwable {
 				return new ClassNameBasedLockSupplier() {
 					protected UnsafeWrapper unsafeWrapper =
 						ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
@@ -115,12 +127,20 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 					@Override
 					public Hashtable<String, Object> get(ClassLoader classLoader) {
-						return (Hashtable<String, Object>)unsafeWrapper.getObject(classLoader, classNameBasedLockHashTableOffset);
+						try {
+							return (Hashtable<String, Object>)unsafeWrapper.getObject(classLoader, classNameBasedLockHashTableOffset);
+						} catch (Throwable exc) {
+							return throwExceptionFunction.apply(exc);
+						}
 					}
 
 					@Override
 					protected ClassLoader getClassLoader(Class<?> cls) {
-						return (ClassLoader)unsafeWrapper.getObject(cls, classLoaderFieldOffset);
+						try {
+							return (ClassLoader)unsafeWrapper.getObject(cls, classLoaderFieldOffset);
+						} catch (Throwable exc) {
+							return throwExceptionFunction.apply(exc);
+						}
 					}
 
 				};
@@ -192,12 +212,17 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 	}
 
-	public static interface Native extends GetLoadedClassesRetrieverFunction {
+	public static abstract class Native extends GetLoadedClassesRetrieverFunction {
 
-		public static class ForJava7 implements Native {
+		Native(Map<Object, Object> context) {
+			super(context);
+		}
+
+		public static class ForJava7 extends Native {
 			protected Field classesField;
 
 			public ForJava7(Map<Object, Object> context) throws Throwable {
+				super(context);
 				checkNativeEngine();
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);

@@ -42,10 +42,12 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 
 	public static class ForJava7 implements GetLoadedPackagesFunction {
 		protected UnsafeWrapper unsafeWrapper;
+		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Long fieldOffset;
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
+			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
 			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 			fieldOffset = unsafeWrapper.objectFieldOffset(
@@ -55,7 +57,11 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 
 		@Override
 		public Map<String, ?> apply(ClassLoader classLoader) {
-			return (Map<String, ?>)unsafeWrapper.getObject(classLoader, fieldOffset);
+			try {
+				return (Map<String, ?>)unsafeWrapper.getObject(classLoader, fieldOffset);
+			} catch (Throwable exc) {
+				return throwExceptionFunction.apply(exc);
+			}
 		}
 
 	}
