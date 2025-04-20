@@ -58,6 +58,7 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
+			this.context = context;
 			functionProvider = ObjectProvider.get(context);
 			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			privateLookupInMethodHandleSupplier =
