@@ -51,8 +51,6 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 
 	public static class ForJava7 extends Abst {
-		protected UnsafeWrapper unsafeWrapper;
-		protected PrivateLookupInMethodHandleSupplier privateLookupInMethodHandleSupplier;
 		protected ObjectProvider functionProvider;
 		protected Map<Object, Object> context;
 
@@ -60,9 +58,6 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 			super(context);
 			this.context = context;
 			functionProvider = ObjectProvider.get(context);
-			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
-			privateLookupInMethodHandleSupplier =
-				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context);
 //			defineHookClassMethodHandle = retrieveConsulter(
 //				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
 //				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get()
@@ -80,12 +75,13 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
-			MethodHandle privateLookupInMethodHandle = privateLookupInMethodHandleSupplier.get();
+			MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
+			UnsafeWrapper unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-				functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass()),
-				unsafeWrapper.getUnsafeClass()
+				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
+				functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass()
 			)).findSpecial(
-				unsafeWrapper.getUnsafeClass(),
+				functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass(),
 				"defineAnonymousClass",
 				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
 				unsafeWrapper.getUnsafeClass()
@@ -108,10 +104,11 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
-			MethodHandle privateLookupInMethodHandle = privateLookupInMethodHandleSupplier.get();
+			MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
+			UnsafeWrapper unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
 			return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
 				unsafeWrapper.getUnsafeClass(),
-				functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass())
+				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get()
 			)).findSpecial(
 				unsafeWrapper.getUnsafeClass(),
 				"defineAnonymousClass",
