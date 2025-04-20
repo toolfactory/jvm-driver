@@ -40,6 +40,7 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 
 	protected static Object unsafe;
 	protected static Class<?> unsafeClass;
+
 	protected static MethodHandle allocateInstance;
 	protected static MethodHandle objectFieldOffset;
 	protected static MethodHandle staticFieldOffset;
@@ -82,75 +83,64 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 	protected static MethodHandle putChar;
 	protected static MethodHandle putCharVolatile;
 
-
-	UnsafeWrapper(Map<Object, Object> context) throws Throwable {
-		init(context, "sun.misc.Unsafe", true);
+	protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws Throwable {
+		if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
+			return false;
+		}
+		Field unsafeField = Class.forName(unsafeClassName).getDeclaredField("theUnsafe");
+		unsafeField.setAccessible(true);
+		init(unsafeField.get(null), MethodHandles.lookup());
+		return true;
 	}
 
-	protected synchronized void init(Map<Object, Object> context, String unsafeClassName, boolean accessibleFlag) throws Throwable {
-		if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
-			return;
-		}
-		Class<?> unsafeClassTemp = Class.forName(unsafeClassName);
-		Field unsafeField = unsafeClassTemp.getDeclaredField("theUnsafe");
-		Object unsafeTemp = null;
-		if (accessibleFlag) {
-			unsafeField.setAccessible(accessibleFlag);
-			unsafeTemp = unsafeField.get(null);
-		} else {
-			unsafeTemp = getObject(unsafeClassTemp, staticFieldOffset(unsafeField));
-		}
-		ConsulterSupplyFunction consulterRetriever = ObjectProvider.getObject(ConsulterSupplyFunction.class, context);
-		MethodHandles.Lookup lookup = null;
-		if (consulterRetriever != null) {
-			lookup = consulterRetriever.apply(unsafeTemp.getClass());
-		} else {
-			lookup = MethodHandles.lookup();
-		}
-		allocateInstance = lookup.bind(unsafeTemp, "allocateInstance", MethodType.methodType(Object.class, Class.class));
-		objectFieldOffset = lookup.bind(unsafeTemp, "objectFieldOffset", MethodType.methodType(long.class, Field.class));
-		staticFieldOffset = lookup.bind(unsafeTemp, "staticFieldOffset", MethodType.methodType(long.class, Field.class));
+	protected void init(
+		Object unsafeObject,
+		MethodHandles.Lookup lookup
+	) throws NoSuchMethodException, IllegalAccessException {
+		allocateInstance = lookup.bind(unsafeObject, "allocateInstance", MethodType.methodType(Object.class, Class.class));
+		objectFieldOffset = lookup.bind(unsafeObject, "objectFieldOffset", MethodType.methodType(long.class, Field.class));
+		staticFieldOffset = lookup.bind(unsafeObject, "staticFieldOffset", MethodType.methodType(long.class, Field.class));
 
-		getObject = lookup.bind(unsafeTemp, "getObject", MethodType.methodType(Object.class, Object.class, long.class));
-		getObjectVolatile = lookup.bind(unsafeTemp, "getObjectVolatile", MethodType.methodType(Object.class, Object.class, long.class));
-		getShort = lookup.bind(unsafeTemp, "getShort", MethodType.methodType(short.class, Object.class, long.class));
-		getShortVolatile = lookup.bind(unsafeTemp, "getShortVolatile", MethodType.methodType(short.class, Object.class, long.class));
-		getInt = lookup.bind(unsafeTemp, "getInt", MethodType.methodType(int.class, Object.class, long.class));
-		getIntVolatile = lookup.bind(unsafeTemp, "getIntVolatile", MethodType.methodType(int.class, Object.class, long.class));
-		getLong = lookup.bind(unsafeTemp, "getLong", MethodType.methodType(long.class, Object.class, long.class));
-		getLongVolatile = lookup.bind(unsafeTemp, "getLongVolatile", MethodType.methodType(long.class, Object.class, long.class));
-		getFloat = lookup.bind(unsafeTemp, "getFloat", MethodType.methodType(float.class, Object.class, long.class));
-		getFloatVolatile = lookup.bind(unsafeTemp, "getFloatVolatile", MethodType.methodType(float.class, Object.class, long.class));
-		getDouble = lookup.bind(unsafeTemp, "getDouble", MethodType.methodType(double.class, Object.class, long.class));
-		getDoubleVolatile = lookup.bind(unsafeTemp, "getDoubleVolatile", MethodType.methodType(double.class, Object.class, long.class));
-		getBoolean = lookup.bind(unsafeTemp, "getBoolean", MethodType.methodType(boolean.class, Object.class, long.class));
-		getBooleanVolatile = lookup.bind(unsafeTemp, "getBooleanVolatile", MethodType.methodType(boolean.class, Object.class, long.class));
-		getByte = lookup.bind(unsafeTemp, "getByte", MethodType.methodType(byte.class, Object.class, long.class));
-		getByteVolatile = lookup.bind(unsafeTemp, "getByteVolatile", MethodType.methodType(byte.class, Object.class, long.class));
-		getChar = lookup.bind(unsafeTemp, "getChar", MethodType.methodType(char.class, Object.class, long.class));
-		getCharVolatile = lookup.bind(unsafeTemp, "getCharVolatile", MethodType.methodType(char.class, Object.class, long.class));
+		getObject = lookup.bind(unsafeObject, "getObject", MethodType.methodType(Object.class, Object.class, long.class));
+		getObjectVolatile = lookup.bind(unsafeObject, "getObjectVolatile", MethodType.methodType(Object.class, Object.class, long.class));
+		getShort = lookup.bind(unsafeObject, "getShort", MethodType.methodType(short.class, Object.class, long.class));
+		getShortVolatile = lookup.bind(unsafeObject, "getShortVolatile", MethodType.methodType(short.class, Object.class, long.class));
+		getInt = lookup.bind(unsafeObject, "getInt", MethodType.methodType(int.class, Object.class, long.class));
+		getIntVolatile = lookup.bind(unsafeObject, "getIntVolatile", MethodType.methodType(int.class, Object.class, long.class));
+		getLong = lookup.bind(unsafeObject, "getLong", MethodType.methodType(long.class, Object.class, long.class));
+		getLongVolatile = lookup.bind(unsafeObject, "getLongVolatile", MethodType.methodType(long.class, Object.class, long.class));
+		getFloat = lookup.bind(unsafeObject, "getFloat", MethodType.methodType(float.class, Object.class, long.class));
+		getFloatVolatile = lookup.bind(unsafeObject, "getFloatVolatile", MethodType.methodType(float.class, Object.class, long.class));
+		getDouble = lookup.bind(unsafeObject, "getDouble", MethodType.methodType(double.class, Object.class, long.class));
+		getDoubleVolatile = lookup.bind(unsafeObject, "getDoubleVolatile", MethodType.methodType(double.class, Object.class, long.class));
+		getBoolean = lookup.bind(unsafeObject, "getBoolean", MethodType.methodType(boolean.class, Object.class, long.class));
+		getBooleanVolatile = lookup.bind(unsafeObject, "getBooleanVolatile", MethodType.methodType(boolean.class, Object.class, long.class));
+		getByte = lookup.bind(unsafeObject, "getByte", MethodType.methodType(byte.class, Object.class, long.class));
+		getByteVolatile = lookup.bind(unsafeObject, "getByteVolatile", MethodType.methodType(byte.class, Object.class, long.class));
+		getChar = lookup.bind(unsafeObject, "getChar", MethodType.methodType(char.class, Object.class, long.class));
+		getCharVolatile = lookup.bind(unsafeObject, "getCharVolatile", MethodType.methodType(char.class, Object.class, long.class));
 
-		putObject = lookup.bind(unsafeTemp, "putObject", MethodType.methodType(void.class, Object.class, long.class, Object.class));
-		putObjectVolatile = lookup.bind(unsafeTemp, "putObjectVolatile", MethodType.methodType(void.class, Object.class, long.class, Object.class));
-		putShort = lookup.bind(unsafeTemp, "putShort", MethodType.methodType(void.class, Object.class, long.class, short.class));
-		putShortVolatile = lookup.bind(unsafeTemp, "putShortVolatile", MethodType.methodType(void.class, Object.class, long.class, short.class));
-		putInt = lookup.bind(unsafeTemp, "putInt", MethodType.methodType(void.class, Object.class, long.class, int.class));
-		putIntVolatile = lookup.bind(unsafeTemp, "putIntVolatile", MethodType.methodType(void.class, Object.class, long.class, int.class));
-		putLong = lookup.bind(unsafeTemp, "putLong", MethodType.methodType(void.class, Object.class, long.class, long.class));
-		putLongVolatile = lookup.bind(unsafeTemp, "putLongVolatile", MethodType.methodType(void.class, Object.class, long.class, long.class));
-		putFloat = lookup.bind(unsafeTemp, "putFloat", MethodType.methodType(void.class, Object.class, long.class, float.class));
-		putFloatVolatile = lookup.bind(unsafeTemp, "putFloatVolatile", MethodType.methodType(void.class, Object.class, long.class, float.class));
-		putDouble = lookup.bind(unsafeTemp, "putDouble", MethodType.methodType(void.class, Object.class, long.class, double.class));
-		putDoubleVolatile = lookup.bind(unsafeTemp, "putDoubleVolatile", MethodType.methodType(void.class, Object.class, long.class, double.class));
-		putBoolean = lookup.bind(unsafeTemp, "putBoolean", MethodType.methodType(void.class, Object.class, long.class, boolean.class));
-		putBooleanVolatile = lookup.bind(unsafeTemp, "putBooleanVolatile", MethodType.methodType(void.class, Object.class, long.class, boolean.class));
-		putByte = lookup.bind(unsafeTemp, "putByte", MethodType.methodType(void.class, Object.class, long.class, byte.class));
-		putByteVolatile = lookup.bind(unsafeTemp, "putByteVolatile", MethodType.methodType(void.class, Object.class, long.class, byte.class));
-		putChar = lookup.bind(unsafeTemp, "putChar", MethodType.methodType(void.class, Object.class, long.class, char.class));
-		putCharVolatile = lookup.bind(unsafeTemp, "putCharVolatile", MethodType.methodType(void.class, Object.class, long.class, char.class));
+		putObject = lookup.bind(unsafeObject, "putObject", MethodType.methodType(void.class, Object.class, long.class, Object.class));
+		putObjectVolatile = lookup.bind(unsafeObject, "putObjectVolatile", MethodType.methodType(void.class, Object.class, long.class, Object.class));
+		putShort = lookup.bind(unsafeObject, "putShort", MethodType.methodType(void.class, Object.class, long.class, short.class));
+		putShortVolatile = lookup.bind(unsafeObject, "putShortVolatile", MethodType.methodType(void.class, Object.class, long.class, short.class));
+		putInt = lookup.bind(unsafeObject, "putInt", MethodType.methodType(void.class, Object.class, long.class, int.class));
+		putIntVolatile = lookup.bind(unsafeObject, "putIntVolatile", MethodType.methodType(void.class, Object.class, long.class, int.class));
+		putLong = lookup.bind(unsafeObject, "putLong", MethodType.methodType(void.class, Object.class, long.class, long.class));
+		putLongVolatile = lookup.bind(unsafeObject, "putLongVolatile", MethodType.methodType(void.class, Object.class, long.class, long.class));
+		putFloat = lookup.bind(unsafeObject, "putFloat", MethodType.methodType(void.class, Object.class, long.class, float.class));
+		putFloatVolatile = lookup.bind(unsafeObject, "putFloatVolatile", MethodType.methodType(void.class, Object.class, long.class, float.class));
+		putDouble = lookup.bind(unsafeObject, "putDouble", MethodType.methodType(void.class, Object.class, long.class, double.class));
+		putDoubleVolatile = lookup.bind(unsafeObject, "putDoubleVolatile", MethodType.methodType(void.class, Object.class, long.class, double.class));
+		putBoolean = lookup.bind(unsafeObject, "putBoolean", MethodType.methodType(void.class, Object.class, long.class, boolean.class));
+		putBooleanVolatile = lookup.bind(unsafeObject, "putBooleanVolatile", MethodType.methodType(void.class, Object.class, long.class, boolean.class));
+		putByte = lookup.bind(unsafeObject, "putByte", MethodType.methodType(void.class, Object.class, long.class, byte.class));
+		putByteVolatile = lookup.bind(unsafeObject, "putByteVolatile", MethodType.methodType(void.class, Object.class, long.class, byte.class));
+		putChar = lookup.bind(unsafeObject, "putChar", MethodType.methodType(void.class, Object.class, long.class, char.class));
+		putCharVolatile = lookup.bind(unsafeObject, "putCharVolatile", MethodType.methodType(void.class, Object.class, long.class, char.class));
 
-		unsafe = unsafeTemp;
-		unsafeClass = unsafeClassTemp;
+		unsafe = unsafeObject;
+		unsafeClass = unsafeObject.getClass();
 	}
 
 
@@ -359,37 +349,62 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 	}
 
 	public static class ForJava7 extends UnsafeWrapper {
+		private final static String UNSAFE_CLASS_NAME = "sun.misc.Unsafe";
 
 		public ForJava7(final Map<Object, Object> context) throws Throwable {
-			super(context);
+			super.init(context, UNSAFE_CLASS_NAME);
 		}
 
 	}
 
 	public static class ForJava14 extends UnsafeWrapper {
+		private final static String UNSAFE_CLASS_NAME = "jdk.internal.misc.Unsafe";
+		private static Thread switcher;
+
 
 		public ForJava14(final Map<Object, Object> context) throws Throwable {
-			super(context);
-			final String unsafeClassName = "jdk.internal.misc.Unsafe";
-			new Thread(new Runnable() {
+			if (!super.init(context, ForJava7.UNSAFE_CLASS_NAME) && !unsafeClass.getName().equals(ForJava14.UNSAFE_CLASS_NAME) && switcher == null) {
+				synchronized (ForJava14.class) {
+					if (!super.init(context, "sun.misc.Unsafe") && !unsafeClass.getName().equals(ForJava14.UNSAFE_CLASS_NAME) && switcher == null) {
+						switcher = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								while (!getUnsafeClass().equals(ForJava14.UNSAFE_CLASS_NAME) &&
+									ObjectProvider.getObject(ConsulterSupplyFunction.class, context) == null &&
+									ObjectProvider.getObject(GetClassByNameFunction.class, context) == null
+								) {
+									try {
+										Thread.sleep(10);
+									} catch (InterruptedException e) {
 
-				@Override
-				public void run() {
-					while (!getUnsafeClass().equals(unsafeClassName) && ObjectProvider.getObject(ConsulterSupplyFunction.class, context) == null) {
-						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-
-						}
-					}
-					try {
-						init(context, "jdk.internal.misc.Unsafe", false);
-					} catch (Throwable e) {
-
+									}
+								}
+								try {
+									init(context, ForJava14.UNSAFE_CLASS_NAME);
+								} catch (Throwable exc) {
+									ObjectProvider.getObject(ThrowExceptionFunction.class, context).accept(exc);
+								}
+							}
+						}, "UnsafeWrapperInitializer");
+						switcher.start();
 					}
 				}
-			}, "UnsafeWrapperInitializer").start();
+			}
 		}
 
+		@Override
+		protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws Throwable {
+			if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
+				return false;
+			}
+			GetClassByNameFunction getClassByNameFunction = ObjectProvider.getObject(GetClassByNameFunction.class, context);
+			Class<?> unsafeClassTemp = getClassByNameFunction.apply(unsafeClassName, true, getClass().getClassLoader(), getClass());
+			Field unsafeField = unsafeClassTemp.getDeclaredField("theUnsafe");
+			Object unsafeTemp = getObject(unsafeClassTemp, staticFieldOffset(unsafeField));
+			ConsulterSupplyFunction consulterRetriever = ObjectProvider.getObject(ConsulterSupplyFunction.class, context);
+			init(unsafeTemp, consulterRetriever.apply(unsafeTemp.getClass()));
+			switcher = null;
+			return true;
+		}
 	}
 }
