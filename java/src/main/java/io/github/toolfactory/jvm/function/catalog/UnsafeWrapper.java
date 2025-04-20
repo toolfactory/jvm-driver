@@ -375,7 +375,7 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 
 				@Override
 				public void run() {
-					while (!getUnsafeClass().equals(unsafeClassName) || ObjectProvider.getObject(ConsulterSupplyFunction.class, context) == null) {
+					while (!getUnsafeClass().equals(unsafeClassName) && ObjectProvider.getObject(ConsulterSupplyFunction.class, context) == null) {
 						try {
 							Thread.sleep(10);
 						} catch (InterruptedException e) {
