@@ -77,15 +77,27 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
 			MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
 			UnsafeWrapper unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
-			return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
-				functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass()
-			)).findSpecial(
-				functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass(),
-				"defineAnonymousClass",
-				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-				unsafeWrapper.getUnsafeClass()
-			).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
+			try {
+				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
+					functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
+					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass()
+				)).findSpecial(
+					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass(),
+					"defineAnonymousClass",
+					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
+					unsafeWrapper.getUnsafeClass()
+				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
+			} catch (IllegalAccessException e) {
+				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
+					functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass()),
+					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass()
+				)).findSpecial(
+					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass(),
+					"defineAnonymousClass",
+					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
+					unsafeWrapper.getUnsafeClass()
+				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
+			}
 		}
 
 	}
@@ -106,15 +118,27 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
 			MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
 			UnsafeWrapper unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
-			return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-				unsafeWrapper.getUnsafeClass(),
-				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get()
-			)).findSpecial(
-				unsafeWrapper.getUnsafeClass(),
-				"defineAnonymousClass",
-				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-				unsafeWrapper.getUnsafeClass()
-			).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
+			try {
+				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
+					unsafeWrapper.getUnsafeClass(),
+					functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get()
+				)).findSpecial(
+					unsafeWrapper.getUnsafeClass(),
+					"defineAnonymousClass",
+					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
+					unsafeWrapper.getUnsafeClass()
+				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
+			} catch (NoSuchMethodException e) {
+				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
+					unsafeWrapper.getUnsafeClass(),
+					functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass())
+				)).findSpecial(
+					unsafeWrapper.getUnsafeClass(),
+					"defineAnonymousClass",
+					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
+					unsafeWrapper.getUnsafeClass()
+				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
+			}
 		}
 
 	}
