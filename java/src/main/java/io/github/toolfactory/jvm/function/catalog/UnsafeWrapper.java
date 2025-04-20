@@ -370,7 +370,7 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 							@Override
 							public void run() {
 								while (!getUnsafeClass().equals(ForJava14.UNSAFE_CLASS_NAME) &&
-									ObjectProvider.getObject(ConsulterSupplyFunction.class, context) == null &&
+									ObjectProvider.getObject(DeepConsulterSupplyFunction.class, context) == null &&
 									ObjectProvider.getObject(GetClassByNameFunction.class, context) == null
 								) {
 									try {
@@ -401,7 +401,7 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 			Class<?> unsafeClassTemp = getClassByNameFunction.apply(unsafeClassName, true, getClass().getClassLoader(), getClass());
 			Field unsafeField = unsafeClassTemp.getDeclaredField("theUnsafe");
 			Object unsafeTemp = getObject(unsafeClassTemp, staticFieldOffset(unsafeField));
-			ConsulterSupplyFunction consulterRetriever = ObjectProvider.getObject(ConsulterSupplyFunction.class, context);
+			DeepConsulterSupplyFunction consulterRetriever = ObjectProvider.getObject(DeepConsulterSupplyFunction.class, context);
 			init(unsafeTemp, consulterRetriever.apply(unsafeTemp.getClass()));
 			switcher = null;
 			return true;
