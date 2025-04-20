@@ -128,7 +128,7 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
 					unsafeWrapper.getUnsafeClass()
 				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
-			} catch (NoSuchMethodException e) {
+			} catch (IllegalAccessException e) {
 				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
 					unsafeWrapper.getUnsafeClass(),
 					functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass())
