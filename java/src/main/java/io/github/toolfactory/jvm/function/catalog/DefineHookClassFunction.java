@@ -53,13 +53,13 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 	public static class ForJava7 extends Abst {
 		protected UnsafeWrapper unsafeWrapper;
 		protected PrivateLookupInMethodHandleSupplier privateLookupInMethodHandleSupplier;
-		protected ConsulterSupplier consulterSupplier;
+		protected ObjectProvider functionProvider;
+		protected Map<Object, Object> context;
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
-			ObjectProvider functionProvider = ObjectProvider.get(context);
+			functionProvider = ObjectProvider.get(context);
 			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
-			consulterSupplier = functionProvider.getOrBuildObject(ConsulterSupplier.class, context);
 			privateLookupInMethodHandleSupplier =
 				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context);
 //			defineHookClassMethodHandle = retrieveConsulter(
@@ -81,7 +81,7 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
 			MethodHandle privateLookupInMethodHandle = privateLookupInMethodHandleSupplier.get();
 			return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-				consulterSupplier.get(),
+				functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass()),
 				unsafeWrapper.getUnsafeClass()
 			)).findSpecial(
 				unsafeWrapper.getUnsafeClass(),
@@ -110,7 +110,7 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 			MethodHandle privateLookupInMethodHandle = privateLookupInMethodHandleSupplier.get();
 			return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
 				unsafeWrapper.getUnsafeClass(),
-				consulterSupplier.get()
+				functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass())
 			)).findSpecial(
 				unsafeWrapper.getUnsafeClass(),
 				"defineAnonymousClass",
