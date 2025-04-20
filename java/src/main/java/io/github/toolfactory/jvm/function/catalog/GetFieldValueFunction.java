@@ -51,16 +51,17 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 
 		@Override
 		public Object apply(Object target, Field field) {
-			target = Modifier.isStatic(field.getModifiers())?
+			boolean isStatic = Modifier.isStatic(field.getModifiers());
+			target = isStatic?
 				field.getDeclaringClass() :
 				target;
-			long fieldOffset = Modifier.isStatic(field.getModifiers())?
+			Long fieldOffset = isStatic?
 				unsafe.staticFieldOffset(field) :
 				unsafe.objectFieldOffset(field);
-			return retrieveFromUnsafe(target, field, fieldOffset, field.getType());
+			return getByUnsafe(target, field, fieldOffset, field.getType());
 		}
 
-		protected Object retrieveFromUnsafe(Object target, Field field, long fieldOffset, Class<?> cls) {
+		protected Object getByUnsafe(Object target, Field field, long fieldOffset, Class<?> cls) {
 			if(!cls.isPrimitive()) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
 					return unsafe.getObject(target, fieldOffset);
@@ -119,10 +120,11 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 		}
 	}
 
-	public static class ForJava14 extends ForJava7 {
-		SetAccessibleFunction setAccessibleFunction;
-		ThrowExceptionFunction throwExceptionFunction;
-		public ForJava14(Map<Object, Object> context) {
+	public static class ForJava25 extends ForJava7 {
+		protected SetAccessibleFunction setAccessibleFunction;
+		protected ThrowExceptionFunction throwExceptionFunction;
+
+		public ForJava25(Map<Object, Object> context) {
 			super(context);
 			setAccessibleFunction = ObjectProvider.get(context).getOrBuildObject(SetAccessibleFunction.class, context);
 			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
@@ -131,14 +133,14 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 		@Override
 		public Object apply(Object target, Field field) {
 			boolean isStatic = Modifier.isStatic(field.getModifiers());
-			target = isStatic?
-				field.getDeclaringClass() :
-				target;
-			Long fieldOffset = null;
 			try {
-				fieldOffset = isStatic?
+				target = isStatic?
+					field.getDeclaringClass() :
+					target;
+				Long fieldOffset = isStatic?
 					unsafe.staticFieldOffset(field) :
 					unsafe.objectFieldOffset(field);
+				return getByUnsafe(target, field, fieldOffset,  field.getType());
 			} catch (UnsupportedOperationException exc) {
 				try {
 					setAccessibleFunction.accept(field, true);
@@ -152,7 +154,6 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 				}
 
 			}
-			return retrieveFromUnsafe(target, field, fieldOffset,  field.getType());
 		}
 
 	}

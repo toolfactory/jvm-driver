@@ -64,9 +64,10 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				throw new IllegalArgumentException(Strings.compile("Value {} is not assignable to {}", value , field.getName()));
 			}
 			Class<?> fieldDeclaringClass = field.getDeclaringClass();
+			boolean isStatic = Modifier.isStatic(field.getModifiers());
 			long fieldOffset;
 			Object target;
-			if (Modifier.isStatic(field.getModifiers())) {
+			if (isStatic) {
 				fieldOffset = unsafe.staticFieldOffset(field);
 				target = fieldDeclaringClass;
 			} else {
@@ -80,7 +81,10 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				fieldOffset = unsafe.objectFieldOffset(field);
 
 			}
-			Class<?> cls = field.getType();
+			setByUnsafe(field, value, fieldOffset, target, field.getType());
+		}
+
+		protected void setByUnsafe(Field field, Object value, long fieldOffset, Object target, Class<?> cls) {
 			if(!cls.isPrimitive()) {
 				if (!Modifier.isVolatile(field.getModifiers())) {
 					unsafe.putObject(target, fieldOffset, value);
@@ -138,6 +142,58 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			}
 		}
 
+	}
+
+	public static class ForJava25 extends ForJava7 {
+		protected SetAccessibleFunction setAccessibleFunction;
+		protected ThrowExceptionFunction throwExceptionFunction;
+
+		public ForJava25(Map<Object, Object> context) {
+			super(context);
+			setAccessibleFunction = ObjectProvider.get(context).getOrBuildObject(SetAccessibleFunction.class, context);
+			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
+		}
+
+		@Override
+		public void accept(Object origTarget, Field field, Object value) {
+			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
+				throw new IllegalArgumentException(Strings.compile("Value {} is not assignable to {}", value , field.getName()));
+			}
+			Class<?> fieldDeclaringClass = field.getDeclaringClass();
+			boolean isStatic = Modifier.isStatic(field.getModifiers());
+			Object target;
+			if (isStatic) {
+				target = fieldDeclaringClass;
+			} else {
+				if ((target = origTarget) == null) {
+					throw new IllegalArgumentException("Target object is null");
+				}
+				Class<?> targetObjectClass = target.getClass();
+	 			if (!Classes.isAssignableFrom(fieldDeclaringClass, targetObjectClass)) {
+					throw new IllegalArgumentException("Target object class " + targetObjectClass + " is not assignable to " + fieldDeclaringClass);
+				}
+			}
+			try {
+				Long fieldOffset;
+				if (isStatic) {
+					fieldOffset = unsafe.staticFieldOffset(field);
+				} else {
+					fieldOffset = unsafe.objectFieldOffset(field);
+				}
+				setByUnsafe(field, value, fieldOffset, target, field.getType());
+			} catch (UnsupportedOperationException exc) {
+				try {
+					setAccessibleFunction.accept(field, true);
+					if (isStatic) {
+						field.set(null, value);
+					} else {
+						field.set(target, value);
+					}
+				} catch (Throwable exc2) {
+					throwExceptionFunction.accept(exc2);
+				}
+			}
+		}
 	}
 
 
