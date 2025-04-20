@@ -41,27 +41,21 @@ import io.github.toolfactory.narcissus.Narcissus;
 public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<String, ?>> {
 
 	public static class ForJava7 implements GetLoadedPackagesFunction {
-		protected UnsafeWrapper unsafeWrapper;
-		protected ThrowExceptionFunction throwExceptionFunction;
+		protected sun.misc.Unsafe unsafe;
 		protected Long fieldOffset;
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
-			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
+			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			fieldOffset = unsafeWrapper.objectFieldOffset(
+			fieldOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "packages")
 			);
 		}
 
 		@Override
 		public Map<String, ?> apply(ClassLoader classLoader) {
-			try {
-				return (Map<String, ?>)unsafeWrapper.getObject(classLoader, fieldOffset);
-			} catch (Throwable exc) {
-				return throwExceptionFunction.apply(exc);
-			}
+			return (Map<String, ?>)unsafe.getObject(classLoader, fieldOffset);
 		}
 
 	}
@@ -78,18 +72,18 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				packagesField = getDeclaredFieldFunction.apply(ClassLoader.class, "packages");
 			}
-
+			
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}",
+							"Could not initialize the native engine {}", 
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-
+			
 			@Override
 			public Map<String, ?> apply(ClassLoader classLoader) {
 				return (Map<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, packagesField);

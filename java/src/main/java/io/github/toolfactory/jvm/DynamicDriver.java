@@ -67,7 +67,7 @@ public class DynamicDriver extends DefaultDriver {
 						return objectProvider.getOrBuildObject(GetFieldValueFunction.Native.class, context);
 					}
 					if (clazz.equals(GetLoadedClassesRetrieverFunction.class)) {
-						return (T)objectProvider.getOrBuildObject(GetLoadedClassesRetrieverFunction.Native.class, context);
+						return objectProvider.getOrBuildObject(GetLoadedClassesRetrieverFunction.Native.class, context);
 					}
 					if (clazz.equals(GetLoadedPackagesFunction.class)) {
 						return objectProvider.getOrBuildObject(GetLoadedPackagesFunction.Native.class, context);

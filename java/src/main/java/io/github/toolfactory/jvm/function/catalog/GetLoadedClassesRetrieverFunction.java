@@ -44,24 +44,17 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
-public abstract class GetLoadedClassesRetrieverFunction implements Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
-	protected ThrowExceptionFunction throwExceptionFunction;
+public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader, CleanableSupplier<Collection<Class<?>>>> {
 
-	GetLoadedClassesRetrieverFunction(Map<Object, Object> context) {
-		ObjectProvider functionProvider = ObjectProvider.get(context);
-		throwExceptionFunction = functionProvider.getOrBuildObject(ThrowExceptionFunction.class, context);
-	}
-	public static class ForJava7 extends GetLoadedClassesRetrieverFunction {
-		protected UnsafeWrapper unsafeWrapper;
-
+	public static class ForJava7 implements GetLoadedClassesRetrieverFunction {
+		protected sun.misc.Unsafe unsafe;
 		protected Long loadedClassesVectorMemoryOffset;
 
 		public ForJava7(Map<Object, Object> context) throws Throwable {
-			super(context);
 			ObjectProvider functionProvider = ObjectProvider.get(context);
-			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
+			unsafe = functionProvider.getOrBuildObject(UnsafeSupplier.class, context).get();
 			GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
-			loadedClassesVectorMemoryOffset = unsafeWrapper.objectFieldOffset(
+			loadedClassesVectorMemoryOffset = unsafe.objectFieldOffset(
 				getDeclaredFieldFunction.apply(ClassLoader.class, "classes")
 			);
 		}
@@ -79,11 +72,7 @@ public abstract class GetLoadedClassesRetrieverFunction implements Function<Clas
 					if (classes != null) {
 						return classes;
 					}
-					try {
-						return classes = (Collection<Class<?>>)unsafeWrapper.getObject(classLoader, loadedClassesVectorMemoryOffset);
-					} catch (Throwable exc) {
-						return throwExceptionFunction.apply(exc);
-					}
+					return classes = (Collection<Class<?>>)unsafe.getObject(classLoader, loadedClassesVectorMemoryOffset);
 				}
 
 				@Override
@@ -97,14 +86,13 @@ public abstract class GetLoadedClassesRetrieverFunction implements Function<Clas
 			};
 		}
 
-		public static class ForSemeru extends GetLoadedClassesRetrieverFunction {
+		public static class ForSemeru implements GetLoadedClassesRetrieverFunction {
 			protected ClassNameBasedLockSupplier classNameBasedLockSupplier;
 			protected Field classNameBasedLockField;
 			protected Field classLoaderField;
 			protected GetClassByNameFunction getClassByNameFunction;
 
 			public ForSemeru(Map<Object, Object> context) throws Throwable {
-				super(context);
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				getClassByNameFunction = functionProvider.getOrBuildObject(GetClassByNameFunction.class, context);
@@ -113,34 +101,26 @@ public abstract class GetLoadedClassesRetrieverFunction implements Function<Clas
 				classNameBasedLockSupplier = buildClassNameBasedLockSupplier(context);
 			}
 
-			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) throws Throwable {
+			protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
 				return new ClassNameBasedLockSupplier() {
-					protected UnsafeWrapper unsafeWrapper =
-						ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
-					protected Long classNameBasedLockHashTableOffset = unsafeWrapper.objectFieldOffset(
+					protected sun.misc.Unsafe unsafe =
+						ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+					protected Long classNameBasedLockHashTableOffset = unsafe.objectFieldOffset(
 						classNameBasedLockField
 					);
-					protected Long classLoaderFieldOffset = unsafeWrapper.objectFieldOffset(
+					protected Long classLoaderFieldOffset = unsafe.objectFieldOffset(
 						classLoaderField
 					);
 
 
 					@Override
 					public Hashtable<String, Object> get(ClassLoader classLoader) {
-						try {
-							return (Hashtable<String, Object>)unsafeWrapper.getObject(classLoader, classNameBasedLockHashTableOffset);
-						} catch (Throwable exc) {
-							return throwExceptionFunction.apply(exc);
-						}
+						return (Hashtable<String, Object>)unsafe.getObject(classLoader, classNameBasedLockHashTableOffset);
 					}
 
 					@Override
 					protected ClassLoader getClassLoader(Class<?> cls) {
-						try {
-							return (ClassLoader)unsafeWrapper.getObject(cls, classLoaderFieldOffset);
-						} catch (Throwable exc) {
-							return throwExceptionFunction.apply(exc);
-						}
+						return (ClassLoader)unsafe.getObject(cls, classLoaderFieldOffset);
 					}
 
 				};
@@ -212,34 +192,29 @@ public abstract class GetLoadedClassesRetrieverFunction implements Function<Clas
 
 	}
 
-	public static abstract class Native extends GetLoadedClassesRetrieverFunction {
+	public static interface Native extends GetLoadedClassesRetrieverFunction {
 
-		Native(Map<Object, Object> context) {
-			super(context);
-		}
-
-		public static class ForJava7 extends Native {
+		public static class ForJava7 implements Native {
 			protected Field classesField;
 
 			public ForJava7(Map<Object, Object> context) throws Throwable {
-				super(context);
 				checkNativeEngine();
 				ObjectProvider functionProvider = ObjectProvider.get(context);
 				GetDeclaredFieldFunction getDeclaredFieldFunction = functionProvider.getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				classesField = getDeclaredFieldFunction.apply(ClassLoader.class, "classes");
 			}
-
+			
 			protected void checkNativeEngine() throws InitializeException {
 				if (!Narcissus.libraryLoaded) {
 					throw new InitializeException(
 						Strings.compile(
-							"Could not initialize the native engine {}",
+							"Could not initialize the native engine {}", 
 							io.github.toolfactory.narcissus.Narcissus.class.getName()
 						)
 					);
 				}
 			}
-
+			
 			@Override
 			public CleanableSupplier<Collection<Class<?>>> apply(final ClassLoader classLoader) {
 				if (classLoader == null) {

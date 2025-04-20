@@ -33,8 +33,12 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.util.ObjectProvider;
+
+//Unused component
 @SuppressWarnings("all")
 public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.function.template.Supplier<Object>{
+	protected ThrowExceptionFunction throwExceptionFunction;
 
 	protected static Object unsafe;
 	protected static Class<?> unsafeClass;
@@ -82,6 +86,7 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 	protected static MethodHandle putCharVolatile;
 
 	protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws Throwable {
+		throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
 		if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
 			return false;
 		}
@@ -206,197 +211,213 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 	}
 
 
-	public Object allocateInstance(Class<?> cls) throws Throwable {
-		return allocateInstance.invoke(cls);
+	public Object allocateInstance(Class<?> cls) {
+		return invokeAndReturn(allocateInstance,cls);
 	}
 
 
-	public long objectFieldOffset(Field field) throws Throwable {
-		return (long)objectFieldOffset.invoke(field);
+	public long objectFieldOffset(Field field) {
+		return (long)invokeAndReturn(objectFieldOffset, field);
 	}
 
 
-	public long staticFieldOffset(Field field) throws Throwable {
-		return (long)staticFieldOffset.invoke(field);
+	public long staticFieldOffset(Field field) {
+		return (long)invokeAndReturn(staticFieldOffset, field);
 	}
 
 
-	public Object getObject(Object target, long fieldOffset) throws Throwable {
-		return getObject.invoke(target, fieldOffset);
+	public Object getObject(Object target, long fieldOffset) {
+		return invokeAndReturn(getObject, target, fieldOffset);
 	}
 
 
-	public Object getObjectVolatile(Object target, long fieldOffset) throws Throwable {
-		return getObjectVolatile.invoke(target, fieldOffset);
+	public Object getObjectVolatile(Object target, long fieldOffset) {
+		return invokeAndReturn(getObjectVolatile, fieldOffset);
 	}
 
 
-	public short getShort(Object target, long fieldOffset) throws Throwable {
-		return (short) getShort.invoke(target, fieldOffset);
+	public short getShort(Object target, long fieldOffset) {
+		return (short)invokeAndReturn(getShort, fieldOffset);
 	}
 
 
-	public short getShortVolatile(Object target, long fieldOffset) throws Throwable {
-		return (short) getShortVolatile.invoke(target, fieldOffset);
+	public short getShortVolatile(Object target, long fieldOffset) {
+		return (short)invokeAndReturn(getShortVolatile, fieldOffset);
 	}
 
 
-	public int getInt(Object target, long fieldOffset) throws Throwable {
-		return (int) getInt.invoke(target, fieldOffset);
+	public int getInt(Object target, long fieldOffset) {
+		return (int)invokeAndReturn(getInt, fieldOffset);
 	}
 
 
-	public int getIntVolatile(Object target, long fieldOffset) throws Throwable {
-		return (int) getIntVolatile.invoke(target, fieldOffset);
+	public int getIntVolatile(Object target, long fieldOffset) {
+		return (int)invokeAndReturn(getIntVolatile, fieldOffset);
 	}
 
 
-	public long getLong(Object target, long fieldOffset) throws Throwable {
-		return (long) getLong.invoke(target, fieldOffset);
+	public long getLong(Object target, long fieldOffset) {
+		return (long)invokeAndReturn(getLong, fieldOffset);
 	}
 
 
-	public long getLongVolatile(Object target, long fieldOffset) throws Throwable {
-		return (long) getLongVolatile.invoke(target, fieldOffset);
+	public long getLongVolatile(Object target, long fieldOffset) {
+		return (long)invokeAndReturn(getLongVolatile, fieldOffset);
 	}
 
 
-	public float getFloat(Object target, long fieldOffset) throws Throwable {
-		return (float) getFloat.invoke(target, fieldOffset);
+	public float getFloat(Object target, long fieldOffset) {
+		return (float)invokeAndReturn(getFloat, fieldOffset);
 	}
 
 
-	public float getFloatVolatile(Object target, long fieldOffset) throws Throwable {
-		return (float) getFloatVolatile.invoke(target, fieldOffset);
+	public float getFloatVolatile(Object target, long fieldOffset) {
+		return (float)invokeAndReturn(getFloatVolatile, fieldOffset);
 	}
 
 
-	public double getDouble(Object target, long fieldOffset) throws Throwable {
-		return (double) getDouble.invoke(target, fieldOffset);
+	public double getDouble(Object target, long fieldOffset) {
+		return (double)invokeAndReturn(getDouble, fieldOffset);
 	}
 
 
-	public double getDoubleVolatile(Object target, long fieldOffset) throws Throwable {
-		return (double) getDoubleVolatile.invoke(target, fieldOffset);
+	public double getDoubleVolatile(Object target, long fieldOffset) {
+		return (double)invokeAndReturn(getDoubleVolatile, fieldOffset);
 	}
 
 
-	public boolean getBoolean(Object target, long fieldOffset) throws Throwable {
-		return (boolean) getBoolean.invoke(target, fieldOffset);
+	public boolean getBoolean(Object target, long fieldOffset) {
+		return (boolean)invokeAndReturn(getBoolean, fieldOffset);
 	}
 
 
-	public boolean getBooleanVolatile(Object target, long fieldOffset) throws Throwable {
-		return (boolean) getBooleanVolatile.invoke(target, fieldOffset);
+	public boolean getBooleanVolatile(Object target, long fieldOffset) {
+		return (boolean)invokeAndReturn(getBooleanVolatile, fieldOffset);
 	}
 
 
-	public byte getByte(Object target, long fieldOffset) throws Throwable {
-		return (byte) getByte.invoke(target, fieldOffset);
+	public byte getByte(Object target, long fieldOffset) {
+		return (byte)invokeAndReturn(getByte, fieldOffset);
 	}
 
 
-	public byte getByteVolatile(Object target, long fieldOffset) throws Throwable {
-		return (byte) getByteVolatile.invoke(target, fieldOffset);
+	public byte getByteVolatile(Object target, long fieldOffset) {
+		return (byte)invokeAndReturn(getByteVolatile, fieldOffset);
 	}
 
 
-	public char getChar(Object target, long fieldOffset) throws Throwable {
-		return (char) getChar.invoke(target, fieldOffset);
+	public char getChar(Object target, long fieldOffset) {
+		return (char)invokeAndReturn(getChar, fieldOffset);
 	}
 
 
-	public char getCharVolatile(Object target, long fieldOffset) throws Throwable {
-		return (char) getCharVolatile.invoke(target, fieldOffset);
+	public char getCharVolatile(Object target, long fieldOffset) {
+		return (char)invokeAndReturn(getCharVolatile, fieldOffset);
 	}
 
 
-	public void putObject(Object target, long fieldOffset, Object value) throws Throwable {
-		putObject.invoke(target, fieldOffset, value);
+	public void putObject(Object target, long fieldOffset, Object value) {
+		invoke(putObject, fieldOffset, value);
 	}
 
 
-	public void putObjectVolatile(Object target, long fieldOffset, Object value) throws Throwable {
-		putObjectVolatile.invoke(target, fieldOffset, value);
+	public void putObjectVolatile(Object target, long fieldOffset, Object value) {
+		invoke(putObjectVolatile, fieldOffset, value);
 	}
 
 
-	public void putShort(Object target, long fieldOffset, short value) throws Throwable {
-		putShort.invoke(target, fieldOffset, value);
+	public void putShort(Object target, long fieldOffset, short value) {
+		invoke(putShort, fieldOffset, value);
 	}
 
 
-	public void putShortVolatile(Object target, long fieldOffset, short value) throws Throwable {
-		putShortVolatile.invoke(target, fieldOffset, value);
+	public void putShortVolatile(Object target, long fieldOffset, short value) {
+		invoke(putShortVolatile, fieldOffset, value);
 	}
 
 
-	public void putInt(Object target, long fieldOffset, int value) throws Throwable {
-		putInt.invoke(target, fieldOffset, value);
+	public void putInt(Object target, long fieldOffset, int value) {
+		invoke(putInt, fieldOffset, value);
 	}
 
 
-	public void putIntVolatile(Object target, long fieldOffset, int value) throws Throwable {
-		putIntVolatile.invoke(target, fieldOffset, value);
+	public void putIntVolatile(Object target, long fieldOffset, int value) {
+		invoke(putIntVolatile, fieldOffset, value);
 	}
 
 
-	public void putLong(Object target, long fieldOffset, long value) throws Throwable {
-		putLong.invoke(target, fieldOffset, value);	}
+	public void putLong(Object target, long fieldOffset, long value) {
+		invoke(putLong, fieldOffset, value);	}
 
 
-	public void putLongVolatile(Object target, long fieldOffset, long value) throws Throwable {
-		putLongVolatile.invoke(target, fieldOffset, value);
+	public void putLongVolatile(Object target, long fieldOffset, long value) {
+		invoke(putLongVolatile, fieldOffset, value);
 	}
 
 
-	public void putFloat(Object target, long fieldOffset, float value) throws Throwable {
-		putFloat.invoke(target, fieldOffset, value);
+	public void putFloat(Object target, long fieldOffset, float value) {
+		invoke(putFloat, fieldOffset, value);
 	}
 
 
-	public void putFloatVolatile(Object target, long fieldOffset, float value) throws Throwable {
-		putFloatVolatile.invoke(target, fieldOffset, value);
+	public void putFloatVolatile(Object target, long fieldOffset, float value) {
+		invoke(putFloatVolatile, fieldOffset, value);
 	}
 
 
-	public void putDouble(Object target, long fieldOffset, double value) throws Throwable {
-		putDouble.invoke(target, fieldOffset, value);
+	public void putDouble(Object target, long fieldOffset, double value) {
+		invoke(putDouble, fieldOffset, value);
 	}
 
 
-	public void putDoubleVolatile(Object target, long fieldOffset, double value) throws Throwable {
-		putDoubleVolatile.invoke(target, fieldOffset, value);
+	public void putDoubleVolatile(Object target, long fieldOffset, double value) {
+		invoke(putDoubleVolatile, fieldOffset, value);
 	}
 
 
-	public void putBoolean(Object target, long fieldOffset, boolean value) throws Throwable {
-		putBoolean.invoke(target, fieldOffset, value);
+	public void putBoolean(Object target, long fieldOffset, boolean value) {
+		invoke(putBoolean, fieldOffset, value);
 	}
 
 
-	public void putBooleanVolatile(Object target, long fieldOffset, boolean value) throws Throwable {
-		putBooleanVolatile.invoke(target, fieldOffset, value);
+	public void putBooleanVolatile(Object target, long fieldOffset, boolean value) {
+		invoke(putBooleanVolatile, fieldOffset, value);
 	}
 
 
-	public void putByte(Object target, long fieldOffset, byte value) throws Throwable {
-		putByte.invoke(target, fieldOffset, value);
+	public void putByte(Object target, long fieldOffset, byte value) {
+		invoke(putByte, fieldOffset, value);
 	}
 
 
-	public void putByteVolatile(Object target, long fieldOffset, byte value) throws Throwable {
-		putByteVolatile.invoke(target, fieldOffset, value);
+	public void putByteVolatile(Object target, long fieldOffset, byte value) {
+		invoke(putByteVolatile, fieldOffset, value);
 	}
 
 
-	public void putChar(Object target, long fieldOffset, char value) throws Throwable {
-		putChar.invoke(target, fieldOffset, value);
+	public void putChar(Object target, long fieldOffset, char value) {
+		invoke(putChar, fieldOffset, value);
 	}
 
 
-	public void putCharVolatile(Object target, long fieldOffset, char value) throws Throwable {
-		putCharVolatile.invoke(target, fieldOffset, value);
+	public void putCharVolatile(Object target, long fieldOffset, char value) {
+		invoke(putCharVolatile, fieldOffset, value);
+	}
+
+	private void invoke(MethodHandle method, Object... parameters) {
+		try {
+			method.invoke(parameters);
+		} catch (Throwable exc) {
+			throwExceptionFunction.accept(exc);
+		}
+	}
+
+	private Object invokeAndReturn(MethodHandle method, Object... parameters) {
+		try {
+			return method.invoke(parameters);
+		} catch (Throwable exc) {
+			return throwExceptionFunction.apply(exc);
+		}
 	}
 
 	public static class ForJava7 extends UnsafeWrapper {
@@ -445,7 +466,7 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 //		}
 //
 //		@Override
-//		protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws Throwable {
+//		protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws NoSuchMethodException, IllegalAccessException, Throwable {
 //			if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
 //				return false;
 //			}

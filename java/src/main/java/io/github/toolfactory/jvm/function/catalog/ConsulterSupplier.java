@@ -150,16 +150,12 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 				return false;
 			}
 
-			public ForSemeru(Map<Object, Object> context) throws Throwable {
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
-				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
-				Long allowedModesFieldMemoryOffset = unsafeWrapper.objectFieldOffset(modes);
-				unsafeWrapper.putInt(
-					consulter,
-					allowedModesFieldMemoryOffset,
-					io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE
-				);
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED | MODULE);
 			}
 
 		}
@@ -170,12 +166,12 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	public static interface ForJava14 extends ConsulterSupplier {
 
 		public static class ForSemeru extends Abst {
-			public ForSemeru(Map<Object, Object> context) throws Throwable {
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
 				Field modes = MethodHandles.Lookup.class.getDeclaredField("accessMode");
-				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
-				Long allowedModesFieldMemoryOffset = unsafeWrapper.objectFieldOffset(modes);
-				unsafeWrapper.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				Long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(modes);
+				unsafe.putInt(consulter, allowedModesFieldMemoryOffset, io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED);
 			}
 
 		}
@@ -185,18 +181,18 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 	public static class ForJava17 extends Abst {
 
-		public ForJava17(Map<Object, Object> context) throws Throwable {
+		public ForJava17(Map<Object, Object> context) {
 			super(context);
-			UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
+			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
 			final long allowedModesFieldMemoryOffset = Info.Provider.getInfoInstance().is64Bit() ? 12L : 8L;
-			unsafeWrapper.putInt(consulter, allowedModesFieldMemoryOffset, ForJava7.TRUSTED);
+			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, ForJava7.TRUSTED);
 		}
 
 		public static class ForSemeru extends Abst {
-			public ForSemeru(Map<Object, Object> context) throws Throwable {
+			public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 				super(context);
-				UnsafeWrapper unsafeWrapper = ObjectProvider.get(context).getOrBuildObject(UnsafeWrapper.class, context);
-				unsafeWrapper.putInt(consulter, 20, ForJava7.TRUSTED);
+				sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+				unsafe.putInt(consulter, 20, ForJava7.TRUSTED);
 			}
 
 		}
