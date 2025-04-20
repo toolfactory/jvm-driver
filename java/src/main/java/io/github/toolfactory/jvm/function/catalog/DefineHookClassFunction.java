@@ -51,53 +51,30 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 
 
 	public static class ForJava7 extends Abst {
-		protected ObjectProvider functionProvider;
-		protected Map<Object, Object> context;
+		protected UnsafeWrapper unsafeWrapper;
 
 		public ForJava7(Map<Object, Object> context) throws NoSuchMethodException, IllegalAccessException, Throwable {
 			super(context);
-			this.context = context;
-			functionProvider = ObjectProvider.get(context);
-//			defineHookClassMethodHandle = retrieveConsulter(
-//				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
-//				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get()
-//			).findSpecial(
-//				unsafeWrapper.getUnsafeClass(),
-//				"defineAnonymousClass",
-//				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-//				unsafeWrapper.getUnsafeClass()
-//			);
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
+			defineHookClassMethodHandle = retrieveConsulter(
+				functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
+				functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get()
+			).findSpecial(
+				unsafeWrapper.getUnsafeClass(),
+				"defineAnonymousClass",
+				MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
+				unsafeWrapper.getUnsafeClass()
+			);
 		}
 
-//		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
-//			return (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(consulter, unsafeWrapper.getUnsafeClass());
-//		}
+		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle privateLookupInMethodHandle) throws Throwable {
+			return (MethodHandles.Lookup)privateLookupInMethodHandle.invokeWithArguments(consulter, unsafeWrapper.getUnsafeClass());
+		}
 
 		@Override
 		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
-			MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
-			UnsafeWrapper unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
-			try {
-				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-					functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get(),
-					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass()
-				)).findSpecial(
-					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass(),
-					"defineAnonymousClass",
-					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-					unsafeWrapper.getUnsafeClass()
-				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
-			} catch (IllegalAccessException e) {
-				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-					functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass()),
-					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass()
-				)).findSpecial(
-					functionProvider.getOrBuildObject(UnsafeWrapper.class, context).getUnsafeClass(),
-					"defineAnonymousClass",
-					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-					unsafeWrapper.getUnsafeClass()
-				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
-			}
+			return (Class<?>) defineHookClassMethodHandle.invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
 		}
 
 	}
@@ -109,36 +86,9 @@ public interface DefineHookClassFunction extends ThrowingBiFunction<Class<?>, by
 			super(context);
 		}
 
-//		@Override
-//		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
-//			return (MethodHandles.Lookup)lookupMethod.invokeWithArguments(unsafeWrapper.getUnsafeClass(), consulter);
-//		}
-
 		@Override
-		public Class<?> apply(Class<?> clientClass, byte[] byteCode) throws Throwable {
-			MethodHandle privateLookupInMethodHandle = functionProvider.getOrBuildObject(PrivateLookupInMethodHandleSupplier.class, context).get();
-			UnsafeWrapper unsafeWrapper = functionProvider.getOrBuildObject(UnsafeWrapper.class, context);
-			try {
-				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-					unsafeWrapper.getUnsafeClass(),
-					functionProvider.getOrBuildObject(ConsulterSupplier.class, context).get()
-				)).findSpecial(
-					unsafeWrapper.getUnsafeClass(),
-					"defineAnonymousClass",
-					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-					unsafeWrapper.getUnsafeClass()
-				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
-			} catch (IllegalAccessException e) {
-				return (Class<?>) ((MethodHandles.Lookup) privateLookupInMethodHandle.invokeWithArguments(
-					unsafeWrapper.getUnsafeClass(),
-					functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(unsafeWrapper.getUnsafeClass())
-				)).findSpecial(
-					unsafeWrapper.getUnsafeClass(),
-					"defineAnonymousClass",
-					MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class),
-					unsafeWrapper.getUnsafeClass()
-				).invokeWithArguments(unsafeWrapper.get(), clientClass, byteCode, null);
-			}
+		public MethodHandles.Lookup retrieveConsulter(MethodHandles.Lookup consulter, MethodHandle lookupMethod) throws Throwable {
+			return (MethodHandles.Lookup)lookupMethod.invokeWithArguments(unsafeWrapper.getUnsafeClass(), consulter);
 		}
 
 	}

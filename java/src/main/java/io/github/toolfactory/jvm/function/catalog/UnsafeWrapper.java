@@ -33,8 +33,6 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.util.ObjectProvider;
-
 @SuppressWarnings("all")
 public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.function.template.Supplier<Object>{
 
@@ -410,55 +408,55 @@ public abstract class UnsafeWrapper implements io.github.toolfactory.jvm.functio
 
 	}
 
-	public static class ForJava14 extends UnsafeWrapper {
-		private final static String UNSAFE_CLASS_NAME = "jdk.internal.misc.Unsafe";
-		private static Thread switcher;
-
-
-		public ForJava14(final Map<Object, Object> context) throws Throwable {
-			if (!super.init(context, ForJava7.UNSAFE_CLASS_NAME) && !unsafeClass.getName().equals(ForJava14.UNSAFE_CLASS_NAME) && switcher == null) {
-				synchronized (ForJava14.class) {
-					if (!super.init(context, "sun.misc.Unsafe") && !unsafeClass.getName().equals(ForJava14.UNSAFE_CLASS_NAME) && switcher == null) {
-						switcher = new Thread(new Runnable() {
-							@Override
-							public void run() {
-								while (!getUnsafeClass().equals(ForJava14.UNSAFE_CLASS_NAME) &&
-									ObjectProvider.getObject(DeepConsulterSupplyFunction.class, context) == null &&
-									ObjectProvider.getObject(GetClassByNameFunction.class, context) == null
-								) {
-									try {
-										Thread.sleep(10);
-									} catch (InterruptedException e) {
-
-									}
-								}
-								try {
-									init(context, ForJava14.UNSAFE_CLASS_NAME);
-								} catch (Throwable exc) {
-									ObjectProvider.getObject(ThrowExceptionFunction.class, context).accept(exc);
-								}
-							}
-						}, "UnsafeWrapperInitializer");
-						switcher.start();
-					}
-				}
-				Thread switcherTemp = switcher;
-			}
-		}
-
-		@Override
-		protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws Throwable {
-			if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
-				return false;
-			}
-			GetClassByNameFunction getClassByNameFunction = ObjectProvider.getObject(GetClassByNameFunction.class, context);
-			Class<?> unsafeClassTemp = getClassByNameFunction.apply(unsafeClassName, true, getClass().getClassLoader(), getClass());
-			Field unsafeField = unsafeClassTemp.getDeclaredField("theUnsafe");
-			Object unsafeTemp = getObject(unsafeClassTemp, staticFieldOffset(unsafeField));
-			DeepConsulterSupplyFunction consulterRetriever = ObjectProvider.getObject(DeepConsulterSupplyFunction.class, context);
-			init(unsafeTemp, consulterRetriever.apply(unsafeTemp.getClass()));
-			switcher = null;
-			return true;
-		}
-	}
+//	public static class ForJava14 extends UnsafeWrapper {
+//		private final static String UNSAFE_CLASS_NAME = "jdk.internal.misc.Unsafe";
+//		private static Thread switcher;
+//
+//
+//		public ForJava14(final Map<Object, Object> context) throws Throwable {
+//			if (!super.init(context, ForJava7.UNSAFE_CLASS_NAME) && !unsafeClass.getName().equals(ForJava14.UNSAFE_CLASS_NAME) && switcher == null) {
+//				synchronized (ForJava14.class) {
+//					if (!super.init(context, "sun.misc.Unsafe") && !unsafeClass.getName().equals(ForJava14.UNSAFE_CLASS_NAME) && switcher == null) {
+//						switcher = new Thread(new Runnable() {
+//							@Override
+//							public void run() {
+//								while (!getUnsafeClass().equals(ForJava14.UNSAFE_CLASS_NAME) &&
+//									ObjectProvider.getObject(DeepConsulterSupplyFunction.class, context) == null &&
+//									ObjectProvider.getObject(GetClassByNameFunction.class, context) == null
+//								) {
+//									try {
+//										Thread.sleep(10);
+//									} catch (InterruptedException e) {
+//
+//									}
+//								}
+//								try {
+//									init(context, ForJava14.UNSAFE_CLASS_NAME);
+//								} catch (Throwable exc) {
+//									ObjectProvider.getObject(ThrowExceptionFunction.class, context).accept(exc);
+//								}
+//							}
+//						}, "UnsafeWrapperInitializer");
+//						switcher.start();
+//					}
+//				}
+//				Thread switcherTemp = switcher;
+//			}
+//		}
+//
+//		@Override
+//		protected synchronized boolean init(Map<Object, Object> context, String unsafeClassName) throws Throwable {
+//			if (unsafeClass != null && unsafeClass.getName().equals(unsafeClassName)) {
+//				return false;
+//			}
+//			GetClassByNameFunction getClassByNameFunction = ObjectProvider.getObject(GetClassByNameFunction.class, context);
+//			Class<?> unsafeClassTemp = getClassByNameFunction.apply(unsafeClassName, true, getClass().getClassLoader(), getClass());
+//			Field unsafeField = unsafeClassTemp.getDeclaredField("theUnsafe");
+//			Object unsafeTemp = getObject(unsafeClassTemp, staticFieldOffset(unsafeField));
+//			DeepConsulterSupplyFunction consulterRetriever = ObjectProvider.getObject(DeepConsulterSupplyFunction.class, context);
+//			init(unsafeTemp, consulterRetriever.apply(unsafeTemp.getClass()));
+//			switcher = null;
+//			return true;
+//		}
+//	}
 }
