@@ -126,7 +126,7 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Supplier<SetAccessibleFunction> setAccessibleFunctionSupplier;
 
-		public ForJava25(Map<Object, Object> context) {
+		public ForJava25(final Map<Object, Object> context) {
 			super(context);
 			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
 			setAccessibleFunctionSupplier = new Supplier<SetAccessibleFunction>() {
