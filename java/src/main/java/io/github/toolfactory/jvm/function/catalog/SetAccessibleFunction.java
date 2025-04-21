@@ -90,6 +90,10 @@ public interface SetAccessibleFunction extends ThrowingBiConsumer<AccessibleObje
 				Class<?> methodHandleWrapperClass = functionProvider.getOrBuildObject(
 					DefineHookClassFunction.class, context
 				).apply(AccessibleObject.class, Streams.toByteArray(inputStream));
+				functionProvider.getOrBuildObject(SetFieldValueFunction.class, context).accept(
+					methodHandleWrapperClass, methodHandleWrapperClass.getDeclaredField("mainConsulter"),
+					functionProvider.getOrBuildObject(ConsulterSupplyFunction.class, context).apply(methodHandleWrapperClass)
+				);
 				setFunction((java.util.function.BiConsumer<AccessibleObject, Boolean>)
 					functionProvider.getOrBuildObject(AllocateInstanceFunction.class, context).apply(methodHandleWrapperClass));
 			}

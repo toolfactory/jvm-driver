@@ -32,6 +32,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.InitializeException;
+import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.util.Classes;
 import io.github.toolfactory.jvm.util.ObjectProvider;
@@ -147,11 +148,17 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 	public static class ForJava25 extends ForJava7 {
 		protected SetAccessibleFunction setAccessibleFunction;
 		protected ThrowExceptionFunction throwExceptionFunction;
+		protected Supplier<SetAccessibleFunction> setAccessibleFunctionSupplier;
 
 		public ForJava25(Map<Object, Object> context) {
 			super(context);
 			setAccessibleFunction = ObjectProvider.get(context).getOrBuildObject(SetAccessibleFunction.class, context);
-			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
+			setAccessibleFunctionSupplier = new Supplier<SetAccessibleFunction>() {
+				@Override
+				public SetAccessibleFunction get() {
+					return ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
+				}
+			};
 		}
 
 		@Override
@@ -183,7 +190,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				setByUnsafe(field, value, fieldOffset, target, field.getType());
 			} catch (UnsupportedOperationException exc) {
 				try {
-					setAccessibleFunction.accept(field, true);
+					setAccessible(field);
 					if (isStatic) {
 						field.set(null, value);
 					} else {
@@ -191,6 +198,19 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 					}
 				} catch (Throwable exc2) {
 					throwExceptionFunction.accept(exc2);
+				}
+			}
+		}
+
+		protected void setAccessible(Field field) throws Throwable {
+			try {
+				setAccessibleFunction.accept(field, true);
+			} catch (NullPointerException exc) {
+				if (setAccessibleFunction == null) {
+					setAccessibleFunction = setAccessibleFunctionSupplier.get();
+					setAccessible(field);
+				} else {
+					throwExceptionFunction.accept(exc);
 				}
 			}
 		}

@@ -35,10 +35,10 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("unchecked")
 public class AccessibleSetterInvokerForJDK9 implements BiConsumer<AccessibleObject, Boolean> {
 	private static MethodHandle accessibleSetterMethodHandle;
+	// Lazy initialized by io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction
 	public static MethodHandles.Lookup mainConsulter;
 	
 	static {
-		mainConsulter = MethodHandles.lookup();
 		try {
 			Method accessibleSetterMethod = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
 			accessibleSetterMethodHandle = mainConsulter.unreflect(accessibleSetterMethod);
