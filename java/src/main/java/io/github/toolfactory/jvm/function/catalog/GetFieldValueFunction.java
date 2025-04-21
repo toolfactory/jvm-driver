@@ -132,7 +132,7 @@ public interface GetFieldValueFunction extends BiFunction<Object, Field, Object>
 			setAccessibleFunctionSupplier = new Supplier<SetAccessibleFunction>() {
 				@Override
 				public SetAccessibleFunction get() {
-					return ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
+					return ObjectProvider.get(context).getOrBuildObject(SetAccessibleFunction.class, context);
 				}
 			};
 		}
