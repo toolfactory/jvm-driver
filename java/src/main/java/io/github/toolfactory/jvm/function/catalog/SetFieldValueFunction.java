@@ -146,17 +146,26 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 	}
 
 	public static class ForJava25 extends ForJava7 {
-		protected SetAccessibleFunction setAccessibleFunction;
 		protected ThrowExceptionFunction throwExceptionFunction;
+		protected Field modifiersField;
+		protected GetDeclaredFieldFunction getDeclaredFieldFunction;
+		protected Supplier<GetDeclaredFieldFunction> getDeclaredFieldFunctionSupplier;
+		protected SetAccessibleFunction setAccessibleFunction;
 		protected Supplier<SetAccessibleFunction> setAccessibleFunctionSupplier;
 
-		public ForJava25(final Map<Object, Object> context) {
+		public ForJava25(final Map<Object, Object> context) throws Throwable {
 			super(context);
 			throwExceptionFunction = ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context);
 			setAccessibleFunctionSupplier = new Supplier<SetAccessibleFunction>() {
 				@Override
 				public SetAccessibleFunction get() {
 					return ObjectProvider.get(context).getOrBuildObject(SetAccessibleFunction.class, context);
+				}
+			};
+			getDeclaredFieldFunctionSupplier = new Supplier<GetDeclaredFieldFunction>() {
+				@Override
+				public GetDeclaredFieldFunction get() {
+					return ObjectProvider.get(context).getOrBuildObject(GetDeclaredFieldFunction.class, context);
 				}
 			};
 		}
@@ -200,69 +209,16 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 		protected void setByReflection(Field field, Class<?> fieldType, boolean isStatic, Object target, Object value) throws Throwable {
 			setAccessible(field);
-			Integer modifiers = field.getModifiers();
+			int modifiers = field.getModifiers();
 			Field modifiersField = null;
-			if ((modifiers & Modifier.FINAL) == Modifier.FINAL) {
-				modifiersField = Field.class.getDeclaredField("modifiers");
-				setAccessible(modifiersField);
+			if (Modifier.isFinal(modifiers)) {
+				modifiersField = this.modifiersField;
 				modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
 			}
-			if (fieldType.isPrimitive()) {
-				if (fieldType == short.class) {
-					if (isStatic) {
-						field.set(null, (short)value);
-					} else {
-						field.set(target, (short)value);
-					}
-				} else if (fieldType == int.class) {
-					if (isStatic) {
-						field.set(null, (int)value);
-					} else {
-						field.set(target, (int)value);
-					}
-				} else if (fieldType == long.class) {
-					if (isStatic) {
-						field.set(null, (long)value);
-					} else {
-						field.set(target, (long)value);
-					}
-				} else if (fieldType == float.class) {
-					if (isStatic) {
-						field.set(null, (float)value);
-					} else {
-						field.set(target, (float)value);
-					}
-				} else if (fieldType == double.class) {
-					if (isStatic) {
-						field.set(null, (double)value);
-					} else {
-						field.set(target, (double)value);
-					}
-				} else if (fieldType == boolean.class) {
-					if (isStatic) {
-						field.set(null, (boolean)value);
-					} else {
-						field.set(target, (boolean)value);
-					}
-				} else if (fieldType == byte.class) {
-					if (isStatic) {
-						field.set(null, (byte)value);
-					} else {
-						field.set(target, (byte)value);
-					}
-				} else if (fieldType == char.class) {
-					if (isStatic) {
-						field.set(null, (char)value);
-					} else {
-						field.set(target, (char)value);
-					}
-				}
+			if (isStatic) {
+				field.set(null, value);
 			} else {
-				if (isStatic) {
-					field.set(null, value);
-				} else {
-					field.set(target, value);
-				}
+				field.set(target, value);
 			}
 			if (modifiersField != null) {
 				modifiersField.setInt(field, modifiers);
@@ -274,7 +230,13 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				setAccessibleFunction.accept(field, true);
 			} catch (NullPointerException exc) {
 				if (setAccessibleFunction == null) {
-					setAccessibleFunction = setAccessibleFunctionSupplier.get();
+					synchronized (this) {
+						if (setAccessibleFunction == null) {
+							setAccessibleFunction = setAccessibleFunctionSupplier.get();
+							getDeclaredFieldFunction = getDeclaredFieldFunctionSupplier.get();
+							setAccessible(this.modifiersField = getDeclaredFieldFunction.apply(Field.class, "modifiers"));
+						}
+					}
 					setAccessible(field);
 				} else {
 					throwExceptionFunction.accept(exc);
