@@ -163,7 +163,8 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 		@Override
 		public void accept(Object origTarget, Field field, Object value) {
-			if(value != null && !Classes.isAssignableFrom(field.getType(), value.getClass())) {
+			Class<?> fieldType = field.getType();
+			if(value != null && !Classes.isAssignableFrom(fieldType, value.getClass())) {
 				throw new IllegalArgumentException(Strings.compile("Value {} is not assignable to {}", value , field.getName()));
 			}
 			Class<?> fieldDeclaringClass = field.getDeclaringClass();
@@ -190,14 +191,70 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				setByUnsafe(field, value, fieldOffset, target, field.getType());
 			} catch (UnsupportedOperationException exc) {
 				try {
-					setAccessible(field);
-					if (isStatic) {
-						field.set(null, value);
-					} else {
-						field.set(target, value);
-					}
+					setByReflection(field, fieldType, isStatic, target, value);
 				} catch (Throwable exc2) {
 					throwExceptionFunction.accept(exc2);
+				}
+			}
+		}
+
+		protected void setByReflection(Field field, Class<?> fieldType, boolean isStatic, Object target, Object value) throws Throwable {
+			setAccessible(field);
+			if (fieldType.isPrimitive()) {
+				if (fieldType == short.class) {
+					if (isStatic) {
+						field.set(null, (short)value);
+					} else {
+						field.set(target, (short)value);
+					}
+				} else if (fieldType == int.class) {
+					if (isStatic) {
+						field.set(null, (int)value);
+					} else {
+						field.set(target, (int)value);
+					}
+				} else if (fieldType == long.class) {
+					if (isStatic) {
+						field.set(null, (long)value);
+					} else {
+						field.set(target, (long)value);
+					}
+				} else if (fieldType == float.class) {
+					if (isStatic) {
+						field.set(null, (float)value);
+					} else {
+						field.set(target, (float)value);
+					}
+				} else if (fieldType == double.class) {
+					if (isStatic) {
+						field.set(null, (double)value);
+					} else {
+						field.set(target, (double)value);
+					}
+				} else if (fieldType == boolean.class) {
+					if (isStatic) {
+						field.set(null, (boolean)value);
+					} else {
+						field.set(target, (boolean)value);
+					}
+				} else if (fieldType == byte.class) {
+					if (isStatic) {
+						field.set(null, (byte)value);
+					} else {
+						field.set(target, (byte)value);
+					}
+				} else if (fieldType == char.class) {
+					if (isStatic) {
+						field.set(null, (char)value);
+					} else {
+						field.set(target, (char)value);
+					}
+				}
+			} else {
+				if (isStatic) {
+					field.set(null, value);
+				} else {
+					field.set(target, value);
 				}
 			}
 		}
