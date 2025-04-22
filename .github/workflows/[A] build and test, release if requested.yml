@@ -183,7 +183,7 @@ jobs:
 
 #To ensure compatibility with the Java 7 version the build must never be run with a JDK version higher than 19  
   release:
-    needs: [build-and-test-with-zulu-JDK, build-and-test-with-semeru-JDK, build-and-test-with-temurin-JDK]
+    needs: [elaborate-java-hook-module]
     name: Release if requested
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && endsWith(github.event.head_commit.message, 'Releasing new version')
