@@ -209,10 +209,10 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 		protected void setByReflection(Field field, Class<?> fieldType, boolean isStatic, Object target, Object value) throws Throwable {
 			setAccessible(field);
-			int modifiers = field.getModifiers();
+			int initialModifiers = field.getModifiers();
 			Field modifiersField = null;
-			if (Modifier.isFinal(modifiers)) {
-				modifiersField = removeFinalFlag(field, modifiers);
+			if (Modifier.isFinal(initialModifiers)) {
+				modifiersField = removeFinalFlag(field, initialModifiers);
 			}
 			if (isStatic) {
 				field.set(null, value);
@@ -220,7 +220,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				field.set(target, value);
 			}
 			if (modifiersField != null) {
-				modifiersField.setInt(field, modifiers);
+				modifiersField.setInt(field, initialModifiers);
 			}
 		}
 
