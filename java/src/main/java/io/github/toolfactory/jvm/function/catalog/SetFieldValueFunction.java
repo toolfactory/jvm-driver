@@ -233,16 +233,6 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			}
 		}
 
-		protected Field removeFinalFlag(Field field, int currentValue) throws IllegalAccessException {
-			this.modifiersField.setInt(field, currentValue & ~Modifier.FINAL);
-			return modifiersField;
-		}
-
-		protected Field removeReadOnlyFlag(Field field, int currentValue) throws IllegalAccessException {
-			this.fieldFlags.setInt(field, currentValue & ~getReadOnlyBit());
-			return fieldFlags;
-		}
-
 		protected void setAccessible(Field field) throws Throwable {
 			try {
 				setAccessibleFunction.accept(field, true);
@@ -257,7 +247,6 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 								Class.forName(getFieldFlagsDeclaringClassName()),
 								"fieldFlags")
 							);
-							removeFinalFlag(this.fieldFlags, field.getModifiers());
 						}
 					}
 					setAccessible(field);
@@ -274,6 +263,17 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		protected int getReadOnlyBit() {
 			return 0x0001;
 		}
+
+		protected Field removeFinalFlag(Field field, int currentValue) throws IllegalAccessException {
+			this.modifiersField.setInt(field, currentValue & ~Modifier.FINAL);
+			return modifiersField;
+		}
+
+		protected Field removeReadOnlyFlag(Field field, int currentValue) throws IllegalAccessException {
+			this.fieldFlags.setInt(field, currentValue & ~getReadOnlyBit());
+			return fieldFlags;
+		}
+
 	}
 
 
