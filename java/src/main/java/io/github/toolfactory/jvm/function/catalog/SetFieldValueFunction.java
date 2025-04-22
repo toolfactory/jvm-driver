@@ -149,6 +149,8 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Field modifiersField;
 		protected Field fieldFlags;
+		protected GetClassByNameFunction getClassByNameFunction;
+		protected Supplier<GetClassByNameFunction> getClassByNameFunctionSupplier;
 		protected GetDeclaredFieldFunction getDeclaredFieldFunction;
 		protected Supplier<GetDeclaredFieldFunction> getDeclaredFieldFunctionSupplier;
 		protected SetAccessibleFunction setAccessibleFunction;
@@ -167,6 +169,12 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				@Override
 				public GetDeclaredFieldFunction get() {
 					return ObjectProvider.get(context).getOrBuildObject(GetDeclaredFieldFunction.class, context);
+				}
+			};
+			getClassByNameFunctionSupplier = new Supplier<GetClassByNameFunction>() {
+				@Override
+				public GetClassByNameFunction get() {
+					return ObjectProvider.get(context).getOrBuildObject(GetClassByNameFunction.class, context);
 				}
 			};
 		}
@@ -240,13 +248,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				if (setAccessibleFunction == null) {
 					synchronized (this) {
 						if (setAccessibleFunction == null) {
-							setAccessibleFunction = setAccessibleFunctionSupplier.get();
-							getDeclaredFieldFunction = getDeclaredFieldFunctionSupplier.get();
-							setAccessible(this.modifiersField = getDeclaredFieldFunction.apply(Field.class, "modifiers"));
-							setAccessible(this.fieldFlags = getDeclaredFieldFunction.apply(
-								Class.forName(getFieldFlagsDeclaringClassName()),
-								"fieldFlags")
-							);
+							init();
 						}
 					}
 					setAccessible(field);
@@ -256,12 +258,27 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			}
 		}
 
-		protected String getFieldFlagsDeclaringClassName() {
-			return "jdk.internal.reflect.MethodHandleFieldAccessorImpl";
+		protected void init() throws Throwable {
+			setAccessibleFunction = setAccessibleFunctionSupplier.get();
+			getDeclaredFieldFunction = getDeclaredFieldFunctionSupplier.get();
+			getClassByNameFunction = getClassByNameFunctionSupplier.get();
+			setAccessible(this.modifiersField = getDeclaredFieldFunction.apply(Field.class, "modifiers"));
+			setAccessible(
+				this.fieldFlags =
+					getDeclaredFieldFunction.apply(
+						getClassByNameFunction.apply(
+							getFieldFlagsDeclaringClassName(),
+							true,
+							this.modifiersField.getClass().getClassLoader(),
+							ForJava25.class
+						),
+						"fieldFlags"
+					)
+			);
 		}
 
-		protected int getReadOnlyBit() {
-			return 0x0001;
+		protected String getFieldFlagsDeclaringClassName() {
+			return "jdk.internal.reflect.MethodHandleFieldAccessorImpl";
 		}
 
 		protected Field removeFinalFlag(Field field, int currentValue) throws IllegalAccessException {
@@ -272,6 +289,10 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		protected Field removeReadOnlyFlag(Field field, int currentValue) throws IllegalAccessException {
 			this.fieldFlags.setInt(field, currentValue & ~getReadOnlyBit());
 			return fieldFlags;
+		}
+
+		protected int getReadOnlyBit() {
+			return 0x0001;
 		}
 
 	}
