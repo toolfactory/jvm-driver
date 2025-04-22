@@ -28,6 +28,8 @@ package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
@@ -149,10 +151,13 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Field modifiersField;
 		protected Field fieldFlags;
+		protected Method getOverrideFieldAccessor;
 		protected GetClassByNameFunction getClassByNameFunction;
 		protected Supplier<GetClassByNameFunction> getClassByNameFunctionSupplier;
 		protected GetDeclaredFieldFunction getDeclaredFieldFunction;
 		protected Supplier<GetDeclaredFieldFunction> getDeclaredFieldFunctionSupplier;
+		protected GetDeclaredMethodFunction getDeclaredMethodFunction;
+		protected Supplier<GetDeclaredMethodFunction> getDeclaredMethodFunctionSupplier;
 		protected SetAccessibleFunction setAccessibleFunction;
 		protected Supplier<SetAccessibleFunction> setAccessibleFunctionSupplier;
 
@@ -175,6 +180,12 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				@Override
 				public GetClassByNameFunction get() {
 					return ObjectProvider.get(context).getOrBuildObject(GetClassByNameFunction.class, context);
+				}
+			};
+			getDeclaredMethodFunctionSupplier = new Supplier<GetDeclaredMethodFunction>() {
+				@Override
+				public GetDeclaredMethodFunction get() {
+					return ObjectProvider.get(context).getOrBuildObject(GetDeclaredMethodFunction.class, context);
 				}
 			};
 		}
@@ -224,9 +235,10 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				modifiersField = removeFinalFlag(field, modifiers);
 			}
 			Field fieldFlags = null;
-			int readOnlyFlag = this.fieldFlags.getInt(field);
+			Object overrideFieldAccessor = getOverrideFieldAccessor.invoke(field);
+			int readOnlyFlag = getReadOnlyFlag(overrideFieldAccessor);
 			if ((readOnlyFlag & getReadOnlyBit()) != 0) {
-				fieldFlags = removeReadOnlyFlag(field, modifiers);
+				fieldFlags = removeReadOnlyFlag(overrideFieldAccessor, readOnlyFlag);
 			}
 			if (isStatic) {
 				field.set(null, value);
@@ -237,13 +249,13 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				modifiersField.setInt(field, modifiers);
 			}
 			if (fieldFlags != null) {
-				fieldFlags.setInt(field, readOnlyFlag);
+				resetReadOnlyFlag(overrideFieldAccessor, readOnlyFlag);
 			}
 		}
 
-		protected void setAccessible(Field field) throws Throwable {
+		protected void setAccessible(java.lang.reflect.AccessibleObject accessibleObject) throws Throwable {
 			try {
-				setAccessibleFunction.accept(field, true);
+				setAccessibleFunction.accept(accessibleObject, true);
 			} catch (NullPointerException exc) {
 				if (setAccessibleFunction == null) {
 					synchronized (this) {
@@ -251,7 +263,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 							init();
 						}
 					}
-					setAccessible(field);
+					setAccessible(accessibleObject);
 				} else {
 					throwExceptionFunction.accept(exc);
 				}
@@ -261,6 +273,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		protected void init() throws Throwable {
 			setAccessibleFunction = setAccessibleFunctionSupplier.get();
 			getDeclaredFieldFunction = getDeclaredFieldFunctionSupplier.get();
+			getDeclaredMethodFunction = getDeclaredMethodFunctionSupplier.get();
 			getClassByNameFunction = getClassByNameFunctionSupplier.get();
 			setAccessible(this.modifiersField = getDeclaredFieldFunction.apply(Field.class, "modifiers"));
 			setAccessible(
@@ -275,6 +288,9 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 						"fieldFlags"
 					)
 			);
+			setAccessible(
+				this.getOverrideFieldAccessor = getDeclaredMethodFunction.apply(Field.class, "getOverrideFieldAccessor", new Class[]{})
+			);
 		}
 
 		protected String getFieldFlagsDeclaringClassName() {
@@ -286,9 +302,17 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			return modifiersField;
 		}
 
-		protected Field removeReadOnlyFlag(Field field, int currentValue) throws IllegalAccessException {
-			this.fieldFlags.setInt(field, currentValue & ~getReadOnlyBit());
+		protected int getReadOnlyFlag(Object overrideFieldAccessor) throws Throwable {
+			return this.fieldFlags.getInt(overrideFieldAccessor);
+		}
+
+		protected Field removeReadOnlyFlag(Object overrideFieldAccessor, int currentValue) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			this.fieldFlags.setInt(overrideFieldAccessor, currentValue & ~getReadOnlyBit());
 			return fieldFlags;
+		}
+
+		protected void resetReadOnlyFlag(Object overrideFieldAccessor, int readOnlyFlag) throws IllegalArgumentException, IllegalAccessException {
+			this.fieldFlags.setInt(overrideFieldAccessor, readOnlyFlag & ~getReadOnlyBit());
 		}
 
 		protected int getReadOnlyBit() {
