@@ -28,8 +28,6 @@ package io.github.toolfactory.jvm.function.catalog;
 
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
@@ -150,14 +148,8 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 	public static class ForJava25 extends ForJava7 {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Field modifiersField;
-		protected Field fieldFlags;
-		protected Method getOverrideFieldAccessor;
-		protected GetClassByNameFunction getClassByNameFunction;
-		protected Supplier<GetClassByNameFunction> getClassByNameFunctionSupplier;
 		protected GetDeclaredFieldFunction getDeclaredFieldFunction;
 		protected Supplier<GetDeclaredFieldFunction> getDeclaredFieldFunctionSupplier;
-		protected GetDeclaredMethodFunction getDeclaredMethodFunction;
-		protected Supplier<GetDeclaredMethodFunction> getDeclaredMethodFunctionSupplier;
 		protected SetAccessibleFunction setAccessibleFunction;
 		protected Supplier<SetAccessibleFunction> setAccessibleFunctionSupplier;
 
@@ -174,18 +166,6 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 				@Override
 				public GetDeclaredFieldFunction get() {
 					return ObjectProvider.get(context).getOrBuildObject(GetDeclaredFieldFunction.class, context);
-				}
-			};
-			getClassByNameFunctionSupplier = new Supplier<GetClassByNameFunction>() {
-				@Override
-				public GetClassByNameFunction get() {
-					return ObjectProvider.get(context).getOrBuildObject(GetClassByNameFunction.class, context);
-				}
-			};
-			getDeclaredMethodFunctionSupplier = new Supplier<GetDeclaredMethodFunction>() {
-				@Override
-				public GetDeclaredMethodFunction get() {
-					return ObjectProvider.get(context).getOrBuildObject(GetDeclaredMethodFunction.class, context);
 				}
 			};
 		}
@@ -234,12 +214,6 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			if (Modifier.isFinal(modifiers)) {
 				modifiersField = removeFinalFlag(field, modifiers);
 			}
-			Field fieldFlags = null;
-			Object overrideFieldAccessor = getOverrideFieldAccessor.invoke(field);
-			int readOnlyFlag = getReadOnlyFlag(overrideFieldAccessor);
-			if ((readOnlyFlag & getReadOnlyBit()) != 0) {
-				fieldFlags = removeReadOnlyFlag(overrideFieldAccessor, readOnlyFlag);
-			}
 			if (isStatic) {
 				field.set(null, value);
 			} else {
@@ -247,9 +221,6 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 			}
 			if (modifiersField != null) {
 				modifiersField.setInt(field, modifiers);
-			}
-			if (fieldFlags != null) {
-				resetReadOnlyFlag(overrideFieldAccessor, readOnlyFlag);
 			}
 		}
 
@@ -273,50 +244,12 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		protected void init() throws Throwable {
 			setAccessibleFunction = setAccessibleFunctionSupplier.get();
 			getDeclaredFieldFunction = getDeclaredFieldFunctionSupplier.get();
-			getDeclaredMethodFunction = getDeclaredMethodFunctionSupplier.get();
-			getClassByNameFunction = getClassByNameFunctionSupplier.get();
 			setAccessible(this.modifiersField = getDeclaredFieldFunction.apply(Field.class, "modifiers"));
-			setAccessible(
-				this.fieldFlags =
-					getDeclaredFieldFunction.apply(
-						getClassByNameFunction.apply(
-							getFieldFlagsDeclaringClassName(),
-							true,
-							this.modifiersField.getClass().getClassLoader(),
-							ForJava25.class
-						),
-						"fieldFlags"
-					)
-			);
-			setAccessible(
-				this.getOverrideFieldAccessor = getDeclaredMethodFunction.apply(Field.class, "getOverrideFieldAccessor", new Class[]{})
-			);
-		}
-
-		protected String getFieldFlagsDeclaringClassName() {
-			return "jdk.internal.reflect.MethodHandleFieldAccessorImpl";
 		}
 
 		protected Field removeFinalFlag(Field field, int currentValue) throws IllegalAccessException {
 			this.modifiersField.setInt(field, currentValue & ~Modifier.FINAL);
 			return modifiersField;
-		}
-
-		protected int getReadOnlyFlag(Object overrideFieldAccessor) throws Throwable {
-			return this.fieldFlags.getInt(overrideFieldAccessor);
-		}
-
-		protected Field removeReadOnlyFlag(Object overrideFieldAccessor, int currentValue) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			this.fieldFlags.setInt(overrideFieldAccessor, currentValue & ~getReadOnlyBit());
-			return fieldFlags;
-		}
-
-		protected void resetReadOnlyFlag(Object overrideFieldAccessor, int readOnlyFlag) throws IllegalArgumentException, IllegalAccessException {
-			this.fieldFlags.setInt(overrideFieldAccessor, readOnlyFlag & ~getReadOnlyBit());
-		}
-
-		protected int getReadOnlyBit() {
-			return 0x0001;
 		}
 
 	}
