@@ -95,4 +95,29 @@ public interface GetClassByNameFunction extends ThrowingQuadFunction<String, Boo
 
 	}
 
+
+	public static class ForJava26 extends Abst {
+
+		public ForJava26(Map<Object, Object> context) throws Throwable {
+			super(context);
+		}
+
+		@Override
+		protected MethodHandle retrieveClassFinder(Map<Object, Object> context) throws Throwable {
+			ObjectProvider functionProvider = ObjectProvider.get(context);
+			MethodHandles.Lookup consulter = functionProvider.getOrBuildObject(DeepConsulterSupplyFunction.class, context).apply(Class.class);
+			// In Java 26 the caller parameter was removed from Class.forName0
+			return consulter.findStatic(
+				Class.class, "forName0",
+				MethodType.methodType(Class.class, String.class, boolean.class, ClassLoader.class)
+			);
+		}
+
+		@Override
+		public Class<?> apply(String className, Boolean initialize, ClassLoader classLoader, Class<?> caller) throws Throwable {
+			return (Class<?>)classFinder.invokeWithArguments(className, initialize.booleanValue(), classLoader);
+		}
+
+	}
+
 }
