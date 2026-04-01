@@ -115,7 +115,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/toolfactory/jvm-driver</url>
-		<tag>jvm-driver-9.10.0</tag>
+		<tag>jvm-driver-9.10.1</tag>
 	</scm>
 
 	<dependencies>
