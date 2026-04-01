@@ -349,6 +349,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-javadoc-plugin</artifactId>
@@ -357,8 +358,9 @@
 			        <javadocExecutable>${java.home}/${javadocExecutable.relativePath}</javadocExecutable>
 			        <encoding>UTF-8</encoding>
 			        <source>${project_jdk_version}</source>
-			        
-			        <doclint>none</doclint> <failOnError>false</failOnError> <additionalOptions>
+			        <doclint>none</doclint>
+			        <failOnError>false</failOnError>
+			        <additionalOptions>
 			            <additionalOption>-Xdoclint:none</additionalOption>
 			        </additionalOptions>
 			    </configuration>
@@ -371,6 +373,7 @@
 			        </execution>
 			    </executions>
 			</plugin>
+			
 			<plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
