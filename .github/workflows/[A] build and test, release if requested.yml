@@ -209,7 +209,8 @@ jobs:
                       <username>${{ secrets.nexus_username }}</username>
                       <password>${{ secrets.nexus_password }}</password>
                   </server>
-              </servers>' > ~/.m2/settings.xml  
+              </servers>
+          </settings>' > ~/.m2/settings.xml  
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}
