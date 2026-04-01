@@ -204,7 +204,7 @@ jobs:
           mv ./java/temp-pom.xml ./java/sa-pom.xml
           git commit -am "Swithcing pom for releasing"
           git push          
-          mvn -B release:prepare release:perform -DskipTests=true \
+          mvn -X -B release:prepare release:perform -DskipTests=true \
             -Prelease-sign-artifacts \
             -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} \
             -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git \
