@@ -24,23 +24,61 @@
 	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 	OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>io.github.toolfactory</groupId>
-		<artifactId>jvm-driver-parent</artifactId>
-		<version>${revision}</version>
-	</parent>
-
+	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
 	<version>9.10.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
+	<name>ToolFactory JVM Driver</name>
+	<description>
+		A driver to allow deep interaction with the JVM without any restrictions
+	</description>
+	<url>https://toolfactory.github.io/jvm-driver/</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>ToolFactory</name>
+		<url>https://github.com/toolfactory</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<name>Luke Hutchison</name>
+			<id>lukehutch</id>
+			<email>tool.factory.heads@gmail.com</email>
+			<organization>ToolFactory</organization>
+			<organizationUrl>https://github.com/toolfactory</organizationUrl>
+			<roles>
+				<role>Administrator</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Roberto Gentili</name>
+			<id>roberto.gentili</id>
+			<email>tool.factory.heads@gmail.com</email>
+			<organization>ToolFactory</organization>
+			<organizationUrl>https://github.com/toolfactory</organizationUrl>
+			<roles>
+				<role>Administrator</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
 	<properties>
+		<copyright.holder>Luke Hutchison, Roberto Gentili</copyright.holder>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project_jdk_version>7</project_jdk_version>
@@ -49,15 +87,24 @@
 		<project.test.testSuite>AllTestsSuite</project.test.testSuite>
 		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
 		<project.test.excludes>**/*Test.java</project.test.excludes>
+		<repository.url>https://toolfactory@github.com/toolfactory/jvm-driver.git</repository.url>
 
+		<coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<junit-jupiter.version>5.10.0</junit-jupiter.version>
 		<junit.version>1.10.0</junit.version>
 		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
 		<maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
-		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
-		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+		<!-- maven-javadoc-plugin v3.1+ has a bug which prevents it from working with multi-release
+        jars: -->
+        <!-- https://issues.apache.org/jira/projects/MJAVADOC/issues/MJAVADOC-673 -->
+        <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+		<maven-jxr-plugin.version>3.1.1</maven-jxr-plugin.version>
+		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+		<maven-scm-provider-gitexe.version>2.1.0</maven-scm-provider-gitexe.version>
 		<maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
 		<narcissus.version>1.0.11</narcissus.version>
 	</properties>
@@ -67,22 +114,11 @@
 		<url>https://github.com/toolfactory/jvm-driver/issues</url>
 	</issueManagement>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
 	<scm>
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/toolfactory/jvm-driver</url>
-		<tag>HEAD</tag>
+		<tag>jvm-driver-9.10.0</tag>
 	</scm>
 
 	<dependencies>
@@ -170,18 +206,10 @@
 						</phase>
 						<configuration>
 							<target>
-								<copy
-									file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ConsulterRetrieverForJDK9.bwc" />
-								<copy
-									file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/AccessibleSetterInvokerForJDK9.bwc" />
-								<copy
-									file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
-								<copy
-									file="${project.basedir}/../java-hook/bin/io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunction$ForJava7.class"
-									tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunction$ForJava7.class" />
+								<copy file="${project.basedir}/../java-hook/bin/java/lang/ConsulterRetrieverForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ConsulterRetrieverForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/java/lang/reflect/AccessibleSetterInvokerForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/AccessibleSetterInvokerForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/jdk/internal/loader/ClassLoaderDelegateForJDK9.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/util/ClassLoaderDelegateForJDK9.bwc" />
+								<copy file="${project.basedir}/../java-hook/bin/io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunction$ForJava7.class" tofile="${project.build.directory}/classes/io/github/toolfactory/jvm/function/catalog/ThrowExceptionFunction$ForJava7.class" />
 							</target>
 						</configuration>
 					</execution>
@@ -193,11 +221,8 @@
 						</goals>
 						<configuration>
 							<target>
-								<jar update="true"
-									destfile="${project.build.directory}/${project.build.finalName}.jar">
-									<zipfileset prefix="META-INF/versions/9"
-										dir="${project.build.directory}/classes"
-										includes="module-info.class" />
+								<jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
+									<zipfileset prefix="META-INF/versions/9" dir="${project.build.directory}/classes" includes="module-info.class" />
 								</jar>
 							</target>
 						</configuration>
@@ -258,46 +283,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${maven-jar-plugin.version}</version>
-				<configuration>
-					<excludes>
-						<exclude>module-info.class</exclude>
-						<exclude>jdk/</exclude>
-						<exclude>java/</exclude>
-						<exclude>META-INF/maven/</exclude>
-					</excludes>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<built-by>ToolFactory</built-by>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>${maven-source-plugin.version}</version>
-				<configuration>
-					<excludes>
-						<exclude>**/*.class</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<version>${maven-bundle-plugin.version}</version>
@@ -351,22 +336,145 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${maven-javadoc-plugin.version}</version>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
 				<configuration>
-					<javadocExecutable>${java.home}/${javadocExecutable.relativePath}</javadocExecutable>
-					<encoding>UTF-8</encoding>
-					<source>${project_jdk_version}</source>
+					<excludes>
+						<exclude>**/*.class</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
-						<id>attach-javadoc</id>
+						<id>attach-sources</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>${project_jdk_version}</source>
+                    <detectJavaApiLink>false</detectJavaApiLink>
+                    <doclint>all</doclint>
+                    <show>public</show>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+			<plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
+                    <waitUntil>uploaded</waitUntil>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>${maven-jxr-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<profiles>
+		<!-- GPG Signature on release -->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <excludes>
+                                        <exclude>**/*.zip</exclude>
+                                    </excludes>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>run-coveralls</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Generate coveralls reports from CI server. -->
+					<plugin>
+						<groupId>org.eluder.coveralls</groupId>
+						<artifactId>coveralls-maven-plugin</artifactId>
+						<version>${coveralls-maven-plugin.version}</version>
+						<configuration>
+							<sourceDirectories>
+								<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+							</sourceDirectories>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco-maven-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<excludes>
+								<exclude>**/*AccessibleSetterInvokerForJDK9.*</exclude>
+								<exclude>**/*ClassLoaderDelegateForJDK9.*</exclude>
+								<exclude>**/*ConsulterRetrieverForJDK9.*</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
