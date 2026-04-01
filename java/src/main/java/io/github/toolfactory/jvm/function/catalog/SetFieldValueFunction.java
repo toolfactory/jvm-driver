@@ -32,7 +32,6 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.function.InitializeException;
-import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.function.template.TriConsumer;
 import io.github.toolfactory.jvm.util.Classes;
 import io.github.toolfactory.jvm.util.ObjectProvider;
@@ -145,6 +144,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 	}
 
+	/** Added from version 9.9.0 and it is not necessary
 	public static class ForJava25 extends ForJava7 {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Field modifiersField;
@@ -253,7 +253,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 		}
 
 	}
-
+	*/
 
 	public interface Native extends SetFieldValueFunction{
 
