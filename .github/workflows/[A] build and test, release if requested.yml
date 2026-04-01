@@ -192,10 +192,10 @@ jobs:
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.gpg_private_key }}
+          gpg-passphrase: GPG_PASSPHRASE
       - name: Publish to the Maven central repository
         run: |
-          export GPG_TTY=$(tty)
-          echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}
@@ -206,7 +206,8 @@ jobs:
           git push          
           mvn -X -B release:prepare release:perform -DskipTests=true \
             -Prelease-sign-artifacts \
-            -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} \
+            -Dgpg.passphrase="${GPG_PASSPHRASE}" \
+            -Darguments="-Dgpg.passphrase='${GPG_PASSPHRASE}' -Dgpg.loopback=true" \
             -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git \
             --file ./java/pom.xml
           mv ./java/pom.xml ./java/temp-pom.xml
@@ -219,3 +220,4 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.nexus_username }}
           MAVEN_PASSWORD: ${{ secrets.nexus_password }}
+          GPG_PASSPHRASE: ${{ secrets.gpg_passphrase }}
