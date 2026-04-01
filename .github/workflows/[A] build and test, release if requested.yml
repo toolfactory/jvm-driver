@@ -189,23 +189,13 @@ jobs:
         with:
           java-version: 19
           distribution: 'zulu'
-          server-id: ossrh
+          server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
       - name: Publish to the Maven central repository
         run: |
           export GPG_TTY=$(tty)
           echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
-          mkdir -p ~/.m2
-          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-              <servers>
-                  <server>
-                      <id>central</id>
-                      <username>${{ secrets.nexus_username }}</username>
-                      <password>${{ secrets.nexus_password }}</password>
-                  </server>
-              </servers>
-          </settings>' > ~/.m2/settings.xml  
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}
@@ -214,7 +204,10 @@ jobs:
           mv ./java/temp-pom.xml ./java/sa-pom.xml
           git commit -am "Swithcing pom for releasing"
           git push          
-          mvn -B release:prepare release:perform -DskipTests=true -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git --file ./java/pom.xml
+          mvn -B release:prepare release:perform -DskipTests=true \
+            -Dgpg.passphrase="${{ secrets.gpg_passphrase }}" -Dgpg.keyname=${{ secrets.gpg_key_id }} \
+            -Drepository.url=https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git \
+            --file ./java/pom.xml
           mv ./java/pom.xml ./java/temp-pom.xml
           mv ./java/sa-pom.xml ./java/pom.xml
           mv ./java/temp-pom.xml ./java/sa-pom.xml
