@@ -201,6 +201,21 @@ jobs:
         run: |
           export GPG_TTY=$(tty)
           echo "${{ secrets.gpg_private_key }}" | gpg --batch --import
+          mkdir -p ~/.m2
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+		  mkdir -p ~/.m2
+		  echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+		          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+		          http://maven.apache.org/xsd/settings-1.0.0.xsd">
+		    <servers>
+		      <server>
+		        <id>central</id>
+		        <username>${{ secrets.nexus_username }}</username>
+		        <password>${{ secrets.nexus_password }}</password>
+		      </server>
+		    </servers>
+		  </settings>' > ~/.m2/settings.xml
           git config user.name "${{ github.event.head_commit.committer.name }}"
           git config user.email "${{ github.event.head_commit.committer.email }}"
           git pull origin ${{github.ref}}
