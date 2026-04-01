@@ -29,7 +29,7 @@
 
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver</artifactId>
-	<version>9.10.0</version>
+	<version>9.10.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
