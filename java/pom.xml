@@ -59,7 +59,7 @@
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
-		<narcissus.version>1.0.11</narcissus.version>
+		<narcissus.version>1.0.13</narcissus.version>
 	</properties>
 
 	<issueManagement>
