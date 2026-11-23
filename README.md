@@ -58,7 +58,7 @@ By default all JNI methods used by the dynamic, hybrid and native driver are sup
 * Linux (x86, x64)
 * MacOs (x64)
 
-It is also possible to replace the Narcissus JNI engine with [another fast JNI engine](https://github.com/toolfactory/narcissus/discussions/11): the one included in the [**Burningwave JVM Driver**](https://burningwave.github.io/jvm-driver/).
+It is also possible to replace the Narcissus JNI engine with [an even faster JNI engine](https://github.com/toolfactory/narcissus/discussions/11): the one included in the [**Burningwave JVM Driver**](https://burningwave.github.io/jvm-driver/).
 
 <br/>
 
