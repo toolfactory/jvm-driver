@@ -54,11 +54,17 @@ There are four kinds of driver:
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 By default all JNI methods used by the dynamic, hybrid and native driver are supplied by [**Narcissus**](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
-* Windows (x86, x64)
-* Linux (x86, x64)
-* MacOs (x64)
+* Windows (x64)
+* Linux (x64, arm64)
+* macOS (x64, arm64)
 
 It is also possible to replace the Narcissus JNI engine with [an even faster JNI engine](https://github.com/toolfactory/narcissus/discussions/11): the one included in the [**Burningwave JVM Driver**](https://burningwave.github.io/jvm-driver/).
+
+### Prefer the default driver
+
+The default driver only uses Java APIs and it is faster than the drivers that use JNI functions: the JIT compiles its operations like any other Java code, while every operation that the dynamic, hybrid and native drivers delegate to a JNI function pays the cost of a native call. In [a JMH benchmark run on JDK 18](https://github.com/toolfactory/narcissus/discussions/11) the default driver read a field at 41,581 ops/ms against the 16,982 ops/ms of the native driver, and wrote it at 37,480 ops/ms against 19,672 ops/ms.
+
+The JNI functions exist to get around the strong encapsulation of the JDK, not to be faster: use the dynamic, hybrid or native driver only when the default driver cannot be initialized on your JVM. `Driver.Factory.getNew()` already works this way, since it returns the first driver that can be initialized among the default, hybrid and native drivers.
 
 <br/>
 
