@@ -33,6 +33,11 @@ hs_err_pid*
 /java-hook/.classpath
 /java-hook/target/
 
+/narcissus-plugin/.project
+/narcissus-plugin/.settings
+/narcissus-plugin/.classpath
+/narcissus-plugin/target/
+
 /native/.project
 /native/.settings
 /native/.classpath

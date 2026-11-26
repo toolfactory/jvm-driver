@@ -44,6 +44,7 @@
 	<modules>
 		<module>java-hook</module>
 		<module>java</module>
+		<module>narcissus-plugin</module>
 	</modules>
 
 	<licenses>

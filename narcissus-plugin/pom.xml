@@ -1,0 +1,391 @@
+<!--
+	This file is part of ToolFactory JVM driver.
+
+	Hosted at: https://github.com/toolfactory/jvm-driver
+
+	- -
+
+	The MIT License (MIT)
+
+	Copyright (c) 2021 Luke Hutchison, Roberto Gentili
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+	documentation files (the "Software"), to deal in the Software without restriction, including without
+	limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+	the Software, and to permit persons to whom the Software is furnished to do so, subject to the following
+	conditions:
+
+	The above copyright notice and this permission notice shall be included in all copies or substantial
+	portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+	EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+	OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<!--
+	The plugin that makes ToolFactory JVM Driver use Narcissus as native engine.
+
+	This POM has no parent, unlike java/pom.xml: the release builds it as it is, without swapping it with a standalone
+	copy. Its tests are the ones of the java module, run with the engine of this plugin.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.github.toolfactory</groupId>
+	<artifactId>jvm-driver-narcissus-plugin</artifactId>
+	<version>10.0.0-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+
+	<name>ToolFactory JVM Driver - Narcissus plugin</name>
+	<description>
+		A plugin that makes ToolFactory JVM Driver use Narcissus as JNI engine
+	</description>
+	<url>https://toolfactory.github.io/jvm-driver/</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://github.com/toolfactory/jvm-driver/blob/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>ToolFactory</name>
+		<url>https://github.com/toolfactory</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<name>Luke Hutchison</name>
+			<id>lukehutch</id>
+			<email>tool.factory.heads@gmail.com</email>
+			<organization>ToolFactory</organization>
+			<organizationUrl>https://github.com/toolfactory</organizationUrl>
+			<roles>
+				<role>Administrator</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Roberto Gentili</name>
+			<id>roberto.gentili</id>
+			<email>tool.factory.heads@gmail.com</email>
+			<organization>ToolFactory</organization>
+			<organizationUrl>https://github.com/toolfactory</organizationUrl>
+			<roles>
+				<role>Administrator</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<properties>
+		<copyright.holder>Luke Hutchison, Roberto Gentili</copyright.holder>
+		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project_jdk_version>7</project_jdk_version>
+		<javadocExecutable.relativePath>bin/javadoc</javadocExecutable.relativePath>
+		<skipTests>true</skipTests>
+		<project.test.testSuite>AllTestsSuite</project.test.testSuite>
+		<project.test.includes>**/${project.test.testSuite}.java</project.test.includes>
+		<project.test.excludes>**/*Test.java</project.test.excludes>
+		<repository.url>https://toolfactory@github.com/toolfactory/jvm-driver.git</repository.url>
+
+		<!-- The release sets it to the version of ToolFactory JVM Driver just released, then back to the snapshot -->
+		<jvm-driver.version>10.0.0-SNAPSHOT</jvm-driver.version>
+		<narcissus.version>1.0.13</narcissus.version>
+
+		<build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+		<central-publishing-maven-plugin.version>0.8.0</central-publishing-maven-plugin.version>
+		<junit-jupiter.version>5.10.0</junit-jupiter.version>
+		<junit.version>1.10.0</junit.version>
+		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+		<maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
+	</properties>
+
+	<issueManagement>
+		<system>github.com</system>
+		<url>https://github.com/toolfactory/jvm-driver/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:${repository.url}</connection>
+		<developerConnection>scm:git:${repository.url}</developerConnection>
+		<url>https://github.com/toolfactory/jvm-driver</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>io.github.toolfactory</groupId>
+			<artifactId>jvm-driver</artifactId>
+			<version>${jvm-driver.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.toolfactory</groupId>
+			<artifactId>narcissus</artifactId>
+			<version>${narcissus.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-engine</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-commons</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/../</directory>
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+				<targetPath>META-INF</targetPath>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>${build-helper-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<!-- The tests of the java module, which this module runs with the engine of the plugin -->
+						<id>add-tests-of-the-java-module</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.basedir}/../java/src/test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>${maven-antrun-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>add-module-info-to-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<jar update="true" destfile="${project.build.directory}/${project.build.finalName}.jar">
+									<zipfileset prefix="META-INF/versions/9" dir="${project.build.outputDirectory}" includes="module-info.class" />
+								</jar>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<configuration>
+							<!-- Compiles everything, so that module-info sees the package that it exports -->
+							<release>9</release>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-testCompile</id>
+						<configuration>
+							<testExcludes>
+								<testExclude>module-info.java</testExclude>
+							</testExcludes>
+							<release>${project_jdk_version}</release>
+						</configuration>
+					</execution>
+					<execution>
+						<id>base-compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<!-- Compiles everything again for the target JVM, except module-info -->
+						<configuration>
+							<excludes>
+								<exclude>module-info.java</exclude>
+							</excludes>
+							<source>${project_jdk_version}</source>
+							<target>${project_jdk_version}</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<skipTests>${skipTests}</skipTests>
+					<excludes>
+						<exclude>${project.test.excludes}</exclude>
+					</excludes>
+					<includes>
+						<include>${project.test.includes}</include>
+					</includes>
+					<useModulePath>false</useModulePath>
+					<systemPropertyVariables>
+						<!-- The engine that NativeEngineTest expects -->
+						<jvm-driver.test.native-engine.class>io.github.toolfactory.jvm.narcissus.NarcissusEngine</jvm-driver.test.native-engine.class>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>module-info.class</exclude>
+						<exclude>META-INF/maven/</exclude>
+					</excludes>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<built-by>${project.organization.name}</built-by>
+							<!-- module-info.class is in META-INF/versions/9 -->
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+				<configuration>
+					<javadocExecutable>${java.home}/${javadocExecutable.relativePath}</javadocExecutable>
+					<encoding>UTF-8</encoding>
+					<source>${project_jdk_version}</source>
+					<doclint>none</doclint>
+					<failOnError>false</failOnError>
+					<additionalOptions>
+						<additionalOption>-Xdoclint:none</additionalOption>
+					</additionalOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>${central-publishing-maven-plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<autoPublish>true</autoPublish>
+					<waitUntil>uploaded</waitUntil>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- GPG signature on release -->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+								<configuration>
+									<excludes>
+										<exclude>**/*.zip</exclude>
+									</excludes>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
