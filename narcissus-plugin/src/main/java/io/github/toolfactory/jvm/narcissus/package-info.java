@@ -1,0 +1,36 @@
+/*
+ * This file is part of ToolFactory JVM driver.
+ *
+ * Hosted at: https://github.com/toolfactory/jvm-driver
+ *
+ * --
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2021 Luke Hutchison, Roberto Gentili
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without
+ * limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+ * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+ * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+ * OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+/**
+ * The Narcissus plugin of ToolFactory JVM Driver, which makes the drivers use
+ * <a href="https://github.com/toolfactory/narcissus">Narcissus</a>, the JNI engine used before version 10.0.0,
+ * instead of the default {@link io.github.toolfactory.jvm.BurningwaveEngine}.
+ * <p>
+ * The plugin contains a {@code jvm-driver.properties} file with priority 1 that sets the {@code native-engine.class}
+ * property to {@link NarcissusEngine}: adding the plugin to the class path, or requiring its module
+ * {@code io.github.toolfactory.jvm.narcissus} on the module path, is enough.
+ */
+package io.github.toolfactory.jvm.narcissus;

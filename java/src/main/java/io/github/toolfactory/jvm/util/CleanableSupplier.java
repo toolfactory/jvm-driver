@@ -28,8 +28,19 @@ package io.github.toolfactory.jvm.util;
 
 import io.github.toolfactory.jvm.function.template.Supplier;
 
+/**
+ * A supplier whose value can be cleared, such as the one returned by
+ * {@link io.github.toolfactory.jvm.Driver#getLoadedClassesRetriever(ClassLoader)}.
+ *
+ * @param <T> the type of the supplied value
+ */
 public interface CleanableSupplier<T> extends Supplier<T> {
 
+	/**
+	 * Clears the supplied value: what this means depends on the supplier, for example the one returned by
+	 * {@link io.github.toolfactory.jvm.Driver#getLoadedClassesRetriever(ClassLoader)} empties the collection of the
+	 * classes.
+	 */
 	public void clear();
 
 }

@@ -51,6 +51,20 @@ import io.github.toolfactory.jvm.function.catalog.StopThreadFunction;
 import io.github.toolfactory.jvm.function.catalog.ThrowExceptionFunction;
 
 
+/**
+ * The default driver, completely based on Java APIs: it uses no JNI function.
+ * <p>
+ * Some of its functions use {@code sun.misc.Unsafe}: the allocation of the instances, the reading and the writing
+ * of the fields, the retrieval of the classes and of the packages of the class loaders and, up to Java 16, the
+ * definition of the hook classes. From Java 17, and from Java 9 on IBM Semeru, it also writes through
+ * {@code sun.misc.Unsafe} the access modes of the lookup with full access on which the other functions are built.
+ * <p>
+ * It is faster than the drivers that use JNI functions, since the JIT compiles its operations like any other Java
+ * code, while every operation delegated to a JNI function pays the cost of a native call: prefer it, and use the
+ * other drivers only when it cannot be initialized on your JVM. The {@linkplain DynamicDriver dynamic},
+ * {@linkplain HybridDriver hybrid} and {@linkplain NativeDriver native} drivers extend it and replace some of its
+ * functions with the ones based on the {@link NativeEngine}.
+ */
 public class DefaultDriver extends DriverAbst {
 
 	@Override

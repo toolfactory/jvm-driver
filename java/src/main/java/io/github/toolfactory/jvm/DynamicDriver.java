@@ -42,6 +42,19 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
+/**
+ * A driver that extends the {@linkplain DefaultDriver default driver} and uses a JNI function only if a Java based
+ * function of the default driver cannot be initialized, or if the memory-access methods of {@code sun.misc.Unsafe}
+ * are not available.
+ * <p>
+ * The functions that it can replace are the ones that the {@linkplain NativeDriver native driver} bases on the
+ * {@link NativeEngine}: the allocation of the instances, the reading and the writing of the fields, the setting of the
+ * accessible flag, the retrieval of the classes and of the packages of the class loaders, and the lookups with full
+ * access on which the other functions are built. It replaces each of them with the version of the native driver when
+ * its Java based version cannot be initialized on the running JVM, and all of them when the memory-access methods of
+ * {@code sun.misc.Unsafe} are not available (see {@link #isUnsafeMemoryAccessAvailable(Map)}), because they are
+ * disabled with {@code --sun-misc-unsafe-memory-access=deny} or, in the future, removed from the JDK (JEP 471).
+ */
 public class DynamicDriver extends DefaultDriver {
 
 	@Override
@@ -99,6 +112,18 @@ public class DynamicDriver extends DefaultDriver {
 		return context;
 	}
 
+	/**
+	 * Tells whether the memory-access methods of {@code sun.misc.Unsafe} work on the running JVM, by calling its
+	 * method {@code objectFieldOffset} on a field of a private class.
+	 * <p>
+	 * When they do not work, {@link #functionsToMap()} marks the functions that have a version in the native driver,
+	 * so that they are built in that version: some Java based functions call those methods only when they are used,
+	 * so their initialization would not fail. When they work, each of those functions is replaced only if it cannot
+	 * be initialized.
+	 *
+	 * @param context the context in which the functions are built, from which {@code sun.misc.Unsafe} is obtained
+	 * @return {@code true} if {@code sun.misc.Unsafe} can be obtained and its method {@code objectFieldOffset} works
+	 */
 	protected boolean isUnsafeMemoryAccessAvailable(Map<Object, Object> context) {
 		try {
 			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();

@@ -30,6 +30,10 @@ package io.github.toolfactory.jvm;
 import java.lang.reflect.Method;
 
 
+/**
+ * The implementation of {@link Info} supplied by {@link Info.Provider}: its public fields hold the values read from
+ * the JVM when the instance is created.
+ */
 public class InfoImpl implements Info {
 
     public String osArch;

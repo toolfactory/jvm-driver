@@ -36,8 +36,8 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 /**
  * The native engine based on <a href="https://github.com/toolfactory/narcissus">Narcissus</a>, the JNI engine used
- * by ToolFactory JVM Driver before version 10.0.0, whose native libraries support Windows (x64), Linux (x64, arm64)
- * and macOS (x64, arm64).
+ * by ToolFactory JVM Driver before version 10.0.0, whose native libraries support Windows (x64, arm64), Linux (x64,
+ * arm64) and macOS (x64, arm64).
  * <p>
  * The {@code jvm-driver.properties} file of this artifact makes the drivers use this engine instead of the default
  * one: putting the artifact in the class path, or requiring its module, is enough.

@@ -35,6 +35,15 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
+/**
+ * A driver that extends the {@linkplain DefaultDriver default driver} and uses some JNI functions only when run on
+ * JVM 17 and later.
+ * <p>
+ * From Java 17 it writes through the {@link NativeEngine} the access modes of the lookups with full access on which
+ * the other functions are built, which the default driver writes through {@code sun.misc.Unsafe} at a fixed memory
+ * offset. Its other functions are the ones of the default driver, so it still uses {@code sun.misc.Unsafe}, and before
+ * Java 17 it works exactly like the default driver.
+ */
 @SuppressWarnings("unchecked")
 public class HybridDriver extends DefaultDriver {
 

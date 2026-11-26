@@ -43,14 +43,21 @@ import io.github.toolfactory.jvm.util.Strings;
  * modifiers and the encapsulation of the modules.
  * <p>
  * The engine is chosen through the {@value #ENGINE_CLASS_PROPERTY} property of the {@code jvm-driver.properties} files
- * found in the class path, merged according to their {@code priority-of-this-configuration} property, as the classes
- * of the drivers are: ToolFactory JVM Driver sets it to {@link BurningwaveEngine}, with priority 0, and the
- * {@code jvm-driver-narcissus-plugin} artifact to the engine based on Narcissus, with priority 1. The engine is
- * created the first time that {@link #getInstance()} is called and the same instance is used by all the drivers.
- * If the chosen engine cannot be created no other engine is tried: {@link #getInstance()} throws an
- * {@link InitializeException}, so the native functions, and the drivers that need them, cannot be initialized.
+ * found through the class loader of this class and the context class loader of the current thread, merged according
+ * to their {@code priority-of-this-configuration} property, as the classes of the drivers are (see
+ * {@link Driver.Factory}): ToolFactory JVM Driver sets it to {@link BurningwaveEngine}, with priority 0, and the
+ * {@code jvm-driver-narcissus-plugin} artifact to the engine based on Narcissus, with priority 1. If no file sets it,
+ * the engine is {@link BurningwaveEngine}. The engine is created the first time that {@link #getInstance()} is called
+ * and the same instance is used by all the drivers. If the chosen engine cannot be created no other engine is tried:
+ * {@link #getInstance()} throws an {@link InitializeException}, so the native functions, and the drivers that need
+ * them, cannot be initialized.
  * <p>
- * A class that extends this one must be public and must have a public constructor without parameters.
+ * On JDK 24 and later the JVM prints a warning when an engine loads its native library, and a future JDK release will
+ * block it, unless native access is enabled for the module of the engine: for example with
+ * {@code --enable-native-access=ALL-UNNAMED} on the class path.
+ * <p>
+ * A class that extends this one must be public and must have a public constructor without parameters: on the module
+ * path, its module must export its package, at least to the module {@code io.github.toolfactory.jvm}.
  */
 public abstract class NativeEngine {
 	/**

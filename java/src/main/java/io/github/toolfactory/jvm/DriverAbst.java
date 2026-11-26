@@ -74,6 +74,17 @@ import io.github.toolfactory.jvm.util.CleanableSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 
 
+/**
+ * The base class of the drivers: it implements the methods of {@link Driver} through the functions of the catalog in
+ * the package {@code io.github.toolfactory.jvm.function.catalog}, which an {@link ObjectProvider} builds by choosing,
+ * for each of them, the implementation for the running JVM.
+ * <p>
+ * A subclass chooses the class of each function through the abstract {@code get...FunctionClass()} methods, and can
+ * change how the functions are built by overriding {@link #functionsToMap()}, which returns the context in which they
+ * are built: the dynamic, hybrid and native drivers set there an {@link ObjectProvider.ExceptionHandler} that
+ * replaces some functions with their JNI versions. Each function is built the first time that it is needed, or by
+ * {@link #init()}, and released by {@link #close()}.
+ */
 @SuppressWarnings({"unchecked"})
 public abstract class DriverAbst implements Driver {
 

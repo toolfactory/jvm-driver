@@ -34,8 +34,11 @@ import org.burningwave.jni.Executor;
 
 /**
  * The default native engine: it is based on {@code org.burningwave.jni.Executor}, the JNI engine of Burningwave
- * supplied by the {@code org.burningwave:jni-executor} artifact, whose native libraries support Windows (x86, x64),
- * Linux (x86, x64, aarch64) and macOS (x64, aarch64).
+ * supplied by the {@code org.burningwave:jni-executor} artifact, whose native libraries support Windows (x86, x64,
+ * aarch64), Linux (x86, x64, aarch64) and macOS (x64, aarch64).
+ * <p>
+ * On the module path it needs the module {@code org.burningwave.jni}, which the module of ToolFactory JVM Driver
+ * requires only statically: add {@code requires org.burningwave.jni;} to your {@code module-info.java}.
  */
 public class BurningwaveEngine extends NativeEngine {
 	private final Executor executor;
@@ -43,6 +46,9 @@ public class BurningwaveEngine extends NativeEngine {
 
 	/**
 	 * Creates the engine, loading the native library of the current platform if it has not been loaded yet.
+	 *
+	 * @throws LinkageError if the native library of the current platform cannot be loaded: an
+	 * {@link ExceptionInInitializerError} the first time, a {@link NoClassDefFoundError} afterwards
 	 */
 	public BurningwaveEngine() {
 		executor = Executor.getInstance();

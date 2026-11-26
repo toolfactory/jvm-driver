@@ -26,14 +26,33 @@
  */
 package io.github.toolfactory.jvm.function;
 
+/**
+ * Thrown when the JNI engine cannot be created: {@link io.github.toolfactory.jvm.NativeEngine#getInstance()} throws
+ * it, and so do the constructors of the functions of the catalog that use the engine.
+ * <p>
+ * A driver that cannot be initialized for this reason throws a
+ * {@link io.github.toolfactory.jvm.Driver.InitializeException}, which is a different, unchecked exception, whose
+ * chain of causes contains this one.
+ */
 public class InitializeException extends Exception {
 
 	private static final long serialVersionUID = 5712614840976686057L;
 
+	/**
+	 * Creates the exception.
+	 *
+	 * @param message the message of the exception
+	 * @param cause the cause of the exception
+	 */
 	public InitializeException(String message, Throwable cause) {
         super(message, cause);
     }
 
+	/**
+	 * Creates the exception.
+	 *
+	 * @param message the message of the exception
+	 */
 	public InitializeException(String message) {
         super(message);
     }

@@ -144,7 +144,7 @@ public interface SetFieldValueFunction extends TriConsumer<Object, Field, Object
 
 	}
 
-	/** Added from version 9.9.0 and it is not necessary
+	/* Added from version 9.9.0 and it is not necessary
 	public static class ForJava25 extends ForJava7 {
 		protected ThrowExceptionFunction throwExceptionFunction;
 		protected Field modifiersField;

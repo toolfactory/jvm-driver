@@ -41,6 +41,17 @@ import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
 
+/**
+ * A driver that extends the {@linkplain DefaultDriver default driver} and uses JNI functions more consistently,
+ * regardless of the Java version it is running on.
+ * <p>
+ * Through the {@link NativeEngine} it allocates the instances, reads and writes the fields, makes the members
+ * accessible from Java 9, reads the classes and the packages of the class loaders, and writes the access modes of the
+ * lookups with full access on which the other functions are built. Its other functions are the ones of the default
+ * driver: among them, up to Java 16, {@link #defineHookClass(Class, byte[])} uses {@code sun.misc.Unsafe}. From Java
+ * 17 it does not use {@code sun.misc.Unsafe} at all, so it also works when the memory-access methods of
+ * {@code sun.misc.Unsafe} are not available.
+ */
 @SuppressWarnings({"unchecked"})
 public class NativeDriver extends DefaultDriver {
 
