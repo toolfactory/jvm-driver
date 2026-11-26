@@ -30,11 +30,10 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Strings;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -65,6 +64,7 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 
 		public static class ForJava7 implements Native {
 			Field packagesField;
+			protected NativeEngine nativeEngine;
 
 			public ForJava7(Map<Object, Object> context) throws Throwable {
 				checkNativeEngine();
@@ -74,19 +74,12 @@ public interface GetLoadedPackagesFunction extends Function<ClassLoader, Map<Str
 			}
 			
 			protected void checkNativeEngine() throws InitializeException {
-				if (!Narcissus.libraryLoaded) {
-					throw new InitializeException(
-						Strings.compile(
-							"Could not initialize the native engine {}", 
-							io.github.toolfactory.narcissus.Narcissus.class.getName()
-						)
-					);
-				}
+				nativeEngine = NativeEngine.getInstance();
 			}
 			
 			@Override
 			public Map<String, ?> apply(ClassLoader classLoader) {
-				return (Map<String, ?>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, packagesField);
+				return (Map<String, ?>)nativeEngine.getFieldValue(classLoader, packagesField);
 			}
 		}
 

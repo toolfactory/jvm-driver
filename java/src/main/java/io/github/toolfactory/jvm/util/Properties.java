@@ -57,7 +57,7 @@ public class Properties {
 			    String propValue = props.getProperty(propertyName);
 			    if (propValue != null && !propValue.trim().isEmpty()) {
 			    	try {
-						orderedProperties.put(stringToBigDecimal(propValue, decimalFormat), props);
+						putOrMerge(orderedProperties, stringToBigDecimal(propValue, decimalFormat), props);
 					} catch (ParseException exc) {
 						throw new IllegalArgumentException(
 							Strings.compile(
@@ -122,7 +122,7 @@ public class Properties {
 	    		properties.putAll(otherValueMap);
 			    if (propValue != null && !propValue.trim().isEmpty()) {
 			    	try {
-						orderedProperties.put(stringToBigDecimal(propValue, decimalFormat), properties);
+						putOrMerge(orderedProperties, stringToBigDecimal(propValue, decimalFormat), properties);
 					} catch (ParseException exc) {
 						throw new IllegalArgumentException(
 							Strings.compile(
@@ -149,8 +149,23 @@ public class Properties {
 				currentMinPriority = orderedProperties.firstKey();
 			}
 			for (java.util.Properties props : propertiesWithoutPriority) {
-				orderedProperties.put(currentMinPriority.subtract(new BigDecimal(1)), props);
+				putOrMerge(orderedProperties, currentMinPriority.subtract(new BigDecimal(1)), props);
 			}
+		}
+	}
+
+
+	//The files with the same priority are merged: before version 10.0.0 only one of them was kept
+	private static void putOrMerge(
+		Map<BigDecimal, java.util.Properties> orderedProperties,
+		BigDecimal priority,
+		java.util.Properties properties
+	) {
+		java.util.Properties propertiesWithSamePriority = orderedProperties.get(priority);
+		if (propertiesWithSamePriority == null) {
+			orderedProperties.put(priority, properties);
+		} else {
+			propertiesWithSamePriority.putAll(properties);
 		}
 	}
 

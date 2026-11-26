@@ -35,12 +35,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Function;
 import io.github.toolfactory.jvm.util.CleanableSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Strings;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -196,6 +195,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 		public static class ForJava7 implements Native {
 			protected Field classesField;
+			protected NativeEngine nativeEngine;
 
 			public ForJava7(Map<Object, Object> context) throws Throwable {
 				checkNativeEngine();
@@ -205,14 +205,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 			}
 			
 			protected void checkNativeEngine() throws InitializeException {
-				if (!Narcissus.libraryLoaded) {
-					throw new InitializeException(
-						Strings.compile(
-							"Could not initialize the native engine {}", 
-							io.github.toolfactory.narcissus.Narcissus.class.getName()
-						)
-					);
-				}
+				nativeEngine = NativeEngine.getInstance();
 			}
 			
 			@Override
@@ -228,7 +221,7 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 						if (classes != null) {
 							return classes;
 						}
-						return classes = (Collection<Class<?>>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classesField);
+						return classes = (Collection<Class<?>>)nativeEngine.getFieldValue(classLoader, classesField);
 					}
 
 					@Override
@@ -250,20 +243,30 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 				@Override
 				protected ClassNameBasedLockSupplier buildClassNameBasedLockSupplier(final Map<Object, Object> context) {
+					final NativeEngine nativeEngine = retrieveNativeEngine(context);
 					return new ClassNameBasedLockSupplier() {
 
 						@Override
 						public Hashtable<String, Object> get(ClassLoader classLoader) {
-							return (Hashtable<String, Object>)io.github.toolfactory.narcissus.Narcissus.getField(classLoader, classNameBasedLockField);
+							return (Hashtable<String, Object>)nativeEngine.getFieldValue(classLoader, classNameBasedLockField);
 						}
 
 						@Override
 						protected ClassLoader getClassLoader(Class<?> cls) {
-							return (ClassLoader)io.github.toolfactory.narcissus.Narcissus.getField(cls, classLoaderField);
+							return (ClassLoader)nativeEngine.getFieldValue(cls, classLoaderField);
 						}
 
 					};
 
+				}
+
+				//This method is called by the constructor of the superclass, so it cannot store the engine in a field
+				protected NativeEngine retrieveNativeEngine(Map<Object, Object> context) {
+					try {
+						return NativeEngine.getInstance();
+					} catch (InitializeException exc) {
+						return ObjectProvider.get(context).getOrBuildObject(ThrowExceptionFunction.class, context).apply(exc);
+					}
 				}
 
 			}

@@ -36,11 +36,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import io.github.toolfactory.jvm.Info;
+import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Supplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Strings;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -203,6 +202,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 	public static interface Native extends ConsulterSupplier {
 
 		public abstract static class Abst extends ConsulterSupplier.Abst {
+			protected NativeEngine nativeEngine;
 
 			public Abst(Map<Object, Object> context) throws InitializeException {
 				super(context);
@@ -210,14 +210,7 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 			}
 
 			protected void checkNativeEngine() throws InitializeException {
-				if (!Narcissus.libraryLoaded) {
-					throw new InitializeException(
-						Strings.compile(
-							"Could not initialize the native engine {}",
-							io.github.toolfactory.narcissus.Narcissus.class.getName()
-						)
-					);
-				}
+				nativeEngine = NativeEngine.getInstance();
 			}
 
 		}
@@ -226,9 +219,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 			public ForJava7(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
 				super(context);
-				io.github.toolfactory.narcissus.Narcissus.setField(
+				nativeEngine.setFieldValue(
 					consulter,
-					io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"),
+					nativeEngine.getDeclaredField(consulter.getClass(), "allowedModes", int.class),
 					ConsulterSupplier.ForJava7.TRUSTED
 				);
 
@@ -238,9 +231,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, InitializeException {
 					super(context);
-					io.github.toolfactory.narcissus.Narcissus.setField(
+					nativeEngine.setFieldValue(
 						consulter,
-						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
+						nativeEngine.getDeclaredField(consulter.getClass(), "accessMode", int.class),
 						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED
 					);
 
@@ -254,9 +247,9 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 				public ForSemeru(Map<Object, Object> context) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InitializeException {
 					super(context);
-					io.github.toolfactory.narcissus.Narcissus.setField(
+					nativeEngine.setFieldValue(
 						consulter,
-						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "accessMode"),
+						nativeEngine.getDeclaredField(consulter.getClass(), "accessMode", int.class),
 						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava7.ForSemeru.INTERNAL_PRIVILEGED |
 						io.github.toolfactory.jvm.function.catalog.ConsulterSupplier.ForJava9.ForSemeru.MODULE
 					);

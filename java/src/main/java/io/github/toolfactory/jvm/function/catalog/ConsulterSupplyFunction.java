@@ -32,6 +32,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Streams;
@@ -136,9 +137,10 @@ public interface ConsulterSupplyFunction extends ThrowingFunction<Class<?>, Meth
 
 				@Override
 				protected void empowerMainConsulter(MethodHandles.Lookup consulter, Map<Object, Object> context) throws Throwable {
-					io.github.toolfactory.narcissus.Narcissus.setField(
+					NativeEngine nativeEngine = NativeEngine.getInstance();
+					nativeEngine.setFieldValue(
 						consulter,
-						io.github.toolfactory.narcissus.Narcissus.findField(consulter.getClass(), "allowedModes"),
+						nativeEngine.getDeclaredField(consulter.getClass(), "allowedModes", int.class),
 						-1
 					);
 				}
