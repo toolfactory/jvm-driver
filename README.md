@@ -46,7 +46,7 @@ requires io.github.toolfactory.jvm;
 
 ## What's new in version 10.0.0
 
-* The dynamic, hybrid and native drivers use a new default JNI engine: [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), supplied by the `org.burningwave:jni-executor` artifact, which supports more platforms than Narcissus and [is faster](https://github.com/toolfactory/narcissus/discussions/11). [**Narcissus**](https://toolfactory.github.io/narcissus/) is no longer a dependency of ToolFactory JVM Driver: to keep using it, [add the Narcissus plugin](#going-back-to-narcissus).
+* The dynamic, hybrid and native drivers use a new default JNI engine, [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), supplied by the `org.burningwave:jni-executor` artifact: the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)), and the engine also supports more platforms. [**Narcissus**](https://toolfactory.github.io/narcissus/) is no longer a dependency of ToolFactory JVM Driver, but it is still supported: see [Going back to Narcissus](#going-back-to-narcissus).
 * The JNI engine is no longer bound to the drivers: the drivers use the engine chosen through the `native-engine.class` property of the `jvm-driver.properties` files, an implementation of the new abstract class [`io.github.toolfactory.jvm.NativeEngine`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/main/java/io/github/toolfactory/jvm/NativeEngine.java). If the chosen engine cannot be loaded, the drivers that need it cannot be initialized: no other engine is tried.
 * On the module path, the dynamic, hybrid and native drivers need `requires org.burningwave.jni;` instead of `requires io.github.toolfactory.narcissus;`.
 * The `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged: before, only one of them was used.
@@ -89,12 +89,12 @@ There are four kinds of driver:
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
-By default all JNI methods used by the dynamic, hybrid and native driver are supplied by [the JNI engine of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor) that works on the following system configurations:
+All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)). The Burningwave engine works on the following system configurations:
 * Windows (x86, x64)
 * Linux (x86, x64, aarch64)
 * macOS (x64, aarch64)
 
-They can be supplied by [**Narcissus**](https://toolfactory.github.io/narcissus/) instead, through [the Narcissus plugin](#going-back-to-narcissus): Narcissus 1.0.13 works on Windows (x64), Linux (x64, arm64) and macOS (x64, arm64).
+Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#going-back-to-narcissus) to your dependencies. Narcissus 1.0.13 works on Windows (x64), Linux (x64, arm64) and macOS (x64, arm64).
 
 ### Prefer the default driver
 
@@ -202,6 +202,8 @@ public <T> T throwException(Throwable exception);
 
 <br/>
 
+
+If you need a complete reflection engine and not only the driver, see [**Burningwave Reflection**](https://burningwave.github.io/reflection/): it handles the private and all the other members of an object, gets and sets the properties of Java beans through paths, and uses the JVM Driver only if it is in the class path.
 
 In the [test folder](https://github.com/toolfactory/jvm-driver/tree/main/java/src/test/java/io/github/toolfactory/util) is also present a little utility class named [`io.github.toolfactory.util.Reflection`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/test/java/io/github/toolfactory/util/Reflection.java) that can be copied into your project and that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
 
