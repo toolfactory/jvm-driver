@@ -88,7 +88,7 @@ There are four kinds of driver:
 * the **default driver** completely based on Java api
 * the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
-* the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
+* the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)). The Burningwave engine works on the following system configurations:
 * Windows (x86, x64)
@@ -109,7 +109,7 @@ The JNI functions exist to get around the strong encapsulation of the JDK, not t
 
 To create a driver instance you should use this code:
 ```java
-io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.getNew();
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNew();
 ```
 
 The driver type returned by the method `io.github.toolfactory.jvm.Driver.Factory.getNew()` is **the first driver that can be initialized among the default, hybrid and native drivers respectively**.
@@ -142,7 +142,7 @@ io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Facto
 
 <br/>
 
-Each functionality offered by the driver is **initialized in deferred way** at the first call if the driver is not obtained through the method `io.github.toolfactory.jvm.Driver.getNew()`. However, it is possible to initialize all of the functionalities at once by calling the method `Driver.init()`.
+Each functionality offered by the driver is **initialized in deferred way** at the first call if the driver is not obtained through the method `io.github.toolfactory.jvm.Driver.Factory.getNew()`. However, it is possible to initialize all of the functionalities at once by calling the method `Driver.init()`.
 
 The methods exposed by the Driver interface are the following:
 ```java
