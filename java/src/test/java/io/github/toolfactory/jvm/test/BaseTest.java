@@ -317,7 +317,9 @@ abstract class BaseTest {
 						try {
 							Thread.sleep(500);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							//From Java 20 the driver interrupts the thread instead of stopping it
+							log(Thread.currentThread().getName() + " interrupted");
+							return;
 						}
 					}
 				}
@@ -326,8 +328,9 @@ abstract class BaseTest {
 			thread.start();
 			Thread.sleep(5000);
 			getReflection().getDriver().stop(thread);
-			Thread.sleep(2000);
+			thread.join(2000);
 			log(thread + " - " + thread.getState());
+			assertTrue(!thread.isAlive());
 		} catch (Throwable exc) {
 			exc.printStackTrace();
 			getReflection().getDriver().throwException(exc);

@@ -414,12 +414,12 @@ public interface Driver extends Closeable {
 	 * Stops a thread.
 	 * <p>
 	 * Up to Java 19 it invokes the private method {@code Thread.stop0(Object)}, or {@code Thread.stopImpl(Throwable)}
-	 * on IBM Semeru, with a {@code ThreadDeath}, as {@code Thread.stop()} did. From Java 20, where that method no
-	 * longer exists, it invokes the private method {@code Thread.interrupt0()}, which neither stops the thread nor
-	 * sets its interrupt status.
+	 * on IBM Semeru, with a {@code ThreadDeath}, as {@code Thread.stop()} did. From Java 20, where a thread can no
+	 * longer be stopped, it interrupts the thread with {@link Thread#interrupt()}: the thread ends only if its code
+	 * handles the interruption.
 	 *
 	 * @param thread the thread to stop
-	 * @deprecated stopping a thread is inherently unsafe, and from Java 20 this method does not stop it
+	 * @deprecated stopping a thread is inherently unsafe, and from Java 20 this method only interrupts the thread
 	 */
 	@Deprecated(since="9.4.0")
 	public void stop(Thread thread);

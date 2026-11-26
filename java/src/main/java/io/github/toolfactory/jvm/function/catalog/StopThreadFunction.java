@@ -84,7 +84,9 @@ public interface StopThreadFunction extends ThrowingBiConsumer<Thread, Throwable
 
 		@Override
 		protected Method retrieveStopThreadMethod() throws NoSuchMethodException, SecurityException {
-			return Thread.class.getDeclaredMethod("interrupt0");
+			//From Java 20 a thread can no longer be stopped: Thread.interrupt() is the closest operation, while
+			//Thread.interrupt0() only woke the thread up, without setting its interrupt status
+			return Thread.class.getDeclaredMethod("interrupt");
 		}
 
 		@Override
