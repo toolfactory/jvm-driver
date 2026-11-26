@@ -91,11 +91,13 @@ There are four kinds of driver:
 * the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)). The Burningwave engine works on the following system configurations:
-* Windows (x86, x64)
+* Windows (x86, x64, aarch64)
 * Linux (x86, x64, aarch64)
 * macOS (x64, aarch64)
 
 Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#going-back-to-narcissus) to your dependencies. Narcissus 1.0.14 works on Windows (x64, arm64), Linux (x64, arm64) and macOS (x64, arm64).
+
+On JDK 24 and later the JVM prints a warning when a JNI engine loads its native library, and a future JDK release will block it unless native access is enabled. To enable it, start the JVM with `--enable-native-access=ALL-UNNAMED` or, on the module path, with the name of the module of the engine (`--enable-native-access=org.burningwave.jni` or `--enable-native-access=io.github.toolfactory.narcissus`); for an executable jar you can instead add `Enable-Native-Access: ALL-UNNAMED` to its manifest.
 
 ### Prefer the default driver
 
