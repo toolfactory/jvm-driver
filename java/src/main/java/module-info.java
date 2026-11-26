@@ -28,9 +28,10 @@ module io.github.toolfactory.jvm {
 	
     requires java.base;
     requires static jdk.unsupported;
-    requires static io.github.toolfactory.narcissus;
+    requires static org.burningwave.jni;
 	
     exports io.github.toolfactory.jvm;
+    exports io.github.toolfactory.jvm.function;
     exports io.github.toolfactory.jvm.function.catalog;
     exports io.github.toolfactory.jvm.function.template;
     exports io.github.toolfactory.jvm.util;

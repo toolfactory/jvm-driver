@@ -29,11 +29,10 @@ package io.github.toolfactory.jvm.function.catalog;
 
 import java.util.Map;
 
+import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.ThrowingFunction;
 import io.github.toolfactory.jvm.util.ObjectProvider;
-import io.github.toolfactory.jvm.util.Strings;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("all")
@@ -57,25 +56,19 @@ public interface AllocateInstanceFunction extends ThrowingFunction<Class<?>, Obj
 	public static interface Native extends AllocateInstanceFunction {
 
 		public static class ForJava7 implements Native {
+			protected NativeEngine nativeEngine;
 
 			public ForJava7(Map<Object, Object> context) throws InitializeException {
 				checkNativeEngine();
 			}
 			
 			protected void checkNativeEngine() throws InitializeException {
-				if (!Narcissus.libraryLoaded) {
-					throw new InitializeException(
-						Strings.compile(
-							"Could not initialize the native engine {}", 
-							io.github.toolfactory.narcissus.Narcissus.class.getName()
-						)
-					);
-				}
+				nativeEngine = NativeEngine.getInstance();
 			}
 			
 			@Override
 			public Object apply(Class<?> cls) {
-				return io.github.toolfactory.narcissus.Narcissus.allocateInstance(cls);
+				return nativeEngine.allocateInstance(cls);
 			}
 
 		}

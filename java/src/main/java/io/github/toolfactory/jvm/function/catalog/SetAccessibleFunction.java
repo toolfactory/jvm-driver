@@ -30,16 +30,16 @@ package io.github.toolfactory.jvm.function.catalog;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.ThrowingBiConsumer;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.Streams;
-import io.github.toolfactory.jvm.util.Strings;
 import io.github.toolfactory.jvm.util.ThrowingBiConsumerAdapter;
-import io.github.toolfactory.narcissus.Narcissus;
 
 
 @SuppressWarnings("unchecked")
@@ -135,32 +135,25 @@ public interface SetAccessibleFunction extends ThrowingBiConsumer<AccessibleObje
 		}
 
 		public static class ForJava9 extends Abst<ThrowingBiConsumer<AccessibleObject, Boolean, Throwable>> implements Native {
+			protected NativeEngine nativeEngine;
 
 			public ForJava9(Map<Object, Object> context) throws Throwable {
 				super(context);
 				checkNativeEngine();
-				ObjectProvider functionProvider = ObjectProvider.get(context);
-				GetDeclaredMethodFunction getDeclaredMethodFunction = functionProvider.getOrBuildObject(GetDeclaredMethodFunction.class, context);
-				final Method accessibleSetterMethod = getDeclaredMethodFunction.apply(AccessibleObject.class, "setAccessible0", new Class<?>[]{boolean.class});
+				//From JDK 9 the method AccessibleObject.setAccessible0(boolean) only writes this field
+				final Field overrideField = nativeEngine.getDeclaredField(AccessibleObject.class, "override", boolean.class);
 				setFunction(
 					new ThrowingBiConsumer<AccessibleObject, Boolean, Throwable>() {
 						@Override
 						public void accept(AccessibleObject target, Boolean flag) {
-							io.github.toolfactory.narcissus.Narcissus.invokeMethod(target, accessibleSetterMethod, flag);
+							nativeEngine.setFieldValue(target, overrideField, flag);
 						}
 					}
 				);
 			}
 
 			protected void checkNativeEngine() throws InitializeException {
-				if (!Narcissus.libraryLoaded) {
-					throw new InitializeException(
-						Strings.compile(
-							"Could not initialize the native engine {}",
-							io.github.toolfactory.narcissus.Narcissus.class.getName()
-						)
-					);
-				}
+				nativeEngine = NativeEngine.getInstance();
 			}
 
 			@Override
