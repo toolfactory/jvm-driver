@@ -51,6 +51,7 @@ requires io.github.toolfactory.jvm;
 * On the module path, the dynamic, hybrid and native drivers need `requires org.burningwave.jni;` instead of `requires io.github.toolfactory.narcissus;`.
 * The `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged: before, only one of them was used.
 * The module `io.github.toolfactory.jvm` exports the package `io.github.toolfactory.jvm.function`, which contains the `InitializeException` thrown by the catalog of the functions and by `NativeEngine.getInstance()`.
+* The dynamic driver also switches to the JNI functions when the memory-access methods of `sun.misc.Unsafe` are not available: they can be disabled with `--sun-misc-unsafe-memory-access=deny` and they will be removed from the JDK ([JEP 471](https://openjdk.org/jeps/471)).
 
 ### Going back to Narcissus
 
@@ -85,16 +86,18 @@ It can also name your own engine: a public class that extends `io.github.toolfac
 There are four kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized
+* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
-* the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
+* the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
 
 All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)). The Burningwave engine works on the following system configurations:
-* Windows (x86, x64)
+* Windows (x86, x64, aarch64)
 * Linux (x86, x64, aarch64)
 * macOS (x64, aarch64)
 
 Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#going-back-to-narcissus) to your dependencies. Narcissus 1.0.14 works on Windows (x64, arm64), Linux (x64, arm64) and macOS (x64, arm64).
+
+On JDK 24 and later the JVM prints a warning when a JNI engine loads its native library, and a future JDK release will block it unless native access is enabled. To enable it, start the JVM with `--enable-native-access=ALL-UNNAMED` or, on the module path, with the name of the module of the engine (`--enable-native-access=org.burningwave.jni` or `--enable-native-access=io.github.toolfactory.narcissus`); for an executable jar you can instead add `Enable-Native-Access: ALL-UNNAMED` to its manifest.
 
 ### Prefer the default driver
 
@@ -108,7 +111,7 @@ The JNI functions exist to get around the strong encapsulation of the JDK, not t
 
 To create a driver instance you should use this code:
 ```java
-io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.getNew();
+io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Factory.getNew();
 ```
 
 The driver type returned by the method `io.github.toolfactory.jvm.Driver.Factory.getNew()` is **the first driver that can be initialized among the default, hybrid and native drivers respectively**.
@@ -141,7 +144,7 @@ io.github.toolfactory.jvm.Driver driver = io.github.toolfactory.jvm.Driver.Facto
 
 <br/>
 
-Each functionality offered by the driver is **initialized in deferred way** at the first call if the driver is not obtained through the method `io.github.toolfactory.jvm.Driver.getNew()`. However, it is possible to initialize all of the functionalities at once by calling the method `Driver.init()`.
+Each functionality offered by the driver is **initialized in deferred way** at the first call if the driver is not obtained through the method `io.github.toolfactory.jvm.Driver.Factory.getNew()`. However, it is possible to initialize all of the functionalities at once by calling the method `Driver.init()`.
 
 The methods exposed by the Driver interface are the following:
 ```java
