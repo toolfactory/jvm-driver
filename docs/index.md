@@ -60,7 +60,7 @@ To make the drivers use Narcissus, the JNI engine used before version 10.0.0, ad
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver-narcissus-plugin</artifactId>
-    <version>10.0.0</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 Nothing else is needed: the plugin contains a `jvm-driver.properties` file with priority 1 that sets the engine to `io.github.toolfactory.jvm.narcissus.NarcissusEngine`. The plugin depends on ToolFactory JVM Driver and on Narcissus 1.0.14: to leave out the Burningwave engine, exclude `org.burningwave:jni-executor` from its dependencies.
