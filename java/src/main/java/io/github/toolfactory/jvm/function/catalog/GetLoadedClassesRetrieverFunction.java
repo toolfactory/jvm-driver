@@ -29,10 +29,8 @@ package io.github.toolfactory.jvm.function.catalog;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.toolfactory.jvm.NativeEngine;
@@ -133,25 +131,19 @@ public interface GetLoadedClassesRetrieverFunction extends Function<ClassLoader,
 
 					@Override
 					public Collection<Class<?>> get() {
-						Hashtable<String, Object> loadedClassesHS = null;
-						Hashtable<String, Object> loadedClassesHSTemp = getClassNameBasedLock();
-						while (loadedClassesHS == null) {
-							try {
-								if (loadedClassesHSTemp != null) {
-									loadedClassesHS = new Hashtable<>(
-										loadedClassesHSTemp
-									);
-								} else {
-									loadedClassesHS = new Hashtable<>();
-								}
-							} catch (ConcurrentModificationException exc) {
-
+						String[] classNames = {};
+						Hashtable<String, Object> lockTable = getClassNameBasedLock();
+						if (lockTable != null) {
+							//OpenJ9 adds and removes the entries of this table while holding its monitor (an entry is
+							//removed once the GC has cleared its lock), and Hashtable.remove sets the value of the
+							//removed entry to null: a copy made without holding the monitor can read that null value
+							synchronized (lockTable) {
+								classNames = lockTable.keySet().toArray(new String[lockTable.size()]);
 							}
 						}
-
-						for (Entry<String, ?> entry : loadedClassesHS.entrySet()) {
+						for (String className : classNames) {
 							try {
-								Class<?> cls = getClassByNameFunction.apply(entry.getKey(), false, classLoader, CleanableSupplier.class);
+								Class<?> cls = getClassByNameFunction.apply(className, false, classLoader, CleanableSupplier.class);
 								if (classNameBasedLockSupplier.getClassLoader(cls) == classLoader) {
 									loadedClasses.add(cls);
 								}
