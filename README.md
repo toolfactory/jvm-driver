@@ -51,6 +51,7 @@ requires io.github.toolfactory.jvm;
 * On the module path, the dynamic, hybrid and native drivers need `requires org.burningwave.jni;` instead of `requires io.github.toolfactory.narcissus;`.
 * The `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged: before, only one of them was used.
 * The module `io.github.toolfactory.jvm` exports the package `io.github.toolfactory.jvm.function`, which contains the `InitializeException` thrown by the catalog of the functions and by `NativeEngine.getInstance()`.
+* The dynamic driver also switches to the JNI functions when the memory-access methods of `sun.misc.Unsafe` are not available: they can be disabled with `--sun-misc-unsafe-memory-access=deny` and they will be removed from the JDK ([JEP 471](https://openjdk.org/jeps/471)).
 
 ### Going back to Narcissus
 
@@ -85,7 +86,7 @@ It can also name your own engine: a public class that extends `io.github.toolfac
 There are four kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized
+* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 

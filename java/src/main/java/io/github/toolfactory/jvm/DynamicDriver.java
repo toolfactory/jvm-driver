@@ -31,11 +31,13 @@ import java.util.Map;
 
 import io.github.toolfactory.jvm.function.catalog.AllocateInstanceFunction;
 import io.github.toolfactory.jvm.function.catalog.ConsulterSupplier;
+import io.github.toolfactory.jvm.function.catalog.ConsulterSupplyFunction;
 import io.github.toolfactory.jvm.function.catalog.GetFieldValueFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedClassesRetrieverFunction;
 import io.github.toolfactory.jvm.function.catalog.GetLoadedPackagesFunction;
 import io.github.toolfactory.jvm.function.catalog.SetAccessibleFunction;
 import io.github.toolfactory.jvm.function.catalog.SetFieldValueFunction;
+import io.github.toolfactory.jvm.function.catalog.UnsafeSupplier;
 import io.github.toolfactory.jvm.util.ObjectProvider;
 import io.github.toolfactory.jvm.util.ObjectProvider.BuildingException;
 
@@ -45,6 +47,21 @@ public class DynamicDriver extends DefaultDriver {
 	@Override
 	protected Map<Object, Object> functionsToMap() {
 		Map<Object, Object> context = super.functionsToMap();
+		if (!isUnsafeMemoryAccessAvailable(context)) {
+			//Some Java based functions call the memory-access methods of sun.misc.Unsafe only when they are used, so their
+			//initialization does not fail when those methods are disabled (--sun-misc-unsafe-memory-access=deny) or
+			//removed (JEP 471): in that case the functions that use them are initialized via the exception handler, which
+			//returns their native version, as the native driver does
+			ObjectProvider objectProvider = ObjectProvider.get(context);
+			objectProvider.markToBeInitializedViaExceptionHandler(ConsulterSupplier.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(ConsulterSupplyFunction.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(SetFieldValueFunction.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(AllocateInstanceFunction.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(GetFieldValueFunction.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(SetAccessibleFunction.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(GetLoadedPackagesFunction.class, context);
+			objectProvider.markToBeInitializedViaExceptionHandler(GetLoadedClassesRetrieverFunction.class, context);
+		}
 		ObjectProvider.setExceptionHandler(
 			context,
 			new ObjectProvider.ExceptionHandler() {
@@ -53,6 +70,9 @@ public class DynamicDriver extends DefaultDriver {
 						BuildingException exc) {
 					if (clazz.equals(ConsulterSupplier.class)) {
 						return objectProvider.getOrBuildObject(ConsulterSupplier.Native.class, context);
+					}
+					if (clazz.equals(ConsulterSupplyFunction.class)) {
+						return objectProvider.getOrBuildObject(ConsulterSupplyFunction.Native.class, context);
 					}
 					if (clazz.equals(SetFieldValueFunction.class)) {
 						return objectProvider.getOrBuildObject(SetFieldValueFunction.Native.class, context);
@@ -77,6 +97,24 @@ public class DynamicDriver extends DefaultDriver {
 			}
 		);
 		return context;
+	}
+
+	protected boolean isUnsafeMemoryAccessAvailable(Map<Object, Object> context) {
+		try {
+			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
+			unsafe.objectFieldOffset(UnsafeMemoryAccessProbe.class.getDeclaredField("field"));
+			return true;
+		} catch (Throwable exc) {
+			return false;
+		}
+	}
+
+
+	private static class UnsafeMemoryAccessProbe {
+
+		@SuppressWarnings("unused")
+		private int field;
+
 	}
 
 }
