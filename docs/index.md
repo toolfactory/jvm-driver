@@ -4,7 +4,7 @@
 <img src="https://raw.githubusercontent.com/toolfactory/jvm-driver/master/docs/logo.png" alt="logo.png" height="180px" align="right"/>
 </a>
 
-[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/9)](https://central.sonatype.com/artifact/io.github.toolfactory/jvm-driver)
+[![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/io.github.toolfactory/jvm-driver/10)](https://central.sonatype.com/artifact/io.github.toolfactory/jvm-driver)
 [![GitHub](https://img.shields.io/github/license/toolfactory/jvm-driver)](https://github.com/toolfactory/jvm-driver/blob/main/LICENSE)
 
 [![Platforms](https://img.shields.io/badge/platforms-Windows%2C%20Mac%20OS%2C%20Linux-orange)](https://github.com/toolfactory/jvm-driver/actions/runs/23859879109)
@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>9.10.0<version>
+    <version>10.0.0</version>
 </dependency>	
 ```
 ### Requiring the ToolFactory JVM Driver module
@@ -33,14 +33,50 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 To use ToolFactory JMV Driver as a Java module, add the following to your `module-info.java`: 
 
 ```java
-//Mandatory if you use the dynamic, hybrid or native driver
-requires io.github.toolfactory.narcissus;
+//Mandatory if you use the dynamic, hybrid or native driver with the default JNI engine
+requires org.burningwave.jni;
 
 //Mandatory if you use the default, dynamic or hybrid driver
 requires jdk.unsupported;
 
 requires io.github.toolfactory.jvm;
 ```
+
+<br/>
+
+## What's new in version 10.0.0
+
+* The dynamic, hybrid and native drivers use a new default JNI engine, [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), supplied by the `org.burningwave:jni-executor` artifact: the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)), and the engine also supports more platforms. [**Narcissus**](https://toolfactory.github.io/narcissus/) is no longer a dependency of ToolFactory JVM Driver, but it is still supported: see [Going back to Narcissus](#going-back-to-narcissus).
+* The JNI engine is no longer bound to the drivers: the drivers use the engine chosen through the `native-engine.class` property of the `jvm-driver.properties` files, an implementation of the new abstract class [`io.github.toolfactory.jvm.NativeEngine`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/main/java/io/github/toolfactory/jvm/NativeEngine.java). If the chosen engine cannot be loaded, the drivers that need it cannot be initialized: no other engine is tried.
+* On the module path, the dynamic, hybrid and native drivers need `requires org.burningwave.jni;` instead of `requires io.github.toolfactory.narcissus;`.
+* The `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged: before, only one of them was used.
+* The module `io.github.toolfactory.jvm` exports the package `io.github.toolfactory.jvm.function`, which contains the `InitializeException` thrown by the catalog of the functions and by `NativeEngine.getInstance()`.
+
+### Going back to Narcissus
+
+To make the drivers use Narcissus, the JNI engine used before version 10.0.0, add the **Narcissus plugin**:
+```xml
+<dependency>
+    <groupId>io.github.toolfactory</groupId>
+    <artifactId>jvm-driver-narcissus-plugin</artifactId>
+    <version>10.0.0</version>
+</dependency>
+```
+Nothing else is needed: the plugin contains a `jvm-driver.properties` file with priority 1 that sets the engine to `io.github.toolfactory.jvm.narcissus.NarcissusEngine`. The plugin depends on ToolFactory JVM Driver and on Narcissus 1.0.13: to leave out the Burningwave engine, exclude `org.burningwave:jni-executor` from its dependencies.
+
+On the module path, require the module of the plugin, which in turn requires the modules of ToolFactory JVM Driver and of Narcissus:
+```java
+requires io.github.toolfactory.jvm.narcissus;
+```
+
+### Choosing the JNI engine
+
+The engine is the class named by the `native-engine.class` property of the `jvm-driver.properties` file with the highest priority that sets it: ToolFactory JVM Driver sets it to `io.github.toolfactory.jvm.BurningwaveEngine` with priority 0 and the Narcissus plugin to `io.github.toolfactory.jvm.narcissus.NarcissusEngine` with priority 1. To choose an engine regardless of the plugins in the class path, add to your project a `jvm-driver.properties` file with a higher priority, for example:
+```properties
+priority-of-this-configuration=2
+native-engine.class=io.github.toolfactory.jvm.BurningwaveEngine
+```
+It can also name your own engine: a public class that extends `io.github.toolfactory.jvm.NativeEngine` and has a public constructor without parameters.
 
 <br/>
 
@@ -53,12 +89,18 @@ There are four kinds of driver:
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the hybrid driver and uses JNI functions more consistently regardless of the Java version it is running on
 
-By default all JNI methods used by the dynamic, hybrid and native driver are supplied by [**Narcissus**](https://toolfactory.github.io/narcissus/) that works on the following system configurations:
+All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)). The Burningwave engine works on the following system configurations:
 * Windows (x86, x64)
-* Linux (x86, x64)
-* MacOs (x64)
+* Linux (x86, x64, aarch64)
+* macOS (x64, aarch64)
 
-It is also possible to replace the Narcissus JNI engine with [an even faster JNI engine](https://github.com/toolfactory/narcissus/discussions/11): the one included in the [**Burningwave JVM Driver**](https://burningwave.github.io/jvm-driver/).
+Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#going-back-to-narcissus) to your dependencies. Narcissus 1.0.13 works on Windows (x64), Linux (x64, arm64) and macOS (x64, arm64).
+
+### Prefer the default driver
+
+The default driver only uses Java APIs and it is faster than the drivers that use JNI functions: the JIT compiles its operations like any other Java code, while every operation that the dynamic, hybrid and native drivers delegate to a JNI function pays the cost of a native call. In [a JMH benchmark run on JDK 18](https://github.com/toolfactory/narcissus/discussions/11) the default driver read a field at 41,581 ops/ms against the 16,982 ops/ms of the native driver, and wrote it at 37,480 ops/ms against 19,672 ops/ms.
+
+The JNI functions exist to get around the strong encapsulation of the JDK, not to be faster: use the dynamic, hybrid or native driver only when the default driver cannot be initialized on your JVM. `Driver.Factory.getNew()` already works this way, since it returns the first driver that can be initialized among the default, hybrid and native drivers.
 
 <br/>
 
@@ -160,6 +202,8 @@ public <T> T throwException(Throwable exception);
 
 <br/>
 
+
+If you need a complete reflection engine and not only the driver, see [**Burningwave Reflection**](https://burningwave.github.io/reflection/): it handles the private and all the other members of an object, gets and sets the properties of Java beans through paths, and uses the JVM Driver only if it is in the class path.
 
 In the [test folder](https://github.com/toolfactory/jvm-driver/tree/main/java/src/test/java/io/github/toolfactory/util) is also present a little utility class named [`io.github.toolfactory.util.Reflection`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/test/java/io/github/toolfactory/util/Reflection.java) that can be copied into your project and that can be instantiated through the factory methods exposed by the inner static class `io.github.toolfactory.util.Reflection.Factory`:
 
