@@ -96,7 +96,9 @@ On JDK 24 and later the JVM prints a warning when a JNI engine loads its native 
 
 The default driver only uses Java APIs and it is faster than the drivers that use JNI functions: the JIT compiles its operations like any other Java code, while every operation that the dynamic, hybrid and native drivers delegate to a JNI function pays the cost of a native call. In [a JMH benchmark run on JDK 18](https://github.com/toolfactory/narcissus/discussions/11) the default driver read a field at 41,581 ops/ms against the 16,982 ops/ms of the native driver, and wrote it at 37,480 ops/ms against 19,672 ops/ms.
 
-The JNI functions exist to get around the strong encapsulation of the JDK, not to be faster: use the dynamic, hybrid or native driver only when the default driver cannot be initialized on your JVM. `Driver.Factory.getNew()` already works this way, since it returns the first driver that can be initialized among the default, hybrid and native drivers.
+> **The JNI functions exist to get around the strong encapsulation of the JDK, not to be faster: use the dynamic, hybrid or native driver only when the default driver cannot be initialized on your JVM.**
+
+`Driver.Factory.getNew()` already works this way, since it returns the first driver that can be initialized among the default, hybrid and native drivers.
 
 <br/>
 
