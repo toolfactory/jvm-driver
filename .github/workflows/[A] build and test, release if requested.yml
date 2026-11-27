@@ -97,7 +97,7 @@ jobs:
         architecture: [x64]
         distribution: [zulu]
         os: [ubuntu-latest, macos-26-intel, windows-latest]
-        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+        java: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
         exclude:
           - architecture: x64
             java: 10
@@ -136,7 +136,7 @@ jobs:
         distribution: [semeru]
 # On ubuntu-26.04 the Semeru JVMs 16, 18, 19, 20 and 22 do not start, because their libraries require an executable stack
         os: [ubuntu-24.04, macos-26-intel, windows-latest]
-        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -171,7 +171,7 @@ jobs:
         architecture: [x64]
         distribution: [temurin]
         os: [ubuntu-latest, macos-26-intel, windows-latest]
-        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+        java: [11, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
