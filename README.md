@@ -44,6 +44,32 @@ requires io.github.toolfactory.jvm;
 
 <br/>
 
+## Overview
+
+There are four kinds of driver:
+
+* the **default driver** completely based on Java api
+* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available (they can be disabled with `--sun-misc-unsafe-memory-access=deny` and they will be removed from the JDK, see [JEP 471](https://openjdk.org/jeps/471))
+* the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
+* the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
+
+All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the JNI Executor of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45961546382)). The Burningwave engine works on the following system configurations:
+* Windows (x86, x64, aarch64)
+* Linux (x86, x64, aarch64)
+* macOS (x64, aarch64)
+
+Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#using-narcissus) to your dependencies. Narcissus 1.0.14 works on Windows (x64, arm64), Linux (x64, arm64) and macOS (x64, arm64).
+
+On JDK 24 and later the JVM prints a warning when a JNI engine loads its native library, and a future JDK release will block it unless native access is enabled. To enable it, start the JVM with `--enable-native-access=ALL-UNNAMED` or, on the module path, with the name of the module of the engine (`--enable-native-access=org.burningwave.jni` or `--enable-native-access=io.github.toolfactory.narcissus`); for an executable jar you can instead add `Enable-Native-Access: ALL-UNNAMED` to its manifest.
+
+### Prefer the default driver
+
+The default driver only uses Java APIs and it is faster than the drivers that use JNI functions: the JIT compiles its operations like any other Java code, while every operation that the dynamic, hybrid and native drivers delegate to a JNI function pays the cost of a native call. In [a JMH benchmark run on JDK 18](https://github.com/toolfactory/narcissus/discussions/11) the default driver read a field at 41,581 ops/ms against the 16,982 ops/ms of the native driver, and wrote it at 37,480 ops/ms against 19,672 ops/ms.
+
+> **The JNI functions exist to get around the strong encapsulation of the JDK, not to be faster: use the dynamic, hybrid or native driver only when the default driver cannot be initialized on your JVM.**
+
+`Driver.Factory.getNew()` already works this way, since it returns the first driver that can be initialized among the default, hybrid and native drivers.
+
 ### Using Narcissus
 
 To make the drivers use [**Narcissus**](https://toolfactory.github.io/narcissus/) instead of the Burningwave engine, add the **Narcissus plugin**:
@@ -71,34 +97,6 @@ native-engine.class=io.github.toolfactory.jvm.BurningwaveEngine
 It can also name your own engine: a public class that extends `io.github.toolfactory.jvm.NativeEngine` and has a public constructor without parameters.
 
 If the chosen engine cannot be loaded, the drivers that need it cannot be initialized, because no other engine is tried: the catalog of the functions and `NativeEngine.getInstance()` throw the `InitializeException` of the `io.github.toolfactory.jvm.function` package, which the module `io.github.toolfactory.jvm` exports.
-
-<br/>
-
-## Overview
-
-There are four kinds of driver:
-
-* the **default driver** completely based on Java api
-* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available (they can be disabled with `--sun-misc-unsafe-memory-access=deny` and they will be removed from the JDK, see [JEP 471](https://openjdk.org/jeps/471))
-* the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
-* the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
-
-All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the JNI Executor of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45961546382)). The Burningwave engine works on the following system configurations:
-* Windows (x86, x64, aarch64)
-* Linux (x86, x64, aarch64)
-* macOS (x64, aarch64)
-
-Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#using-narcissus) to your dependencies. Narcissus 1.0.14 works on Windows (x64, arm64), Linux (x64, arm64) and macOS (x64, arm64).
-
-On JDK 24 and later the JVM prints a warning when a JNI engine loads its native library, and a future JDK release will block it unless native access is enabled. To enable it, start the JVM with `--enable-native-access=ALL-UNNAMED` or, on the module path, with the name of the module of the engine (`--enable-native-access=org.burningwave.jni` or `--enable-native-access=io.github.toolfactory.narcissus`); for an executable jar you can instead add `Enable-Native-Access: ALL-UNNAMED` to its manifest.
-
-### Prefer the default driver
-
-The default driver only uses Java APIs and it is faster than the drivers that use JNI functions: the JIT compiles its operations like any other Java code, while every operation that the dynamic, hybrid and native drivers delegate to a JNI function pays the cost of a native call. In [a JMH benchmark run on JDK 18](https://github.com/toolfactory/narcissus/discussions/11) the default driver read a field at 41,581 ops/ms against the 16,982 ops/ms of the native driver, and wrote it at 37,480 ops/ms against 19,672 ops/ms.
-
-> **The JNI functions exist to get around the strong encapsulation of the JDK, not to be faster: use the dynamic, hybrid or native driver only when the default driver cannot be initialized on your JVM.**
-
-`Driver.Factory.getNew()` already works this way, since it returns the first driver that can be initialized among the default, hybrid and native drivers.
 
 <br/>
 
