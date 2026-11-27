@@ -25,7 +25,7 @@ To include ToolFactory JVM Driver in your projects simply use with **Apache Mave
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver</artifactId>
-    <version>10.0.0</version>
+    <version>10.0.1</version>
 </dependency>	
 ```
 ### Requiring the ToolFactory JVM Driver module
@@ -46,7 +46,7 @@ requires io.github.toolfactory.jvm;
 
 ## What's new in version 10.0.0
 
-* The dynamic, hybrid and native drivers use a new default JNI engine, [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), supplied by the `org.burningwave:jni-executor` artifact: the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)), and the engine also supports more platforms. [**Narcissus**](https://toolfactory.github.io/narcissus/) is no longer a dependency of ToolFactory JVM Driver, but it is still supported: see [Going back to Narcissus](#going-back-to-narcissus).
+* The dynamic, hybrid and native drivers use a new default JNI engine, [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), supplied by the `org.burningwave:jni-executor` artifact: the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45630242180)), and the engine also supports more platforms. [**Narcissus**](https://toolfactory.github.io/narcissus/) is no longer a dependency of ToolFactory JVM Driver, but it is still supported: see [Going back to Narcissus](#going-back-to-narcissus).
 * The JNI engine is no longer bound to the drivers: the drivers use the engine chosen through the `native-engine.class` property of the `jvm-driver.properties` files, an implementation of the new abstract class [`io.github.toolfactory.jvm.NativeEngine`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/main/java/io/github/toolfactory/jvm/NativeEngine.java). If the chosen engine cannot be loaded, the drivers that need it cannot be initialized: no other engine is tried.
 * On the module path, the dynamic, hybrid and native drivers need `requires org.burningwave.jni;` instead of `requires io.github.toolfactory.narcissus;`.
 * The `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged: before, only one of them was used.
@@ -60,7 +60,7 @@ To make the drivers use Narcissus, the JNI engine used before version 10.0.0, ad
 <dependency>
     <groupId>io.github.toolfactory</groupId>
     <artifactId>jvm-driver-narcissus-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 Nothing else is needed: the plugin contains a `jvm-driver.properties` file with priority 1 that sets the engine to `io.github.toolfactory.jvm.narcissus.NarcissusEngine`. The plugin depends on ToolFactory JVM Driver and on Narcissus 1.0.14: to leave out the Burningwave engine, exclude `org.burningwave:jni-executor` from its dependencies.
@@ -90,7 +90,7 @@ There are four kinds of driver:
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
 
-All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/tree/main/benchmark)). The Burningwave engine works on the following system configurations:
+All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45630242180)). The Burningwave engine works on the following system configurations:
 * Windows (x86, x64, aarch64)
 * Linux (x86, x64, aarch64)
 * macOS (x64, aarch64)
