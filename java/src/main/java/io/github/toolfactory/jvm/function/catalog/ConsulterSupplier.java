@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-import io.github.toolfactory.jvm.Info;
 import io.github.toolfactory.jvm.NativeEngine;
 import io.github.toolfactory.jvm.function.InitializeException;
 import io.github.toolfactory.jvm.function.template.Supplier;
@@ -180,11 +179,23 @@ public interface ConsulterSupplier extends Supplier<MethodHandles.Lookup> {
 
 	public static class ForJava17 extends Abst {
 
-		public ForJava17(Map<Object, Object> context) {
+		public ForJava17(Map<Object, Object> context) throws NoSuchFieldException {
 			super(context);
 			sun.misc.Unsafe unsafe = ObjectProvider.get(context).getOrBuildObject(UnsafeSupplier.class, context).get();
-			final long allowedModesFieldMemoryOffset = Info.Provider.getInfoInstance().is64Bit() ? 12L : 8L;
+			final long allowedModesFieldMemoryOffset = unsafe.objectFieldOffset(LookupLayout.class.getDeclaredField("allowedModes"));
+			if (unsafe.getInt(consulter, allowedModesFieldMemoryOffset) != consulter.lookupModes()) {
+				throw new IllegalStateException("Unable to find the allowedModes field of " + MethodHandles.Lookup.class.getName());
+			}
 			unsafe.putInt(consulter, allowedModesFieldMemoryOffset, ForJava7.TRUSTED);
+		}
+
+		//The fields of MethodHandles.Lookup are hidden from reflection: this class declares the same ones, so the JVM
+		//places its allowedModes field at the same offset, which depends on the layout of the objects (for example on
+		//the compact object headers, enabled by default from JDK 27)
+		private static class LookupLayout {
+			private Class<?> lookupClass;
+			private Class<?> prevLookupClass;
+			private int allowedModes;
 		}
 
 		public static class ForSemeru extends Abst {

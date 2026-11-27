@@ -35,7 +35,7 @@
 
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver-narcissus-plugin</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -96,7 +96,7 @@
 		<repository.url>https://toolfactory@github.com/toolfactory/jvm-driver.git</repository.url>
 
 		<!-- The release sets it to the version of ToolFactory JVM Driver just released, then back to the snapshot -->
-		<jvm-driver.version>10.0.2-SNAPSHOT</jvm-driver.version>
+		<jvm-driver.version>10.1.0-SNAPSHOT</jvm-driver.version>
 		<narcissus.version>1.0.14</narcissus.version>
 
 		<build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
