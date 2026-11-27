@@ -83,7 +83,7 @@ There are four kinds of driver:
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
 
-All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45961546382)). The Burningwave engine works on the following system configurations:
+All JNI methods used by the dynamic, hybrid and native driver are supplied by a JNI engine. Starting from version 10.0.0 the default JNI engine is [the JNI Executor of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), which took the place of [**Narcissus**](https://toolfactory.github.io/narcissus/): the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45961546382)). The Burningwave engine works on the following system configurations:
 * Windows (x86, x64, aarch64)
 * Linux (x86, x64, aarch64)
 * macOS (x64, aarch64)
