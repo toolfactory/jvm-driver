@@ -35,7 +35,7 @@
 
 	<groupId>io.github.toolfactory</groupId>
 	<artifactId>jvm-driver-narcissus-plugin</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.1.0</version>
 
 	<packaging>jar</packaging>
 
@@ -121,7 +121,7 @@
 		<connection>scm:git:${repository.url}</connection>
 		<developerConnection>scm:git:${repository.url}</developerConnection>
 		<url>https://github.com/toolfactory/jvm-driver</url>
-		<tag>HEAD</tag>
+		<tag>jvm-driver-narcissus-plugin-1.1.0</tag>
 	</scm>
 
 	<dependencies>
