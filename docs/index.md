@@ -44,22 +44,9 @@ requires io.github.toolfactory.jvm;
 
 <br/>
 
-## What's new in version 10.1.0
+### Using Narcissus
 
-* The default and dynamic drivers work on JDK 27, which enables the compact object headers by default, and on JDK 25 and 26 with `-XX:+UseCompactObjectHeaders`: they wrote the `allowedModes` field of `MethodHandles.Lookup` at a fixed offset, which with those headers belongs to another field, while now they compute the offset and check it before writing.
-
-## What's new in version 10.0.0
-
-* The dynamic, hybrid and native drivers use a new default JNI engine, [the one of **Burningwave**](https://github.com/burningwave/jvm-driver/tree/main/jni-executor), supplied by the `org.burningwave:jni-executor` artifact: the switch is based on the excellent results it obtained in benchmarks ([this one](https://github.com/toolfactory/narcissus/discussions/11) and the [Burningwave JVM Driver benchmark](https://github.com/burningwave/jvm-driver/actions/runs/45961546382)), and the engine also supports more platforms. [**Narcissus**](https://toolfactory.github.io/narcissus/) is no longer a dependency of ToolFactory JVM Driver, but it is still supported: see [Going back to Narcissus](#going-back-to-narcissus).
-* The JNI engine is no longer bound to the drivers: the drivers use the engine chosen through the `native-engine.class` property of the `jvm-driver.properties` files, an implementation of the new abstract class [`io.github.toolfactory.jvm.NativeEngine`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/main/java/io/github/toolfactory/jvm/NativeEngine.java). If the chosen engine cannot be loaded, the drivers that need it cannot be initialized: no other engine is tried.
-* On the module path, the dynamic, hybrid and native drivers need `requires org.burningwave.jni;` instead of `requires io.github.toolfactory.narcissus;`.
-* The `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged: before, only one of them was used.
-* The module `io.github.toolfactory.jvm` exports the package `io.github.toolfactory.jvm.function`, which contains the `InitializeException` thrown by the catalog of the functions and by `NativeEngine.getInstance()`.
-* The dynamic driver also switches to the JNI functions when the memory-access methods of `sun.misc.Unsafe` are not available: they can be disabled with `--sun-misc-unsafe-memory-access=deny` and they will be removed from the JDK ([JEP 471](https://openjdk.org/jeps/471)).
-
-### Going back to Narcissus
-
-To make the drivers use Narcissus, the JNI engine used before version 10.0.0, add the **Narcissus plugin**:
+To make the drivers use [**Narcissus**](https://toolfactory.github.io/narcissus/) instead of the Burningwave engine, add the **Narcissus plugin**:
 ```xml
 <dependency>
     <groupId>io.github.toolfactory</groupId>
@@ -76,12 +63,14 @@ requires io.github.toolfactory.jvm.narcissus;
 
 ### Choosing the JNI engine
 
-The engine is the class named by the `native-engine.class` property of the `jvm-driver.properties` file with the highest priority that sets it: ToolFactory JVM Driver sets it to `io.github.toolfactory.jvm.BurningwaveEngine` with priority 0 and the Narcissus plugin to `io.github.toolfactory.jvm.narcissus.NarcissusEngine` with priority 1. To choose an engine regardless of the plugins in the class path, add to your project a `jvm-driver.properties` file with a higher priority, for example:
+The engine is an implementation of the abstract class [`io.github.toolfactory.jvm.NativeEngine`](https://github.com/toolfactory/jvm-driver/blob/main/java/src/main/java/io/github/toolfactory/jvm/NativeEngine.java), named by the `native-engine.class` property of the `jvm-driver.properties` file with the highest priority that sets it; the `jvm-driver.properties` files with the same value of `priority-of-this-configuration` are merged. ToolFactory JVM Driver sets it to `io.github.toolfactory.jvm.BurningwaveEngine` with priority 0 and the Narcissus plugin to `io.github.toolfactory.jvm.narcissus.NarcissusEngine` with priority 1. To choose an engine regardless of the plugins in the class path, add to your project a `jvm-driver.properties` file with a higher priority, for example:
 ```properties
 priority-of-this-configuration=2
 native-engine.class=io.github.toolfactory.jvm.BurningwaveEngine
 ```
 It can also name your own engine: a public class that extends `io.github.toolfactory.jvm.NativeEngine` and has a public constructor without parameters.
+
+If the chosen engine cannot be loaded, the drivers that need it cannot be initialized, because no other engine is tried: the catalog of the functions and `NativeEngine.getInstance()` throw the `InitializeException` of the `io.github.toolfactory.jvm.function` package, which the module `io.github.toolfactory.jvm` exports.
 
 <br/>
 
@@ -90,7 +79,7 @@ It can also name your own engine: a public class that extends `io.github.toolfac
 There are four kinds of driver:
 
 * the **default driver** completely based on Java api
-* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available
+* the **dynamic driver** that extends the default driver and uses a JNI function only if a Java based function offered by the default driver cannot be initialized, or if the memory-access methods of `sun.misc.Unsafe` are not available (they can be disabled with `--sun-misc-unsafe-memory-access=deny` and they will be removed from the JDK, see [JEP 471](https://openjdk.org/jeps/471))
 * the **hybrid driver** that extends the default driver and uses some JNI functions only when run on JVM 17 and later
 * the **native driver** that extends the default driver and uses JNI functions more consistently regardless of the Java version it is running on
 
@@ -99,7 +88,7 @@ All JNI methods used by the dynamic, hybrid and native driver are supplied by a 
 * Linux (x86, x64, aarch64)
 * macOS (x64, aarch64)
 
-Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#going-back-to-narcissus) to your dependencies. Narcissus 1.0.14 works on Windows (x64, arm64), Linux (x64, arm64) and macOS (x64, arm64).
+Narcissus is still supported: to use it instead of the Burningwave engine, just add [the Narcissus plugin](#using-narcissus) to your dependencies. Narcissus 1.0.14 works on Windows (x64, arm64), Linux (x64, arm64) and macOS (x64, arm64).
 
 On JDK 24 and later the JVM prints a warning when a JNI engine loads its native library, and a future JDK release will block it unless native access is enabled. To enable it, start the JVM with `--enable-native-access=ALL-UNNAMED` or, on the module path, with the name of the module of the engine (`--enable-native-access=org.burningwave.jni` or `--enable-native-access=io.github.toolfactory.narcissus`); for an executable jar you can instead add `Enable-Native-Access: ALL-UNNAMED` to its manifest.
 
