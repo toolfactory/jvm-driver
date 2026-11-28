@@ -87,6 +87,10 @@ jobs:
           git push
 
           
+# The build and test jobs keep the local Maven repository in the cache of GitHub Actions, so that they do not download
+# all the plugins and the dependencies at every run: Maven Central answered with HTTP 429 (too many requests) and made
+# many jobs fail. The first job that succeeds on each OS saves the cache, which starts over when a pom.xml file changes.
+# The hook module job does not use it: it runs first, and it would save a cache without the plugins of the tests
   build-and-test-with-zulu-JDK:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, JVM ${{ matrix.distribution }} ${{ matrix.java }}
     needs: [elaborate-java-hook-module]
@@ -111,6 +115,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: ${{ matrix.distribution }}
           architecture: ${{ matrix.architecture }}
+          cache: 'maven'
       - name: Update repositories
         if: github.event_name == 'push'
         run: |
@@ -147,6 +152,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: ${{ matrix.distribution }}
           architecture: ${{ matrix.architecture }}
+          cache: 'maven'
       - name: Update repositories
         if: github.event_name == 'push'
         run: |
@@ -186,6 +192,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: ${{ matrix.distribution }}
           architecture: ${{ matrix.architecture }}
+          cache: 'maven'
       - name: Update repositories
         if: github.event_name == 'push'
         run: |
